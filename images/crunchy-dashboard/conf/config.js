@@ -21,13 +21,13 @@ define(['settings'], function(Settings) {
       datasources: {
         influxdb: {
           type: 'influxdb',
-          url: "http://cluster-mon.crunchy.lab:8083/db/cpm",
+          url: "http://cluster-mon.crunchy.lab:8086/db/cpm",
           username: 'root',
           password: 'root',
         },
         grafana: {
           type: 'influxdb',
-          url: "http://cluster-mon.crunchy.lab:8083/db/grafana",
+          url: "http://cluster-mon.crunchy.lab:8086/db/grafana",
           username: 'root',
           password: 'root',
           grafanaDB: true

@@ -48,6 +48,9 @@ ping -c 2 cluster-mon.crunchy.lab
 
 exit
 
+docker rm dashboard
+docker run --name=dashboard -d crunchy-dashboard
+
 docker run --name=backup-job-blah \
 	-e BACKUP_HOST=blah.crunchy.lab \
 	-e BACKUP_PORT=5432 \
