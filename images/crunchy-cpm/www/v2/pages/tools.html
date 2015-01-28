@@ -1,0 +1,80 @@
+  <div ng-controller="getServerController as gsc">
+    <table style="background-color: white; width:100%">
+      <tr>
+        <td valign="top" bgcolor="white" width="10%">
+          <table style="background-color: white;width:200px;">
+            <tr style="background-color: white; color: gray;">
+              <td align="center">
+              </td>
+          </tr>
+      </table>
+
+      <!-- here is the left accordian start -->
+
+      <accordion close-others="toolsCtrl.oneAtATime">
+        <accordion-group is-open="backupstatus.open">
+        <accordion-heading>
+        Database Backup<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': backupstatus.open, 'glyphicon-chevron-right': !backupstatus.open}"></i>
+    </accordion-heading>
+    <div>
+        <a href ng-click="handleClick(result)">Backup Style 1</a><br>
+        <a href ng-click="handleClick(result)">Backup Style 2</a><br>
+    </div>
+</accordion-group>
+<accordion-group is-open="accessstatus.open">
+<accordion-heading>
+Access Rules<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': accessstatus.open, 'glyphicon-chevron-right': !accessstatus.open}"></i>
+</accordion-heading>
+<div>
+    <a href ng-click="handleClick(result)">Allow 192.168.0.106</a><br>
+    <a href ng-click="handleClick(result)">Allow 192.168.56.16</a><br>
+    <a href ng-click="handleClick(result)">Allow 0.0.0.0/32</a><br>
+</div>
+</accordion-group>
+<accordion-group is-open="userstatus.open">
+<accordion-heading>
+User Profiles<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': userstatus.open, 'glyphicon-chevron-right': !userstatus.open}"></i>
+</accordion-heading>
+<div>
+    <a href ng-click="handleClick(result)">readonly</a><br>
+    <a href ng-click="handleClick(result)">secmgr</a><br>
+    <a href ng-click="handleClick(result)">super</a><br>
+</div>
+</accordion-group>
+<accordion-group is-open="schemastatus.open">
+<accordion-heading>
+Schema Templates<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': schemastatus.open, 'glyphicon-chevron-right': !schemastatus.open}"></i>
+</accordion-heading>
+<div>
+    <a href ng-click="handleClick(result)">engr database</a><br>
+    <a href ng-click="handleClick(result)">sales app database</a><br>
+    <a href ng-click="handleClick(result)">mfg app database</a><br>
+    <a href ng-click="handleClick(result)">demo app database</a><br>
+</div>
+</accordion-group>
+</accordion>
+
+<!-- here is the left accordian end -->
+</td>
+
+<td width="3%">
+  &nbsp;
+</td>
+<!-- CONTENT GOES IN THIS TD -->
+<td width="70%" valign="top" >
+  <h3>Tools</h3>
+  <table>
+     <tr>
+         <td>
+         </td>
+     </tr>
+
+ </table>
+</td>
+</tr>
+
+<div id="veil" ng-show="isLoading"></div>
+<div id="feedLoading" ng-show="isLoading">Working...</div>
+
+</table>
+</div>

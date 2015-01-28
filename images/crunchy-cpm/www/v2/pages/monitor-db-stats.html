@@ -1,0 +1,33 @@
+		<div style="border:0px" id="viewstatdb">
+			<p style="font-family: Arial, Helvetica, sans-serif;">This page shows pg_stat_database values.</p>
+			<h1>{{container.Name}}</h1>
+			<div class="datagrid">
+
+                <table class="table">
+                    <thead>
+                        <th>DATABASE</th>
+                        <th>BLOCKS READ</th>
+                        <th>RETURNED</th>
+                        <th>FETCHED</th>
+                        <th>INSERTED</th>
+                        <th>UPDATED</th>
+                        <th>DELETED</th>
+                        <th>STATS RESET</th>
+                    </thead>
+                    <tbody>
+
+                     <tr ng-repeat="x in statdbresults">
+                      <td>{{x.datname}}</td>
+                      <td>{{x.blks_read}}</td>
+                      <td>{{x.tup_returned}}</td>
+                      <td>{{x.tup_fetched}}</td>
+                      <td>{{x.tup_inserted}}</td>
+                      <td>{{x.tup_updated}}</td>
+                      <td>{{x.tup_deleted}}</td>
+                      <td>{{x.stats_reset}}</td>
+                  </tr>
+
+              </tbody>
+          </table>
+      </div>
+      <a class="btn btn-primary" ng-click="handleRefresh()" ><i class="fa fa-refresh fa-lg"></i> Refresh</a>

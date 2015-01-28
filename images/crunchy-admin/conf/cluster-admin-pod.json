@@ -1,0 +1,48 @@
+    {
+      "id": "cluster-admin",
+      "kind": "Pod",
+      "apiVersion": "v1beta1",
+      "desiredState": {
+        "manifest": {
+          "version": "v1beta1",
+          "id": "cluster-admin",
+          "volumes": [
+          	{
+               	"name": "pgdata",
+               	"source":
+               		{
+                       	"hostDir":
+                       		{
+                               	"path": "/var/lib/pgsql/cluster-admin"
+                               	}
+			}
+
+		}
+          ],
+          "containers": [{
+            "name": "master",
+            "image": "registry:5000/crunchy-admin",
+        	"volumeMounts": [
+                                    {
+                                        "name": "pgdata",
+                                        "mountPath": "/pgdata",
+                                        "readOnly": false
+                                    }
+                 ],
+
+            "env": [
+              {
+                "name": "KUBE_URL",
+                "value": "http://192.168.0.106:8080"
+              }
+            ],
+            "ports": [{
+              "containerPort": 8080
+            }]
+          }]
+        }
+      },
+      "labels": {
+        "name": "cluster-admin"
+      }
+    }

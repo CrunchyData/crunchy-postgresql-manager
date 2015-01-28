@@ -1,0 +1,9 @@
+#!/bin/bash
+#return the percent utilized of memory range of (1-100)
+MEMVALUES=`free -k | grep Mem | cut -f2 -d':'`
+TOTAL=`echo $MEMVALUES | awk '{print $1}'`
+USED=`echo $MEMVALUES | awk '{print $2}'`
+#echo "TOTAL=" $TOTAL
+#echo "USED=" $USED
+PCT=$(( USED * 100 / TOTAL ))
+echo $PCT

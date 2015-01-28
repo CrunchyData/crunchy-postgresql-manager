@@ -1,0 +1,26 @@
+# PostgreSQL Client Authentication Configuration File
+# ===================================================
+#
+
+# Allow all users to connect over the local socket
+local   all         all                                 trust
+
+# Allow all users to connect over the network with valid credentials
+host    all         all           127.0.0.1/32          trust
+# on initial pg startup, we calculate the docker bridge to supply PG_HOST_IP 
+
+{{range .BRIDGE_IP_LIST}}
+#host    all             all       {{.}}/16                   md5
+{{end}}
+
+{{range .SERVER_IP_LIST}}
+host    all             all       {{.}}/32                   md5
+{{end}}
+
+host    all         all           ::1/128               md5
+
+host    replication     postgres        {{.BACKUP_HOST}}            trust
+
+# allow the CPM monitor 
+host    all         all           {{.MONITOR_HOST}}          trust
+host    all         all           {{.ADMIN_HOST}}          trust

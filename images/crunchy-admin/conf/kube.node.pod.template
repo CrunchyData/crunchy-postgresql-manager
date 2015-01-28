@@ -1,0 +1,50 @@
+    {
+      "id": "{{.ID}}",
+      "kind": "Pod",
+      "apiVersion": "v1beta1",
+      "desiredState": {
+        "manifest": {
+          "version": "v1beta1",
+          "id": "{{.ID}}",
+          "volumes": [
+          	{
+               	"name": "pgdata",
+               	"source":
+               		{
+                       	"hostDir":
+                       		{
+                               	"path": "{{.VOLUME}}"
+                               	}
+			}
+
+		}
+          ],
+          "containers": [{
+            "name": "master",
+            "cpu": "{{.CPU}}",
+            "memory": "{{.MEM}}",
+            "image": "{{.IMAGE}}",
+        	"volumeMounts": [
+                                    {
+                                        "name": "pgdata",
+                                        "mountPath": "/pgdata",
+                                        "readOnly": false
+                                    }
+                 ],
+
+            "env": [
+              {
+                "name": "SOMETING",
+                "value": "http://foo:80"
+              }
+            ],
+            "ports": [{
+              "containerPort": 5432
+            }]
+          }]
+        }
+      },
+      "labels": {
+        "name": "{{.ID}}"
+      }
+    }

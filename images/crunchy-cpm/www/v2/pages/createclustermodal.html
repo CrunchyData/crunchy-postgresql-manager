@@ -1,0 +1,26 @@
+<div class="modal-header">
+	<table>
+		<tr>
+			<td><h1 id="myModalLabel">Add Cluster</h1></td>
+		</tr>
+	</table>
+</div>
+
+<div class="modal-body">
+	<form class="form-horizontal" name="myForm" novalidate ng-submit="ok();">
+		<h4>Cluster Name</h4>
+		<input required  class="form-control" type="text" name="Name" ng-model="$parent.Name" ng-pattern="/^[a-zA-Z0-9-]*$/" ng-maxlength="20"/>
+		<br>
+		<h4>Replication Type</h4>
+		<select class="form-control" ng-model="$parent.ClusterType" class="jeffselect">
+			<option value="asynchronous" selected>asynchronous</option>
+			<option value="synchronous" selected>synchronous</option>
+		</select>
+		<br>
+		<div class="modal-footer">
+			<input type="submit" class="btn btn-primary" ng-disabled="myForm.Name.$pristine || myForm.Name.$dirty && myForm.Name.$invalid"/>
+			<button class="btn btn-primary" ng-click="cancel()">Cancel</button>
+			<alert ng-repeat="alert in alerts" type="danger">{{alert.msg}}</alert>
+		</div>
+	</form>
+</div>

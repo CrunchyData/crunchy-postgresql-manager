@@ -1,0 +1,30 @@
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     trust
+# IPv4 local connections:
+#host    all             all             {{.PG_HOST_IP}}         trust
+
+host    all     	cpmtest 	{{.PGPOOL_HOST}}            	md5
+
+{{range .STANDBY_LIST}}
+host    all     postgres	{{.}}            trust
+{{end}}
+
+{{range .BRIDGE_IP_LIST}}
+#host    all     	all 		{{.}}/16            	md5
+host    replication     postgres	{{.}}/16            trust
+{{end}}
+
+{{range .SERVER_IP_LIST}}
+host    all     	all 		{{.}}/32            	md5
+host    replication     postgres	{{.}}/32            trust
+{{end}}
+
+{{range .STANDBY_LIST}}
+host    replication     postgres	{{.}}            trust
+{{end}}
+
+host    replication     postgres	{{.BACKUP_HOST}}            trust
+host    all     	all 		{{.MONITOR_HOST}}           trust
+host    all     	all 		{{.ADMIN_HOST}}           trust

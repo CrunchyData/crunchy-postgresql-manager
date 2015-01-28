@@ -1,0 +1,260 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Crunchy Backup Monitor</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../css/bootstrap.min.css"> 
+  <link rel="stylesheet" href="../css/style.css"> 
+  <link rel="stylesheet" href="../font-awesome-4.2.0/css/font-awesome.min.css"> 
+  <script type="text/javascript" src="../js/angular.min.js"></script>
+  <script type="text/javascript" src="../js/angular-route.min.js"></script>
+  <script type="text/javascript" src="../js/angular-cookies.min.js"></script>
+  <script type="text/javascript" src="../js/ui-bootstrap-tpls-0.11.0.min.js"></script>
+  <script type="text/javascript" src="../js/ng-table.js"></script>
+  <script type="text/javascript" src="../js/backups.js"></script>
+</head>
+
+<body>
+
+ <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" ><img src="../images/logo.png"/></a>
+    </div>
+
+  </div>
+</nav>
+
+<div>
+  &nbsp;
+</div>
+
+ 
+<div id="main" ng-app="BackupApp" ng-controller="GetContainerController as gsc">
+	<div id="veil" ng-show="isLoading"></div>
+	<div id="feedLoading" ng-show="isLoading">Working...</div>
+
+  	<table style="background-color: white; width:100%">
+  		<tr>
+  			<td valign="top" bgcolor="white" width="10%">
+
+  				<ul ng-controller="GetSchedulesController as gas" style="overflow:hidden; overflow-y:scroll;height:300px; width:200px;"
+  				class="nav nav-pills nav-stacked">
+  				<li ng-repeat="result in results" ng-class="{ active:gas.isSelected2(result.ID) }"><a href="" ng-click="gas.selectTab2(result)">{{result.Name}}</a></li>
+  			</ul>
+  			<div class="btn-group" dropdown is-open="status.isopen">
+  				<button style="width:120px" type="button" class="btn btn-danger">Action</button>
+  				<button style="height:34px" type="button" class="btn btn-danger dropdown-toggle" ng-disabled="disabled">
+  					<span class="caret"></span>      
+  					<span class="sr-only">Split button!</span>
+  				</button>
+
+  				<ul class="dropdown-menu" role="menu">
+  					<li><a ng-click="handleCreateClick()" href="#/backups"><i class="fa fa-plus fa-fw"></i>Create Schedule</a></li>
+  					<li><a ng-click="handleMinusClick()" href="#/backups"><i class="fa fa-trash-o fa-fw"></i>Delete Schedule</a></li>
+  				</ul>
+  			</div>
+  		</td>
+
+  		<td width="3%">
+  			&nbsp;
+  		</td>
+  		<!-- CONTENT GOES IN THIS TD -->
+  		<td width="70%" valign="top" >
+
+			<accordion close-others="oneAtATime">
+										      <accordion-group is-open="status.open">
+<accordion-heading><h3>Schedule for {{currentContainer.Name}} - {{currentSchedule.Name}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i></h3></accordion-heading>
+
+			<form name="myForm">
+  			<table>
+				<tr>
+					<td>
+						<table>
+							<tr>
+								<td width="100px" valign="top">
+  							<h4>Enabled</h4><input  ng-model="thething.checked"  type="checkbox"></td>
+  							<td width="100px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  							</td>
+							<td width="200px" valign="top">
+							<h4>Server</h4><select class="form-control" id="server" name="server" type="text" ng-model="myServer" ng-options="server.Name for server in servers"></select> 
+  							</td>
+							<td width="10px" valign="top">&nbsp;&nbsp;&nbsp;
+							</td>
+							<td width="200px" valign="top">
+							<h4>Profile</h4><select class="form-control" disabled id="profile" name="profile" type="text" ng-model="currentProfileName" ng-options="profile.name for profile in profiles"></select> 
+  							</td>
+							</tr>
+						</table>
+					</td>
+  				</tr>
+				<tr>
+					<td>
+  						<h4>Day of Week</h4>
+						<table class="gridtable">
+							<tr>
+								<th ng-repeat="dow in dayofweek">{{dow.name}}</th>
+							</tr>
+							<tr>
+							   <td ng-repeat="dow in dayofweek"><input name="{{dow.name}}" ng-model="dow.checked" ng-change="selectdow()" type="checkbox"></td>
+							</tr>
+						</table>
+  					</td>
+  				</tr>
+
+  				<tr>
+					<td>
+  						<h4>Hours</h4>
+						<table class="gridtable">
+							<tr>
+								<th ng-repeat="hour in hours">{{hour.name}}</th>
+							</tr>
+							<tr>
+							   <td ng-repeat="hour in hours"><input name="{{hour.name}}" ng-model="hour.checked" ng-change="selecthour()" type="checkbox"></td>
+							</tr>
+						</table>
+  					</td>
+				</tr>
+
+  				<tr>
+					<td>
+  						<h4>Minutes</h4>
+						<table class="gridtable">
+							<tr>
+								<th ng-repeat="min in theminutes">{{min.name}}</th>
+							</tr>
+							<tr>
+							   <td ng-repeat="min in theminutes"><input name="{{min.name}}" ng-model="min.checked" ng-change="selectmin()" type="checkbox"></td>
+							</tr>
+						</table>
+  					</td>
+  				</tr>
+  				<tr>
+					<td>
+  						<h4>Month</h4>
+						<table class="gridtable">
+							<tr>
+								<th ng-repeat="month in themonths">{{month.name}}</th>
+						</tr>
+							<tr>
+							   <td ng-repeat="month in themonths"><input name="{{month.name}}" ng-model="month.checked" ng-change="selectmonth()" type="checkbox"></td>
+							</tr>
+						</table>
+  					</td>
+  				</tr>
+
+
+  				<tr>
+  					<td width="30%">
+  						<h4>Day Of Month</h4>
+						<table class="gridtable">
+							<tr>
+								<th ng-repeat="dom in dayofmonth">{{dom.name}}</th>
+						</tr>
+							<tr>
+							   <td ng-repeat="dom in dayofmonth"><input name="{{dom.name}}" ng-model="dom.checked" ng-change="selectdom()" type="checkbox"></td>
+							</tr>
+							<tr>
+								<th ng-repeat="dom in dayofmonth2">{{dom.name}}</th>
+						</tr>
+							<tr>
+							   <td ng-repeat="dom in dayofmonth2"><input name="{{dom.name}}" ng-model="dom.checked" ng-change="selectdom2()" type="checkbox"></td>
+							</tr>
+						</table>
+  					</td>
+  					<td>&nbsp;&nbsp;
+  					</td>
+  				</tr>
+  				<tr>
+  					<td width="5%">&nbsp;</td>
+  				</tr>
+  				<tr>
+  					<td width="30%">
+						<input value="Save" ng-click="handleUpdateClick()" class="btn btn-primary"  type="submit">
+						<input value="Execute Now" ng-click="handleBackupNowClick()" class="btn btn-danger"  type="submit">
+  					</td>
+  				</tr>
+
+  			</table>
+		</form>
+															      </accordion-group>
+			</accordion>
+			<table>
+				<tr>
+					<td>
+						<a class="btn btn-primary" ng-click="handleRefresh()" href="#">
+							  <i class="fa fa-refresh fa-lg"></i> Refresh</a>
+					</td>
+				</tr>
+			</table>
+			<table ng-show="stats.length > 0" 
+				ng-table="tableParams" 
+				template-pagination="custom/pager" 
+				show-filter="false" class="table">
+
+                                <tr width="400" ng-repeat="stat in stats" 
+					ng-class="{ 'emphasis': checkboxes.items[container.ID] == true  }">
+                                        <td width="30" style="text-align: left" header="'ng-table/headers/checkbox.html'">
+                                                <input type="checkbox" ng-model="checkboxes.items[container.ID]" />
+                                        </td>
+                                        <td header-class="text-left" data-title="'Container'" >
+						{{stat.ContainerName}}
+                                        </td>
+                                        <td header-class="text-left" data-title="'Started'"  >
+                                                {{stat.StartTime}}
+                                        </td>
+                                        <td header-class="text-left" data-title="'Size'"  >
+                                                {{stat.BackupSize}}
+                                        </td>
+                                        <td header-class="text-left" data-title="'Elapsed Time'"  >
+                                                {{stat.ElapsedTime}}
+                                        </td>
+                                        <td header-class="text-left" data-title="'Server'"  >
+                                                {{stat.ServerName}}
+                                        </td>
+                                        <td header-class="text-left" data-title="'Path'" >
+                                                {{stat.Path}}
+                                        </td>
+                                        <td header-class="text-left" data-title="'Status'" >
+                                                {{stat.Status}}
+                                        </td>
+
+                                </tr>
+                        </table>
+
+  		</td>
+  	</tr>
+
+  <script type="text/ng-template" id="ng-table/headers/checkbox.html">
+  <input type="checkbox" ng-model="stats.checked" id="select_all" name="filter-checkbox" value="" />
+  </script>
+
+  <script type="text/ng-template" id="custom/pager">
+  <ul class="pager ng-cloak">
+  <li ng-repeat="page in pages"
+  ng-class="{'disabled': !page.active, 'previous': page.type == 'prev', 'next': page.type == 'next'}"
+  ng-show="page.type == 'prev' || page.type == 'next'" ng-switch="page.type">
+  <a ng-switch-when="prev" ng-click="params.page(page.number)" href="">&laquo; Previous</a>
+  <a ng-switch-when="next" ng-click="params.page(page.number)" href="">Next &raquo;</a>
+  </li>
+  </ul>
+  </script>
+
+  </table>
+<footer class="text-center">
+  <p>Copyright 2014 <a href="http://crunchydatasolutions.com">CrunchyDataSolutions.com</a></p>
+  <p>Logged in as {{currentUser}}</p>
+</footer>
+</div>
+
+
+</div> <!-- main -->
+
+
+
+</body>
+
+</html>
+
