@@ -1,6 +1,8 @@
 VERSION=0.2.0
 
 build:
+		rm -rf bin
+		mkdir bin
 		cp ../../sbin/reload-cpmagent.sh ./bin
 		cp ../../sbin/start-cpmagent.sh ./bin
 		cp ../../sbin/stop-cpmagent.sh ./bin

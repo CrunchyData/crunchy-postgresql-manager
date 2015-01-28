@@ -3,6 +3,8 @@ PROJROOT=$(HOME)/cpm
 GOPATH=$(HOME)/cpm
 
 build:
+	        rm -rf bin
+	        mkdir bin
 	        cp ../../sql/clusteradmin.sql  ./bin/setup.sql
 	        cp ../../sql/*  ./bin
 	        cp ../../bin/adminapi  ./bin
