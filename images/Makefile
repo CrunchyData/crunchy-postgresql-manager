@@ -3,6 +3,7 @@ PROJROOT=$HOME/cpm
 GOPATH=$HOME/cpm
 
 build:
+		cd crunchy-dashboard && make
 		cd crunchy-base && make  
 		cd crunchy-admin && make  
 		cd crunchy-cpm && make 
