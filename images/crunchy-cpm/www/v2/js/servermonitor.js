@@ -101,6 +101,12 @@
 
     app.controller('graphController', function($rootScope, $scope, $route, $http, $cookies, $cookieStore) {
 
+var seriesData2;
+var graph, memgraph;
+var axes, memaxes;
+var yAxis, memyAxis;
+var graphCreated = false;
+var memgraphCreated = false;
 
         $scope.handleRefresh = function() {
             var token = $cookieStore.get('cpmsession');
@@ -109,18 +115,162 @@
                 return;
             }
             console.log('graphing server stats');
-            $http.get($cookies.AdminURL + '/monitor/server-getinfo/' + serverid + ".cpmdf." + token).
+	    var query = 'http://localhost:8086/db/cpm/series?u=root&p=root&q=select * from cpu where server = \'myserver\' order asc limit 100';
+            $http.get(query).
             success(function(data, status, headers, config) {
-                $scope.dfresults = data.df;
-                console.log('getinfo results set ' + data.df);
+		    loadSeries(data[0].points);
+		    render();
+                console.log('flux query results ' + data[0].points);
+                console.log('first point t=' + data[0].points[0][0] + " v=" + data[0].points[0][2]);
             }).error(function(data, status, headers, config) {
                 alert('error happended');
             });
 
         };
 
-        $scope.handleRefresh();
+	$scope.handleRefresh();
+
+        $scope.memhandleRefresh = function() {
+            var token = $cookieStore.get('cpmsession');
+            if (token === void 0) {
+                alert('login required');
+                return;
+            }
+            console.log('graphing server stats');
+	    var query = 'http://localhost:8086/db/cpm/series?u=root&p=root&q=select * from mem where server = \'myserver\' order asc limit 100';
+            $http.get(query).
+            success(function(data, status, headers, config) {
+		    memloadSeries(data[0].points);
+		    memrender();
+                console.log('mem flux query results ' + data[0].points);
+                console.log('mem first point t=' + data[0].points[0][0] + " v=" + data[0].points[0][2]);
+            }).error(function(data, status, headers, config) {
+                alert('error happended');
+            });
+
+        };
+
+	$scope.memhandleRefresh();
+
+	function render() {
+
+		if (!graphCreated) {
+			graph = new Rickshaw.Graph( {
+                        element: document.getElementById("chart"),
+                        width: 800,
+                        height: 300,
+                        renderer: 'line',
+                        series: [
+                        {
+                        color: "#c05020",
+                        //data: seriesData[0],
+                        data: seriesData2,
+                        name: 'CPU Load'
+                        }
+                        ]
+			} );
+		/*	
+			var legend = new Rickshaw.Graph.Legend( {
+        		graph: graph,
+        		element: document.getElementById('legend')
+			} );
+			*/
+			
+			var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+        		graph: graph
+			} );
+
+
+		/*	
+			var shelving = new Rickshaw.Graph.Behavior.Series.Toggle( {
+        		graph: graph,
+        		legend: legend
+			} );
+			*/
+	
+			var ticksTreatment = 'glow';
+			axes = new Rickshaw.Graph.Axis.Time( {
+				graph: graph
+			} );
+			yAxis = new Rickshaw.Graph.Axis.Y( {
+				graph: graph,
+				tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+				ticksTreatment: ticksTreatment
+			} );
+
+			graphCreated = true;
+		}
+
+		graph.render();
+		axes.render();
+		yAxis.render();
+	}
+
+	function loadSeries(points) {
+		seriesData2 = [];
+		angular.forEach(points, function(p) {
+			console.log('loading point x=' + p[0] + ' y=' + p[2]);
+			seriesData2.push( { x: p[0]/1000, y: p[2] } );
+		});
+	}
+	function memloadSeries(points) {
+		memseriesData2 = [];
+		angular.forEach(points, function(p) {
+			console.log('mem loading point x=' + p[0] + ' y=' + p[2]);
+			memseriesData2.push( { x: p[0]/1000, y: p[2] } );
+		});
+	}
+	function memrender() {
+
+		if (!memgraphCreated) {
+			memgraph = new Rickshaw.Graph( {
+                        element: document.getElementById("memchart"),
+                        width: 800,
+                        height: 300,
+                        renderer: 'line',
+                        series: [
+                        { color: "#c05020", data: memseriesData2,
+                        name: 'Mem Usage' }
+                        ]
+			} );
+		
+		/*	
+			var memlegend = new Rickshaw.Graph.Legend( {
+        			graph: memgraph,
+        			element: document.getElementById('memlegend')
+			} );
+			*/
+		
+			var memhoverDetail = new Rickshaw.Graph.HoverDetail( {
+        			graph: memgraph
+			} );
+		
+		/*	
+			var memshelving = new Rickshaw.Graph.Behavior.Series.Toggle( {
+        			graph: memgraph,
+        			legend: memlegend
+			} );
+			*/
+
+			memaxes = new Rickshaw.Graph.Axis.Time( {
+				graph: memgraph
+			} );
+			memyAxis = new Rickshaw.Graph.Axis.Y( {
+				graph: memgraph,
+				tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+				ticksTreatment: 'glow'
+			} );
+
+			memgraphCreated = true;
+		}
+
+		memgraph.render();
+		memaxes.render();
+		memyAxis.render();
+	}
+
     });
+
 
 
 })();

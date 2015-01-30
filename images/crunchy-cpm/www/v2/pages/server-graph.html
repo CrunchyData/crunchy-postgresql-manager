@@ -1,11 +1,23 @@
 		<div id="viewgraph">
-			<p style="font-family: Arial, Helvetica, sans-serif;">Server Graphs</p>
-			<h1>{{server.Name}}</h1>
-			<table class="table">
-				<tbody>
-				<tr>
-						<td><a ><img src="../images/mixed_styles.png"/></a>
-					</tr>
-				</tbody>
-			</table>
+			<h2>Server Graphs - {{server.Name}}</h2>
+			<div id="chart_container">
+				<div><h3>CPU Load</h3></div>
+				<div id="chart"></div>
+				<div id="legend_container"><div id="legend"></div></div>
+				<div>
+					<a class="btn btn-primary" ng-click="handleRefresh()" ><i class="fa fa-refresh fa-lg"></i> Refresh</a></td>
+				</div>
+			</div>
+			<div>&nbsp </div>
+			<div id="memchart_container">
+				<div><h3>Memory Usage</h3></div>
+				<div id="memchart"></div>
+				<div id="memlegend_container"><div id="memlegend"></div></div>
+				<div>
+					<a class="btn btn-primary" ng-click="memhandleRefresh()" ><i class="fa fa-refresh fa-lg"></i> Refresh</a></td>
+				</div>
+			</div>
+
 		</div>
+
+
