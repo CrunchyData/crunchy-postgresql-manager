@@ -176,50 +176,59 @@
         var pg1yAxis, pg2yAxis;
         var pg1graphCreated = false;
         var pg2graphCreated = false;
+	$scope.refreshTime8h = '8h';
+	$scope.refreshTime24h = '24h';
+	$scope.refreshTime48h = '48h';
 
-        $scope.pg1handleRefresh = function() {
+        $scope.pg1handleRefresh = function(interval) {
             var token = $cookieStore.get('cpmsession');
             if (token === void 0) {
                 alert('login required');
                 return;
             }
-            console.log('graphing pg1 stats');
-            var query = 'http://cluster-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=select * from pg1 where database = \'' + $scope.container.Name + '\' order asc limit 100';
-            $http.get(query).
+            console.log('graphing pg1 stats interval=' + interval);
+            var query = 'http://cluster-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=';
+            var query2 = 'select * from pg1 where database = \'' + $scope.container.Name + '\'  and time > now() - ' + interval + ' order asc limit 1000';
+	    var es = escape(query2);
+
+            $http.get(query + es).
             success(function(data, status, headers, config) {
                     pg1loadSeries(data[0].points);
                     pg1render();
-                console.log('pg1 flux query results ' + data[0].points);
-                console.log('pg1 first point t=' + data[0].points[0][0] + " v=" + data[0].points[0][2]);
+                //console.log('pg1 flux query results ' + data[0].points);
+                //console.log('pg1 first point t=' + data[0].points[0][0] + " v=" + data[0].points[0][2]);
             }).error(function(data, status, headers, config) {
                 alert('error happended');
             });
 
         };
 
-        $scope.pg1handleRefresh();
+        $scope.pg1handleRefresh($scope.refreshTime8h);
 
-        $scope.pg2handleRefresh = function() {
+        $scope.pg2handleRefresh = function(interval) {
             var token = $cookieStore.get('cpmsession');
             if (token === void 0) {
                 alert('login required');
                 return;
             }
-            console.log('graphing pg2');
-            var query = 'http://cluster-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=select * from pg2 where database = \'' + $scope.container.Name + '\' order asc limit 100';
-            $http.get(query).
+            console.log('graphing pg2 with interval ' + interval);
+            var query = 'http://cluster-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=';
+            var query2 = 'select * from pg2 where database = \'' + $scope.container.Name + '\' and time > now() - ' + interval + ' order asc limit 1000';
+	    var es = escape(query2);
+
+            $http.get(query + es).
             success(function(data, status, headers, config) {
                     pg2loadSeries(data[0].points);
                     pg2render();
-                console.log('pg2 query results ' + data[0].points);
-                console.log('pg2 first point t=' + data[0].points[0][0] + " v=" + data[0].points[0][2]);
+                //console.log('pg2 query results ' + data[0].points);
+                //console.log('pg2 first point t=' + data[0].points[0][0] + " v=" + data[0].points[0][2]);
             }).error(function(data, status, headers, config) {
                 alert('error happended');
             });
 
         };
 
-        $scope.pg2handleRefresh();
+        $scope.pg2handleRefresh($scope.refreshTime8h);
 
         function pg1render() {
 
@@ -261,16 +270,19 @@
         function pg1loadSeries(points) {
                 pg1seriesData = [];
                 angular.forEach(points, function(p) {
-                        console.log('pg1 loading point x=' + p[0] + ' y=' + p[2]);
-                        pg1seriesData.push( { x: p[0]/1000, y: p[2] } );
+                        //console.log('pg1 loading point x=' + p[0] + ' y=' + p[2]);
+			xval = Math.round(p[0] / 1000 );
+
+                        pg1seriesData.push( { x: xval, y: p[2] } );
                 });
         }
 
         function pg2loadSeries(points) {
                 pg2seriesData = [];
                 angular.forEach(points, function(p) {
-                        console.log('pg2 loading point x=' + p[0] + ' y=' + p[2]);
-                        pg2seriesData.push( { x: p[0]/1000, y: p[2] } );
+                        //console.log('pg2 loading point x=' + p[0] + ' y=' + p[2]);
+			xval = Math.round(p[0] / 1000 );
+                        pg2seriesData.push( { x: xval, y: p[2] } );
                 });
         }
 
@@ -278,7 +290,7 @@
 
                 if (!pg2graphCreated) {
                         pg2graph = new Rickshaw.Graph( {
-                        element: document.getElementById("pg2chart"),
+                        element: document.getElemenById("pg2chart"),
                         width: 800,
                         height: 300,
                         renderer: 'line',

@@ -108,50 +108,60 @@
 	var yAxis, memyAxis;
 	var graphCreated = false;
 	var memgraphCreated = false;
+	$scope.refreshTime8h = '8h';
+	$scope.refreshTime24h = '24h';
+	$scope.refreshTime48h = '48h';
 
-        $scope.handleRefresh = function() {
+        $scope.handleRefresh = function(interval) {
             var token = $cookieStore.get('cpmsession');
             if (token === void 0) {
                 alert('login required');
                 return;
             }
-            console.log('graphing cpu ');
-	    var query = 'http://cluster-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=select * from cpu where server = \'' + $scope.server.Name + '\' order asc limit 1000';
-            $http.get(query).
+            console.log('graphing cpu interval= ' + interval);
+	    var query = 'http://cluster-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=';
+	    var query2 = 'select * from cpu where server = \'' + $scope.server.Name + '\' and time > now() - ' + interval + ' order asc limit 1000';
+	    var es = escape(query2);
+
+            $http.get(query + es).
             success(function(data, status, headers, config) {
 		    loadSeries(data[0].points);
 		    render();
-                console.log('flux query results ' + data[0].points);
-                console.log('first point t=' + data[0].points[0][0] + ' v=' + data[0].points[0][2]);
+                //console.log('flux query results ' + data[0].points);
+                //console.log('first point t=' + data[0].points[0][0] + ' v=' + data[0].points[0][2]);
             }).error(function(data, status, headers, config) {
                 alert('error happended');
             });
 
         };
 
-	$scope.handleRefresh();
+	$scope.handleRefresh($scope.refreshTime8h);
 
-        $scope.memhandleRefresh = function() {
+        $scope.memhandleRefresh = function(interval) {
             var token = $cookieStore.get('cpmsession');
             if (token === void 0) {
                 alert('login required');
                 return;
             }
             console.log('graphing mem ');
-	    var query = 'http://cluster-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=select * from mem where server = \'' + $scope.server.Name + '\' order asc limit 1000';
-            $http.get(query).
+	    var query = 'http://cluster-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=';
+	    var query2 = 'select * from mem where server = \'' + $scope.server.Name + '\' and time > now() - ' + interval + ' order asc limit 1000';
+	    //console.log('flux query ' + query + query2);
+	    var es = escape(query2);
+	    console.log('encoded query is ' + query + es);
+            $http.get(query + es).
             success(function(data, status, headers, config) {
 		    memloadSeries(data[0].points);
 		    memrender();
-                console.log('mem flux query results ' + data[0].points);
-                console.log('mem first point t=' + data[0].points[0][0] + " v=" + data[0].points[0][2]);
+                //console.log('mem flux query results ' + data[0].points);
+                //console.log('mem first point t=' + data[0].points[0][0] + " v=" + data[0].points[0][2]);
             }).error(function(data, status, headers, config) {
                 alert('error happended');
             });
 
         };
 
-	$scope.memhandleRefresh();
+	$scope.memhandleRefresh($scope.refreshTime8h);
 
 	function render() {
 
@@ -200,7 +210,7 @@
 			//xval = Math.floor(p[0]/1000);
 			//xval = new Date(p[0]);
 			xval = Math.round(p[0] / 1000 );
-			console.log('loading point x=' + xval + ' y=' + p[2]);
+			//console.log('loading point x=' + xval + ' y=' + p[2]);
 			seriesData2.push( { x: xval, y: p[2] } );
 		});
 	}
@@ -211,7 +221,7 @@
 			//xval = new Date(p[0]);
 			//xval = p[0];
 			xval = Math.round(p[0]/1000);
-			console.log('mem loading point x=' + xval + ' y=' + p[2]);
+			//console.log('mem loading point x=' + xval + ' y=' + p[2]);
 			memseriesData2.push( { x: xval,  y: p[2] } );
 		});
 	}
