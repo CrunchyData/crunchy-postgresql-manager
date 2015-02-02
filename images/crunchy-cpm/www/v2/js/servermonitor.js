@@ -101,12 +101,12 @@
 
     app.controller('graphController', function($rootScope, $scope, $route, $http, $cookies, $cookieStore) {
 
-var seriesData2;
-var graph, memgraph;
-var axes, memaxes;
-var yAxis, memyAxis;
-var graphCreated = false;
-var memgraphCreated = false;
+	var seriesData2;
+	var graph, memgraph;
+	var axes, memaxes;
+	var yAxis, memyAxis;
+	var graphCreated = false;
+	var memgraphCreated = false;
 
         $scope.handleRefresh = function() {
             var token = $cookieStore.get('cpmsession');
@@ -169,25 +169,11 @@ var memgraphCreated = false;
                         }
                         ]
 			} );
-		/*	
-			var legend = new Rickshaw.Graph.Legend( {
-        		graph: graph,
-        		element: document.getElementById('legend')
-			} );
-			*/
 			
 			var hoverDetail = new Rickshaw.Graph.HoverDetail( {
         		graph: graph
 			} );
 
-
-		/*	
-			var shelving = new Rickshaw.Graph.Behavior.Series.Toggle( {
-        		graph: graph,
-        		legend: legend
-			} );
-			*/
-	
 			var ticksTreatment = 'glow';
 			axes = new Rickshaw.Graph.Axis.Time( {
 				graph: graph
@@ -234,24 +220,10 @@ var memgraphCreated = false;
                         ]
 			} );
 		
-		/*	
-			var memlegend = new Rickshaw.Graph.Legend( {
-        			graph: memgraph,
-        			element: document.getElementById('memlegend')
-			} );
-			*/
-		
 			var memhoverDetail = new Rickshaw.Graph.HoverDetail( {
         			graph: memgraph
 			} );
 		
-		/*	
-			var memshelving = new Rickshaw.Graph.Behavior.Series.Toggle( {
-        			graph: memgraph,
-        			legend: memlegend
-			} );
-			*/
-
 			memaxes = new Rickshaw.Graph.Axis.Time( {
 				graph: memgraph
 			} );

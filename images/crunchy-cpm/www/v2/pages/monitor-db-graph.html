@@ -1,12 +1,21 @@
 		<div id="viewmon1">
-			 <h1>{{container.Name}}</h1>
-
-				<table>
-					<!-- tr>
-						<td><a><img src="../images/graph-example-1.png"/></a></td>
-					</tr -->
-					<tr>
-						<td><a><img src="../images/graph-mocks-light-colors.png"/></a></td>
-					</tr>
-				</table>
+		
+		  <h2>Database Graphs - {{container.Name}}</h2>
+                        <div id="pg1_container">
+                                <div><h3>PG 1</h3></div>
+                                <div id="pg1chart"></div>
+                                <div id="pg1legend_container"><div id="pg1legend"></div></div>
+                                <div>
+                                        <a class="btn btn-primary" ng-click="pg1handleRefresh()" ><i class="fa fa-refresh fa-lg"></i> Refresh</a></td>
+                                </div>
+                        </div>
+                        <div>&nbsp </div>
+                        <div id="pg2_container">
+                                <div><h3>PG 2</h3></div>
+                                <div id="pg2chart"></div>
+                                <div id="pg2legend_container"><div id="pg2legend"></div></div>
+                                <div>
+                                        <a class="btn btn-primary" ng-click="pg2handleRefresh()" ><i class="fa fa-refresh fa-lg"></i> Refresh</a></td>
+                                </div>
+                        </div>
 		</div>
