@@ -116,7 +116,7 @@
                 return;
             }
             console.log('graphing cpu ');
-	    var query = 'http://cluster-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=select * from cpu where server = \'' + $scope.server.Name + '\' order asc limit 100';
+	    var query = 'http://cluster-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=select * from cpu where server = \'' + $scope.server.Name + '\' order asc limit 1000';
             $http.get(query).
             success(function(data, status, headers, config) {
 		    loadSeries(data[0].points);
@@ -138,7 +138,7 @@
                 return;
             }
             console.log('graphing mem ');
-	    var query = 'http://cluster-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=select * from mem where server = \'' + $scope.server.Name + '\' order asc limit 100';
+	    var query = 'http://cluster-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=select * from mem where server = \'' + $scope.server.Name + '\' order asc limit 1000';
             $http.get(query).
             success(function(data, status, headers, config) {
 		    memloadSeries(data[0].points);
@@ -196,15 +196,23 @@
 	function loadSeries(points) {
 		seriesData2 = [];
 		angular.forEach(points, function(p) {
-			console.log('loading point x=' + p[0] + ' y=' + p[2]);
-			seriesData2.push( { x: p[0]/1000, y: p[2] } );
+			//console.log('loading point x=' + p[0] + ' y=' + p[2]);
+			//xval = Math.floor(p[0]/1000);
+			//xval = new Date(p[0]);
+			xval = Math.round(p[0] / 1000 );
+			console.log('loading point x=' + xval + ' y=' + p[2]);
+			seriesData2.push( { x: xval, y: p[2] } );
 		});
 	}
 	function memloadSeries(points) {
 		memseriesData2 = [];
 		angular.forEach(points, function(p) {
-			console.log('mem loading point x=' + p[0] + ' y=' + p[2]);
-			memseriesData2.push( { x: p[0]/1000, y: p[2] } );
+			//xval = Math.floor(p[0]/1000);
+			//xval = new Date(p[0]);
+			//xval = p[0];
+			xval = Math.round(p[0]/1000);
+			console.log('mem loading point x=' + xval + ' y=' + p[2]);
+			memseriesData2.push( { x: xval,  y: p[2] } );
 		});
 	}
 	function memrender() {
