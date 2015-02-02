@@ -179,6 +179,7 @@
 	$scope.refreshTime8h = '8h';
 	$scope.refreshTime24h = '24h';
 	$scope.refreshTime48h = '48h';
+	$scope.refreshTime1w = '1w';
 
         $scope.pg1handleRefresh = function(interval) {
             var token = $cookieStore.get('cpmsession');
@@ -213,7 +214,7 @@
             }
             console.log('graphing pg2 with interval ' + interval);
             var query = 'http://cluster-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=';
-            var query2 = 'select * from pg2 where database = \'' + $scope.container.Name + '\' and time > now() - ' + interval + ' order asc limit 1000';
+            var query2 = 'select * from pg2 where database = \'' + $scope.container.Name + '\'  and time > now() - ' + interval + ' order asc limit 1000';
 	    var es = escape(query2);
 
             $http.get(query + es).
@@ -290,9 +291,9 @@
 
                 if (!pg2graphCreated) {
                         pg2graph = new Rickshaw.Graph( {
-                        element: document.getElemenById("pg2chart"),
                         width: 800,
                         height: 300,
+                        element: document.getElementById('pg2chart'),
                         renderer: 'line',
                         series: [
                         { color: "#c05020", data: pg2seriesData,
