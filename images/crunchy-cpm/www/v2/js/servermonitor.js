@@ -110,6 +110,7 @@
 	var memgraphCreated = false;
 	$scope.refreshTime8h = '8h';
 	$scope.refreshTime24h = '24h';
+	$scope.refreshTime48h = '48h';
 	$scope.refreshTime1w = '1w';
 
         $scope.handleRefresh = function(interval) {
