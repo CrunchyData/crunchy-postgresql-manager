@@ -101,6 +101,7 @@
 
     app.controller('graphController', function($rootScope, $scope, $route, $http, $cookies, $cookieStore) {
 
+	    console.log('graphing server ' + $scope.server.Name); 
 	var seriesData2;
 	var graph, memgraph;
 	var axes, memaxes;
@@ -114,14 +115,14 @@
                 alert('login required');
                 return;
             }
-            console.log('graphing server stats');
-	    var query = 'http://localhost:8086/db/cpm/series?u=root&p=root&q=select * from cpu where server = \'myserver\' order asc limit 100';
+            console.log('graphing cpu ');
+	    var query = 'http://cluster-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=select * from cpu where server = \'' + $scope.server.Name + '\' order asc limit 100';
             $http.get(query).
             success(function(data, status, headers, config) {
 		    loadSeries(data[0].points);
 		    render();
                 console.log('flux query results ' + data[0].points);
-                console.log('first point t=' + data[0].points[0][0] + " v=" + data[0].points[0][2]);
+                console.log('first point t=' + data[0].points[0][0] + ' v=' + data[0].points[0][2]);
             }).error(function(data, status, headers, config) {
                 alert('error happended');
             });
@@ -136,8 +137,8 @@
                 alert('login required');
                 return;
             }
-            console.log('graphing server stats');
-	    var query = 'http://localhost:8086/db/cpm/series?u=root&p=root&q=select * from mem where server = \'myserver\' order asc limit 100';
+            console.log('graphing mem ');
+	    var query = 'http://cluster-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=select * from mem where server = \'' + $scope.server.Name + '\' order asc limit 100';
             $http.get(query).
             success(function(data, status, headers, config) {
 		    memloadSeries(data[0].points);
