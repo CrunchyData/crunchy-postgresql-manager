@@ -22,6 +22,7 @@ import (
 	"database/sql"
 	"github.com/myinfluxdb/client"
 	"strconv"
+	"time"
 )
 
 type DefaultJob struct {
@@ -114,6 +115,19 @@ func RunMonJob(args *MonRequest) error {
 						}
 					} else if metrics[i].MetricType == "healthck" {
 						logutil.Log("healthck metric database run on schedule " + args.Schedule.Name)
+						err = hc1(databaseConn)
+						if err != nil {
+							series := &client.Series{
+								Name:    "hc1",
+								Columns: []string{"seconds", "database"},
+								Points: [][]interface{}{
+									{time.Now().Unix(), nodes[y].Name},
+								},
+							}
+							if err = c.WriteSeries([]*client.Series{series}); err != nil {
+								logutil.Log("error writing to influxdb " + err.Error())
+							}
+						}
 					}
 				}
 			}

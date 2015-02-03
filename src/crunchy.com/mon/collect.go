@@ -158,3 +158,11 @@ func mem(server string) (DBMetric, error) {
 
 	return values, err
 }
+
+func hc1(databaseConn *sql.DB) error {
+	var err error
+	var strValue string
+
+	err = databaseConn.QueryRow(fmt.Sprintf("select now()::text")).Scan(&strValue)
+	return err
+}
