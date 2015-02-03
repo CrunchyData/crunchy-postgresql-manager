@@ -192,6 +192,7 @@ create table monschedule (
 
 insert into monschedule values ( 's1', '@every 0h5m0s');
 insert into monschedule values ( 's2', '@every 0h5m0s');
+insert into monschedule values ( 's3', '@every 0h5m0s');
 
 
 create table monmetric (
@@ -199,7 +200,7 @@ create table monmetric (
 	metrictype varchar(30) not null,
 	schedule varchar(30) references monschedule (name),
 	constraint valid_metrictype check (
-		metrictype in ('server', 'database')
+		metrictype in ('server', 'database', 'healthck')
 	)
 );
 
@@ -207,4 +208,5 @@ insert into monmetric values ('cpu', 'server', 's1');
 insert into monmetric values ('mem', 'server', 's2');
 insert into monmetric values ('pg1', 'database', 's1');
 insert into monmetric values ('pg2', 'database', 's2');
+insert into monmetric values ('hc1', 'healthck', 's3');
 

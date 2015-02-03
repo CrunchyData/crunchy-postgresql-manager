@@ -41,6 +41,7 @@ docker run -e DB_HOST=cluster-admin.crunchy.lab \
 	-v $INFLUXDIR:/monitordata \
 	-d --name=cluster-mon crunchy-mon
 
+sleep 2
 ping -c 2 cpm.crunchy.lab
 ping -c 2 cluster-admin.crunchy.lab
 ping -c 2 cluster-backup.crunchy.lab

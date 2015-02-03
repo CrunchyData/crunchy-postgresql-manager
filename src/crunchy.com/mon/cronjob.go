@@ -62,22 +62,25 @@ func RunMonJob(args *MonRequest) error {
 		//collect all the server metrics
 		i := 0
 		for i = range metrics {
-			if metrics[i].MetricType == "server" &&
-				metrics[i].ScheduleName == args.Schedule.Name {
-				value, err = collectServerMetrics(metrics[i].Name, servers[x].IPAddress)
-				//add value to influxdb here
-				logutil.Log(metrics[i].Name + " value " + strconv.FormatFloat(value.Value, 'f', 3, 64))
-				series := &client.Series{
-					Name:    metrics[i].Name,
-					Columns: []string{"value", "server"},
-					Points: [][]interface{}{
-						{value.Value, servers[x].Name},
-					},
-				}
-				if err = c.WriteSeries([]*client.Series{series}); err != nil {
-					logutil.Log("error writing to influxdb " + err.Error())
-				}
+			if metrics[i].ScheduleName == args.Schedule.Name {
+				if metrics[i].MetricType == "server" {
+					value, err = collectServerMetrics(metrics[i].Name, servers[x].IPAddress)
+					//add value to influxdb here
+					logutil.Log(metrics[i].Name + " value " + strconv.FormatFloat(value.Value, 'f', 3, 64))
+					series := &client.Series{
+						Name:    metrics[i].Name,
+						Columns: []string{"value", "server"},
+						Points: [][]interface{}{
+							{value.Value, servers[x].Name},
+						},
+					}
+					if err = c.WriteSeries([]*client.Series{series}); err != nil {
+						logutil.Log("error writing to influxdb " + err.Error())
+					}
 
+				} else if metrics[i].MetricType == "healthck" {
+					logutil.Log("healthck server metrics callled on " + args.Schedule.Name)
+				}
 			}
 		}
 	}
@@ -94,20 +97,23 @@ func RunMonJob(args *MonRequest) error {
 			//collect all the database metrics
 			i := 0
 			for i = range metrics {
-				if metrics[i].MetricType == "database" &&
-					metrics[i].ScheduleName == args.Schedule.Name {
-					value, err = collectContainerMetrics(metrics[i].Name, databaseConn)
-					logutil.Log(metrics[i].Name + " value " + strconv.FormatFloat(value.Value, 'f', 3, 64))
-					//add value to influxdb here
-					series := &client.Series{
-						Name:    metrics[i].Name,
-						Columns: []string{"value", "database"},
-						Points: [][]interface{}{
-							{value.Value, nodes[y].Name},
-						},
-					}
-					if err = c.WriteSeries([]*client.Series{series}); err != nil {
-						logutil.Log("error writing to influxdb " + err.Error())
+				if metrics[i].ScheduleName == args.Schedule.Name {
+					if metrics[i].MetricType == "database" {
+						value, err = collectContainerMetrics(metrics[i].Name, databaseConn)
+						logutil.Log(metrics[i].Name + " value " + strconv.FormatFloat(value.Value, 'f', 3, 64))
+						//add value to influxdb here
+						series := &client.Series{
+							Name:    metrics[i].Name,
+							Columns: []string{"value", "database"},
+							Points: [][]interface{}{
+								{value.Value, nodes[y].Name},
+							},
+						}
+						if err = c.WriteSeries([]*client.Series{series}); err != nil {
+							logutil.Log("error writing to influxdb " + err.Error())
+						}
+					} else if metrics[i].MetricType == "healthck" {
+						logutil.Log("healthck metric database run on schedule " + args.Schedule.Name)
 					}
 				}
 			}
