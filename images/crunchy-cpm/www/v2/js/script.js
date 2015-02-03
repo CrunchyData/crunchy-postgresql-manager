@@ -1,5 +1,5 @@
 // create the module and name it cpmApp
-var cpmApp = angular.module('cpmApp', ['ngRoute', 'ngCookies', 'cpmApp.servers', 'cpmApp.clusters', 'cpmApp.containers', 'cpmApp.tools', 'cpmApp.settings']);
+var cpmApp = angular.module('cpmApp', ['ngRoute', 'ngTable', 'ui.bootstrap', 'ngCookies', 'cpmApp.servers', 'cpmApp.clusters', 'cpmApp.containers', 'cpmApp.tools', 'cpmApp.settings']);
 
 // configure our routes
 cpmApp.config(function($routeProvider) {
@@ -44,16 +44,53 @@ cpmApp.config(function($routeProvider) {
 });
 
 // create the controller and inject Angular's $scope
-cpmApp.controller('mainController', function($scope, $http, $cookieStore, $cookies, $modal, $cookieStore) {
+cpmApp.controller('mainController', function($scope, $http, $cookieStore, $cookies, $modal, $cookieStore, $filter, ngTableParams) {
     // create a message to display in our view
     $scope.message = 'PostgreSQL Container Management!';
     if ($cookies.AdminURL) {} else {
         alert('CPM AdminURL setting is NOT defined, please update on the Settings page before using CPM');
     }
 
+    $scope.hc = [
+{
+'ts': '2015-Feb-2 10am',
+'rows':[
+ [  'Database - two',
+    'Database is down',
+    'databasedown'
+ ],
+ [  'Database - one',
+    'Database is down',
+    'databasedown'
+ ]
+]
+}	];
+console.log('hc.ts=' + $scope.hc[0].ts);
+
+    $scope.data = [];
     $scope.results = [];
     $scope.items = ['item1', 'item2'];
     $scope.loginValue = '';
+
+    $scope.tableParams = new ngTableParams({
+        page: 1, // show first page
+        count: 10 // count per page
+    }, {
+        total: $scope.hc.length, // length of data
+        getData: function($defer, params) {
+            console.log('getData called hc=' + $scope.hc.length);
+            // use build-in angular filter
+            var orderedData = $scope.hc;
+
+            params.total(orderedData.length); // set total for recalc pagination
+            $defer.resolve($scope.hc = orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+        }
+    });
+
+   //fix around ng-table bug?
+    $scope.tableParams.settings().$scope = $scope;
+
+
 
     $scope.doLogin = function() {
         console.log(' login called');
