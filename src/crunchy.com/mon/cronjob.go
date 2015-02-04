@@ -39,6 +39,8 @@ func RunMonJob(args *MonRequest) error {
 	logutil.Log("mon.RunMonJob called")
 	logutil.Log("with Schedule Name=" + args.Schedule.Name)
 
+	var scheduleTS = time.Now().Unix()
+
 	c, err := client.NewClient(&client.ClientConfig{
 		Username: "root",
 		Password: "root",
@@ -119,9 +121,9 @@ func RunMonJob(args *MonRequest) error {
 						if err != nil {
 							series := &client.Series{
 								Name:    "hc1",
-								Columns: []string{"seconds", "database"},
+								Columns: []string{"seconds", "service", "servicetype", "status"},
 								Points: [][]interface{}{
-									{time.Now().Unix(), nodes[y].Name},
+									{scheduleTS, nodes[y].Name, "db", "down"},
 								},
 							}
 							if err = c.WriteSeries([]*client.Series{series}); err != nil {
