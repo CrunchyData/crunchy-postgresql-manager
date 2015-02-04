@@ -2,14 +2,17 @@
 var cpmApp = angular.module('cpmApp.containers', ['ngRoute', 'ngCookies']);
 
 
-cpmApp.controller('containersController', function($scope, $rootScope, $cookies) {
+cpmApp.controller('containersController', function($scope, $rootScope, $cookies, $routeParams ) {
     console.log('hi from containers controller');
+    //var param1 = $routeParams.param1;
+
     $scope.message = 'containers page.';
     if ($cookies.AdminURL) {
         $rootScope.isLoading = false;
     } else {
         alert('CPM AdminURL setting is NOT defined, please update on the Settings page before using CPM');
     }
+
 });
 
 
@@ -312,7 +315,7 @@ cpmApp.controller('GetAllContainersController', function($rootScope, $scope, $ht
 
 
 
-cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, $modal, $cookies, $cookieStore) {
+cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, $modal, $cookies, $cookieStore, $routeParams) {
     $scope.results = [];
     $scope.clusters = [];
     $scope.myCluster = [];
@@ -387,8 +390,6 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
         popupWindow.containerid = $scope.currentContainer.ID;
         popupWindow.slidervalue = $scope.slidervalue;
     };
-
-
 
     $scope.handlePlusClick = function() {
         console.log('hi from handlePlusClick');

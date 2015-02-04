@@ -15,7 +15,7 @@
 
        		<tr ng-repeat="entry in hc">
                	<td header-class="text-left" data-title="'Status'" width="200">
-               	<a tooltip="{{entry[2]}}" style="color:red" ng-if="entry[5] == 'down'" href=""><i class="fa fa-warning"></i></a>
+               	<a ng-href="#containers" tooltip="{{entry[2]}}" style="color:red" ng-if="entry[5] == 'down'" href=""><i class="fa fa-warning"></i></a>
                	</td>
 		<td header-class="text-left" data-title="'Service Name'" width="200">
                	{{entry[4]}}

@@ -5,37 +5,31 @@ var cpmApp = angular.module('cpmApp', ['ngRoute', 'ngTable', 'ui.bootstrap', 'ng
 cpmApp.config(function($routeProvider) {
     $routeProvider
 
-    // route for the home page
         .when('/', {
         templateUrl: 'pages/home.html',
         //controller: 'mainController'
     })
 
-    // route for the about page
     .when('/servers', {
         templateUrl: 'pages/servers.html',
         controller: 'serversController'
     })
 
-    // route for the servers page
     .when('/containers', {
         templateUrl: 'pages/containers.html',
         controller: 'containersController'
     })
 
-    // route for the contact page
     .when('/clusters', {
         templateUrl: 'pages/clusters.html',
         controller: 'clustersController'
     })
 
-    // route for the contact page
     .when('/tools', {
         templateUrl: 'pages/tools.html',
         controller: 'toolsController'
     })
 
-    // route for the settings page
     .when('/settings', {
         templateUrl: 'pages/settings.html',
         controller: 'settingsController'
