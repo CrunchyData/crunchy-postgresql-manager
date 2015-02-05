@@ -17,7 +17,7 @@ package main
 
 import (
 	"crunchy.com/dummy"
-	"crunchy.com/logutil"
+	"github.com/golang/glog"
 	"net"
 	"net/http"
 	"net/rpc"
@@ -25,18 +25,18 @@ import (
 
 func main() {
 
-	logutil.Log("dummy starting\n")
+	glog.Infoln("dummy starting\n")
 	command := new(dummy.Command)
 	rpc.Register(command)
-	logutil.Log("Command registered\n")
+	glog.Infoln("Command registered\n")
 	rpc.HandleHTTP()
 	l, e := net.Listen("tcp", ":13013")
-	logutil.Log("listening\n")
+	glog.Infoln("listening\n")
 	if e != nil {
-		logutil.Log(e.Error())
+		glog.Errorln(e.Error())
 		panic("could not listen on rpc socker")
 	}
-	logutil.Log("about to serve\n")
+	glog.Infoln("about to serve\n")
 	http.Serve(l, nil)
-	logutil.Log("after serve\n")
+	glog.Infoln("after serve\n")
 }

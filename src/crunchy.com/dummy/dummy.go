@@ -17,9 +17,9 @@ package dummy
 
 import (
 	"bytes"
-	"crunchy.com/logutil"
 	"errors"
 	"fmt"
+	"github.com/golang/glog"
 	"os/exec"
 )
 
@@ -42,15 +42,15 @@ type InspectCommandOutput struct {
 */
 func (t *Command) Get(args *Args, reply *Command) error {
 
-	logutil.Log("on server, Command Get called A=" + args.A + " B=" + args.B)
+	glog.Infoln("on server, Command Get called A=" + args.A + " B=" + args.B)
 	if args.A == "" {
-		logutil.Log("A was nil")
+		glog.Errorln("A was nil")
 		return errors.New("Arg A was nil")
 	}
 	if args.B == "" {
-		logutil.Log("B was nil")
+		glog.Infoln("B was nil")
 	} else {
-		logutil.Log("B was " + args.B)
+		glog.Infoln("B was " + args.B)
 	}
 
 	var cmd *exec.Cmd
@@ -67,11 +67,11 @@ func (t *Command) Get(args *Args, reply *Command) error {
 
 	err := cmd.Run()
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		errorString := fmt.Sprintf("%s\n%s\n%s\n", err.Error(), out.String(), stderr.String())
 		return errors.New(errorString)
 	}
-	logutil.Log("command output was " + out.String())
+	glog.Infoln("command output was " + out.String())
 	reply.Output = out.String()
 
 	return nil
