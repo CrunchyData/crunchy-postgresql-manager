@@ -16,11 +16,11 @@
 package main
 
 import (
-	"crunchy.com/logutil"
 	"crunchy.com/template"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
 	client "github.com/GoogleCloudPlatform/kubernetes/pkg/client"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
+	"github.com/golang/glog"
 )
 
 // DeletePod deletes a kube pod that should already exist
@@ -28,18 +28,18 @@ import (
 // ID - the ID of the Pod we want to delete
 // it returns an error is there was a problem
 func DeletePod(kubeURL string, ID string) error {
-	logutil.Log("deleting pod " + ID)
+	glog.Infoln("deleting pod " + ID)
 	var c *client.Client
 	c = client.NewOrDie(&client.Config{
 		Host:    kubeURL,
 		Version: "v1beta1",
 	})
 	if c != nil {
-		logutil.Log("connection to kube ok....")
+		glog.Infoln("connection to kube ok....")
 	}
 	err := c.Pods(api.NamespaceDefault).Delete(ID)
 	if err != nil {
-		logutil.Log("DeletePod:" + err.Error())
+		glog.Errorln("DeletePod:" + err.Error())
 		return err
 	}
 
@@ -51,16 +51,16 @@ func DeletePod(kubeURL string, ID string) error {
 // podInfo - the params used to configure the pod
 // return an error if anything goes wrong
 func CreatePod(kubeURL string, podInfo template.KubePodParams) error {
-	logutil.Log("creating pod " + podInfo.ID)
+	glog.Infoln("creating pod " + podInfo.ID)
 
 	//use a pod template to build the pod definition
 	data, err := template.KubeNodePod(podInfo)
 	if err != nil {
-		logutil.Log("CreatePod:" + err.Error())
+		glog.Errorln("CreatePod:" + err.Error())
 		return err
 	}
 
-	logutil.Log(string(data[:]))
+	glog.Infoln(string(data[:]))
 
 	//use the kube api directly for now, later on probably an openshift wrapping api
 	var obj runtime.Object
@@ -71,16 +71,16 @@ func CreatePod(kubeURL string, podInfo template.KubePodParams) error {
 		Version: "v1beta1",
 	})
 	if c != nil {
-		logutil.Log("connection to kube ok....")
+		glog.Infoln("connection to kube ok....")
 	}
 
 	obj, err = c.Verb("POST").Path("pods").Body(data).Do().WasCreated(&wasCreated).Get()
 	if err != nil {
-		logutil.Log("CreatePod:" + err.Error())
+		glog.Errorln("CreatePod:" + err.Error())
 		return err
 	}
 	if obj != nil {
-		logutil.Log("got the object from the kube pod create")
+		glog.Infoln("got the object from the kube pod create")
 	}
 	return nil
 }

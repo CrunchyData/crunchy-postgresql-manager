@@ -16,10 +16,10 @@
 package sec
 
 import (
-	"crunchy.com/logutil"
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/golang/glog"
 )
 
 //this is the default security implementation for CPM, others
@@ -30,7 +30,7 @@ type DefaultSec struct {
 }
 
 func (d DefaultSec) Login(id string, psw string) (string, error) {
-	logutil.Log("DefaultSec.Login")
+	glog.Infoln("DefaultSec.Login")
 	var uuid string
 	var err error
 	var user User
@@ -38,60 +38,60 @@ func (d DefaultSec) Login(id string, psw string) (string, error) {
 	user, err = DBGetUser(id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			logutil.Log("DefaultSec.login: " + err.Error())
+			glog.Errorln("DefaultSec.login: " + err.Error())
 			return "", errors.New("user not found")
 		} else {
-			logutil.Log("error in DefaultSec.login: " + err.Error())
+			glog.Errorln("error in DefaultSec.login: " + err.Error())
 			return "", err
 		}
 	}
-	logutil.Log("Login checkpoint 1")
+	glog.Infoln("Login checkpoint 1")
 
 	unencryptedPsw, err = DecryptPassword(user.Password)
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		return "", err
 	}
 
 	if unencryptedPsw != psw {
 		return "", errors.New("incorrect password")
 	}
-	logutil.Log("Login checkpoint 2")
+	glog.Infoln("Login checkpoint 2")
 
 	uuid, err = newUUID()
 	if err != nil {
-		logutil.Log("error in DefaultSec.login: " + err.Error())
+		glog.Errorln("error in DefaultSec.login: " + err.Error())
 		return "", err
 	}
 
-	logutil.Log("Login checkpoint 3")
+	glog.Infoln("Login checkpoint 3")
 	//register the session
 	err = DBAddSession(uuid, id)
 	if err != nil {
-		logutil.Log("error in DefaultSec.login add session: " + err.Error())
+		glog.Errorln("error in DefaultSec.login add session: " + err.Error())
 		return "", err
 	}
 
-	logutil.Log("secimpl Login returning uuid " + uuid)
+	glog.Infoln("secimpl Login returning uuid " + uuid)
 	return uuid, nil
 }
 
 func (d DefaultSec) Logout(uuid string) error {
-	logutil.Log("DefaultSec.Logout")
+	glog.Infoln("DefaultSec.Logout")
 	err := DBDeleteSession(uuid)
 	if err != nil {
-		logutil.Log("error in DefaultSec.logout session: " + err.Error())
+		glog.Errorln("error in DefaultSec.logout session: " + err.Error())
 		return err
 	}
-	logutil.Log("DefaultSec.Logout ok for " + uuid)
+	glog.Infoln("DefaultSec.Logout ok for " + uuid)
 	return nil
 }
 
 func (d DefaultSec) UpdateUser(user User) error {
-	logutil.Log("DefaultSec.UpdateUser")
+	glog.Infoln("DefaultSec.UpdateUser")
 	err := DBUpdateUser(user)
 	if err != nil {
-		logutil.Log("error in UpdateUser: " + err.Error())
+		glog.Errorln("error in UpdateUser: " + err.Error())
 		return err
 	}
 
@@ -99,31 +99,31 @@ func (d DefaultSec) UpdateUser(user User) error {
 }
 
 func (d DefaultSec) AddUser(user User) error {
-	logutil.Log("DefaultSec.AddUser")
+	glog.Infoln("DefaultSec.AddUser")
 	encryptedPsw, err := EncryptPassword(user.Password)
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		return err
 	}
 	user.Password = encryptedPsw
 
 	err = DBAddUser(user)
 	if err != nil {
-		logutil.Log("error in AddUser: " + err.Error())
+		glog.Errorln("error in AddUser: " + err.Error())
 		return err
 	}
 	return nil
 }
 
 func (d DefaultSec) GetUser(id string) (User, error) {
-	logutil.Log("DefaultSec.GetUser id=" + id)
+	glog.Infoln("DefaultSec.GetUser id=" + id)
 	user, err := DBGetUser(id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			logutil.Log("no user found " + id)
+			glog.Errorln("no user found " + id)
 			return user, err
 		} else {
-			logutil.Log("error in GetUser: " + err.Error())
+			glog.Errorln("error in GetUser: " + err.Error())
 			return user, err
 		}
 	}
@@ -131,64 +131,64 @@ func (d DefaultSec) GetUser(id string) (User, error) {
 }
 
 func (d DefaultSec) GetAllUsers() ([]User, error) {
-	logutil.Log("DefaultSec.GetAllUsers")
+	glog.Infoln("DefaultSec.GetAllUsers")
 	var users []User
 	var err error
 	users, err = DBGetAllUsers()
 	if err != nil {
-		logutil.Log("error in GetAllUsers: " + err.Error())
+		glog.Errorln("error in GetAllUsers: " + err.Error())
 		return users, err
 	}
 	return users, err
 }
 
 func (d DefaultSec) DeleteUser(id string) error {
-	logutil.Log("DefaultSec.DeleteUser id=" + id)
+	glog.Infoln("DefaultSec.DeleteUser id=" + id)
 	err := DBDeleteUser(id)
 	if err != nil {
-		logutil.Log("error in DeleteUser: " + err.Error())
+		glog.Errorln("error in DeleteUser: " + err.Error())
 		return err
 	}
 	return nil
 }
 
 func (d DefaultSec) UpdateRole(role Role) error {
-	logutil.Log("DefaultSec.UpdateRole")
+	glog.Infoln("DefaultSec.UpdateRole")
 	err := DBUpdateRole(role)
 	if err != nil {
-		logutil.Log("error in UpdateRole: " + err.Error())
+		glog.Errorln("error in UpdateRole: " + err.Error())
 		return err
 	}
 	return nil
 }
 
 func (d DefaultSec) AddRole(role Role) error {
-	logutil.Log("DefaultSec.AddRole")
+	glog.Infoln("DefaultSec.AddRole")
 	err := DBAddRole(role)
 	if err != nil {
-		logutil.Log("error in AddRole: " + err.Error())
+		glog.Errorln("error in AddRole: " + err.Error())
 		return err
 	}
 	return nil
 }
 
 func (d DefaultSec) DeleteRole(name string) error {
-	logutil.Log("DefaultSec.DeleteRole name=" + name)
+	glog.Infoln("DefaultSec.DeleteRole name=" + name)
 	err := DBDeleteRole(name)
 	if err != nil {
-		logutil.Log("error in DeleteRole: " + err.Error())
+		glog.Errorln("error in DeleteRole: " + err.Error())
 		return err
 	}
 	return nil
 }
 
 func (d DefaultSec) GetAllRoles() ([]Role, error) {
-	logutil.Log("DefaultSec.GetAllRoles")
+	glog.Infoln("DefaultSec.GetAllRoles")
 	roles := []Role{}
 	var err error
 	roles, err = DBGetRoles()
 	if err != nil {
-		logutil.Log("error in GetAllRoles: " + err.Error())
+		glog.Errorln("error in GetAllRoles: " + err.Error())
 		return roles, err
 	}
 
@@ -196,7 +196,7 @@ func (d DefaultSec) GetAllRoles() ([]Role, error) {
 }
 
 func (d DefaultSec) GetRole(name string) (Role, error) {
-	logutil.Log("DefaultSec.GetRole Name=" + name)
+	glog.Infoln("DefaultSec.GetRole Name=" + name)
 	permissions := make(map[string]string)
 	permissions["perm1"] = "perm1 desc"
 	role := Role{}
@@ -204,27 +204,27 @@ func (d DefaultSec) GetRole(name string) (Role, error) {
 }
 
 func (d DefaultSec) LogRole(role Role) {
-	logutil.Log("***role***")
-	logutil.Log("role=" + role.Name + " Selected=" + fmt.Sprintf("%t", role.Selected))
+	glog.Infoln("***role***")
+	glog.Infoln("role=" + role.Name + " Selected=" + fmt.Sprintf("%t", role.Selected))
 	for k, v := range role.Permissions {
-		logutil.Log("perm=" + k + " desc=" + v.Description + " selected=" + fmt.Sprintf("%t", v.Selected))
+		glog.Infoln("perm=" + k + " desc=" + v.Description + " selected=" + fmt.Sprintf("%t", v.Selected))
 	}
-	logutil.Log("******")
+	glog.Infoln("******")
 
 }
 
 func (d DefaultSec) LogUser(user User) {
-	logutil.Log("***user***")
-	logutil.Log("user.Name=" + user.Name + " user.Password=" + user.Password)
+	glog.Infoln("***user***")
+	glog.Infoln("user.Name=" + user.Name + " user.Password=" + user.Password)
 	for k, v := range user.Roles {
-		logutil.Log("***role***")
-		logutil.Log("role=" + k + " Selected=" + fmt.Sprintf("%t", v.Selected))
+		glog.Infoln("***role***")
+		glog.Infoln("role=" + k + " Selected=" + fmt.Sprintf("%t", v.Selected))
 		for i, j := range v.Permissions {
-			logutil.Log("perm=" + i + " desc=" + j.Description + " selected=" + fmt.Sprintf("%t", j.Selected))
+			glog.Infoln("perm=" + i + " desc=" + j.Description + " selected=" + fmt.Sprintf("%t", j.Selected))
 		}
-		logutil.Log("******")
+		glog.Infoln("******")
 	}
-	logutil.Log("******")
+	glog.Infoln("******")
 
 }
 
@@ -241,7 +241,7 @@ func (d DefaultSec) Authorize(token string, action string) error {
 		if err == sql.ErrNoRows {
 			return errors.New("expired user session, new user login required")
 		} else {
-			logutil.Log("error in DefaultSec.Authorize: " + err.Error())
+			glog.Infoln("error in DefaultSec.Authorize: " + err.Error())
 			return errors.New("error authorizing user session")
 		}
 	}
@@ -253,13 +253,13 @@ func (d DefaultSec) Authorize(token string, action string) error {
 		if err == sql.ErrNoRows {
 			return errors.New("security error, contact CPM admin")
 		} else {
-			logutil.Log("error in DefaultSec.Authorize: " + err.Error())
+			glog.Errorln("error in DefaultSec.Authorize: " + err.Error())
 			return errors.New("error authorizing user session - u")
 		}
 	}
 
 	//authorize all read-only actions
-	logutil.Log("Authorize:  action=[" + action + "]")
+	glog.Infoln("Authorize:  action=[" + action + "]")
 	if action == "perm-read" {
 		return nil
 	}
@@ -288,13 +288,13 @@ func (d DefaultSec) Authorize(token string, action string) error {
 func (d DefaultSec) ChangePassword(username string, newpass string) error {
 	encryptedPsw, err := EncryptPassword(newpass)
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		return err
 	}
 
 	err = DBUpdatePassword(username, encryptedPsw)
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		return err
 	}
 
@@ -309,7 +309,7 @@ func (d DefaultSec) CompareUserToToken(username string, token string) (bool, err
 		if err == sql.ErrNoRows {
 			return false, errors.New("expired user session, new user login required")
 		} else {
-			logutil.Log("error in CompareUserToToken: " + err.Error())
+			glog.Errorln("error in CompareUserToToken: " + err.Error())
 			return false, err
 		}
 	}
@@ -321,14 +321,14 @@ func (d DefaultSec) CompareUserToToken(username string, token string) (bool, err
 		if err == sql.ErrNoRows {
 			return false, errors.New("security error, contact CPM admin 2")
 		} else {
-			logutil.Log("error in CompareUserToToken: " + err.Error())
+			glog.Errorln("error in CompareUserToToken: " + err.Error())
 			return false, err
 		}
 	}
 
-	logutil.Log("comparing [" + username + "] to [" + user.Name + "]")
+	glog.Infoln("comparing [" + username + "] to [" + user.Name + "]")
 	if username == user.Name {
-		logutil.Log("compare returning true")
+		glog.Errorln("compare returning true")
 		return true, nil
 	}
 

@@ -16,9 +16,9 @@
 package sec
 
 import (
-	"crunchy.com/logutil"
 	"database/sql"
 	"fmt"
+	"github.com/golang/glog"
 	_ "github.com/lib/pq"
 	"log"
 )
@@ -33,7 +33,7 @@ var db = "clusteradmin"
 var dbConn *sql.DB
 
 func init() {
-	logutil.Log("secdb:init: called to open dbConn")
+	glog.Infoln("secdb:init: called to open dbConn")
 	var err error
 	dbConn, err = sql.Open("postgres", "sslmode=disable user="+pguser+" host="+pghost+" port="+pgport+" dbname="+db)
 	if err != nil {
@@ -43,7 +43,7 @@ func init() {
 
 func DBGetUser(Name string) (User, error) {
 	user := User{}
-	logutil.Log("secdb:GetUser: called name=" + Name)
+	glog.Infoln("secdb:GetUser: called name=" + Name)
 	var rows *sql.Rows
 
 	roles, err := DBGetRoles()
@@ -59,10 +59,10 @@ func DBGetUser(Name string) (User, error) {
 	err = dbConn.QueryRow(fmt.Sprintf("select password, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from secuser where name='%s'", Name)).Scan(&user.Password, &user.UpdateDate)
 	switch {
 	case err == sql.ErrNoRows:
-		logutil.Log("DBGetUser:no user with that name")
+		glog.Errorln("DBGetUser:no user with that name")
 		return user, err
 	case err != nil:
-		logutil.Log("DBGetuser:Get User:" + err.Error())
+		glog.Errorln("DBGetuser:Get User:" + err.Error())
 		return user, err
 	default:
 	}
@@ -88,14 +88,14 @@ func DBGetUser(Name string) (User, error) {
 		role = user.Roles[roleName]
 		role.Selected = true
 		user.Roles[roleName] = role
-		logutil.Log("setting role " + roleName + " to true for User " + Name)
+		glog.Infoln("setting role " + roleName + " to true for User " + Name)
 	}
 	if err = rows.Err(); err != nil {
 		return user, err
 	}
 
 	if rolesfound == false {
-		logutil.Log("no roles found for user " + Name)
+		glog.Errorln("no roles found for user " + Name)
 	}
 
 	return user, nil
@@ -104,7 +104,7 @@ func DBGetUser(Name string) (User, error) {
 func DBGetRole(Name string) (Role, error) {
 	role := Role{}
 	role.Selected = false
-	logutil.Log("secdb:GetRole: called")
+	glog.Infoln("secdb:GetRole: called")
 	var rows *sql.Rows
 	var err error
 
@@ -113,7 +113,7 @@ func DBGetRole(Name string) (Role, error) {
 	var perms []Permission
 	perms, err = DBGetPermissions()
 	if err != nil {
-		logutil.Log("error in DBGetRole:GetPermissions")
+		glog.Errorln("error in DBGetRole:GetPermissions")
 		return role, err
 	}
 	role.Permissions = make(map[string]Permission)
@@ -150,7 +150,7 @@ func DBGetRole(Name string) (Role, error) {
 		perm.Selected = true
 		perm.Description = permDescription
 		role.Permissions[permName] = perm
-		//logutil.Log("setting perm " + permName + " to true for role " + roleName)
+		//glog.Infoln("setting perm " + permName + " to true for role " + roleName)
 	}
 	if err = rows.Err(); err != nil {
 		return role, err
@@ -160,7 +160,7 @@ func DBGetRole(Name string) (Role, error) {
 
 func DBGetPermissions() ([]Permission, error) {
 	slice := []Permission{}
-	logutil.Log("secdb:GetPermissions: called")
+	glog.Infoln("secdb:GetPermissions: called")
 	var rows *sql.Rows
 	var err error
 
@@ -191,16 +191,16 @@ func DBGetPermissions() ([]Permission, error) {
 
 func DBDeleteRole(name string) error {
 	queryStr := fmt.Sprintf("delete from secrole where name='%s' returning name", name)
-	logutil.Log("secdb:DeleteRole:" + queryStr)
+	glog.Infoln("secdb:DeleteRole:" + queryStr)
 
 	var theName string
 	err := dbConn.QueryRow(queryStr).Scan(&theName)
 	switch {
 	case err != nil:
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		return err
 	default:
-		logutil.Log("secdb:DeleteRole:role " + name + " deleted ")
+		glog.Infoln("secdb:DeleteRole:role " + name + " deleted ")
 	}
 
 	return nil
@@ -208,34 +208,34 @@ func DBDeleteRole(name string) error {
 
 func DBDeleteUser(name string) error {
 	queryStr := fmt.Sprintf("delete from secuser where name='%s' returning name", name)
-	logutil.Log("secdb:DeleteUser:" + queryStr)
+	glog.Infoln("secdb:DeleteUser:" + queryStr)
 
 	var theName string
 	err := dbConn.QueryRow(queryStr).Scan(&theName)
 	switch {
 	case err != nil:
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		return err
 	default:
-		logutil.Log("secdb:DeleteUser:User " + name + " deleted ")
+		glog.Infoln("secdb:DeleteUser:User " + name + " deleted ")
 	}
 
 	return nil
 }
 
 func DBAddRole(role Role) error {
-	logutil.Log("secdb:AddRole:called")
+	glog.Infoln("secdb:AddRole:called")
 	queryStr := fmt.Sprintf("insert into secrole( name, updatedt) values ( '%s', now()) returning name", role.Name)
 
-	logutil.Log("secdb:AddRole:" + queryStr)
+	glog.Infoln("secdb:AddRole:" + queryStr)
 	var theName string
 	err := dbConn.QueryRow(queryStr).Scan(&theName)
 	switch {
 	case err != nil:
-		logutil.Log("secdb:AddRole:" + err.Error())
+		glog.Errorln("secdb:AddRole:" + err.Error())
 		return err
 	default:
-		logutil.Log("secdb:AddRole: role inserted " + role.Name)
+		glog.Infoln("secdb:AddRole: role inserted " + role.Name)
 	}
 
 	for k, v := range role.Permissions {
@@ -251,54 +251,54 @@ func DBAddRole(role Role) error {
 }
 
 func DBAddUserRole(user string, role string) error {
-	logutil.Log("secdb:AddUserRole:called")
+	glog.Infoln("secdb:AddUserRole:called")
 	queryStr := fmt.Sprintf("insert into secuserrole ( username, role) values ( '%s', '%s') returning username", user, role)
 
-	logutil.Log("secdb:AddUserRole:" + queryStr)
+	glog.Infoln("secdb:AddUserRole:" + queryStr)
 	var theUser string
 	err := dbConn.QueryRow(queryStr).Scan(&theUser)
 	switch {
 	case err != nil:
-		logutil.Log("secdb:AddUserRole:" + err.Error())
+		glog.Errorln("secdb:AddUserRole:" + err.Error())
 		return err
 	default:
-		logutil.Log("secdb:AddUserRole: inserted user=" + user + " role=" + role)
+		glog.Infoln("secdb:AddUserRole: inserted user=" + user + " role=" + role)
 	}
 
 	return nil
 }
 
 func DBAddRolePerm(role string, perm string) error {
-	logutil.Log("secdb:AddRolePerm:called")
+	glog.Infoln("secdb:AddRolePerm:called")
 	queryStr := fmt.Sprintf("insert into secroleperm ( role, perm) values ( '%s', '%s') returning role", role, perm)
 
-	logutil.Log("secdb:AddRolePerm:" + queryStr)
+	glog.Infoln("secdb:AddRolePerm:" + queryStr)
 	var theRole string
 	err := dbConn.QueryRow(queryStr).Scan(&theRole)
 	switch {
 	case err != nil:
-		logutil.Log("secdb:AddRolePerm:" + err.Error())
+		glog.Errorln("secdb:AddRolePerm:" + err.Error())
 		return err
 	default:
-		logutil.Log("secdb:AddRolePerm: inserted role=" + role + " perm=" + perm)
+		glog.Infoln("secdb:AddRolePerm: inserted role=" + role + " perm=" + perm)
 	}
 
 	return nil
 }
 
 func DBAddUser(user User) error {
-	logutil.Log("secdb:AddUser:called")
+	glog.Infoln("secdb:AddUser:called")
 	queryStr := fmt.Sprintf("insert into secuser ( name, password, updatedt) values ( '%s', '%s', now()) returning name", user.Name, user.Password)
 
-	logutil.Log("secdb:AddUser:" + queryStr)
+	glog.Infoln("secdb:AddUser:" + queryStr)
 	var theName string
 	err := dbConn.QueryRow(queryStr).Scan(&theName)
 	switch {
 	case err != nil:
-		logutil.Log("secdb:AddUser:" + err.Error())
+		glog.Errorln("secdb:AddUser:" + err.Error())
 		return err
 	default:
-		logutil.Log("secdb:AddUser: inserted " + user.Name)
+		glog.Infoln("secdb:AddUser: inserted " + user.Name)
 	}
 	for k, v := range user.Roles {
 		if v.Selected {
@@ -313,7 +313,7 @@ func DBAddUser(user User) error {
 }
 
 func DBUpdateRole(role Role) error {
-	logutil.Log("secdb:UpdateRole:called")
+	glog.Infoln("secdb:UpdateRole:called")
 	err := DBDeleteRole(role.Name)
 	if err != nil {
 		return err
@@ -328,7 +328,7 @@ func DBUpdateRole(role Role) error {
 }
 
 func DBUpdateUser(user User) error {
-	logutil.Log("secdb:DBUpdateUser:called")
+	glog.Infoln("secdb:DBUpdateUser:called")
 
 	err := DBDeleteUser(user.Name)
 	if err != nil {
@@ -344,7 +344,7 @@ func DBUpdateUser(user User) error {
 
 func DBGetAllUsers() ([]User, error) {
 	userList := []User{}
-	logutil.Log("secdb:DBGetAllUser: called")
+	glog.Infoln("secdb:DBGetAllUser: called")
 	var rows *sql.Rows
 	var err error
 
@@ -365,7 +365,7 @@ func DBGetAllUsers() ([]User, error) {
 			return userList, err
 		}
 		if err != nil {
-			logutil.Log("error in GetUser" + err.Error())
+			glog.Errorln("error in GetUser" + err.Error())
 			return userList, err
 		}
 		userList = append(userList, user)
@@ -376,10 +376,10 @@ func DBGetAllUsers() ([]User, error) {
 
 	var user User
 	for i := range userList {
-		logutil.Log("fetching user info for " + userList[i].Name)
+		glog.Infoln("fetching user info for " + userList[i].Name)
 		user, err = DBGetUser(userList[i].Name)
 		if err != nil {
-			logutil.Log("error" + err.Error())
+			glog.Errorln("error" + err.Error())
 			return userList, err
 		}
 
@@ -392,7 +392,7 @@ func DBGetAllUsers() ([]User, error) {
 
 func DBGetRoles() ([]Role, error) {
 	slice := []Role{}
-	logutil.Log("secdb:GetRoles: called")
+	glog.Infoln("secdb:GetRoles: called")
 	var rows *sql.Rows
 	var err error
 
@@ -401,7 +401,7 @@ func DBGetRoles() ([]Role, error) {
 	rows, err = dbConn.Query(queryStr)
 
 	if err != nil {
-		logutil.Log("error in GetRoles:" + err.Error())
+		glog.Errorln("error in GetRoles:" + err.Error())
 		return slice, err
 	}
 	defer rows.Close()
@@ -421,10 +421,10 @@ func DBGetRoles() ([]Role, error) {
 
 	var role Role
 	for i := range slice {
-		logutil.Log("fetching role info for " + slice[i].Name)
+		glog.Infoln("fetching role info for " + slice[i].Name)
 		role, err = DBGetRole(slice[i].Name)
 		if err != nil {
-			logutil.Log("error" + err.Error())
+			glog.Errorln("error" + err.Error())
 			return slice, err
 		}
 
@@ -435,31 +435,31 @@ func DBGetRoles() ([]Role, error) {
 }
 
 func LogUser(user User) {
-	logutil.Log("***user***")
-	logutil.Log("user.Name=" + user.Name + " user.Password=" + user.Password)
+	glog.Infoln("***user***")
+	glog.Infoln("user.Name=" + user.Name + " user.Password=" + user.Password)
 	for k, v := range user.Roles {
-		logutil.Log("***role***")
-		logutil.Log("role=" + k + " Selected=" + fmt.Sprintf("%t", v.Selected))
+		glog.Infoln("***role***")
+		glog.Infoln("role=" + k + " Selected=" + fmt.Sprintf("%t", v.Selected))
 		for i, j := range v.Permissions {
-			logutil.Log("perm=" + i + " desc=" + j.Description + " selected=" + fmt.Sprintf("%t", j.Selected))
+			glog.Infoln("perm=" + i + " desc=" + j.Description + " selected=" + fmt.Sprintf("%t", j.Selected))
 		}
-		logutil.Log("******")
+		glog.Infoln("******")
 	}
-	logutil.Log("******")
+	glog.Infoln("******")
 
 }
 func LogPermissions(perms map[string]Permission) {
-	logutil.Log("***log of permissions***")
+	glog.Infoln("***log of permissions***")
 	for i, j := range perms {
-		logutil.Log("perm=" + i + " desc=" + j.Description + " selected=" + fmt.Sprintf("%t", j.Selected))
+		glog.Infoln("perm=" + i + " desc=" + j.Description + " selected=" + fmt.Sprintf("%t", j.Selected))
 	}
-	logutil.Log("******")
+	glog.Infoln("******")
 
 }
 
 func DBGetSession(token string) (Session, error) {
 	session := Session{}
-	logutil.Log("secdb:GetSession: called token=" + token)
+	glog.Infoln("secdb:GetSession: called token=" + token)
 
 	queryStr := fmt.Sprintf("select token, name, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS')  from secsession where token = '%s'", token)
 
@@ -470,66 +470,66 @@ func DBGetSession(token string) (Session, error) {
 
 	switch {
 	case err == sql.ErrNoRows:
-		logutil.Log("secdb:DBGetSession:no token matched")
+		glog.Errorln("secdb:DBGetSession:no token matched")
 		return session, err
 	case err != nil:
-		logutil.Log("secdb:DBGetSession:" + err.Error())
+		glog.Errorln("secdb:DBGetSession:" + err.Error())
 		return session, err
 	default:
-		logutil.Log("secdb:DBGetSession: token returned is " + session.Token)
+		glog.Infoln("secdb:DBGetSession: token returned is " + session.Token)
 	}
 
 	return session, nil
 }
 
 func DBAddSession(uuid string, id string) error {
-	logutil.Log("secdb:DBAddSession:called")
+	glog.Infoln("secdb:DBAddSession:called")
 	queryStr := fmt.Sprintf("insert into secsession ( token, name, updatedt) values ( '%s', '%s', now()) returning token", uuid, id)
 
-	logutil.Log("secdb:DBAddSession:" + queryStr)
+	glog.Infoln("secdb:DBAddSession:" + queryStr)
 	var theToken string
 	err := dbConn.QueryRow(queryStr).Scan(&theToken)
 	switch {
 	case err != nil:
-		logutil.Log("secdb:DBAddSession:" + err.Error())
+		glog.Errorln("secdb:DBAddSession:" + err.Error())
 		return err
 	default:
-		logutil.Log("secdb:AddSession: Session inserted " + theToken)
+		glog.Infoln("secdb:AddSession: Session inserted " + theToken)
 	}
 
 	return nil
 }
 
 func DBDeleteSession(uuid string) error {
-	logutil.Log("secdb:DBDeleteSession:called")
+	glog.Infoln("secdb:DBDeleteSession:called")
 	queryStr := fmt.Sprintf("delete from secsession where token='%s' returning token", uuid)
-	logutil.Log("secdb:DeleteSession:" + queryStr)
+	glog.Infoln("secdb:DeleteSession:" + queryStr)
 
 	var theToken string
 	err := dbConn.QueryRow(queryStr).Scan(&theToken)
 	switch {
 	case err != nil:
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		return err
 	default:
-		logutil.Log("secdb:DeleteSession " + uuid + " deleted ")
+		glog.Infoln("secdb:DeleteSession " + uuid + " deleted ")
 	}
 
 	return nil
 }
 
 func DBUpdatePassword(username string, password string) error {
-	logutil.Log("UpdatePassword:called")
+	glog.Infoln("UpdatePassword:called")
 	queryStr := fmt.Sprintf("update secuser set ( password, updatedt) = ('%s', now()) where name = '%s' returning name", password, username)
 
-	logutil.Log("UpdatePassword: str=[" + queryStr + "]")
+	glog.Infoln("UpdatePassword: str=[" + queryStr + "]")
 	var theName string
 	err := dbConn.QueryRow(queryStr).Scan(&theName)
 	switch {
 	case err != nil:
 		return err
 	default:
-		logutil.Log("UpdatePassword:updated " + username)
+		glog.Infoln("UpdatePassword:updated " + username)
 	}
 	return nil
 }

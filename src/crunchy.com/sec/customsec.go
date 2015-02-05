@@ -16,7 +16,7 @@
 package sec
 
 import (
-	"crunchy.com/logutil"
+	"github.com/golang/glog"
 )
 
 //this is a place holder for any future security implementations
@@ -26,66 +26,66 @@ type CustomSec struct {
 }
 
 func (d CustomSec) Login(id string, psw string) (string, error) {
-	logutil.Log("CustomSec.Login")
+	glog.Infoln("CustomSec.Login")
 	return "", nil
 }
 
 func (d CustomSec) Logout(id string) error {
-	logutil.Log("CustomSec.Logout")
+	glog.Infoln("CustomSec.Logout")
 	return nil
 }
 
 func (d CustomSec) UpdateUser(user User) error {
-	logutil.Log("CustomSec.UpdateUser")
+	glog.Infoln("CustomSec.UpdateUser")
 	return nil
 }
 
 func (d CustomSec) AddUser(user User) error {
-	logutil.Log("CustomSec.AddUser")
+	glog.Infoln("CustomSec.AddUser")
 	return nil
 }
 
 func (d CustomSec) GetUser(id string) (User, error) {
 	user := User{Name: "myname", Password: "mypass"}
-	logutil.Log("CustomSec.GetUser id=" + id)
+	glog.Infoln("CustomSec.GetUser id=" + id)
 	return user, nil
 }
 
 func (d CustomSec) GetAllUsers() ([]User, error) {
 	user := User{Name: "myname", Password: "mypass"}
 	users := []User{user}
-	logutil.Log("CustomSec.GetAllUsers")
+	glog.Infoln("CustomSec.GetAllUsers")
 	return users, nil
 }
 
 func (d CustomSec) DeleteUser(id string) error {
-	logutil.Log("CustomSec.DeleteUser id=" + id)
+	glog.Infoln("CustomSec.DeleteUser id=" + id)
 	return nil
 }
 
 func (d CustomSec) UpdateRole(role Role) error {
-	logutil.Log("CustomSec.UpdateRole")
+	glog.Infoln("CustomSec.UpdateRole")
 	return nil
 }
 
 func (d CustomSec) AddRole(role Role) error {
-	logutil.Log("CustomSec.AddRole")
+	glog.Infoln("CustomSec.AddRole")
 	return nil
 }
 
 func (d CustomSec) DeleteRole(name string) error {
-	logutil.Log("CustomSec.DeleteRole name=" + name)
+	glog.Infoln("CustomSec.DeleteRole name=" + name)
 	return nil
 }
 
 func (d CustomSec) GetAllRoles() ([]Role, error) {
-	logutil.Log("CustomSec.GetAllRoles")
+	glog.Infoln("CustomSec.GetAllRoles")
 	roles := []Role{}
 	return roles, nil
 }
 
 func (d CustomSec) GetRole(name string) (Role, error) {
-	logutil.Log("CustomSec.GetRole Name=" + name)
+	glog.Infoln("CustomSec.GetRole Name=" + name)
 	permissions := make(map[string]string)
 	permissions["perm1"] = "perm1 desc"
 	permissions["perm2"] = "perm2 desc"

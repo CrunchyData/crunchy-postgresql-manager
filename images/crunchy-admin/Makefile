@@ -7,6 +7,7 @@ build:
 	        mkdir bin
 	        cp ../../sql/clusteradmin.sql  ./bin/setup.sql
 	        cp ../../sql/*  ./bin
+	        cp ../../sbin/startadmin.sh ./bin
 	        cp ../../bin/adminapi  ./bin
 	        cp ../../bin/cpmagentserver  ./bin
 	        cp ../../bin/dummyclient  ./bin

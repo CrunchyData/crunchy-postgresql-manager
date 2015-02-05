@@ -17,8 +17,8 @@ package main
 
 import (
 	"crunchy.com/admindb"
-	"crunchy.com/logutil"
 	"github.com/ant0ine/go-json-rest/rest"
+	"github.com/golang/glog"
 	"net/http"
 )
 
@@ -26,14 +26,14 @@ func GetAllSettings(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logutil.Log("GetAllSettings: validate token error " + err.Error())
+		glog.Errorln("GetAllSettings: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	results, err := admindb.GetAllDBSettings()
 	if err != nil {
-		logutil.Log("GetAllSettings: error-" + err.Error())
+		glog.Errorln("GetAllSettings: error-" + err.Error())
 		rest.Error(w, err.Error(), 400)
 	}
 	settings := make([]Setting, len(results))
@@ -49,24 +49,24 @@ func GetAllSettings(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func SaveSettings(w rest.ResponseWriter, r *rest.Request) {
-	logutil.Log("SaveSettings:")
+	glog.Infoln("SaveSettings:")
 	settings := Settings{}
 	err := r.DecodeJsonPayload(&settings)
 	if err != nil {
-		logutil.Log("SaveSettings: error in decode" + err.Error())
+		glog.Errorln("SaveSettings: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	err = secimpl.Authorize(settings.Token, "perm-setting")
 	if err != nil {
-		logutil.Log("SaveSettings: authorize error " + err.Error())
+		glog.Errorln("SaveSettings: authorize error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
-	logutil.Log("SaveSettings: DockerRegistry=" + settings.DockerRegistry)
-	logutil.Log("SaveSettings: PGPort=" + settings.PGPort)
-	logutil.Log("SaveSettings: DomainName=" + settings.DomainName)
+	glog.Infoln("SaveSettings: DockerRegistry=" + settings.DockerRegistry)
+	glog.Infoln("SaveSettings: PGPort=" + settings.PGPort)
+	glog.Infoln("SaveSettings: DomainName=" + settings.DomainName)
 
 	dbsetting := admindb.DBSetting{"DOCKER-REGISTRY", settings.DockerRegistry, ""}
 	err2 := admindb.UpdateDBSetting(dbsetting)
@@ -75,7 +75,7 @@ func SaveSettings(w rest.ResponseWriter, r *rest.Request) {
 	dbsetting = admindb.DBSetting{"DOMAIN-NAME", settings.DomainName, ""}
 	err2 = admindb.UpdateDBSetting(dbsetting)
 	if err2 != nil {
-		logutil.Log("SaveSettings: error in UpdateDBSetting " + err.Error())
+		glog.Errorln("SaveSettings: error in UpdateDBSetting " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -87,25 +87,25 @@ func SaveSettings(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func SaveProfiles(w rest.ResponseWriter, r *rest.Request) {
-	logutil.Log("SaveProfiles:")
+	glog.Infoln("SaveProfiles:")
 	profiles := Profiles{}
 	err := r.DecodeJsonPayload(&profiles)
 	if err != nil {
-		logutil.Log("SaveProfiles: error in decode" + err.Error())
+		glog.Errorln("SaveProfiles: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = secimpl.Authorize(profiles.Token, "perm-setting")
 	if err != nil {
-		logutil.Log("SaveProfiles: authorize error " + err.Error())
+		glog.Errorln("SaveProfiles: authorize error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
-	logutil.Log("SaveProfiles: smallCPU=" + profiles.SmallCPU + " smallMEM=" + profiles.SmallMEM)
-	logutil.Log("SaveProfiles: mediumCPU=" + profiles.MediumCPU + " mediumMEM=" + profiles.MediumMEM)
-	logutil.Log("SaveProfiles: largeCPU=" + profiles.LargeCPU + " largeMEM=" + profiles.LargeMEM)
+	glog.Infoln("SaveProfiles: smallCPU=" + profiles.SmallCPU + " smallMEM=" + profiles.SmallMEM)
+	glog.Infoln("SaveProfiles: mediumCPU=" + profiles.MediumCPU + " mediumMEM=" + profiles.MediumMEM)
+	glog.Infoln("SaveProfiles: largeCPU=" + profiles.LargeCPU + " largeMEM=" + profiles.LargeMEM)
 
 	dbsetting := admindb.DBSetting{"S-DOCKER-PROFILE-CPU", profiles.SmallCPU, ""}
 	err2 := admindb.UpdateDBSetting(dbsetting)
@@ -120,7 +120,7 @@ func SaveProfiles(w rest.ResponseWriter, r *rest.Request) {
 	dbsetting = admindb.DBSetting{"L-DOCKER-PROFILE-MEM", profiles.LargeMEM, ""}
 	err2 = admindb.UpdateDBSetting(dbsetting)
 	if err2 != nil {
-		logutil.Log("SaveProfiles: sql error " + err2.Error())
+		glog.Errorln("SaveProfiles: sql error " + err2.Error())
 		rest.Error(w, err2.Error(), 400)
 		return
 	}
@@ -133,24 +133,24 @@ func SaveProfiles(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func SaveClusterProfiles(w rest.ResponseWriter, r *rest.Request) {
-	logutil.Log("SaveProfiles:")
+	glog.Infoln("SaveProfiles:")
 	profiles := ClusterProfiles{}
 	var err error
 	err = r.DecodeJsonPayload(&profiles)
 	if err != nil {
-		logutil.Log("SaveProfiles: error in decode" + err.Error())
+		glog.Errorln("SaveProfiles: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = secimpl.Authorize(profiles.Token, "perm-setting")
 	if err != nil {
-		logutil.Log("SaveProfiles: authorize error " + err.Error())
+		glog.Errorln("SaveProfiles: authorize error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
-	logutil.Log("SaveClusterProfiles: size=" + profiles.Size)
+	glog.Infoln("SaveClusterProfiles: size=" + profiles.Size)
 
 	dbsetting := admindb.DBSetting{"CP-" + profiles.Size + "-COUNT", profiles.Count, ""}
 	err = admindb.UpdateDBSetting(dbsetting)
@@ -166,7 +166,7 @@ func SaveClusterProfiles(w rest.ResponseWriter, r *rest.Request) {
 	err = admindb.UpdateDBSetting(dbsetting)
 
 	if err != nil {
-		logutil.Log("SaveClusterProfiles: sql error " + err.Error())
+		glog.Errorln("SaveClusterProfiles: sql error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -183,7 +183,7 @@ func getClusterProfileInfo(sz string) (ClusterProfiles, error) {
 
 	results, err := admindb.GetAllDBSettingsMap()
 	if err != nil {
-		logutil.Log("GetAllSettings: error-" + err.Error())
+		glog.Errorln("GetAllSettings: error-" + err.Error())
 		return prof, err
 	}
 

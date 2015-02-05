@@ -18,8 +18,8 @@ package main
 import (
 	"crunchy.com/admindb"
 	"crunchy.com/backup"
-	"crunchy.com/logutil"
 	"github.com/ant0ine/go-json-rest/rest"
+	"github.com/golang/glog"
 	"net/http"
 )
 
@@ -49,38 +49,38 @@ func BackupNow(w rest.ResponseWriter, r *rest.Request) {
 	postMsg := BackupNowPost{}
 	err := r.DecodeJsonPayload(&postMsg)
 	if err != nil {
-		logutil.Log("BackupNow: error in decode" + err.Error())
+		glog.Errorln("BackupNow: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = secimpl.Authorize(postMsg.Token, "perm-backup")
 	if err != nil {
-		logutil.Log("BackupNow: validate token error " + err.Error())
+		glog.Errorln("BackupNow: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	if postMsg.ServerID == "" {
-		logutil.Log("BackupNow: error node ServerID required")
+		glog.Errorln("BackupNow: error node ServerID required")
 		rest.Error(w, "server ID required", 400)
 		return
 	}
 	if postMsg.ProfileName == "" {
-		logutil.Log("BackupNow: error node ProfileName required")
+		glog.Errorln("BackupNow: error node ProfileName required")
 		rest.Error(w, "ProfileName required", 400)
 		return
 	}
 
 	if postMsg.ScheduleID == "" {
-		logutil.Log("BackupNow: error schedule ID required")
+		glog.Errorln("BackupNow: error schedule ID required")
 		rest.Error(w, "schedule ID required", 400)
 		return
 	}
 
 	schedule, err := backup.DBGetSchedule(postMsg.ScheduleID)
 	if err != nil {
-		logutil.Log("BackupNow: " + err.Error())
+		glog.Errorln("BackupNow: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -89,7 +89,7 @@ func BackupNow(w rest.ResponseWriter, r *rest.Request) {
 	server := admindb.DBServer{}
 	server, err = admindb.GetDBServer(postMsg.ServerID)
 	if err != nil {
-		logutil.Log("BackupNow: " + err.Error())
+		glog.Errorln("BackupNow: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -99,7 +99,7 @@ func BackupNow(w rest.ResponseWriter, r *rest.Request) {
 	var domainname admindb.DBSetting
 	domainname, err = admindb.GetDBSetting("DOMAIN-NAME")
 	if err != nil {
-		logutil.Log("BackupNow: DOMAIN-NAME err " + err.Error())
+		glog.Errorln("BackupNow: DOMAIN-NAME err " + err.Error())
 	}
 
 	request := backup.BackupRequest{}
@@ -112,9 +112,9 @@ func BackupNow(w rest.ResponseWriter, r *rest.Request) {
 	backupServerURL := "cluster-backup." + domainname.Value + ":13010"
 	output, err := backup.BackupNowClient(backupServerURL, request)
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 	}
-	logutil.Log("output=" + output)
+	glog.Infoln("output=" + output)
 
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}
@@ -126,36 +126,36 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 	postMsg := AddSchedulePost{}
 	err := r.DecodeJsonPayload(&postMsg)
 	if err != nil {
-		logutil.Log("AddSchedule: error in decode" + err.Error())
+		glog.Errorln("AddSchedule: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = secimpl.Authorize(postMsg.Token, "perm-backup")
 	if err != nil {
-		logutil.Log("AddSchedule: validate token error " + err.Error())
+		glog.Errorln("AddSchedule: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	if postMsg.ServerID == "" {
-		logutil.Log("AddSchedule: error node ServerID required")
+		glog.Errorln("AddSchedule: error node ServerID required")
 		rest.Error(w, "server ID required", 400)
 		return
 	}
 
 	if postMsg.ContainerName == "" {
-		logutil.Log("AddSchedule: error node ContainerName required")
+		glog.Errorln("AddSchedule: error node ContainerName required")
 		rest.Error(w, "ContainerName required", 400)
 		return
 	}
 	if postMsg.ProfileName == "" {
-		logutil.Log("AddSchedule: error node ProfileName required")
+		glog.Errorln("AddSchedule: error node ProfileName required")
 		rest.Error(w, "ProfileName required", 400)
 		return
 	}
 	if postMsg.Name == "" {
-		logutil.Log("AddSchedule: error node Name required")
+		glog.Errorln("AddSchedule: error node Name required")
 		rest.Error(w, "Name required", 400)
 		return
 	}
@@ -177,12 +177,12 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 
 	result, err := backup.DBAddSchedule(s)
 	if err != nil {
-		logutil.Log("GetNode: " + err.Error())
+		glog.Errorln("GetNode: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
-	logutil.Log("AddSchedule: new ID " + result)
+	glog.Infoln("AddSchedule: new ID " + result)
 
 	//we choose by design to not notify the backup server
 	//on schedule adds, instead we mark any new schedule
@@ -199,7 +199,7 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 func DeleteSchedule(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-backup")
 	if err != nil {
-		logutil.Log("DeleteSchedule: validate token error " + err.Error())
+		glog.Errorln("DeleteSchedule: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -212,7 +212,7 @@ func DeleteSchedule(w rest.ResponseWriter, r *rest.Request) {
 
 	err = backup.DBDeleteSchedule(ID)
 	if err != nil {
-		logutil.Log("DeleteSchedule: " + err.Error())
+		glog.Errorln("DeleteSchedule: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -224,7 +224,7 @@ func DeleteSchedule(w rest.ResponseWriter, r *rest.Request) {
 	var domainname admindb.DBSetting
 	domainname, err = admindb.GetDBSetting("DOMAIN-NAME")
 	if err != nil {
-		logutil.Log("DeleteSchedule: DOMAIN-NAME err " + err.Error())
+		glog.Errorln("DeleteSchedule: DOMAIN-NAME err " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -235,12 +235,12 @@ func DeleteSchedule(w rest.ResponseWriter, r *rest.Request) {
 	backupServerURL := "cluster-backup." + domainname.Value + ":13010"
 	output, err := backup.ReloadClient(backupServerURL, s)
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
 	}
-	logutil.Log("reload output=" + output)
+	glog.Infoln("reload output=" + output)
 
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}
@@ -252,7 +252,7 @@ func DeleteSchedule(w rest.ResponseWriter, r *rest.Request) {
 func GetSchedule(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logutil.Log("GetSchedule: validate token error " + err.Error())
+		glog.Errorln("GetSchedule: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -265,7 +265,7 @@ func GetSchedule(w rest.ResponseWriter, r *rest.Request) {
 
 	result, err := backup.DBGetSchedule(ID)
 	if err != nil {
-		logutil.Log("GetNode: " + err.Error())
+		glog.Errorln("GetNode: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -282,7 +282,7 @@ func GetAllSchedules(w rest.ResponseWriter, r *rest.Request) {
 	}
 	err := secimpl.Authorize(Token, "perm-read")
 	if err != nil {
-		logutil.Log("GetAllSchedules: validate token error " + err.Error())
+		glog.Errorln("GetAllSchedules: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -295,7 +295,7 @@ func GetAllSchedules(w rest.ResponseWriter, r *rest.Request) {
 
 	schedules, err := backup.DBGetAllSchedules(ContainerName)
 	if err != nil {
-		logutil.Log("GetAllSchedules: " + err.Error())
+		glog.Errorln("GetAllSchedules: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -312,7 +312,7 @@ func GetStatus(w rest.ResponseWriter, r *rest.Request) {
 	}
 	err := secimpl.Authorize(Token, "perm-read")
 	if err != nil {
-		logutil.Log("GetStatus: validate token error " + err.Error())
+		glog.Errorln("GetStatus: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -323,7 +323,7 @@ func GetStatus(w rest.ResponseWriter, r *rest.Request) {
 	}
 	stat, err := backup.DBGetStatus(ID)
 	if err != nil {
-		logutil.Log("GetStatus: " + err.Error())
+		glog.Errorln("GetStatus: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -340,7 +340,7 @@ func GetAllStatus(w rest.ResponseWriter, r *rest.Request) {
 	}
 	err := secimpl.Authorize(Token, "perm-read")
 	if err != nil {
-		logutil.Log("GetAllStatus: validate token error " + err.Error())
+		glog.Errorln("GetAllStatus: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -352,7 +352,7 @@ func GetAllStatus(w rest.ResponseWriter, r *rest.Request) {
 
 	stats, err := backup.DBGetAllStatus(ID)
 	if err != nil {
-		logutil.Log("GetAllStatus: " + err.Error())
+		glog.Errorln("GetAllStatus: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -366,60 +366,60 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 	postMsg := AddSchedulePost{}
 	err := r.DecodeJsonPayload(&postMsg)
 	if err != nil {
-		logutil.Log("UpdateSchedule: error in decode" + err.Error())
+		glog.Errorln("UpdateSchedule: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = secimpl.Authorize(postMsg.Token, "perm-backup")
 	if err != nil {
-		logutil.Log("UpdateSchedule: validate token error " + err.Error())
+		glog.Errorln("UpdateSchedule: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	if postMsg.ID == "" {
-		logutil.Log("UpdateSchedule: error schedule ID required")
+		glog.Errorln("UpdateSchedule: error schedule ID required")
 		rest.Error(w, "schedule ID required", 400)
 		return
 	}
 	if postMsg.ServerID == "" {
-		logutil.Log("UpdateSchedule: error ServerID required")
+		glog.Errorln("UpdateSchedule: error ServerID required")
 		rest.Error(w, "schedule ID required", 400)
 		return
 	}
 	if postMsg.Enabled == "" {
-		logutil.Log("UpdateSchedule: error Enabled required")
+		glog.Errorln("UpdateSchedule: error Enabled required")
 		rest.Error(w, "Enabled required", 400)
 		return
 	}
 	if postMsg.Minutes == "" {
-		logutil.Log("UpdateSchedule: error Minutes required")
+		glog.Errorln("UpdateSchedule: error Minutes required")
 		rest.Error(w, "schedule Minutes required", 400)
 		return
 	}
 	if postMsg.Hours == "" {
-		logutil.Log("UpdateSchedule: error Hours required")
+		glog.Errorln("UpdateSchedule: error Hours required")
 		rest.Error(w, "schedule Hours required", 400)
 		return
 	}
 	if postMsg.DayOfMonth == "" {
-		logutil.Log("UpdateSchedule: error DayOfMonth required")
+		glog.Errorln("UpdateSchedule: error DayOfMonth required")
 		rest.Error(w, "schedule DayOfMonth required", 400)
 		return
 	}
 	if postMsg.Month == "" {
-		logutil.Log("UpdateSchedule: error Month required")
+		glog.Errorln("UpdateSchedule: error Month required")
 		rest.Error(w, "schedule Month required", 400)
 		return
 	}
 	if postMsg.DayOfWeek == "" {
-		logutil.Log("UpdateSchedule: error DayOfWeek required")
+		glog.Errorln("UpdateSchedule: error DayOfWeek required")
 		rest.Error(w, "schedule DayOfWeek required", 400)
 		return
 	}
 	if postMsg.Name == "" {
-		logutil.Log("UpdateSchedule: error Name required")
+		glog.Errorln("UpdateSchedule: error Name required")
 		rest.Error(w, "schedule Name required", 400)
 		return
 	}
@@ -437,7 +437,7 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 
 	err = backup.DBUpdateSchedule(s)
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -449,17 +449,17 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 	var domainname admindb.DBSetting
 	domainname, err = admindb.GetDBSetting("DOMAIN-NAME")
 	if err != nil {
-		logutil.Log("BackupNow: DOMAIN-NAME err " + err.Error())
+		glog.Errorln("BackupNow: DOMAIN-NAME err " + err.Error())
 	}
 	backupServerURL := "cluster-backup." + domainname.Value + ":13010"
 	output, err := backup.ReloadClient(backupServerURL, s)
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
 	}
-	logutil.Log("reload output=" + output)
+	glog.Infoln("reload output=" + output)
 
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}
@@ -471,14 +471,14 @@ func GetBackupNodes(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logutil.Log("GetAllNodes: validate token error " + err.Error())
+		glog.Errorln("GetAllNodes: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	results, err := admindb.GetAllDBNodes()
 	if err != nil {
-		logutil.Log("GetAllNodes: " + err.Error())
+		glog.Errorln("GetAllNodes: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 	}
 	i := 0

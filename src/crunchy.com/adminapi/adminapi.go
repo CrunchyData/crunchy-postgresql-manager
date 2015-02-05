@@ -20,12 +20,13 @@ import (
 	"crunchy.com/admindb"
 	"crunchy.com/backup"
 	"crunchy.com/cpmagent"
-	"crunchy.com/logutil"
 	"crunchy.com/util"
 	"database/sql"
 	"errors"
+	"flag"
 	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
+	"github.com/golang/glog"
 	"log"
 	"net/http"
 	"os"
@@ -35,6 +36,8 @@ import (
 
 func main() {
 
+	flag.Parse() //required for glog flags processing
+
 	var dbConn *sql.DB
 	found := false
 	var err error
@@ -42,11 +45,11 @@ func main() {
 	for i := 0; i < 10; i++ {
 		dbConn, err = util.GetConnection("clusteradmin")
 		if err != nil {
-			logutil.Log(err.Error())
-			logutil.Log("could not get initial database connection, will retry in 5 seconds")
+			glog.Errorln(err.Error())
+			glog.Errorln("could not get initial database connection, will retry in 5 seconds")
 			time.Sleep(time.Millisecond * 5000)
 		} else {
-			logutil.Log("got db connection")
+			glog.Infoln("got db connection")
 			found = true
 			break
 		}
@@ -240,7 +243,7 @@ type KubeResponse struct {
 func Kube(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logutil.Log("Kube: validate token error " + err.Error())
+		glog.Errorln("Kube: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -261,7 +264,7 @@ func MonitorContainerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logutil.Log("MonitorContainerGetInfo: authorize error " + err.Error())
+		glog.Errorln("MonitorContainerGetInfo: authorize error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -282,7 +285,7 @@ func MonitorContainerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 		Metric == "loadtest" || Metric == "bgwriter" ||
 		Metric == "statdatabase" {
 	} else {
-		logutil.Log("MonitorContainerGetInfo: error-invalid metric type")
+		glog.Errorln("MonitorContainerGetInfo: error-invalid metric type")
 		err = errors.New("invalid metric type")
 		rest.Error(w, err.Error(), 400)
 		return
@@ -299,7 +302,7 @@ func MonitorContainerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 
 	node, err := admindb.GetDBNode(ID)
 	if err != nil {
-		logutil.Log("MonitorContainerGetInfo:" + err.Error())
+		glog.Errorln("MonitorContainerGetInfo:" + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -326,7 +329,7 @@ func MonitorContainerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 		InsertCount)
 
 	for i := 0; i < len(cmd.Args); i++ {
-		logutil.Log("MonitorContainerGetInfo:" + cmd.Args[i])
+		glog.Infoln("MonitorContainerGetInfo:" + cmd.Args[i])
 	}
 
 	var out bytes.Buffer
@@ -335,12 +338,13 @@ func MonitorContainerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	cmd.Stderr = &stderr
 	err = cmd.Run()
 	if err != nil {
-		logutil.Log("MonitorContainerGetInfo:" + err.Error())
+		glog.Errorln("MonitorContainerGetInfo:" + err.Error())
+		glog.Flush()
 		errorString := fmt.Sprintf("%s\n%s\n%s\n", err.Error(), out.String(), stderr.String())
 		rest.Error(w, errorString, 400)
 		return
 	}
-	logutil.Log("MonitorContainerGetInfo: command output was " + out.String())
+	glog.Infoln("MonitorContainerGetInfo: command output was " + out.String())
 
 	//w.(http.ResponseWriter).Write([]byte(output))
 	w.(http.ResponseWriter).Write([]byte(out.String()))
@@ -362,14 +366,14 @@ func MonitorContainerLoadtest(w rest.ResponseWriter, r *rest.Request) {
 
 	node, err := admindb.GetDBNode(ID)
 	if err != nil {
-		logutil.Log("MonitorContainerGetInfo:" + err.Error())
+		glog.Errorln("MonitorContainerGetInfo:" + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	server, err2 := admindb.GetDBServer(node.ServerID)
 	if err2 != nil {
-		logutil.Log("MonitorContainerGetInfo:" + err2.Error())
+		glog.Errorln("MonitorContainerGetInfo:" + err2.Error())
 		rest.Error(w, err2.Error(), 400)
 		return
 	}
@@ -380,7 +384,7 @@ func MonitorContainerLoadtest(w rest.ResponseWriter, r *rest.Request) {
 	output, err = cpmagent.AgentCommandConfigureNode("/cluster/bin/loadtest", node.Name,
 		port, Writes, "", "", "", "", server.IPAddress)
 	if err != nil {
-		logutil.Log("MonitorContainerGetInfo:" + err.Error())
+		glog.Errorln("MonitorContainerGetInfo:" + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}

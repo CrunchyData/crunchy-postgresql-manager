@@ -19,8 +19,8 @@ import (
 	"bytes"
 	"crunchy.com/admindb"
 	"crunchy.com/cpmagent"
-	"crunchy.com/logutil"
 	"github.com/ant0ine/go-json-rest/rest"
+	"github.com/golang/glog"
 	"net/http"
 	"os"
 	"os/exec"
@@ -29,14 +29,14 @@ import (
 func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logutil.Log("GetNode: validate token error " + err.Error())
+		glog.Errorln("GetNode: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	ID := r.PathParam("ID")
 	if ID == "" {
-		logutil.Log("GetNode: error node ID required")
+		glog.Errorln("GetNode: error node ID required")
 		rest.Error(w, "node ID required", 400)
 		return
 	}
@@ -48,7 +48,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 	if err != nil {
-		logutil.Log("GetNode: " + err.Error())
+		glog.Errorln("GetNode: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -58,7 +58,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 
 	currentStatus, err = GetPGStatus(results.Name)
 	if err != nil {
-		logutil.Log("GetNode:" + err.Error())
+		glog.Errorln("GetNode:" + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -85,12 +85,12 @@ func GetPGStatus(hostname string) (string, error) {
 	cmd.Stderr = &stderr
 	err = cmd.Run()
 	if err != nil {
-		logutil.Log("GetNode:" + err.Error())
+		glog.Errorln("GetNode:" + err.Error())
 		return "", err
 	}
-	logutil.Log("GetPGStatus: command output was " + out.String())
+	glog.Infoln("GetPGStatus: command output was " + out.String())
 
-	logutil.Log("GetPGStatus: output from ping was [" + out.String() + "]")
+	glog.Infoln("GetPGStatus: output from ping was [" + out.String() + "]")
 	currentStatus = "OFFLINE"
 
 	if out.String() == "up" {
@@ -104,14 +104,14 @@ func GetAllNodes(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logutil.Log("GetAllNodes: validate token error " + err.Error())
+		glog.Errorln("GetAllNodes: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	results, err := admindb.GetAllDBNodes()
 	if err != nil {
-		logutil.Log("GetAllNodes: " + err.Error())
+		glog.Errorln("GetAllNodes: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 	}
 	nodes := make([]ClusterNode, len(results))
@@ -136,14 +136,14 @@ func GetAllNodesNotInCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logutil.Log("GetAllNodesNotInCluster: validate token error " + err.Error())
+		glog.Errorln("GetAllNodesNotInCluster: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	results, err := admindb.GetAllDBNodesNotInCluster()
 	if err != nil {
-		logutil.Log("GetAllNodesNotInCluster: " + err.Error())
+		glog.Errorln("GetAllNodesNotInCluster: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 	}
 	nodes := make([]ClusterNode, len(results))
@@ -167,21 +167,21 @@ func GetAllNodesNotInCluster(w rest.ResponseWriter, r *rest.Request) {
 func GetAllNodesForCluster(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logutil.Log("GetAllForCluster: validate token error " + err.Error())
+		glog.Errorln("GetAllForCluster: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	ClusterID := r.PathParam("ClusterID")
 	if ClusterID == "" {
-		logutil.Log("GetAllNodesForCluster: node ClusterID required")
+		glog.Errorln("GetAllNodesForCluster: node ClusterID required")
 		rest.Error(w, "node ClusterID required", 400)
 		return
 	}
 
 	results, err := admindb.GetAllDBNodesForCluster(ClusterID)
 	if err != nil {
-		logutil.Log("GetAllNodesForCluster:" + err.Error())
+		glog.Errorln("GetAllNodesForCluster:" + err.Error())
 		rest.Error(w, err.Error(), 400)
 	}
 	nodes := make([]ClusterNode, len(results))
@@ -209,14 +209,14 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-container")
 	if err != nil {
-		logutil.Log("DeleteNode: validate token error " + err.Error())
+		glog.Errorln("DeleteNode: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	ID := r.PathParam("ID")
 	if ID == "" {
-		logutil.Log("DeleteNode: error node ID required")
+		glog.Errorln("DeleteNode: error node ID required")
 		rest.Error(w, "node ID required", 400)
 		return
 	}
@@ -225,7 +225,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	var dbNode admindb.DBClusterNode
 	dbNode, err = admindb.GetDBNode(ID)
 	if err != nil {
-		logutil.Log("DeleteNode: " + err.Error())
+		glog.Errorln("DeleteNode: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -234,28 +234,28 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	server := admindb.DBServer{}
 	server, err = admindb.GetDBServer(dbNode.ServerID)
 	if err != nil {
-		logutil.Log("DeleteNode: " + err.Error())
+		glog.Errorln("DeleteNode: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	err = admindb.DeleteDBNode(ID)
 	if err != nil {
-		logutil.Log("DeleteNode: " + err.Error())
+		glog.Errorln("DeleteNode: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
-	logutil.Log("got server IP " + server.IPAddress)
+	glog.Infoln("got server IP " + server.IPAddress)
 
 	//it is possible that someone can remove a container
 	//outside of us, so we let it pass that we can't remove
 	//it
 	kubeEnv := false
 	kube := os.Getenv("KUBE_URL")
-	logutil.Log("KUBE_URL=[" + kube + "]")
+	glog.Infoln("KUBE_URL=[" + kube + "]")
 	if kube != "" {
-		logutil.Log("KUBE_URL value set, assume Kube environment")
+		glog.Infoln("KUBE_URL value set, assume Kube environment")
 		kubeEnv = true
 	}
 
@@ -265,20 +265,20 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 		//delete the kube pod with this name
 		err = DeletePod(kube, dbNode.Name)
 		if err != nil {
-			logutil.Log("DeleteNode:" + err.Error())
+			glog.Errorln("DeleteNode:" + err.Error())
 			rest.Error(w, "error in deleting pod", 400)
 			return
 		}
 	} else {
 		output, err = cpmagent.DockerRemoveContainer(dbNode.Name, server.IPAddress)
 		if err != nil {
-			logutil.Log("DeleteNode: error when trying to remove container " + err.Error())
+			glog.Errorln("DeleteNode: error when trying to remove container " + err.Error())
 		}
 	}
 
 	//send the server a deletevolume command
 	output, err = cpmagent.AgentCommand("/cluster/bin/deletevolume", server.PGDataPath+"/"+dbNode.Name, server.IPAddress)
-	logutil.Log(output)
+	glog.Infoln(output)
 
 	//we should not have to delete the DNS entries because
 	//of the dnsbridge, it should remove them when we remove
@@ -294,30 +294,30 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logutil.Log("GetAllNodesForServer: validate token error " + err.Error())
+		glog.Errorln("GetAllNodesForServer: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	serverID := r.PathParam("ServerID")
 	if serverID == "" {
-		logutil.Log("GetAllNodesForServer: error serverID required")
+		glog.Errorln("GetAllNodesForServer: error serverID required")
 		rest.Error(w, "serverID required", 400)
 		return
 	}
 
 	results, err := admindb.GetAllDBNodesForServer(serverID)
 	if err != nil {
-		logutil.Log("GetAllNodesForServer:" + err.Error())
-		logutil.Log("error " + err.Error())
+		glog.Errorln("GetAllNodesForServer:" + err.Error())
+		glog.Errorln("error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	server, err2 := admindb.GetDBServer(serverID)
 	if err2 != nil {
-		logutil.Log("GetAllNodesForServer:" + err2.Error())
-		logutil.Log("error " + err2.Error())
+		glog.Errorln("GetAllNodesForServer:" + err2.Error())
+		glog.Errorln("error " + err2.Error())
 		rest.Error(w, err2.Error(), 400)
 		return
 	}
@@ -336,12 +336,12 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].CreateDate = results[i].CreateDate
 		nodes[i].Status = "down"
 		output, e = cpmagent.DockerInspect2Command(results[i].Name, server.IPAddress)
-		logutil.Log("GetAllNodesForServer:" + results[i].Name + " " + output.IPAddress + " " + output.RunningState)
+		glog.Infoln("GetAllNodesForServer:" + results[i].Name + " " + output.IPAddress + " " + output.RunningState)
 		if e != nil {
-			logutil.Log("GetAllNodesForServer:" + e.Error())
-			logutil.Log(e.Error())
+			glog.Errorln("GetAllNodesForServer:" + e.Error())
+			glog.Errorln(e.Error())
 		} else {
-			logutil.Log("GetAllNodesForServer: setting " + results[i].Name + " to " + output.RunningState)
+			glog.Infoln("GetAllNodesForServer: setting " + results[i].Name + " to " + output.RunningState)
 			nodes[i].Status = output.RunningState
 		}
 		i++
@@ -354,21 +354,21 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logutil.Log("AdminStartNode: validate token error " + err.Error())
+		glog.Errorln("AdminStartNode: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	ID := r.PathParam("ID")
 	if ID == "" {
-		logutil.Log("AdminStartNode: error ID required")
+		glog.Errorln("AdminStartNode: error ID required")
 		rest.Error(w, "ID required", 400)
 		return
 	}
 
 	node, err := admindb.GetDBNode(ID)
 	if err != nil {
-		logutil.Log("AdminStartNode:" + err.Error())
+		glog.Errorln("AdminStartNode:" + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -376,7 +376,7 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 	server := admindb.DBServer{}
 	server, err = admindb.GetDBServer(node.ServerID)
 	if err != nil {
-		logutil.Log("AdminStartNode:" + err.Error())
+		glog.Errorln("AdminStartNode:" + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -385,9 +385,9 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 	output, err = cpmagent.DockerStartContainer(node.Name,
 		server.IPAddress)
 	if err != nil {
-		logutil.Log("AdminStartNode: error when trying to start container " + err.Error())
+		glog.Errorln("AdminStartNode: error when trying to start container " + err.Error())
 	}
-	logutil.Log(output)
+	glog.Infoln(output)
 
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}
@@ -399,21 +399,21 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logutil.Log("AdminStopNode: validate token error " + err.Error())
+		glog.Errorln("AdminStopNode: validate token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	ID := r.PathParam("ID")
 	if ID == "" {
-		logutil.Log("AdminStopNode: error ID required")
+		glog.Errorln("AdminStopNode: error ID required")
 		rest.Error(w, "ID required", 400)
 		return
 	}
 
 	node, err := admindb.GetDBNode(ID)
 	if err != nil {
-		logutil.Log("AdminStopNode:" + err.Error())
+		glog.Errorln("AdminStopNode:" + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -421,7 +421,7 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 	server := admindb.DBServer{}
 	server, err = admindb.GetDBServer(node.ServerID)
 	if err != nil {
-		logutil.Log("AdminStopNode:" + err.Error())
+		glog.Errorln("AdminStopNode:" + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -430,9 +430,9 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 	output, err = cpmagent.DockerStopContainer(node.Name,
 		server.IPAddress)
 	if err != nil {
-		logutil.Log("AdminStopNode error when trying to stop container " + err.Error())
+		glog.Errorln("AdminStopNode error when trying to stop container " + err.Error())
 	}
-	logutil.Log(output)
+	glog.Infoln(output)
 
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}

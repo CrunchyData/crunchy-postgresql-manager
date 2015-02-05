@@ -16,11 +16,11 @@
 package sec
 
 import (
-	"crunchy.com/logutil"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/hex"
 	"fmt"
+	"github.com/golang/glog"
 )
 
 //stuff used by the crypto routines
@@ -36,7 +36,7 @@ func EncryptPassword(inputPassword string) (string, error) {
 
 	encryptedRaw, err = basicencrypt(stuff)
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		return "", err
 	}
 
@@ -58,13 +58,13 @@ func DecryptPassword(encodedHexPassword string) (string, error) {
 
 	encryptedPassword, err = hex.DecodeString(encodedHexPassword)
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		return "", err
 	}
 
 	unencryptedPassword, err = basicdecrypt(encryptedPassword)
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		return "", err
 	}
 	return unencryptedPassword, nil

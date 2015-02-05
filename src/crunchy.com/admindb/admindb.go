@@ -19,6 +19,7 @@ import (
 	"crunchy.com/logutil"
 	"database/sql"
 	"fmt"
+	"github.com/golang/glog"
 	_ "github.com/lib/pq"
 	"log"
 	"strconv"
@@ -663,4 +664,8 @@ func GetAllDBSettingsMap() (map[string]string, error) {
 		return m, err
 	}
 	return m, nil
+}
+
+func Test() {
+	glog.Info("hi from Test")
 }

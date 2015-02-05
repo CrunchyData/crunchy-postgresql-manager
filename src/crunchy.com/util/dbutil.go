@@ -16,8 +16,8 @@
 package util
 
 import (
-	"crunchy.com/logutil"
 	"database/sql"
+	"github.com/golang/glog"
 	"os"
 )
 
@@ -28,10 +28,11 @@ func GetConnection(database string) (*sql.DB, error) {
 	dbPort = os.Getenv("DB_PORT")
 
 	if dbHost == "" || dbUser == "" || dbPort == "" {
-		logutil.Log("DB_HOST [" + dbHost + "]")
-		logutil.Log("DB_USER [" + dbUser + "]")
-		logutil.Log("DB_PORT [" + dbPort + "]")
-		logutil.Log("error in getting required env vars")
+		glog.Errorln("DB_HOST [" + dbHost + "]")
+		glog.Errorln("DB_USER [" + dbUser + "]")
+		glog.Errorln("DB_PORT [" + dbPort + "]")
+		glog.Errorln("error in getting required env vars")
+		glog.Flush()
 		panic("could not get required env vars")
 	}
 
@@ -39,7 +40,7 @@ func GetConnection(database string) (*sql.DB, error) {
 	var err error
 	dbConn, err = sql.Open("postgres", "sslmode=disable user="+dbUser+" host="+dbHost+" port="+dbPort+" dbname="+database)
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 	}
 	return dbConn, err
 }
@@ -49,10 +50,10 @@ func GetMonitoringConnection(dbHost string, dbUser string, dbPort string, databa
 
 	var dbConn *sql.DB
 	var err error
-	logutil.Log("open db with dbHost=[" + dbHost + "] dbUser=[" + dbUser + "] dbPort=[" + dbPort + "] database=[" + database + "]")
+	glog.Infoln("open db with dbHost=[" + dbHost + "] dbUser=[" + dbUser + "] dbPort=[" + dbPort + "] database=[" + database + "]")
 	dbConn, err = sql.Open("postgres", "sslmode=disable user="+dbUser+" host="+dbHost+" port="+dbPort+" dbname="+database)
 	if err != nil {
-		logutil.Log("error in getting connection :" + err.Error())
+		glog.Errorln("error in getting connection :" + err.Error())
 	}
 	return dbConn, err
 }

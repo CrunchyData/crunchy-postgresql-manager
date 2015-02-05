@@ -18,8 +18,8 @@ package main
 import (
 	"crunchy.com/admindb"
 	"crunchy.com/cpmagent"
-	"crunchy.com/logutil"
 	"github.com/ant0ine/go-json-rest/rest"
+	"github.com/golang/glog"
 	"net/http"
 	"strconv"
 	"strings"
@@ -28,22 +28,22 @@ import (
 func GetServer(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logutil.Log("GetServer: authorize error " + err.Error())
+		glog.Errorln("GetServer: authorize error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 	ID := r.PathParam("ID")
-	logutil.Log("in GetServer with ID=" + ID)
+	glog.Infoln("in GetServer with ID=" + ID)
 	results, err := admindb.GetDBServer(ID)
 	if err != nil {
-		logutil.Log("GetServer:" + err.Error())
+		glog.Errorln("GetServer:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	server := Server{results.ID, results.Name, results.IPAddress,
 		results.DockerBridgeIP, results.PGDataPath, results.ServerClass, results.CreateDate}
-	logutil.Log("GetServer: results=" + results.ID)
+	glog.Infoln("GetServer: results=" + results.ID)
 
 	w.WriteJson(&server)
 }
@@ -53,7 +53,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-server")
 	if err != nil {
-		logutil.Log("AddServer: authorize token error " + err.Error())
+		glog.Errorln("AddServer: authorize token error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -66,17 +66,17 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 	server.PGDataPath = strings.Replace(server.PGDataPath, "_", "/", -1)
 
 	if server.Name == "" {
-		logutil.Log("AddServer: error server name required")
+		glog.Errorln("AddServer: error server name required")
 		rest.Error(w, "server name required", 400)
 		return
 	}
 	if server.IPAddress == "" {
-		logutil.Log("AddServer: error ipaddress required")
+		glog.Errorln("AddServer: error ipaddress required")
 		rest.Error(w, "server IPAddress required", 400)
 		return
 	}
 	if server.PGDataPath == "" {
-		logutil.Log("AddServer: error pgdatapath required")
+		glog.Errorln("AddServer: error pgdatapath required")
 		rest.Error(w, "server PGDataPath required", 400)
 		return
 	}
@@ -87,7 +87,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 		strid, err := admindb.InsertDBServer(dbserver)
 		newid := strconv.Itoa(strid)
 		if err != nil {
-			logutil.Log("AddServer:" + err.Error())
+			glog.Errorln("AddServer:" + err.Error())
 			rest.Error(w, err.Error(), 400)
 			return
 		}
@@ -104,7 +104,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logutil.Log("GetAllServers: authorize error " + err.Error())
+		glog.Errorln("GetAllServers: authorize error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -112,12 +112,12 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	Metric := r.PathParam("Metric")
 
 	if ServerID == "" {
-		logutil.Log("MonitorServerGetInfo: error ServerID required")
+		glog.Errorln("MonitorServerGetInfo: error ServerID required")
 		rest.Error(w, "ServerID required", 400)
 		return
 	}
 	if Metric == "" {
-		logutil.Log("MonitorServerGetInfo: error metric required")
+		glog.Errorln("MonitorServerGetInfo: error metric required")
 		rest.Error(w, "Metric required", 400)
 		return
 	}
@@ -125,7 +125,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	//go get the IPAddress
 	server, err := admindb.GetDBServer(ServerID)
 	if err != nil {
-		logutil.Log("MonitorServerGetInfo:" + err.Error())
+		glog.Errorln("MonitorServerGetInfo:" + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -133,7 +133,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	var output string
 	output, err = cpmagent.AgentCommand("/cluster/bin/"+Metric, "", server.IPAddress)
 	if err != nil {
-		logutil.Log("MonitorServerGetInfo:" + err.Error())
+		glog.Errorln("MonitorServerGetInfo:" + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
@@ -146,14 +146,14 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logutil.Log("GetAllServers: authorize error " + err.Error())
+		glog.Errorln("GetAllServers: authorize error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	results, err := admindb.GetAllDBServers()
 	if err != nil {
-		logutil.Log("GetAllServers: " + err.Error())
+		glog.Errorln("GetAllServers: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 	}
 	servers := make([]Server, len(results))
@@ -175,21 +175,21 @@ func DeleteServer(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-server")
 	if err != nil {
-		logutil.Log("DeleteServer: authorize error " + err.Error())
+		glog.Errorln("DeleteServer: authorize error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
 	ID := r.PathParam("ID")
 	if ID == "" {
-		logutil.Log("DeleteServer: error server id required")
+		glog.Errorln("DeleteServer: error server id required")
 		rest.Error(w, "Server ID required", 400)
 		return
 	}
 
 	err = admindb.DeleteDBServer(ID)
 	if err != nil {
-		logutil.Log("DeleteServer: " + err.Error())
+		glog.Errorln("DeleteServer: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 	}
 
