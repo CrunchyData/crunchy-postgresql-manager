@@ -3,7 +3,6 @@ PROJROOT=$(HOME)/cpm
 GOPATH=$(HOME)/cpm
 
 build:
-		go install crunchy.com/logutil
 		go install crunchy.com/util
 		go install crunchy.com/admindb
 		go install crunchy.com/sec

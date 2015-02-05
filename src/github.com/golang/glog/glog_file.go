@@ -43,6 +43,9 @@ var logDir = flag.String("log_dir", "", "If non-empty, write log files in this d
 func createLogDirs() {
 	if *logDir != "" {
 		logDirs = append(logDirs, *logDir)
+		fmt.Println("log dir is here jeff")
+	} else {
+		fmt.Println("log dir is here jeff 2")
 	}
 	logDirs = append(logDirs, os.TempDir())
 }

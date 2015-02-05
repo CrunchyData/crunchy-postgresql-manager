@@ -25,7 +25,6 @@ import (
 var secimpl sec.SecInterface
 
 func init() {
-	glog.Infoln("securitymgmt init called")
 	secimpl = sec.DefaultSec{}
 }
 

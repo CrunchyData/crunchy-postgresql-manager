@@ -25,6 +25,9 @@ ADD conf/.bash_profile /var/lib/pgsql/
 VOLUME ["/pgdata"]
 RUN chown -R postgres:postgres /pgdata
 
+VOLUME ["/cpmlogs"]
+RUN chown -R postgres:postgres /cpmlogs
+
 # open up the postgres port
 EXPOSE 5432
 

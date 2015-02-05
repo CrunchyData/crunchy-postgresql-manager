@@ -16,7 +16,7 @@
 package mon
 
 import (
-	"crunchy.com/logutil"
+	"github.com/golang/glog"
 	"github.com/robfig/cron"
 )
 
@@ -34,7 +34,7 @@ var CRONInstance *cron.Cron
 //placeholder for a client call to the monitor server if ever needed
 func (t *Command) Placeholder(status *string, reply *Command) error {
 
-	logutil.Log("Placeholder called")
+	glog.Infoln("Placeholder called")
 	*status = "processed on monitor server"
 	return nil
 }
@@ -42,15 +42,15 @@ func (t *Command) Placeholder(status *string, reply *Command) error {
 func LoadSchedules() error {
 
 	var err error
-	logutil.Log("LoadSchedules called")
+	glog.Infoln("LoadSchedules called")
 
 	schedules, err := DBGetSchedules()
 	if err != nil {
-		logutil.Log("LoadSchedules error " + err.Error())
+		glog.Errorln("LoadSchedules error " + err.Error())
 	}
 
 	if CRONInstance != nil {
-		logutil.Log("stopping current cron instance...")
+		glog.Infoln("stopping current cron instance...")
 		CRONInstance.Stop()
 	}
 
@@ -58,18 +58,18 @@ func LoadSchedules() error {
 	CRONInstance = nil
 
 	//create a new cron
-	logutil.Log("creating cron instance...")
+	glog.Infoln("creating cron instance...")
 	CRONInstance = cron.New()
 
 	for i := 0; i < len(schedules); i++ {
-		logutil.Log("schedule added " + schedules[i].Name)
+		glog.Infoln("schedule added " + schedules[i].Name)
 		x := DefaultJob{}
 		x.request = MonRequest{}
 		x.request.Schedule = schedules[i]
 		CRONInstance.AddJob(schedules[i].Cronexp, x)
 	}
 
-	logutil.Log("starting new CRONInstance")
+	glog.Infoln("starting new CRONInstance")
 	CRONInstance.Start()
 
 	return err

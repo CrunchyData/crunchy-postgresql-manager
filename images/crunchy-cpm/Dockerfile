@@ -7,6 +7,9 @@ RUN yum install -y procps-ng nginx which hostname
 VOLUME ["/www"]
 RUN chown -R daemon:daemon /www
 
+VOLUME ["/cpmlogs"]
+RUN chown -R daemon:daemon /cpmlogs
+
 EXPOSE 10000
 
 # set up cluster directory

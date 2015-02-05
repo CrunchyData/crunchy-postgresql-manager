@@ -33,7 +33,7 @@ var db = "clusteradmin"
 var dbConn *sql.DB
 
 func init() {
-	glog.Infoln("secdb:init: called to open dbConn")
+	//glog.Infoln("secdb:init: called to open dbConn")
 	var err error
 	dbConn, err = sql.Open("postgres", "sslmode=disable user="+pguser+" host="+pghost+" port="+pgport+" dbname="+db)
 	if err != nil {

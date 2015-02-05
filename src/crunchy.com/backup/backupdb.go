@@ -26,7 +26,7 @@ import (
 var dbConn *sql.DB
 
 func SetConnection(conn *sql.DB) {
-	glog.Infoln("backupdb:SetConnection: called to open dbConn")
+	//glog.Infoln("backupdb:SetConnection: called to open dbConn")
 	dbConn = conn
 }
 

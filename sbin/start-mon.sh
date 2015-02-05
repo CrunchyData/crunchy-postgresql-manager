@@ -30,11 +30,11 @@ export PATH=$PATH:/usr/pgsql-9.3/bin
 #
 # start influx
 #
-/usr/bin/influxdb -pidfile /tmp/influxdb.pid -config /cluster/conf/config.toml &
+/usr/bin/influxdb -stdout=true -pidfile /tmp/influxdb.pid -config /cluster/conf/config.toml > /cpmlogs/crunchy-mon-influx.log &
 
 sleep 2
 
-/cluster/bin/monserver  > /tmp/monserver.log &
+/cluster/bin/monserver -log_dir=/cpmlogs  -logtostderr=false  &
 
 #
 # block with the dummy server, allows for hot swapping the backupserver# when needed

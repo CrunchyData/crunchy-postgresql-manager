@@ -17,9 +17,9 @@ package mon
 
 import (
 	"crunchy.com/admindb"
-	"crunchy.com/logutil"
 	"crunchy.com/util"
 	"database/sql"
+	"github.com/golang/glog"
 	"github.com/myinfluxdb/client"
 	"strconv"
 	"time"
@@ -31,13 +31,13 @@ type DefaultJob struct {
 
 //this is the func that implements the cron Job interface
 func (t DefaultJob) Run() {
-	logutil.Log("running Schedule:" + t.request.Schedule.Name)
+	glog.Infoln("running Schedule:" + t.request.Schedule.Name)
 	RunMonJob(&t.request)
 }
 
 func RunMonJob(args *MonRequest) error {
-	logutil.Log("mon.RunMonJob called")
-	logutil.Log("with Schedule Name=" + args.Schedule.Name)
+	glog.Infoln("mon.RunMonJob called")
+	glog.Infoln("with Schedule Name=" + args.Schedule.Name)
 
 	var scheduleTS = time.Now().Unix()
 
@@ -47,13 +47,13 @@ func RunMonJob(args *MonRequest) error {
 		Database: "cpm",
 	})
 	if err != nil {
-		logutil.Log("error in connection to fluxdb " + err.Error())
+		glog.Errorln("error in connection to fluxdb " + err.Error())
 		return err
 	}
 
 	servers, nodes, metrics, err := getData()
 	if err != nil {
-		logutil.Log("error: RunMonJob " + err.Error())
+		glog.Errorln("error: RunMonJob " + err.Error())
 		return err
 	}
 
@@ -61,7 +61,7 @@ func RunMonJob(args *MonRequest) error {
 	x := 0
 	for x = range servers {
 		//get connection to server
-		logutil.Log("collecting for server " + servers[x].Name)
+		glog.Infoln("collecting for server " + servers[x].Name)
 		//collect all the server metrics
 		i := 0
 		for i = range metrics {
@@ -69,7 +69,7 @@ func RunMonJob(args *MonRequest) error {
 				if metrics[i].MetricType == "server" {
 					value, err = collectServerMetrics(metrics[i].Name, servers[x].IPAddress)
 					//add value to influxdb here
-					logutil.Log(metrics[i].Name + " value " + strconv.FormatFloat(value.Value, 'f', 3, 64))
+					glog.Infoln(metrics[i].Name + " value " + strconv.FormatFloat(value.Value, 'f', 3, 64))
 					series := &client.Series{
 						Name:    metrics[i].Name,
 						Columns: []string{"value", "server"},
@@ -78,11 +78,11 @@ func RunMonJob(args *MonRequest) error {
 						},
 					}
 					if err = c.WriteSeries([]*client.Series{series}); err != nil {
-						logutil.Log("error writing to influxdb " + err.Error())
+						glog.Errorln("error writing to influxdb " + err.Error())
 					}
 
 				} else if metrics[i].MetricType == "healthck" {
-					logutil.Log("healthck server metrics callled on " + args.Schedule.Name)
+					glog.Infoln("healthck server metrics callled on " + args.Schedule.Name)
 				}
 			}
 		}
@@ -91,11 +91,11 @@ func RunMonJob(args *MonRequest) error {
 	y := 0
 	for y = range nodes {
 		//get connection to database
-		logutil.Log("collecting for node " + nodes[y].Name)
+		glog.Infoln("collecting for node " + nodes[y].Name)
 		var databaseConn *sql.DB
 		databaseConn, err = util.GetMonitoringConnection(nodes[y].Name+".crunchy.lab", "postgres", "5432", "postgres")
 		if err != nil {
-			logutil.Log("error in getting connection to " + nodes[y].Name)
+			glog.Errorln("error in getting connection to " + nodes[y].Name)
 		} else {
 			//collect all the database metrics
 			i := 0
@@ -103,7 +103,7 @@ func RunMonJob(args *MonRequest) error {
 				if metrics[i].ScheduleName == args.Schedule.Name {
 					if metrics[i].MetricType == "database" {
 						value, err = collectContainerMetrics(metrics[i].Name, databaseConn)
-						logutil.Log(metrics[i].Name + " value " + strconv.FormatFloat(value.Value, 'f', 3, 64))
+						glog.Infoln(metrics[i].Name + " value " + strconv.FormatFloat(value.Value, 'f', 3, 64))
 						//add value to influxdb here
 						series := &client.Series{
 							Name:    metrics[i].Name,
@@ -113,10 +113,10 @@ func RunMonJob(args *MonRequest) error {
 							},
 						}
 						if err = c.WriteSeries([]*client.Series{series}); err != nil {
-							logutil.Log("error writing to influxdb " + err.Error())
+							glog.Errorln("error writing to influxdb " + err.Error())
 						}
 					} else if metrics[i].MetricType == "healthck" {
-						logutil.Log("healthck metric database run on schedule " + args.Schedule.Name)
+						glog.Infoln("healthck metric database run on schedule " + args.Schedule.Name)
 						err = hc1(databaseConn)
 						if err != nil {
 							series := &client.Series{
@@ -127,7 +127,7 @@ func RunMonJob(args *MonRequest) error {
 								},
 							}
 							if err = c.WriteSeries([]*client.Series{series}); err != nil {
-								logutil.Log("error writing to influxdb " + err.Error())
+								glog.Errorln("error writing to influxdb " + err.Error())
 							}
 						}
 					}
@@ -150,7 +150,7 @@ func getData() ([]admindb.DBServer, []admindb.DBClusterNode, []MonMetric, error)
 
 	dbConn, err = util.GetConnection("clusteradmin")
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Infoln(err.Error())
 		return servers, nodes, metrics, err
 	}
 	defer dbConn.Close()
@@ -159,22 +159,22 @@ func getData() ([]admindb.DBServer, []admindb.DBClusterNode, []MonMetric, error)
 
 	servers, err = admindb.GetAllDBServers()
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Infoln(err.Error())
 		return servers, nodes, metrics, err
 	}
 	nodes, err = admindb.GetAllDBNodes()
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Infoln(err.Error())
 		return servers, nodes, metrics, err
 	}
 
 	SetConnection(dbConn)
 	metrics, err = DBGetMetrics()
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Infoln(err.Error())
 		return servers, nodes, metrics, err
 	}
 
-	logutil.Log("got this many metrics " + strconv.Itoa(len(metrics)))
+	glog.Infoln("got this many metrics " + strconv.Itoa(len(metrics)))
 	return servers, nodes, metrics, err
 }

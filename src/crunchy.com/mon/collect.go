@@ -17,9 +17,9 @@ package mon
 
 import (
 	"crunchy.com/cpmagent"
-	"crunchy.com/logutil"
 	"database/sql"
 	"fmt"
+	"github.com/golang/glog"
 	"strconv"
 	"strings"
 	"time"
@@ -35,19 +35,19 @@ func collectServerMetrics(metricName string, server string) (DBMetric, error) {
 	var values DBMetric
 	var err error
 
-	logutil.Log("collecting metric " + metricName + " for server " + server)
+	glog.Infoln("collecting metric " + metricName + " for server " + server)
 	switch metricName {
 	case "cpu":
-		logutil.Log("cpu collecting ")
+		glog.Infoln("cpu collecting ")
 		values, err = cpu(server)
 	case "mem":
-		logutil.Log("mem collecting ")
+		glog.Infoln("mem collecting ")
 		values, err = mem(server)
 	default:
-		logutil.Log(metricName + " not implemented yet ")
+		glog.Infoln(metricName + " not implemented yet ")
 	}
 	if err != nil {
-		logutil.Log("error in collecting " + metricName + " " + err.Error())
+		glog.Errorln("error in collecting " + metricName + " " + err.Error())
 		return values, err
 	}
 
@@ -58,18 +58,18 @@ func collectContainerMetrics(metricName string, databaseConn *sql.DB) (DBMetric,
 	var values DBMetric
 	var err error
 
-	logutil.Log("collecting metric..." + metricName)
+	glog.Infoln("collecting metric..." + metricName)
 	switch metricName {
 	case "pg1":
 		values, err = pg1(databaseConn)
 	case "pg2":
 		values, err = pg2(databaseConn)
 	default:
-		logutil.Log(metricName + " not implemented yet ")
+		glog.Infoln(metricName + " not implemented yet ")
 	}
 
 	if err != nil {
-		logutil.Log("error in collecting " + metricName + " " + err.Error())
+		glog.Errorln("error in collecting " + metricName + " " + err.Error())
 		return values, err
 	}
 
@@ -85,7 +85,7 @@ func pg1(databaseConn *sql.DB) (DBMetric, error) {
 
 	err = databaseConn.QueryRow(fmt.Sprintf("select trunc(random() * 10 + 1) from  generate_series(1,1)")).Scan(&intValue)
 	if err != nil {
-		logutil.Log("pg1:error:" + err.Error())
+		glog.Errorln("pg1:error:" + err.Error())
 		return values, err
 	}
 	values.Value = float64(intValue)
@@ -101,7 +101,7 @@ func pg2(databaseConn *sql.DB) (DBMetric, error) {
 
 	err = databaseConn.QueryRow(fmt.Sprintf("select trunc(random() * 10 + 1) from  generate_series(1,1)")).Scan(&intValue)
 	if err != nil {
-		logutil.Log("pg1:error:" + err.Error())
+		glog.Errorln("pg1:error:" + err.Error())
 		return values, err
 	}
 	values.Value = float64(intValue)
@@ -120,7 +120,7 @@ func cpu(server string) (DBMetric, error) {
 
 	output, err = cpmagent.AgentCommand("/cluster/bin/monitor-load", "", server)
 	if err != nil {
-		logutil.Log("cpu metric error:" + err.Error())
+		glog.Errorln("cpu metric error:" + err.Error())
 		return values, err
 	}
 
@@ -128,7 +128,7 @@ func cpu(server string) (DBMetric, error) {
 
 	values.Value, err = strconv.ParseFloat(output, 64)
 	if err != nil {
-		logutil.Log("parseFloat error in cpu metric " + err.Error())
+		glog.Errorln("parseFloat error in cpu metric " + err.Error())
 	}
 
 	return values, err
@@ -145,7 +145,7 @@ func mem(server string) (DBMetric, error) {
 
 	output, err = cpmagent.AgentCommand("/cluster/bin/monitor-mem", "", server)
 	if err != nil {
-		logutil.Log("mem metric error:" + err.Error())
+		glog.Errorln("mem metric error:" + err.Error())
 		return values, err
 	}
 
@@ -153,7 +153,7 @@ func mem(server string) (DBMetric, error) {
 
 	values.Value, err = strconv.ParseFloat(output, 64)
 	if err != nil {
-		logutil.Log("parseFloat error in mem metric " + err.Error())
+		glog.Errorln("parseFloat error in mem metric " + err.Error())
 	}
 
 	return values, err

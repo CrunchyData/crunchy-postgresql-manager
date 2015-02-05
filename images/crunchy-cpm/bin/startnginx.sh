@@ -1,2 +1,2 @@
 #!/bin/bash
-/usr/sbin/nginx -c /cluster/conf/nginx.conf > /tmp/nginx.log 2> /tmp/nginx.err
+/usr/sbin/nginx -c /cluster/conf/nginx.conf > /cpmlogs/nginx.log 2> /cpmlogs/nginx.err

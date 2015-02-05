@@ -20,6 +20,7 @@ import (
 	"crunchy.com/backup"
 	"crunchy.com/util"
 	"database/sql"
+	"flag"
 	"github.com/golang/glog"
 	"net"
 	"net/http"
@@ -28,6 +29,7 @@ import (
 )
 
 func main() {
+	flag.Parse()
 
 	glog.Infoln("sleeping during startup to give DNS a chance")
 	time.Sleep(time.Millisecond * 7000)

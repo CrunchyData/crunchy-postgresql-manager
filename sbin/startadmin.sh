@@ -26,7 +26,7 @@ export KUBE_URL=$KUBE_URL
 
 # log output will go to /tmp into files created by glog
 # named similar to adminapi.7869c0a96e4c.postgres.log.INFO.20150204-192844.2313
-/cluster/bin/adminapi -logtostderr=false > /tmp/adminapi.log  &
+/cluster/bin/adminapi -log_dir=/cpmlogs -logtostderr=false &
 
-/cluster/bin/dummyserver > /tmp/dummy.log  
+/cluster/bin/dummyserver > /tmp/dummyserver.log 
 

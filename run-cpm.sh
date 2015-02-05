@@ -16,19 +16,27 @@
 
 INSTALLDIR=$HOME/cpm
 
+LOGDIR=/opt/cpm/logs
+sudo mkdir -p $LOGDIR
+sudo chmod -R 777 $LOGDIR
+sudo chcon -Rt svirt_sandbox_file_t $LOGDIR
+
 docker rm cpm
 sudo chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/crunchy-cpm/www/v2
-docker run --name=cpm -d -v $INSTALLDIR/images/crunchy-cpm/www/v2:/www crunchy-cpm
+docker run --name=cpm -d \
+	-v $LOGDIR:/cpmlogs \
+	-v $INSTALLDIR/images/crunchy-cpm/www/v2:/www crunchy-cpm
 
 sleep 2
 docker rm cluster-admin
 docker run -e DB_HOST=127.0.0.1 \
 	-e DB_PORT=5432 -e DB_USER=postgres \
-	--name=cluster-admin -d -v /var/lib/pgsql/cluster-admin:/pgdata crunchy-admin
+	--name=cluster-admin -d -v $LOGDIR:/cpmlogs -v /var/lib/pgsql/cluster-admin:/pgdata crunchy-admin
 
 sleep 2
 docker rm cluster-backup
 docker run -e DB_HOST=cluster-admin.crunchy.lab \
+	-v $LOGDIR:/cpmlogs \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cluster-backup -d crunchy-backup
 
@@ -38,6 +46,7 @@ INFLUXDIR=/tmp/influxdb
 sudo chcon -Rt svirt_sandbox_file_t $INFLUXDIR
 docker run -e DB_HOST=cluster-admin.crunchy.lab \
 	-e DB_PORT=5432 -e DB_USER=postgres \
+	-v $LOGDIR:/cpmlogs \
 	-v $INFLUXDIR:/monitordata \
 	-d --name=cluster-mon crunchy-mon
 
@@ -57,6 +66,7 @@ docker run --name=backup-job-blah \
 	-e BACKUP_PORT=5432 \
 	-e BACKUP_USER=postgres \
 	-e BACKUP_SERVER_URL=cluster-backup.crunchy.lab:13010 \
+	-v $LOGDIR:/opt/cpm/logs \
 	-v /var/lib/pgsql/blah-backup-201412181707:/pgdata \
 	-d crunchy-backup-job
 

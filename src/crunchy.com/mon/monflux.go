@@ -16,14 +16,14 @@
 package mon
 
 import (
-	"crunchy.com/logutil"
+	"github.com/golang/glog"
 	"github.com/myinfluxdb/client"
 	"log"
 )
 
 //make sure to create the cpm database if it doesn't exist
 func Bootdb() {
-	logutil.Log("monflux:Bootdb: called ")
+	glog.Infoln("monflux:Bootdb: called ")
 
 	//create a connection to influx but not to a database yet
 	c, err := client.NewClient(&client.ClientConfig{
@@ -32,7 +32,8 @@ func Bootdb() {
 	})
 
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
+		glog.Flush()
 		panic("cant connect to influxdb")
 	}
 
@@ -52,10 +53,10 @@ func Bootdb() {
 		}
 	}
 	if !found {
-		logutil.Log("cpm database not found...creating it")
+		glog.Infoln("cpm database not found...creating it")
 
 		if err := c.CreateDatabase("cpm"); err != nil {
-			logutil.Log("cant create the cpm database")
+			glog.Errorln("cant create the cpm database")
 			panic(err)
 		}
 	}

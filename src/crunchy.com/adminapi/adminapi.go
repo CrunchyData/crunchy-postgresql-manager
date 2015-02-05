@@ -34,9 +34,19 @@ import (
 	"time"
 )
 
+func init() {
+	fmt.Println("before parsing in init")
+	flag.Parse()
+}
+
 func main() {
 
-	flag.Parse() //required for glog flags processing
+	fmt.Println("at top of adminapi main")
+	//flag.Parse()
+	//glog.Flush()
+
+	//glog.Info("called flag.Parse\n")
+	//glog.Flush()
 
 	var dbConn *sql.DB
 	found := false
@@ -49,7 +59,7 @@ func main() {
 			glog.Errorln("could not get initial database connection, will retry in 5 seconds")
 			time.Sleep(time.Millisecond * 5000)
 		} else {
-			glog.Infoln("got db connection")
+			//glog.Infoln("got db connection")
 			found = true
 			break
 		}
