@@ -89,7 +89,7 @@ func basicencrypt(input []byte) ([]byte, error) {
 	encrypted := make([]byte, len(input))
 	encrypter.XORKeyStream(encrypted, input)
 	//var stroutput = string(encrypted[:])
-	//logutil.Log("encrypted value " + stroutput)
+	//glog.Infoln("encrypted value " + stroutput)
 
 	return encrypted, nil
 }
@@ -112,6 +112,6 @@ func basicdecrypt(input []byte) (string, error) {
 	decrypter.XORKeyStream(decrypted, input)
 
 	var stroutput = string(decrypted[:])
-	//logutil.Log("decrypted value " + stroutput)
+	//glog.Infoln("decrypted value " + stroutput)
 	return stroutput, nil
 }
