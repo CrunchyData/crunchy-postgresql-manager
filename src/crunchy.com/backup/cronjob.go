@@ -16,7 +16,7 @@
 package backup
 
 import (
-	"crunchy.com/logutil"
+	"github.com/golang/glog"
 )
 
 type DefaultJob struct {
@@ -25,6 +25,6 @@ type DefaultJob struct {
 
 //this is the func that implements the cron Job interface
 func (t DefaultJob) Run() {
-	logutil.Log("running ScheduleID:" + t.request.ScheduleID)
+	glog.Infoln("running ScheduleID:" + t.request.ScheduleID)
 	ProvisionBackupJob(&t.request)
 }

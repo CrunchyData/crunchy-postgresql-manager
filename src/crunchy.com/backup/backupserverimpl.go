@@ -16,7 +16,7 @@
 package backup
 
 import (
-	"crunchy.com/logutil"
+	"github.com/golang/glog"
 	"github.com/robfig/cron"
 )
 
@@ -77,11 +77,11 @@ var CRONInstance *cron.Cron
 //called by backup jobs as they execute
 func (t *Command) AddStatus(status *BackupStatus, reply *Command) error {
 
-	logutil.Log("AddStatus called")
+	glog.Infoln("AddStatus called")
 
 	id, err := DBAddStatus(*status)
 	if err != nil {
-		logutil.Log("AddStatus error " + err.Error())
+		glog.Errorln("AddStatus error " + err.Error())
 	}
 	reply.Output = id
 	return err
@@ -90,11 +90,11 @@ func (t *Command) AddStatus(status *BackupStatus, reply *Command) error {
 //called by backup jobs as they execute
 func (t *Command) UpdateStatus(status *BackupStatus, reply *Command) error {
 
-	logutil.Log("UpdateStatus called")
+	glog.Infoln("UpdateStatus called")
 
 	err := DBUpdateStatus(*status)
 	if err != nil {
-		logutil.Log("UpdateStatus error " + err.Error())
+		glog.Errorln("UpdateStatus error " + err.Error())
 	}
 	return err
 }
@@ -102,83 +102,40 @@ func (t *Command) UpdateStatus(status *BackupStatus, reply *Command) error {
 //called by admin do perform an adhoc backup job
 func (t *Command) BackupNow(args *BackupRequest, reply *Command) error {
 
-	logutil.Log("BackupNow.impl called")
+	glog.Infoln("BackupNow.impl called")
 	err := ProvisionBackupJob(args)
 	if err != nil {
-		logutil.Log("BackupNow.impl error:" + err.Error())
+		glog.Errorln("BackupNow.impl error:" + err.Error())
 	}
-	logutil.Log("BackupNow.impl completed")
+	glog.Infoln("BackupNow.impl completed")
 	return err
 }
-
-/*
-//called by admin to add to the schedule
-func (t *Command) AddSchedule(args *BackupSchedule, reply *Command) error {
-
-	logutil.Log("AddSchedule called")
-	id, err := DBAddSchedule(*args)
-	if err != nil {
-		logutil.Log("AddSchedule error " + err.Error())
-		return err
-	}
-	reply.Output = id
-	return nil
-}
-*/
 
 //called by admin to cause a reload of the cron jobs
 func (t *Command) Reload(schedule *BackupSchedule, reply *Command) error {
 
-	logutil.Log("Reload called")
+	glog.Infoln("Reload called")
 
 	err := LoadSchedules()
 	if err != nil {
-		logutil.Log("Reload error " + err.Error())
+		glog.Errorln("Reload error " + err.Error())
 	}
 
 	return err
 }
-
-/*
-//called by admin to update a schedule
-func (t *Command) UpdateSchedule(schedule *BackupSchedule, reply *Command) error {
-
-	logutil.Log("UpdateSchedule called")
-
-	err := DBUpdateSchedule(*schedule)
-	if err != nil {
-		logutil.Log("UpdateSchedule error " + err.Error())
-	}
-	return err
-}
-*/
-
-/*
-//called by admin to delete a schedule
-func (t *Command) DeleteSchedule(schedule *BackupSchedule, reply *Command) error {
-
-	logutil.Log("DeleteSchedule called")
-
-	err := DBDeleteSchedule(schedule.ID)
-	if err != nil {
-		logutil.Log("DeleteSchedule error " + err.Error())
-	}
-	return err
-}
-*/
 
 func LoadSchedules() error {
 
 	var err error
-	logutil.Log("LoadSchedules called")
+	glog.Infoln("LoadSchedules called")
 
 	schedules, err := DBGetSchedules()
 	if err != nil {
-		logutil.Log("LoadSchedules error " + err.Error())
+		glog.Errorln("LoadSchedules error " + err.Error())
 	}
 
 	if CRONInstance != nil {
-		logutil.Log("stopping current cron instance...")
+		glog.Infoln("stopping current cron instance...")
 		CRONInstance.Stop()
 	}
 
@@ -186,15 +143,15 @@ func LoadSchedules() error {
 	CRONInstance = nil
 
 	//create a new cron
-	logutil.Log("creating cron instance...")
+	glog.Infoln("creating cron instance...")
 	CRONInstance = cron.New()
 
 	var cronexp string
 	for i := 0; i < len(schedules); i++ {
 		cronexp = getCron(schedules[i])
-		logutil.Log("would have loaded schedule..." + cronexp)
+		glog.Infoln("would have loaded schedule..." + cronexp)
 		if schedules[i].Enabled == "YES" {
-			logutil.Log("schedule " + schedules[i].ID + " was enabled so adding it")
+			glog.Infoln("schedule " + schedules[i].ID + " was enabled so adding it")
 			x := DefaultJob{}
 			x.request = BackupRequest{}
 			x.request.ScheduleID = schedules[i].ID
@@ -206,12 +163,12 @@ func LoadSchedules() error {
 
 			CRONInstance.AddJob(cronexp, x)
 		} else {
-			logutil.Log("schedule " + schedules[i].ID + " NOT enabled so dropping it")
+			glog.Infoln("schedule " + schedules[i].ID + " NOT enabled so dropping it")
 		}
 
 	}
 
-	logutil.Log("starting new CRONInstance")
+	glog.Infoln("starting new CRONInstance")
 	CRONInstance.Start()
 
 	return err

@@ -18,9 +18,9 @@ package main
 import (
 	"crunchy.com/admindb"
 	"crunchy.com/backup"
-	"crunchy.com/logutil"
 	"crunchy.com/util"
 	"database/sql"
+	"github.com/golang/glog"
 	"net"
 	"net/http"
 	"net/rpc"
@@ -29,7 +29,7 @@ import (
 
 func main() {
 
-	logutil.Log("sleeping during startup to give DNS a chance")
+	glog.Infoln("sleeping during startup to give DNS a chance")
 	time.Sleep(time.Millisecond * 7000)
 
 	found := false
@@ -38,11 +38,11 @@ func main() {
 	for i := 0; i < 10; i++ {
 		dbConn, err = util.GetConnection("clusteradmin")
 		if err != nil {
-			logutil.Log(err.Error())
-			logutil.Log("could not get initial database connection, will retry in 5 seconds")
+			glog.Errorln(err.Error())
+			glog.Errorln("could not get initial database connection, will retry in 5 seconds")
 			time.Sleep(time.Millisecond * 5000)
 		} else {
-			logutil.Log("got db connection")
+			glog.Infoln("got db connection")
 			found = true
 			break
 		}
@@ -57,18 +57,18 @@ func main() {
 
 	backup.LoadSchedules()
 
-	logutil.Log("starting\n")
+	glog.Infoln("starting\n")
 	command := new(backup.Command)
 	rpc.Register(command)
-	logutil.Log("Command registered\n")
+	glog.Infoln("Command registered\n")
 	rpc.HandleHTTP()
 	l, e := net.Listen("tcp", ":13010")
-	logutil.Log("listening\n")
+	glog.Infoln("listening\n")
 	if e != nil {
-		logutil.Log(e.Error())
+		glog.Errorln(e.Error())
 		panic("could not listen on rpc socker")
 	}
-	logutil.Log("about to serve\n")
+	glog.Infoln("about to serve\n")
 	http.Serve(l, nil)
-	logutil.Log("after serve\n")
+	glog.Infoln("after serve\n")
 }

@@ -18,20 +18,20 @@ package backup
 import (
 	"crunchy.com/admindb"
 	"crunchy.com/cpmagent"
-	"crunchy.com/logutil"
 	"fmt"
+	"github.com/golang/glog"
 	"time"
 )
 
 func ProvisionBackupJob(args *BackupRequest) error {
 
-	logutil.Log("backup.Provision called")
-	logutil.Log("with scheduleid=" + args.ScheduleID)
-	logutil.Log("with serverid=" + args.ServerID)
-	logutil.Log("with servername=" + args.ServerName)
-	logutil.Log("with serverip=" + args.ServerIP)
-	logutil.Log("with containername=" + args.ContainerName)
-	logutil.Log("with profilename=" + args.ProfileName)
+	glog.Infoln("backup.Provision called")
+	glog.Infoln("with scheduleid=" + args.ScheduleID)
+	glog.Infoln("with serverid=" + args.ServerID)
+	glog.Infoln("with servername=" + args.ServerName)
+	glog.Infoln("with serverip=" + args.ServerIP)
+	glog.Infoln("with containername=" + args.ContainerName)
+	glog.Infoln("with profilename=" + args.ProfileName)
 
 	var params cpmagent.DockerRunArgs
 	params = cpmagent.DockerRunArgs{}
@@ -44,7 +44,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	//get server info
 	server, err := admindb.GetDBServer(params.ServerID)
 	if err != nil {
-		logutil.Log("Provision:" + err.Error())
+		glog.Errorln("Provision:" + err.Error())
 		return err
 	}
 
@@ -61,7 +61,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 
 	setting, err = admindb.GetDBSetting("DOMAIN-NAME")
 	if err != nil {
-		logutil.Log("Provision:" + err.Error())
+		glog.Errorln("Provision:" + err.Error())
 		return err
 	}
 	var domain = setting.Value
@@ -77,7 +77,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 
 	setting, err = admindb.GetDBSetting("PG-PORT")
 	if err != nil {
-		logutil.Log("Provision:" + err.Error())
+		glog.Errorln("Provision:" + err.Error())
 		return err
 	}
 	params.EnvVars["BACKUP_PORT"] = setting.Value
@@ -89,7 +89,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	responseStr, err = cpmagent.AgentCommand("/cluster/bin/provisionvolume.sh",
 		params.PGDataPath,
 		server.IPAddress)
-	logutil.Log(responseStr)
+	glog.Infoln(responseStr)
 	//run the container
 	kubeEnv := false
 
@@ -100,10 +100,10 @@ func ProvisionBackupJob(args *BackupRequest) error {
 		output, err = cpmagent.AgentDockerRun(params, server.IPAddress)
 
 		if err != nil {
-			logutil.Log("Provision: " + output)
+			glog.Errorln("Provision: " + output)
 			return err
 		}
-		logutil.Log("docker-run-backup.sh output=" + output)
+		glog.Infoln("docker-run-backup.sh output=" + output)
 	}
 
 	return nil

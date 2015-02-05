@@ -18,7 +18,7 @@ package main
 import (
 	"bytes"
 	"crunchy.com/backup"
-	"crunchy.com/logutil"
+	"github.com/golang/glog"
 	"io"
 	"os"
 	"os/exec"
@@ -46,7 +46,7 @@ func init() {
 	var err error
 	file, err = os.Create(filename)
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 	}
 }
 
@@ -54,7 +54,7 @@ func main() {
 
 	_, err := io.WriteString(file, "backupcommand running....\n")
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 	}
 
 	getEnvVars()
@@ -89,7 +89,7 @@ func main() {
 
 	err = cmd.Run()
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		io.WriteString(file, err.Error())
 	}
 

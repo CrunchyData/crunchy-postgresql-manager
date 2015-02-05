@@ -16,9 +16,9 @@
 package backup
 
 import (
-	"crunchy.com/logutil"
 	"database/sql"
 	"fmt"
+	"github.com/golang/glog"
 	_ "github.com/lib/pq"
 	"strconv"
 )
@@ -26,13 +26,13 @@ import (
 var dbConn *sql.DB
 
 func SetConnection(conn *sql.DB) {
-	logutil.Log("backupdb:SetConnection: called to open dbConn")
+	glog.Infoln("backupdb:SetConnection: called to open dbConn")
 	dbConn = conn
 }
 
 func DBAddStatus(status BackupStatus) (string, error) {
 
-	logutil.Log("DBAddStatus called")
+	glog.Infoln("DBAddStatus called")
 
 	queryStr := fmt.Sprintf("insert into backupstatus ( containername, starttime, backupname, servername, serverip, path, elapsedtime, backupsize, status, profilename, scheduleid, updatedt) values ( '%s', now(), '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, now()) returning id",
 		status.ContainerName,
@@ -44,26 +44,26 @@ func DBAddStatus(status BackupStatus) (string, error) {
 		status.BackupSize,
 		status.Status, status.ProfileName, status.ScheduleID)
 
-	logutil.Log("DBAddStatus:" + queryStr)
+	glog.Infoln("DBAddStatus:" + queryStr)
 	var theID int
 	err := dbConn.QueryRow(queryStr).Scan(
 		&theID)
 	switch {
 	case err != nil:
-		logutil.Log("DBAddStatus: error " + err.Error())
+		glog.Errorln("DBAddStatus: error " + err.Error())
 		return "", err
 	default:
 	}
 
 	var strvalue string
 	strvalue = strconv.Itoa(theID)
-	logutil.Log("DBAddStatus returning ID=" + strvalue)
+	glog.Infoln("DBAddStatus returning ID=" + strvalue)
 	return strvalue, nil
 }
 
 func DBUpdateStatus(status BackupStatus) error {
 
-	logutil.Log("backup.DBUpdateStatus called")
+	glog.Infoln("backup.DBUpdateStatus called")
 
 	queryStr := fmt.Sprintf("update backupstatus set ( status, backupsize, elapsedtime, updatedt) = ('%s', '%s', '%s', now()) where id = %s returning containername",
 		status.Status,
@@ -71,12 +71,12 @@ func DBUpdateStatus(status BackupStatus) error {
 		status.ElapsedTime,
 		status.ID)
 
-	logutil.Log("backup:DBUpdateStatus:[" + queryStr + "]")
+	glog.Infoln("backup:DBUpdateStatus:[" + queryStr + "]")
 	var name string
 	err := dbConn.QueryRow(queryStr).Scan(&name)
 	switch {
 	case err != nil:
-		logutil.Log("backup:DBUpdateStatus:" + err.Error())
+		glog.Errorln("backup:DBUpdateStatus:" + err.Error())
 		return err
 	default:
 	}
@@ -86,7 +86,7 @@ func DBUpdateStatus(status BackupStatus) error {
 
 func DBAddSchedule(s BackupSchedule) (string, error) {
 
-	logutil.Log("DBAddSchedule called")
+	glog.Infoln("DBAddSchedule called")
 
 	queryStr := fmt.Sprintf("insert into backupschedule ( serverid, containername, profilename, name, enabled, minutes, hours, dayofmonth, month, dayofweek, updatedt) values ( '%s','%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s',  now()) returning id",
 		s.ServerID,
@@ -100,18 +100,18 @@ func DBAddSchedule(s BackupSchedule) (string, error) {
 		s.Month,
 		s.DayOfWeek)
 
-	logutil.Log("DBAddSchedule:" + queryStr)
+	glog.Infoln("DBAddSchedule:" + queryStr)
 	var theID string
 	err := dbConn.QueryRow(queryStr).Scan(
 		&theID)
 	if err != nil {
-		logutil.Log("error in DBAddSchedule query " + err.Error())
+		glog.Errorln("error in DBAddSchedule query " + err.Error())
 		return "", err
 	}
 
 	switch {
 	case err != nil:
-		logutil.Log("DBAddSchedule: error " + err.Error())
+		glog.Errorln("DBAddSchedule: error " + err.Error())
 		return "", err
 	default:
 	}
@@ -121,7 +121,7 @@ func DBAddSchedule(s BackupSchedule) (string, error) {
 
 func DBUpdateSchedule(s BackupSchedule) error {
 
-	logutil.Log("backup.DBUpdateSchedule called")
+	glog.Infoln("backup.DBUpdateSchedule called")
 
 	queryStr := fmt.Sprintf("update backupschedule set ( enabled, serverid, name, minutes, hours, dayofmonth, month, dayofweek, updatedt) = ('%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', now()) where id = %s  returning containername",
 		s.Enabled,
@@ -134,12 +134,12 @@ func DBUpdateSchedule(s BackupSchedule) error {
 		s.DayOfWeek,
 		s.ID)
 
-	logutil.Log("backup:DBUpdateSchedule:[" + queryStr + "]")
+	glog.Infoln("backup:DBUpdateSchedule:[" + queryStr + "]")
 	var name string
 	err := dbConn.QueryRow(queryStr).Scan(&name)
 	switch {
 	case err != nil:
-		logutil.Log("backup:DBUpdateSchedule:" + err.Error())
+		glog.Errorln("backup:DBUpdateSchedule:" + err.Error())
 		return err
 	default:
 	}
@@ -149,7 +149,7 @@ func DBUpdateSchedule(s BackupSchedule) error {
 
 func DBDeleteSchedule(id string) error {
 	queryStr := fmt.Sprintf("delete from backupschedule where id=%s returning id", id)
-	logutil.Log("backup:DBDeleteSchedule:" + queryStr)
+	glog.Infoln("backup:DBDeleteSchedule:" + queryStr)
 
 	var theID int
 	err := dbConn.QueryRow(queryStr).Scan(&theID)
@@ -163,16 +163,16 @@ func DBDeleteSchedule(id string) error {
 }
 
 func DBGetSchedule(id string) (BackupSchedule, error) {
-	logutil.Log("DBGetSchedule called with id=" + id)
+	glog.Infoln("DBGetSchedule called with id=" + id)
 	s := BackupSchedule{}
 
 	err := dbConn.QueryRow(fmt.Sprintf("select a.id, a.serverid, b.name, b.ipaddress, a.containername, a.profilename, a.name, a.enabled, a.minutes, a.hours, a.dayofmonth, a.month, a.dayofweek, date_trunc('second', a.updatedt)::text from backupschedule a, server b where a.id=%s and b.id = a.serverid", id)).Scan(&s.ID, &s.ServerID, &s.ServerName, &s.ServerIP, &s.ContainerName, &s.ProfileName, &s.Name, &s.Enabled, &s.Minutes, &s.Hours, &s.DayOfMonth, &s.Month, &s.DayOfWeek, &s.UpdateDt)
 	switch {
 	case err == sql.ErrNoRows:
-		logutil.Log("backupdb:DBGetSchedule:no schedule with that id")
+		glog.Errorln("backupdb:DBGetSchedule:no schedule with that id")
 		return s, err
 	case err != nil:
-		logutil.Log("backupdb:DBGetSchedule:" + err.Error())
+		glog.Errorln("backupdb:DBGetSchedule:" + err.Error())
 		return s, err
 	default:
 	}
@@ -181,7 +181,7 @@ func DBGetSchedule(id string) (BackupSchedule, error) {
 }
 
 func DBGetAllSchedules(containerid string) ([]BackupSchedule, error) {
-	logutil.Log("DBGetAllSchedules called with id=" + containerid)
+	glog.Infoln("DBGetAllSchedules called with id=" + containerid)
 	var rows *sql.Rows
 	var err error
 
@@ -221,7 +221,7 @@ func DBGetAllSchedules(containerid string) ([]BackupSchedule, error) {
 }
 
 func DBGetAllStatus(scheduleid string) ([]BackupStatus, error) {
-	logutil.Log("DBGetAllStatus called with scheduleid=" + scheduleid)
+	glog.Infoln("DBGetAllStatus called with scheduleid=" + scheduleid)
 	var rows *sql.Rows
 	var err error
 
@@ -258,16 +258,16 @@ func DBGetAllStatus(scheduleid string) ([]BackupStatus, error) {
 }
 
 func DBGetStatus(id string) (BackupStatus, error) {
-	logutil.Log("DBGetStatus called with id=" + id)
+	glog.Infoln("DBGetStatus called with id=" + id)
 	s := BackupStatus{}
 
 	err := dbConn.QueryRow(fmt.Sprintf("select id, containername, date_trunc('second', starttime), backupname, servername, serverip, path, elapsedtime, backupsize, status, date_trunc('second', updatedt) from backupstatus where id=%s", id)).Scan(&s.ID, &s.ContainerName, &s.StartTime, &s.BackupName, &s.ServerName, &s.ServerIP, &s.Path, &s.ElapsedTime, &s.BackupSize, &s.Status, &s.UpdateDt)
 	switch {
 	case err == sql.ErrNoRows:
-		logutil.Log("backupdb:DBGetStatus:no status with that id")
+		glog.Errorln("backupdb:DBGetStatus:no status with that id")
 		return s, err
 	case err != nil:
-		logutil.Log("backupdb:DBGetStatus:" + err.Error())
+		glog.Errorln("backupdb:DBGetStatus:" + err.Error())
 		return s, err
 	default:
 	}
@@ -276,7 +276,7 @@ func DBGetStatus(id string) (BackupStatus, error) {
 }
 
 func DBGetSchedules() ([]BackupSchedule, error) {
-	logutil.Log("DBGetSchedules called")
+	glog.Infoln("DBGetSchedules called")
 	var rows *sql.Rows
 	var err error
 
