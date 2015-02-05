@@ -17,10 +17,10 @@ package cpmagent
 
 import (
 	"bytes"
-	"crunchy.com/logutil"
 	"errors"
 	"fmt"
 	dockerapi "github.com/fsouza/go-dockerclient"
+	"github.com/golang/glog"
 	"io/ioutil"
 	"net/rpc"
 	"os/exec"
@@ -66,15 +66,15 @@ type InspectCommandOutput struct {
 */
 func (t *Command) Get(args *Args, reply *Command) error {
 
-	logutil.Log("on server, Command Get called A=" + args.A + " B=" + args.B)
+	glog.Infoln("on server, Command Get called A=" + args.A + " B=" + args.B)
 	if args.A == "" {
-		logutil.Log("A was nil")
+		glog.Errorln("A was nil")
 		return errors.New("Arg A was nil")
 	}
 	if args.B == "" {
-		logutil.Log("B was nil")
+		glog.Infoln("B was nil")
 	} else {
-		logutil.Log("B was " + args.B)
+		glog.Infoln("B was " + args.B)
 	}
 
 	var cmd *exec.Cmd
@@ -91,11 +91,11 @@ func (t *Command) Get(args *Args, reply *Command) error {
 
 	err := cmd.Run()
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		errorString := fmt.Sprintf("%s\n%s\n%s\n", err.Error(), out.String(), stderr.String())
 		return errors.New(errorString)
 	}
-	logutil.Log("command output was " + out.String())
+	glog.Infoln("command output was " + out.String())
 	reply.Output = out.String()
 
 	return nil
@@ -103,7 +103,7 @@ func (t *Command) Get(args *Args, reply *Command) error {
 
 func (t *Command) ConfigureNode(args *Args, reply *Command) error {
 
-	logutil.Log("on server, Command ConfigureMaster called CommandPath=" + args.CommandPath + " A=" + args.A + " B=" + args.B + " C=" + args.C + " D=" + args.D + " cpm=" + args.CPU + " mem=" + args.MEM + " E=" + args.E)
+	glog.Infoln("on server, Command ConfigureMaster called CommandPath=" + args.CommandPath + " A=" + args.A + " B=" + args.B + " C=" + args.C + " D=" + args.D + " cpm=" + args.CPU + " mem=" + args.MEM + " E=" + args.E)
 
 	var cmd *exec.Cmd
 
@@ -115,11 +115,11 @@ func (t *Command) ConfigureNode(args *Args, reply *Command) error {
 
 	err := cmd.Run()
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		errorString := fmt.Sprintf("%s\n%s\n%s\n", err.Error(), out.String(), stderr.String())
 		return errors.New(errorString)
 	}
-	logutil.Log("command output was " + out.String())
+	glog.Infoln("command output was " + out.String())
 	reply.Output = out.String()
 
 	return nil
@@ -131,9 +131,9 @@ func (t *Command) ConfigureNode(args *Args, reply *Command) error {
 //
 func (t *Command) DockerInspectCommand(args *Args, reply *Command) error {
 
-	logutil.Log("DockerInspectCommand called A=" + args.A)
+	glog.Infoln("DockerInspectCommand called A=" + args.A)
 	if args.A == "" {
-		logutil.Log("A was nil")
+		glog.Errorln("A was nil")
 		return errors.New("Arg A was nil")
 	}
 
@@ -152,13 +152,13 @@ func (t *Command) DockerInspectCommand(args *Args, reply *Command) error {
 
 	err := cmd.Run()
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		errorString := fmt.Sprintf("%s\n%s\n%s\n", err.Error(), out.String(), stderr.String())
 		return errors.New(errorString)
 	}
 
 	ipaddr := strings.Trim(out.String(), "\n")
-	logutil.Log("docker inspect command output was " + ipaddr)
+	glog.Infoln("docker inspect command output was " + ipaddr)
 	reply.Output = ipaddr
 
 	return nil
@@ -171,9 +171,9 @@ func (t *Command) DockerInspectCommand(args *Args, reply *Command) error {
 //
 func (t *Command) DockerRemoveCommand(args *Args, reply *Command) error {
 
-	logutil.Log("DockerRemoveCommand called A=" + args.A)
+	glog.Infoln("DockerRemoveCommand called A=" + args.A)
 	if args.A == "" {
-		logutil.Log("A was nil")
+		glog.Errorln("A was nil")
 		return errors.New("Arg A was nil")
 	}
 
@@ -186,7 +186,7 @@ func (t *Command) DockerRemoveCommand(args *Args, reply *Command) error {
 	//remove
 	docker, err := dockerapi.NewClient("unix://var/run/docker.sock")
 	if err != nil {
-		logutil.Log("can't get connection to docker socket")
+		glog.Errorln("can't get connection to docker socket")
 		return err
 	}
 
@@ -195,24 +195,24 @@ func (t *Command) DockerRemoveCommand(args *Args, reply *Command) error {
 	//a user can remove the container manually
 	container, err3 := docker.InspectContainer(containerName)
 	if err3 != nil {
-		logutil.Log("can't inspect container " + containerName)
-		logutil.Log("inspect container error was " + err3.Error())
+		glog.Errorln("can't inspect container " + containerName)
+		glog.Errorln("inspect container error was " + err3.Error())
 		return nil
 	}
 
 	if container != nil {
-		logutil.Log("container found during inspect")
+		glog.Infoln("container found during inspect")
 		err3 = docker.StopContainer(containerName, 10)
 		if err3 != nil {
-			logutil.Log("can't stop container " + containerName)
+			glog.Infoln("can't stop container " + containerName)
 		}
-		logutil.Log("container stopped ")
+		glog.Infoln("container stopped ")
 		opts := dockerapi.RemoveContainerOptions{ID: containerName}
 		err := docker.RemoveContainer(opts)
 		if err != nil {
-			logutil.Log("can't remove container " + containerName)
+			glog.Infoln("can't remove container " + containerName)
 		}
-		logutil.Log("container removed ")
+		glog.Infoln("container removed ")
 	}
 
 	reply.Output = "success"
@@ -225,7 +225,7 @@ func (t *Command) DockerRemoveCommand(args *Args, reply *Command) error {
 //
 func (t *Command) PGCommand(args *Args, reply *Command) error {
 
-	logutil.Log(args.A)
+	glog.Infoln(args.A)
 
 	var cmd *exec.Cmd
 
@@ -238,11 +238,11 @@ func (t *Command) PGCommand(args *Args, reply *Command) error {
 
 	err := cmd.Run()
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		errorString := fmt.Sprintf("%s\n%s\n%s\n", err.Error(), out.String(), stderr.String())
 		return errors.New(errorString)
 	}
-	logutil.Log(args.A + " command output was " + out.String())
+	glog.Infoln(args.A + " command output was " + out.String())
 	reply.Output = out.String()
 	reply.Output = "success"
 
@@ -258,7 +258,7 @@ func (t *Command) Writefile(args *Args, reply *Command) error {
 	d1 := []byte(args.A)
 	err := ioutil.WriteFile(args.B, d1, 0644)
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		return err
 	}
 
@@ -270,7 +270,7 @@ func (t *Command) Writefile(args *Args, reply *Command) error {
 //
 func (t *Command) Command1(args *Args, reply *Command) error {
 
-	logutil.Log(args.A + " " + args.B)
+	glog.Infoln(args.A + " " + args.B)
 
 	var cmd *exec.Cmd
 
@@ -283,11 +283,11 @@ func (t *Command) Command1(args *Args, reply *Command) error {
 
 	err := cmd.Run()
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		errorString := fmt.Sprintf("%s\n%s\n%s\n", err.Error(), out.String(), stderr.String())
 		return errors.New(errorString)
 	}
-	logutil.Log(args.A + " " + args.B + " command output was " + out.String())
+	glog.Infoln(args.A + " " + args.B + " command output was " + out.String())
 	reply.Output = out.String()
 	reply.Output = "success"
 
@@ -301,9 +301,9 @@ func (t *Command) Command1(args *Args, reply *Command) error {
 //
 func (t *Command) DockerStartCommand(args *Args, reply *Command) error {
 
-	logutil.Log("DockerStartCommand called A=" + args.A)
+	glog.Infoln("DockerStartCommand called A=" + args.A)
 	if args.A == "" {
-		logutil.Log("A was nil")
+		glog.Errorln("A was nil")
 		return errors.New("Arg A was nil")
 	}
 
@@ -315,7 +315,7 @@ func (t *Command) DockerStartCommand(args *Args, reply *Command) error {
 	//start
 	docker, err := dockerapi.NewClient("unix://var/run/docker.sock")
 	if err != nil {
-		logutil.Log("can't get connection to docker socket")
+		glog.Errorln("can't get connection to docker socket")
 		return err
 	}
 
@@ -323,25 +323,25 @@ func (t *Command) DockerStartCommand(args *Args, reply *Command) error {
 	//on trying to start it
 	container, err3 := docker.InspectContainer(containerName)
 	if err3 != nil {
-		logutil.Log("can't inspect container " + containerName)
-		logutil.Log("inspect container error was " + err3.Error())
+		glog.Errorln("can't inspect container " + containerName)
+		glog.Errorln("inspect container error was " + err3.Error())
 		return errors.New("container " + containerName + " not found")
 	}
 
 	if container != nil {
-		logutil.Log("container found during inspect")
+		glog.Infoln("container found during inspect")
 
 		if container.State.Running {
-			logutil.Log("container " + containerName + " was already running, no need to start it")
+			glog.Infoln("container " + containerName + " was already running, no need to start it")
 			return nil
 		}
 
 		err3 = docker.StartContainer(containerName, nil)
 		if err3 != nil {
-			logutil.Log("can't start container " + containerName)
+			glog.Errorln("can't start container " + containerName)
 			return errors.New("can not start container " + containerName)
 		}
-		logutil.Log("container started ")
+		glog.Infoln("container started ")
 	}
 
 	reply.Output = "success"
@@ -356,9 +356,9 @@ func (t *Command) DockerStartCommand(args *Args, reply *Command) error {
 //
 func (t *Command) DockerStopCommand(args *Args, reply *Command) error {
 
-	logutil.Log("DockerStopCommand called A=" + args.A)
+	glog.Infoln("DockerStopCommand called A=" + args.A)
 	if args.A == "" {
-		logutil.Log("A was nil")
+		glog.Errorln("A was nil")
 		return errors.New("Arg A was nil")
 	}
 
@@ -366,7 +366,7 @@ func (t *Command) DockerStopCommand(args *Args, reply *Command) error {
 
 	docker, err := dockerapi.NewClient("unix://var/run/docker.sock")
 	if err != nil {
-		logutil.Log("can't get connection to docker socket")
+		glog.Errorln("can't get connection to docker socket")
 		return err
 	}
 
@@ -374,19 +374,19 @@ func (t *Command) DockerStopCommand(args *Args, reply *Command) error {
 	//on trying to stop it
 	container, err3 := docker.InspectContainer(containerName)
 	if err3 != nil {
-		logutil.Log("during stop, can't inspect container " + containerName)
+		glog.Infoln("during stop, can't inspect container " + containerName)
 		return nil
 	}
 
 	if container != nil {
-		logutil.Log("container found during inspect")
+		glog.Infoln("container found during inspect")
 		var timeout uint
 		timeout = 10
 		err3 = docker.StopContainer(containerName, timeout)
 		if err3 != nil {
-			logutil.Log("can't stop container " + containerName)
+			glog.Infoln("can't stop container " + containerName)
 		}
-		logutil.Log("container " + containerName + " stopped ")
+		glog.Infoln("container " + containerName + " stopped ")
 	}
 
 	reply.Output = "success"
@@ -400,9 +400,9 @@ func (t *Command) DockerStopCommand(args *Args, reply *Command) error {
 //
 func (t *Command) DockerInspect2Command(args *Args, reply *InspectCommandOutput) error {
 
-	logutil.Log("DockerInspect2Command called containerName=" + args.A)
+	glog.Infoln("DockerInspect2Command called containerName=" + args.A)
 	if args.A == "" {
-		logutil.Log("containerName was nil")
+		glog.Errorln("containerName was nil")
 		return errors.New("containerName was nil")
 	}
 
@@ -410,7 +410,7 @@ func (t *Command) DockerInspect2Command(args *Args, reply *InspectCommandOutput)
 
 	docker, err := dockerapi.NewClient("unix://var/run/docker.sock")
 	if err != nil {
-		logutil.Log("can't get connection to docker socket")
+		glog.Errorln("can't get connection to docker socket")
 		return err
 	}
 
@@ -421,20 +421,20 @@ func (t *Command) DockerInspect2Command(args *Args, reply *InspectCommandOutput)
 
 	container, err3 := docker.InspectContainer(containerName)
 	if err3 != nil {
-		logutil.Log("can't inspect container " + containerName)
+		glog.Infoln("can't inspect container " + containerName)
 		return nil
 	}
 
 	if container != nil {
-		logutil.Log("container found during inspect")
+		glog.Infoln("container found during inspect")
 		if container.State.Running {
 			reply.RunningState = "up"
-			logutil.Log("container status is up")
-			logutil.Log("container ipaddress is " + container.NetworkSettings.IPAddress)
+			glog.Infoln("container status is up")
+			glog.Infoln("container ipaddress is " + container.NetworkSettings.IPAddress)
 			reply.IPAddress = container.NetworkSettings.IPAddress
 		} else {
 			reply.RunningState = "down"
-			logutil.Log("container status is down")
+			glog.Infoln("container status is down")
 		}
 	}
 
@@ -443,7 +443,7 @@ func (t *Command) DockerInspect2Command(args *Args, reply *InspectCommandOutput)
 
 func (t *Command) DockerRun(args *DockerRunArgs, reply *Command) error {
 
-	logutil.Log("on server, Command DockerRun called CommandPath=" + args.CommandPath + " PGDataPath=" + args.PGDataPath + " ContainerName=" + args.ContainerName + " Image=" + args.Image + " cpm=" + args.CPU + " mem=" + args.MEM)
+	glog.Infoln("on server, Command DockerRun called CommandPath=" + args.CommandPath + " PGDataPath=" + args.PGDataPath + " ContainerName=" + args.ContainerName + " Image=" + args.Image + " cpm=" + args.CPU + " mem=" + args.MEM)
 
 	var cmd *exec.Cmd
 
@@ -453,7 +453,7 @@ func (t *Command) DockerRun(args *DockerRunArgs, reply *Command) error {
 			allEnvVars = allEnvVars + " -e " + k + "=" + v
 		}
 	}
-	logutil.Log("env vars " + allEnvVars)
+	glog.Infoln("env vars " + allEnvVars)
 
 	cmd = exec.Command(args.CommandPath, args.PGDataPath, args.ContainerName, args.Image, args.CPU, args.MEM, allEnvVars)
 	var out bytes.Buffer
@@ -463,11 +463,11 @@ func (t *Command) DockerRun(args *DockerRunArgs, reply *Command) error {
 
 	err := cmd.Run()
 	if err != nil {
-		logutil.Log(err.Error())
+		glog.Errorln(err.Error())
 		errorString := fmt.Sprintf("%s\n%s\n%s\n", err.Error(), out.String(), stderr.String())
 		return errors.New(errorString)
 	}
-	logutil.Log("command output was " + out.String())
+	glog.Infoln("command output was " + out.String())
 	reply.Output = out.String()
 
 	return nil
@@ -476,10 +476,10 @@ func (t *Command) DockerRun(args *DockerRunArgs, reply *Command) error {
 func AgentCommand(arga string, argb string, ipaddress string) (string, error) {
 	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
 	if err != nil {
-		logutil.Log("AgentCommand: dialing:" + err.Error())
+		glog.Errorln("AgentCommand: dialing:" + err.Error())
 	}
 	if client == nil {
-		logutil.Log("AgentCommand: dialing: client was nil")
+		glog.Errorln("AgentCommand: dialing: client was nil")
 		return "", errors.New("client was nil")
 	}
 
@@ -490,26 +490,26 @@ func AgentCommand(arga string, argb string, ipaddress string) (string, error) {
 	args.B = argb
 	err = client.Call("Command.Get", args, &command)
 	if err != nil {
-		logutil.Log("AgentCommand:" + arga + " Command Get error:" + err.Error())
+		glog.Errorln("AgentCommand:" + arga + " Command Get error:" + err.Error())
 		return "", err
 	}
 	return command.Output, nil
 }
 
 func AgentDockerRun(args DockerRunArgs, ipaddress string) (string, error) {
-	logutil.Log("server.go:AgentDockerRun:cpu=" + args.CPU + " mem=" + args.MEM)
+	glog.Infoln("server.go:AgentDockerRun:cpu=" + args.CPU + " mem=" + args.MEM)
 	if args.EnvVars != nil {
 		for k, v := range args.EnvVars {
-			logutil.Log("server.go: env var " + k + " " + v)
+			glog.Infoln("server.go: env var " + k + " " + v)
 		}
 	}
 	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
 	if err != nil {
-		logutil.Log("AgentDockerRun dialing:" + err.Error())
+		glog.Errorln("AgentDockerRun dialing:" + err.Error())
 		return "", err
 	}
 	if client == nil {
-		logutil.Log("AgentDockerRun dialing: client was nil")
+		glog.Errorln("AgentDockerRun dialing: client was nil")
 		return "", errors.New("client was nil")
 	}
 
@@ -517,7 +517,7 @@ func AgentDockerRun(args DockerRunArgs, ipaddress string) (string, error) {
 
 	err = client.Call("Command.DockerRun", args, &command)
 	if err != nil {
-		logutil.Log("DockerRun error:" + err.Error())
+		glog.Errorln("DockerRun error:" + err.Error())
 		return "", err
 	}
 	return command.Output, nil
@@ -526,11 +526,11 @@ func AgentDockerRun(args DockerRunArgs, ipaddress string) (string, error) {
 func DockerInspectCommand(arga string, ipaddress string) (string, error) {
 	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
 	if err != nil {
-		logutil.Log("DockerInspectCommand: dialing:" + err.Error())
+		glog.Errorln("DockerInspectCommand: dialing:" + err.Error())
 		return "", err
 	}
 	if client == nil {
-		logutil.Log("DockerInspectCommand: dialing: client was nil")
+		glog.Errorln("DockerInspectCommand: dialing: client was nil")
 		return "", errors.New("client was nil")
 	}
 
@@ -540,7 +540,7 @@ func DockerInspectCommand(arga string, ipaddress string) (string, error) {
 	args.A = arga
 	err = client.Call("Command.DockerInspectCommand", args, &command)
 	if err != nil {
-		logutil.Log("DockerInspectCommand:" + arga + " Command DockerInspectCommand error:" + err.Error())
+		glog.Errorln("DockerInspectCommand:" + arga + " Command DockerInspectCommand error:" + err.Error())
 		return "", err
 	}
 	return command.Output, nil
@@ -552,11 +552,11 @@ func DockerInspect2Command(arga string, ipaddress string) (InspectOutput, error)
 
 	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
 	if err != nil {
-		logutil.Log("DockerInspect2Command: dialing:" + err.Error())
+		glog.Errorln("DockerInspect2Command: dialing:" + err.Error())
 		return output, err
 	}
 	if client == nil {
-		logutil.Log("DockerInspect2Command dialing: client was nil")
+		glog.Errorln("DockerInspect2Command dialing: client was nil")
 		return output, errors.New("client was nil here")
 	}
 
@@ -564,7 +564,7 @@ func DockerInspect2Command(arga string, ipaddress string) (InspectOutput, error)
 	args.A = arga
 	err = client.Call("Command.DockerInspect2Command", args, &command)
 	if err != nil {
-		logutil.Log("DockerInspect2Command:" + arga + " Command DockerInspect2Command error:" + err.Error())
+		glog.Errorln("DockerInspect2Command:" + arga + " Command DockerInspect2Command error:" + err.Error())
 		return output, err
 	}
 	output.IPAddress = command.IPAddress
@@ -576,11 +576,11 @@ func DockerInspect2Command(arga string, ipaddress string) (InspectOutput, error)
 func DockerRemoveContainer(arga string, ipaddress string) (string, error) {
 	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
 	if err != nil {
-		logutil.Log("DockerRemoveContainer: dialing:" + err.Error())
+		glog.Errorln("DockerRemoveContainer: dialing:" + err.Error())
 		return "", err
 	}
 	if client == nil {
-		logutil.Log("DockerRemoveContainer: dialing:" + err.Error())
+		glog.Errorln("DockerRemoveContainer: dialing:" + err.Error())
 		return "", errors.New("client was nil here2")
 	}
 
@@ -590,7 +590,7 @@ func DockerRemoveContainer(arga string, ipaddress string) (string, error) {
 	args.A = arga
 	err = client.Call("Command.DockerRemoveCommand", args, &command)
 	if err != nil {
-		logutil.Log("DockerRemoveCommand arga error:" + err.Error())
+		glog.Errorln("DockerRemoveCommand arga error:" + err.Error())
 		return "", err
 	}
 	return command.Output, nil
@@ -599,11 +599,11 @@ func DockerRemoveContainer(arga string, ipaddress string) (string, error) {
 func AgentCommandConfigureNode(commandpath string, arga string, argb string, argc string, argd string, arge string, cpu string, mem string, ipaddress string) (string, error) {
 	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
 	if err != nil {
-		logutil.Log("AgentCommandConfigureNode dialing:" + err.Error())
+		glog.Errorln("AgentCommandConfigureNode dialing:" + err.Error())
 		return "", err
 	}
 	if client == nil {
-		logutil.Log("AgentCommandConfigureNode dialing: client was nil")
+		glog.Errorln("AgentCommandConfigureNode dialing: client was nil")
 		return "", errors.New("client was nil")
 	}
 
@@ -620,7 +620,7 @@ func AgentCommandConfigureNode(commandpath string, arga string, argb string, arg
 	args.E = arge
 	err = client.Call("Command.ConfigureNode", args, &command)
 	if err != nil {
-		logutil.Log("AgentCommandConfigureNode error:" + err.Error())
+		glog.Errorln("AgentCommandConfigureNode error:" + err.Error())
 		return "", err
 	}
 	return command.Output, nil
@@ -629,11 +629,11 @@ func AgentCommandConfigureNode(commandpath string, arga string, argb string, arg
 func DockerStartContainer(containerName string, ipaddress string) (string, error) {
 	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
 	if err != nil {
-		logutil.Log("DockerStartContainer dialing:" + err.Error())
+		glog.Errorln("DockerStartContainer dialing:" + err.Error())
 		return "", err
 	}
 	if client == nil {
-		logutil.Log("DockerStartContainer dialing:" + err.Error())
+		glog.Errorln("DockerStartContainer dialing:" + err.Error())
 		return "", errors.New("client was nil 3")
 	}
 
@@ -643,7 +643,7 @@ func DockerStartContainer(containerName string, ipaddress string) (string, error
 	args.A = containerName
 	err = client.Call("Command.DockerStartCommand", args, &command)
 	if err != nil {
-		logutil.Log("DockerStartContainer containerName error:" + err.Error())
+		glog.Errorln("DockerStartContainer containerName error:" + err.Error())
 		return "", err
 	}
 	return command.Output, nil
@@ -653,11 +653,11 @@ func DockerStopContainer(containerName string, ipaddress string) (string, error)
 
 	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
 	if err != nil {
-		logutil.Log("DockerStopContainer dialing:" + err.Error())
+		glog.Errorln("DockerStopContainer dialing:" + err.Error())
 		return "", err
 	}
 	if client == nil {
-		logutil.Log("DockerStopContainer dialing:" + err.Error())
+		glog.Errorln("DockerStopContainer dialing:" + err.Error())
 		return "", errors.New("client was nil here 4")
 	}
 
@@ -667,7 +667,7 @@ func DockerStopContainer(containerName string, ipaddress string) (string, error)
 	args.A = containerName
 	err = client.Call("Command.DockerStopCommand", args, &command)
 	if err != nil {
-		logutil.Log("DockerStopContainer containerName error:" + err.Error())
+		glog.Infoln("DockerStopContainer containerName error:" + err.Error())
 		return "", err
 	}
 	return command.Output, nil
@@ -676,11 +676,11 @@ func DockerStopContainer(containerName string, ipaddress string) (string, error)
 func Command1(pgcommand string, parameter string, ipaddress string) (string, error) {
 	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
 	if err != nil {
-		logutil.Log("Command1: dialing:" + err.Error())
+		glog.Errorln("Command1: dialing:" + err.Error())
 		return "", err
 	}
 	if client == nil {
-		logutil.Log("Command1: client was nil")
+		glog.Errorln("Command1: client was nil")
 		return "", errors.New("client was nil from rpc dial")
 	}
 
@@ -691,7 +691,7 @@ func Command1(pgcommand string, parameter string, ipaddress string) (string, err
 	args.B = parameter
 	err = client.Call("Command.Command1", args, &command)
 	if err != nil {
-		logutil.Log("Command1: " + args.A + " " + args.B + " error:" + err.Error())
+		glog.Errorln("Command1: " + args.A + " " + args.B + " error:" + err.Error())
 		return "", err
 	}
 	return command.Output, nil
