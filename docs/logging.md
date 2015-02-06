@@ -16,15 +16,18 @@ This directory is initially created by the run-cpm.sh script.
 Logs are written to this directory by the following
 containers:
 
-** cpm
-** cpm-admin
-** cpm-mon
-** cpm-backup
++ cpm
++ cpm-admin
++ cpm-mon
++ cpm-backup
 
 glog flushes output to these log files perodically or upon demand
 by coding glog.Flush()
 
-Each container mounts "/cpmlogs"
+Each container mounts 
+````````````
+/cpmlogs
+````````````
 
 Each startup script for the services now writes to /cpmlogs which gets
 mapped by Docker to /opt/cpm/logs on the Docker host.
