@@ -19,13 +19,8 @@
 
 source /cluster/bin/setenv.sh
 
-# bail out if this event is not intended for this IP
-if [ $PG_HOST_IP != $1 ]
-then
-	exit
-fi
-
 echo "fail-over PostgreSQL" >> $CLUSTER_LOG
 
 touch /tmp/pg-failover-trigger
 
+sleep 4

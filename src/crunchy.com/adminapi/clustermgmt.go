@@ -580,11 +580,11 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 
 	output, err = cpmagent.AgentCommand("/cluster/bin/fail-over.sh", dbNode.Name, dbNode.Name)
 	if err != nil {
-		glog.Errorln("AdminFailover: " + err.Error())
+		glog.Errorln("AdminFailover: fail-over error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
-	glog.Infoln("AdminFailover: " + output)
+	glog.Infoln("AdminFailover: fail-over output " + output)
 
 	//update the old master to standalone role
 	oldMaster := admindb.DBClusterNode{}

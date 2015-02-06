@@ -43,7 +43,7 @@ func init() {
 
 func DBGetUser(Name string) (User, error) {
 	user := User{}
-	glog.Infoln("secdb:GetUser: called name=" + Name)
+	//glog.Infoln("secdb:GetUser: called name=" + Name)
 	var rows *sql.Rows
 
 	roles, err := DBGetRoles()
@@ -88,7 +88,7 @@ func DBGetUser(Name string) (User, error) {
 		role = user.Roles[roleName]
 		role.Selected = true
 		user.Roles[roleName] = role
-		glog.Infoln("setting role " + roleName + " to true for User " + Name)
+		//glog.Infoln("setting role " + roleName + " to true for User " + Name)
 	}
 	if err = rows.Err(); err != nil {
 		return user, err
@@ -104,7 +104,7 @@ func DBGetUser(Name string) (User, error) {
 func DBGetRole(Name string) (Role, error) {
 	role := Role{}
 	role.Selected = false
-	glog.Infoln("secdb:GetRole: called")
+	//glog.Infoln("secdb:GetRole: called")
 	var rows *sql.Rows
 	var err error
 
@@ -160,7 +160,7 @@ func DBGetRole(Name string) (Role, error) {
 
 func DBGetPermissions() ([]Permission, error) {
 	slice := []Permission{}
-	glog.Infoln("secdb:GetPermissions: called")
+	//glog.Infoln("secdb:GetPermissions: called")
 	var rows *sql.Rows
 	var err error
 
@@ -191,7 +191,7 @@ func DBGetPermissions() ([]Permission, error) {
 
 func DBDeleteRole(name string) error {
 	queryStr := fmt.Sprintf("delete from secrole where name='%s' returning name", name)
-	glog.Infoln("secdb:DeleteRole:" + queryStr)
+	//glog.Infoln("secdb:DeleteRole:" + queryStr)
 
 	var theName string
 	err := dbConn.QueryRow(queryStr).Scan(&theName)
@@ -344,7 +344,7 @@ func DBUpdateUser(user User) error {
 
 func DBGetAllUsers() ([]User, error) {
 	userList := []User{}
-	glog.Infoln("secdb:DBGetAllUser: called")
+	//glog.Infoln("secdb:DBGetAllUser: called")
 	var rows *sql.Rows
 	var err error
 
@@ -392,7 +392,7 @@ func DBGetAllUsers() ([]User, error) {
 
 func DBGetRoles() ([]Role, error) {
 	slice := []Role{}
-	glog.Infoln("secdb:GetRoles: called")
+	//glog.Infoln("secdb:GetRoles: called")
 	var rows *sql.Rows
 	var err error
 
@@ -421,7 +421,7 @@ func DBGetRoles() ([]Role, error) {
 
 	var role Role
 	for i := range slice {
-		glog.Infoln("fetching role info for " + slice[i].Name)
+		//glog.Infoln("fetching role info for " + slice[i].Name)
 		role, err = DBGetRole(slice[i].Name)
 		if err != nil {
 			glog.Errorln("error" + err.Error())
@@ -459,7 +459,7 @@ func LogPermissions(perms map[string]Permission) {
 
 func DBGetSession(token string) (Session, error) {
 	session := Session{}
-	glog.Infoln("secdb:GetSession: called token=" + token)
+	//glog.Infoln("secdb:GetSession: called token=" + token)
 
 	queryStr := fmt.Sprintf("select token, name, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS')  from secsession where token = '%s'", token)
 
@@ -476,17 +476,17 @@ func DBGetSession(token string) (Session, error) {
 		glog.Errorln("secdb:DBGetSession:" + err.Error())
 		return session, err
 	default:
-		glog.Infoln("secdb:DBGetSession: token returned is " + session.Token)
+		//glog.Infoln("secdb:DBGetSession: token returned is " + session.Token)
 	}
 
 	return session, nil
 }
 
 func DBAddSession(uuid string, id string) error {
-	glog.Infoln("secdb:DBAddSession:called")
+	//glog.Infoln("secdb:DBAddSession:called")
 	queryStr := fmt.Sprintf("insert into secsession ( token, name, updatedt) values ( '%s', '%s', now()) returning token", uuid, id)
 
-	glog.Infoln("secdb:DBAddSession:" + queryStr)
+	//glog.Infoln("secdb:DBAddSession:" + queryStr)
 	var theToken string
 	err := dbConn.QueryRow(queryStr).Scan(&theToken)
 	switch {
