@@ -1,0 +1,136 @@
+<!doctype>
+<head>
+	<link type="text/css" rel="stylesheet" href="css/graph.css">
+	<link type="text/css" rel="stylesheet" href="css/detail.css">
+	<link type="text/css" rel="stylesheet" href="css/legend.css">
+	<link type="text/css" rel="stylesheet" href="css/lines.css">
+
+	<script src="js/d3.v3.js"></script>
+
+	<script src="js/rickshaw.js"></script>
+	<script src="js/Rickshaw.Graph.Axis.Time.js"></script>
+	<script src="js/Rickshaw.Fixtures.Time.js"></script>
+	<script src="js/Rickshaw.Fixtures.Time.Local.js"></script>
+	<script src="js/Rickshaw.Graph.Axis.Y.js"></script>
+	<script src="js/influxdb-0.0.16.js"></script>
+	<!--script src="js/influxdb-0.0.2.js"></script -->
+	<!--script src="js/influxdb-latest.js"></script-->
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+	<script>jQuery.noConflict();</script>
+</head>
+<body>
+
+<div id="chart_container">
+	<div> <h1>hi</h1> </div>
+	<div id="chart"></div>
+	<div id="legend_container">
+		<div id="smoother" title="Smoothing"></div>
+		<div id="legend"></div>
+	</div>
+	<div id="slider"></div>
+</div>
+
+<script>
+
+// set up our data series with 50 random data points
+
+var seriesData = [ [] ];
+//var random = new Rickshaw.Fixtures.RandomData(150);
+
+//for (var i = 0; i < 150; i++) {
+//	random.addData(seriesData);
+//}
+
+var cpuData = [{"name":"cpu","columns":["time","sequence_number","value"],"points":[[1422372211881,250001,1.5],[1422372211882,260001,1.5]]}];
+
+//console.log('series data 1 time is '+ seriesData[0][0].x);
+//console.log('series data 1 y axis value is '+ seriesData[0][0].y);
+console.log('cpu point 1 is ' + cpuData[0].points[0]);
+console.log('cpu point 1 time is ' + cpuData[0].points[0][0]);
+var ftime = cpuData[0].points[0][0];
+console.log('cpu point 1 y axis value  is ' + cpuData[0].points[0][2]);
+var fvalue = cpuData[0].points[0][2];
+seriesData[0].push( { x: ftime, y: fvalue } );
+console.log('cpu point 2 is ' + cpuData[0].points[1]);
+console.log('cpu point 2 time is ' + cpuData[0].points[1][0]);
+ftime = cpuData[0].points[1][0];
+console.log('cpu point 2 y axis value  is ' + cpuData[0].points[1][2]);
+fvalue = cpuData[0].points[1][2];
+seriesData[0].push( { x: ftime, y: fvalue } );
+
+var influxdb = new InfluxDB({host:'localhost', port:8086, username:'root', password:'root', database:'cpm'});
+//var influxdb = new InfluxDB("localhost", 8086, "root", "root", "cpm");
+var graph;
+
+var datapoints;
+
+function foo(points) {
+	console.log('foo called');
+		window.datapoints = points.map(
+			function(point) { 
+				return { x: point.time/1000, y: point.value }; 
+			}).reverse();
+
+		console.log("datapoints=" + window.datapoints);
+}
+
+//influxdb.query("SELECT * FROM cpu where time > now() - 20d and server = 'myserver'", foo);
+var series = influxdb.query("SELECT * FROM cpu where server = 'myserver'");
+console.log("series = " + series[0]);
+
+//console.log("datapoints=" + window.datapoints);
+
+
+var graph = new Rickshaw.Graph( {
+			element: document.getElementById("chart"),
+			width: 960,
+			height: 500,
+			renderer: 'line',
+			series: [
+			{
+			color: "#c05020",
+			//data: seriesData[0],
+			data: series,
+			name: 'CPU Load'
+			}
+			]
+} );
+
+graph.render();
+
+var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+	graph: graph
+} );
+
+var legend = new Rickshaw.Graph.Legend( {
+	graph: graph,
+	element: document.getElementById('legend')
+
+} );
+
+var shelving = new Rickshaw.Graph.Behavior.Series.Toggle( {
+	graph: graph,
+	legend: legend
+} );
+
+var ticksTreatment = 'glow';
+var axes = new Rickshaw.Graph.Axis.Time( {
+	graph: graph,
+	ticksTreatment: ticksTreatment,
+	timeFixture: new Rickshaw.Fixtures.Time.Local()
+} );
+axes.render();
+
+var yAxis = new Rickshaw.Graph.Axis.Y( {
+	graph: graph,
+	tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+	ticksTreatment: ticksTreatment
+} );
+
+yAxis.render();
+
+
+</script>
+
+</body>

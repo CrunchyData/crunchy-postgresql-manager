@@ -1,0 +1,35 @@
+<div class="modal-header">
+	<table>
+		<tr>
+			<td><h1 id="myModalLabel">Login</h1></td>
+		</tr>
+	</table>
+</div>
+
+<div class="modal-body">
+	<form class="form-horizontal" name="myForm" novalidate >
+		<table>
+			<tr>
+				<td>
+					<h4>User ID</h4>
+					<input required class="form-control" type="text" name="ID" ng-model="$parent.ID" ng-maxlength="20" ng-pattern="/^[a-zA-Z0-9-]*$/" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<h4>Password</h4>
+					<input required class="form-control" type="password" placeholder="enter password" name="Password" ng-model="$parent.Password" ng-maxlength="20" ng-pattern="/^[a-zA-Z0-9///.]*$/" />
+				</td>
+			</tr>
+		</table>
+		<br>
+		<div class="modal-footer">
+			<button type="submit" class="btn btn-primary" ng-disabled="myForm.ID.$pristine || myForm.Password.$pristine || (myForm.ID.$dirty && myForm.ID.$invalid) || (myForm.Password.$dirty && myForm.Password.$invalid)" ng-click="ok()" >Login</button>
+			<button class="btn btn-primary" ng-click="cancel()">Cancel</button>
+			<alert ng-repeat="alert in alerts" type="danger">{{alert.msg}}</alert>
+		</div> 
+	</form>
+</div>
+
+
+

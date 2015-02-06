@@ -1,0 +1,41 @@
+<div class="jumbotron text-center">
+	<h3>Crunchy PostgreSQL Manager</h3>
+	<b>Health Check Status as of {{hcts}}</b>
+</div>
+
+<div>	
+
+<table style="margin: auto;" border="0" cellpadding="5" cellspacing="0" width="600">
+<tr>
+<td align="left" valign="top" width="400">
+
+  	<table ng-show="hc.length > 0" ng-table="tableParams" 
+		template-pagination="custom/pager" show-filter="false" 
+		class="table">
+
+       		<tr ng-repeat="entry in hc">
+               	<td header-class="text-left" data-title="'Status'" width="200">
+               	<a ng-href="#containers" tooltip="{{entry[2]}}" style="color:red" ng-if="entry[5] == 'down'" href=""><i class="fa fa-warning"></i></a>
+               	</td>
+		<td header-class="text-left" data-title="'Service Name'" width="200">
+               	{{entry[4]}}
+               	</td>
+		</tr>
+	</table>
+  
+	<script type="text/ng-template" id="custom/pager">
+		<ul class="pager ng-cloak">
+		<li ng-repeat="page in pages"
+		ng-class="{'disabled': !page.active, 'previous': page.type == 'prev', 'next': page.type == 'next'}"
+		ng-show="page.type == 'prev' || page.type == 'next'" ng-switch="page.type">
+		<a ng-switch-when="prev" ng-click="params.page(page.number)" href="">&laquo; Previous</a>
+		<a ng-switch-when="next" ng-click="params.page(page.number)" href="">Next &raquo;</a>
+		</li>
+		</ul>
+  	</script>
+
+</td>
+</tr></table>
+
+
+</div>

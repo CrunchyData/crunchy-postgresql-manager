@@ -1,0 +1,57 @@
+<div class="modal-header">
+	<table>
+		<tr>
+			<td><h1 id="myModalLabel">Add Server</h1></td>
+		</tr>
+	</table>
+</div>
+
+<div class="modal-body">
+	<form class="form-horizontal" name="myForm" novalidate ng-submit="ok();">
+		<table>
+			<tr>
+				<td width="48%">
+					<h4>Server Name</h4>
+					<input required class="form-control" type="text" name="Name" ng-model="$parent.Name" ng-maxlength="15" ng-pattern="/^[a-zA-Z0-9-]*$/" />
+				</td>
+				<td width="2%"></td>
+				<td width="48%">
+					<h4>IP Address</h4>
+					<input required class="form-control" type="text" name="IPAddress" ng-model="$parent.IPAddress" ng-maxlength="14" ng-pattern="/^[0-9/.]*$/" />
+				</td>
+			</tr>
+			<tr>
+				<td width="48%">
+					<h4>PG Data Path</h4>
+					<input required class="form-control" type="text" name="PGDataPath" ng-model="$parent.PGDataPath" ng-maxlength="40" ng-pattern="/^[a-zA-Z0-9///.]*$/" />
+				</td>
+				<td width="2%"></td>
+				<td width="48%">
+					<h4>Docker Bridge IP</h4>
+					<input required class="form-control" type="text" name="DockerBridgeIP" ng-model="$parent.DockerBridgeIP" ng-maxlength="14" ng-pattern="/^[0-9/.]*$/" />
+				</td>
+			</tr>
+			<tr>
+				<td width="48%">
+					<h4>Server Class</h4>
+					<select class="form-control" ng-model="$parent.ServerClass" >
+						<option value="low" >low</option>
+						<option value="medium" >medium</option>
+						<option value="high" >high</option>
+					</select>
+				</td>
+				<td width="2%"></td>
+				<td width="48%"></td>
+			</tr>
+		</table>
+		<br>
+		<div class="modal-footer">
+			<input type="submit" class="btn btn-primary" ng-disabled="myForm.Name.$pristine || myForm.IPAddress.$pristine || myForm.DockerBridgeIP.$pristine || myForm.PGDataPath.$pristine || (myForm.Name.$dirty && myForm.Name.$invalid) || (myForm.IPAddress.$dirty && myForm.IPAddress.$invalid) || (myForm.PGDataPath.$dirty && myForm.PGDataPath.$invalid) || (myForm.DockerBridgeIP.$dirty && myForm.DockerBridgeIP.$invalid)" />
+			<button class="btn btn-primary" ng-click="cancel()">Cancel</button>
+			<alert ng-repeat="alert in alerts" type="danger">{{alert.msg}}</alert>
+		</div> 
+	</form>
+</div>
+
+
+

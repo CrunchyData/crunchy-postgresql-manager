@@ -1,0 +1,14 @@
+
+<div class="modal-header">
+	<h1>Trigger Failover</h1>
+</div>
+
+<div class="modal-body">
+        Confirm that you want to trigger a fail over on  {{$parent.value.Name}}!
+</div>	
+
+<div class="modal-footer">
+	<button type="button" class="btn btn-primary" ng-click="ok()">Failover</button>
+	<button class="btn btn-primary" ng-click="cancel()">Cancel</button>
+	<alert ng-repeat="alert in alerts" type="danger">{{alert.msg}}</alert>
+</div>

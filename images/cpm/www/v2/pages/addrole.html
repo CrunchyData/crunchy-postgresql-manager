@@ -1,0 +1,30 @@
+<div class="modal-header">
+	<table>
+		<tr>
+			<td><h1 id="myModalLabel">Add Role</h1></td>
+		</tr>
+	</table>
+</div>
+
+<div class="modal-body">
+	<form class="form-horizontal" name="myForm" novalidate >
+		<table>
+			<tr>
+				<td>
+					<h4>Role Name</h4>
+					<input required class="form-control" type="text" name="ID" ng-model="$parent.Name" ng-maxlength="20" ng-pattern="/^[a-zA-Z0-9-]*$/" />
+				</td>
+			</tr>
+		</tr>
+	</table>
+	<br>
+	<div class="modal-footer">
+		<button type="submit" class="btn btn-primary" ng-disabled="(myForm.Name.$dirty && myForm.Name.$invalid)" ng-click="ok()" >Submit</button>
+		<button class="btn btn-primary" ng-click="cancel()">Cancel</button>
+		<alert ng-repeat="alert in alerts" type="danger">{{alert.msg}}</alert>
+	</div> 
+</form>
+</div>
+
+
+
