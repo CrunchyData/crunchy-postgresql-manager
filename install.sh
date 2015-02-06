@@ -49,8 +49,9 @@ sudo scp config/cpmagent.service  \
 ssh root@$server "systemctl enable cpmagent.service"
 ssh root@$server "systemctl start cpmagent.service"
 
-sudo mkdir /var/lib/pgsql/cluster-admin
-sudo chown postgres:postgres /var/lib/pgsql/cluster-admin
-sudo chcon -Rt svirt_sandbox_file_t /var/lib/pgsql/cluster-admin/
-sudo chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/crunchy-cpm/www/v2
+DBPATH=/var/lib/pgsql/cpm-admin
+sudo mkdir $DBPATH
+sudo chown postgres:postgres $DBPATH
+sudo chcon -Rt svirt_sandbox_file_t  $DBPATH
+sudo chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v2
 

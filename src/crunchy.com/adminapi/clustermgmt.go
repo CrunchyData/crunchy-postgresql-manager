@@ -636,7 +636,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 		} else if clusterNodes[i].Name == dbNode.Name {
 			glog.Infoln("fail-over is skipping new master " + clusterNodes[i].Name)
 		} else {
-			if clusterNodes[i].Image == "crunchy-pgpool" {
+			if clusterNodes[i].Image == "cpm-pgpool" {
 				glog.Infoln("AdminFailover: fail-over is reconfiguring pgpool  " + clusterNodes[i].Name)
 				//reconfigure pgpool node
 			} else {
@@ -794,7 +794,7 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 
 			//update the node to be in the cluster
 			origDBNode.ClusterID = ClusterID
-			if origDBNode.Image == "crunchy-node" {
+			if origDBNode.Image == "cpm-node" {
 				origDBNode.Role = "standby"
 			} else {
 				origDBNode.Role = "pgpool"
@@ -906,7 +906,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	//create master container
 	docker := new(cpmagent.DockerRunArgs)
-	docker.Image = "crunchy-node"
+	docker.Image = "cpm-node"
 	docker.ContainerName = params.Name + "-master"
 	docker.ServerID = masterServer.ID
 	docker.Standalone = "false"
@@ -978,7 +978,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	//create pgpool container
 	//	provision
 	docker.ContainerName = params.Name + "-pgpool"
-	docker.Image = "crunchy-pgpool"
+	docker.Image = "cpm-pgpool"
 	docker.ServerID = chosenServers[count].ID
 	err2 = provisionImpl(docker, profile.StandbyProfile, true)
 	if err2 != nil {

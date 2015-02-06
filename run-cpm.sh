@@ -22,51 +22,51 @@ sudo chmod -R 777 $LOGDIR
 sudo chcon -Rt svirt_sandbox_file_t $LOGDIR
 
 docker rm cpm
-sudo chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/crunchy-cpm/www/v2
+sudo chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v2
 docker run --name=cpm -d \
 	-v $LOGDIR:/cpmlogs \
-	-v $INSTALLDIR/images/crunchy-cpm/www/v2:/www crunchy-cpm
+	-v $INSTALLDIR/images/cpm/www/v2:/www cpm
 
 sleep 2
-docker rm cluster-admin
+docker rm cpm-admin
 docker run -e DB_HOST=127.0.0.1 \
 	-e DB_PORT=5432 -e DB_USER=postgres \
-	--name=cluster-admin -d -v $LOGDIR:/cpmlogs -v /var/lib/pgsql/cluster-admin:/pgdata crunchy-admin
+	--name=cpm-admin -d -v $LOGDIR:/cpmlogs -v /var/lib/pgsql/cpm-admin:/pgdata cpm-admin
 
 sleep 2
-docker rm cluster-backup
-docker run -e DB_HOST=cluster-admin.crunchy.lab \
+docker rm cpm-backup
+docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-v $LOGDIR:/cpmlogs \
 	-e DB_PORT=5432 -e DB_USER=postgres \
-	--name=cluster-backup -d crunchy-backup
+	--name=cpm-backup -d cpm-backup
 
 sleep 2
-docker rm cluster-mon
+docker rm cpm-mon
 INFLUXDIR=/tmp/influxdb
 sudo chcon -Rt svirt_sandbox_file_t $INFLUXDIR
-docker run -e DB_HOST=cluster-admin.crunchy.lab \
+docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	-v $LOGDIR:/cpmlogs \
 	-v $INFLUXDIR:/monitordata \
-	-d --name=cluster-mon crunchy-mon
+	-d --name=cpm-mon cpm-mon
 
 sleep 2
 ping -c 2 cpm.crunchy.lab
-ping -c 2 cluster-admin.crunchy.lab
-ping -c 2 cluster-backup.crunchy.lab
-ping -c 2 cluster-mon.crunchy.lab
+ping -c 2 cpm-admin.crunchy.lab
+ping -c 2 cpm-backup.crunchy.lab
+ping -c 2 cpm-mon.crunchy.lab
 
 exit
 
-docker rm dashboard
-docker run --name=dashboard -d crunchy-dashboard
+docker rm cpm-dashboard
+docker run --name=cpm-dashboard -d cpm-dashboard
 
 docker run --name=backup-job-blah \
 	-e BACKUP_HOST=blah.crunchy.lab \
 	-e BACKUP_PORT=5432 \
 	-e BACKUP_USER=postgres \
-	-e BACKUP_SERVER_URL=cluster-backup.crunchy.lab:13010 \
+	-e BACKUP_SERVER_URL=cpm-backup.crunchy.lab:13010 \
 	-v $LOGDIR:/opt/cpm/logs \
 	-v /var/lib/pgsql/blah-backup-201412181707:/pgdata \
-	-d crunchy-backup-job
+	-d cpm-backup-job
 

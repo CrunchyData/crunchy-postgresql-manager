@@ -95,7 +95,7 @@ func main() {
 
 }
 
-//report stats back to the cluster-admin for this backup job
+//report stats back to the cpm-admin for this backup job
 func stats(str string) {
 
 	for true {
@@ -113,10 +113,10 @@ func stats(str string) {
 	}
 }
 
-//report stats back to the cluster-admin for this backup job
+//report stats back to the cpm-admin for this backup job
 func finalstats(str string) {
 
-	//connect to backupserver on cluster-admin
+	//connect to backupserver on cpm-admin
 	//send stats to backup
 	stats := backup.BackupStatus{}
 	eDuration := time.Since(startTime)

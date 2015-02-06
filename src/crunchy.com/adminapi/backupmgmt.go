@@ -109,7 +109,7 @@ func BackupNow(w rest.ResponseWriter, r *rest.Request) {
 	request.ServerName = server.Name
 	request.ServerIP = server.IPAddress
 	request.ProfileName = postMsg.ProfileName
-	backupServerURL := "cluster-backup." + domainname.Value + ":13010"
+	backupServerURL := "cpm-backup." + domainname.Value + ":13010"
 	output, err := backup.BackupNowClient(backupServerURL, request)
 	if err != nil {
 		glog.Errorln(err.Error())
@@ -232,7 +232,7 @@ func DeleteSchedule(w rest.ResponseWriter, r *rest.Request) {
 
 	s := backup.BackupSchedule{}
 
-	backupServerURL := "cluster-backup." + domainname.Value + ":13010"
+	backupServerURL := "cpm-backup." + domainname.Value + ":13010"
 	output, err := backup.ReloadClient(backupServerURL, s)
 	if err != nil {
 		glog.Errorln(err.Error())
@@ -451,7 +451,7 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 	if err != nil {
 		glog.Errorln("BackupNow: DOMAIN-NAME err " + err.Error())
 	}
-	backupServerURL := "cluster-backup." + domainname.Value + ":13010"
+	backupServerURL := "cpm-backup." + domainname.Value + ":13010"
 	output, err := backup.ReloadClient(backupServerURL, s)
 	if err != nil {
 		glog.Errorln(err.Error())

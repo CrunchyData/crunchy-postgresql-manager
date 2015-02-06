@@ -105,8 +105,8 @@ func Hba(mode string, hostname string, port string, clusterid string, domainname
 	var hbaInfo HBAParameters
 	hbaInfo.PG_HOST_IP = hostname + "." + domainname
 	hbaInfo.BACKUP_HOST = hostname + "-backup." + domainname
-	hbaInfo.MONITOR_HOST = "cluster-mon." + domainname
-	hbaInfo.ADMIN_HOST = "cluster-admin." + domainname
+	hbaInfo.MONITOR_HOST = "cpm-mon." + domainname
+	hbaInfo.ADMIN_HOST = "cpm-admin." + domainname
 	servers, err := admindb.GetAllDBServers()
 	if err != nil {
 		glog.Errorln("Hba:" + err.Error())

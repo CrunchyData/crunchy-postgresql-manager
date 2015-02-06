@@ -36,15 +36,15 @@ read STATICIP
 
 # pull down CPM Docker images from dockerhub
 
-docker pull jmccormick2001/crunchy-cpm
-docker pull jmccormick2001/crunchy-pgpool
-docker pull jmccormick2001/crunchy-admin
-docker pull jmccormick2001/crunchy-base
-docker pull jmccormick2001/crunchy-mon
-docker pull jmccormick2001/crunchy-backup
-docker pull jmccormick2001/crunchy-backup-job
-docker pull jmccormick2001/crunchy-node
-docker pull jmccormick2001/crunchy-dashboard
+docker pull jmccormick2001/cpm
+docker pull jmccormick2001/cpm-pgpool
+docker pull jmccormick2001/cpm-admin
+docker pull jmccormick2001/cpm-base
+docker pull jmccormick2001/cpm-mon
+docker pull jmccormick2001/cpm-backup
+docker pull jmccormick2001/cpm-backup-job
+docker pull jmccormick2001/cpm-node
+docker pull jmccormick2001/cpm-dashboard
 
 # install deps
 yum -y install gcc make golang docker-io
@@ -94,25 +94,25 @@ systemctl start dnsbridgeclient.service
 
 echo "starting up CPM containers..."
 
-docker run --name=cpm -d -v $INSTALLDIR/images/crunchy-cpm/www/v2:/www crunchy-cpm
+docker run --name=cpm -d -v $INSTALLDIR/images/cpm/www/v2:/www cpm
 sleep 2
 docker run -e DB_HOST=127.0.0.1 \
 	-e DB_PORT=5432 -e DB_USER=postgres \
-	--name=cluster-admin -d -v /var/lib/pgsql/cluster-admin:/pgdata crunchy-admin
+	--name=cpm-admin -d -v /var/lib/pgsql/cluster-admin:/pgdata cpm-admin
 sleep 2
-docker run -e DB_HOST=cluster-admin.crunchy.lab \
+docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	        -e DB_PORT=5432 -e DB_USER=postgres \
-		        --name=cluster-backup -d crunchy-backup
+		        --name=cpm-backup -d cpm-backup
 sleep 2
 INFLUXDIR=$INSTALLDIR/influxdb
 chcon -Rt svirt_sandbox_file_t $INFLUXDIR
-docker run -e DB_HOST=cluster-admin.crunchy.lab \
+docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	-v $INFLUXDIR:/monitordata \
-	-d --name=cluster-mon crunchy-mon
+	-d --name=cluster-mon cpm-mon
 
 sleep 2
-docker run --name=dashboard -d crunchy-dashboard
+docker run --name=dashboard -d cpm-dashboard
 
 echo "installation complete"
 

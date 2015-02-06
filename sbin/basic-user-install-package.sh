@@ -27,29 +27,29 @@ export INSTALLDIR=/opt/cpm
 
 # push docker images to dockerhub
 
-docker tag crunchy-cpm jmccormick2001/crunchy-cpm
-docker push jmccormick2001/crunchy-cpm
+docker tag cpm jmccormick2001/cpm
+docker push jmccormick2001/cpm
 
-docker tag crunchy-pgpool jmccormick2001/crunchy-pgpool
-docker push jmccormick2001/crunchy-pgpool
+docker tag cpm-pgpool jmccormick2001/cpm-pgpool
+docker push jmccormick2001/cpm-pgpool
 
-docker tag crunchy-admin jmccormick2001/crunchy-admin
-docker push jmccormick2001/crunchy-admin
+docker tag cpm-admin jmccormick2001/cpm-admin
+docker push jmccormick2001/cpm-admin
 
-docker tag crunchy-base jmccormick2001/crunchy-base
-docker push jmccormick2001/crunchy-base
+docker tag cpm-base jmccormick2001/cpm-base
+docker push jmccormick2001/cpm-base
 
-docker tag crunchy-mon jmccormick2001/crunchy-mon
-docker push jmccormick2001/crunchy-mon
+docker tag cpm-mon jmccormick2001/cpm-mon
+docker push jmccormick2001/cpm-mon
 
-docker tag crunchy-backup jmccormick2001/crunchy-backup
-docker push jmccormick2001/crunchy-backup
+docker tag cpm-backup jmccormick2001/cpm-backup
+docker push jmccormick2001/cpm-backup
 
-docker tag crunchy-backup-job jmccormick2001/crunchy-backup-job
-docker push jmccormick2001/crunchy-backup-job
+docker tag cpm-backup-job jmccormick2001/cpm-backup-job
+docker push jmccormick2001/cpm-backup-job
 
-docker tag crunchy-node jmccormick2001/crunchy-node
-docker push jmccormick2001/crunchy-node
+docker tag cpm-node jmccormick2001/cpm-node
+docker push jmccormick2001/cpm-node
 
-docker tag crunchy-dashboard jmccormick2001/crunchy-dashboard
-docker push jmccormick2001/crunchy-dashboard
+docker tag cpm-dashboard jmccormick2001/cpm-dashboard
+docker push jmccormick2001/cpm-dashboard

@@ -3,15 +3,15 @@ PROJROOT=$HOME/cpm
 GOPATH=$HOME/cpm
 
 build:
-		cd crunchy-dashboard && make
-		cd crunchy-base && make  
-		cd crunchy-admin && make  
-		cd crunchy-cpm && make 
-		cd crunchy-node && make  
-		cd crunchy-pgpool && make
-		cd crunchy-backup && make
-		cd crunchy-backup-job && make
-		cd crunchy-mon && make
+		cd cpm-dashboard && make
+		cd cpm-base && make  
+		cd cpm-admin && make  
+		cd cpm && make 
+		cd cpm-node && make  
+		cd cpm-pgpool && make
+		cd cpm-backup && make
+		cd cpm-backup-job && make
+		cd cpm-mon && make
 
 
 

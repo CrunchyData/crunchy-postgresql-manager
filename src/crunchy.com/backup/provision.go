@@ -35,7 +35,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 
 	var params cpmagent.DockerRunArgs
 	params = cpmagent.DockerRunArgs{}
-	params.Image = "crunchy-backup-job"
+	params.Image = "cpm-backup-job"
 	params.ServerID = args.ServerID
 	backupcontainername := args.ContainerName + "-backup"
 	params.ContainerName = backupcontainername
@@ -82,7 +82,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	}
 	params.EnvVars["BACKUP_PORT"] = setting.Value
 	params.EnvVars["BACKUP_USER"] = "postgres"
-	params.EnvVars["BACKUP_SERVER_URL"] = "cluster-backup" + "." + domain + ":" + "13010"
+	params.EnvVars["BACKUP_SERVER_URL"] = "cpm-backup" + "." + domain + ":" + "13010"
 
 	//provision the volume
 	var responseStr string
