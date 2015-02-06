@@ -21,27 +21,27 @@ sudo mkdir -p $LOGDIR
 sudo chmod -R 777 $LOGDIR
 sudo chcon -Rt svirt_sandbox_file_t $LOGDIR
 
-docker rm cpm
+docker rm -f cpm
 sudo chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v2
 docker run --name=cpm -d \
 	-v $LOGDIR:/cpmlogs \
 	-v $INSTALLDIR/images/cpm/www/v2:/www cpm
 
 sleep 2
-docker rm cpm-admin
+docker rm -f cpm-admin
 docker run -e DB_HOST=127.0.0.1 \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cpm-admin -d -v $LOGDIR:/cpmlogs -v /var/lib/pgsql/cpm-admin:/pgdata cpm-admin
 
 sleep 2
-docker rm cpm-backup
+docker rm -f cpm-backup
 docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-v $LOGDIR:/cpmlogs \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cpm-backup -d cpm-backup
 
 sleep 2
-docker rm cpm-mon
+docker rm -f cpm-mon
 INFLUXDIR=/tmp/influxdb
 sudo chcon -Rt svirt_sandbox_file_t $INFLUXDIR
 docker run -e DB_HOST=cpm-admin.crunchy.lab \
