@@ -82,7 +82,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	}
 	params.EnvVars["BACKUP_PORT"] = setting.Value
 	params.EnvVars["BACKUP_USER"] = "postgres"
-	params.EnvVars["BACKUP_SERVER_URL"] = "cpm-backup" + "." + domain + ":" + "13010"
+	params.EnvVars["BACKUP_SERVER_URL"] = "cpm-backup" + "." + domain + ":" + "13000"
 
 	//provision the volume
 	var responseStr string

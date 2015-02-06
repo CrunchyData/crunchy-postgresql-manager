@@ -64,7 +64,7 @@ func main() {
 	rpc.Register(command)
 	glog.Infoln("Command registered\n")
 	rpc.HandleHTTP()
-	l, e := net.Listen("tcp", ":13010")
+	l, e := net.Listen("tcp", ":13000")
 	glog.Infoln("listening\n")
 	if e != nil {
 		glog.Errorln(e.Error())

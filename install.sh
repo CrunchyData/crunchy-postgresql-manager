@@ -27,6 +27,9 @@
 # Exit installation on any unexpected error
 set -e
 
+# add the docker group to this user's account so they can run docker cmds
+sudo usermod -a -G docker $USER
+
 # install deps
 export INSTALLDIR=$(pwd)
 
