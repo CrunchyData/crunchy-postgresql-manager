@@ -56,13 +56,13 @@ This should start the the following containers:
 	cpm - cpm.crunchy.lab - the nginx server that hosts the CPM
    	      web app, http://cpm.crunchy.lab:10000
 
-	cluster-admin - cluster-admin.crunchy.lab - the REST API
+	cpm-admin - cluster-admin.crunchy.lab - the REST API
 	      for CPM, http://cluster-admin.crunchy.lab:8080
 
-	cluster-backup - cluster-backup.crunchy.lab - the backup process
+	cpm-backup - cluster-backup.crunchy.lab - the backup process
 	      used by CPM to schedule and run backup jobs
 
-	cluster-mon - cluster-mon.crunchy.lab - the monitoring process
+	cpm-mon - cluster-mon.crunchy.lab - the monitoring process
 	      used by CPM to collect metrics
 
 	dashboard - dashboard.crunchy.lab - the Grafana dashboard that
