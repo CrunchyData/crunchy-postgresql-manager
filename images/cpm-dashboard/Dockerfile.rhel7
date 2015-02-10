@@ -1,7 +1,7 @@
-FROM centos:centos7
+FROM rhel7
 MAINTAINER crunchy
 
-RUN rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+RUN rpm -Uvh http://nginx.org/packages/rhel/7/noarch/RPMS/nginx-release-rhel-7-0.el7.ngx.noarch.rpm
 RUN yum install -y tar procps-ng nginx which hostname wget
 
 # set up cluster directory

@@ -1,6 +1,13 @@
 VERSION=0.2.0
 
-build:
+OSFLAVOR=centos7
+
+all:
+ifeq ($(OSFLAVOR),centos7)
+	cp Dockerfile.centos7 Dockerfile
+else
+	cp Dockerfile.rhel7 Dockerfile
+endif
 		rm -rf bin
 		mkdir bin
 		cp ../../config/.bash_profile conf/
