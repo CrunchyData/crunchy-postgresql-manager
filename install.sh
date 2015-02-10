@@ -38,6 +38,8 @@ source $INSTALLDIR/setpath.sh
 
 make
 
+sudo mkdir -p /cluster/bin
+
 server=$(hostname)
 
 scp bin/* sql/loadtest.sql  \

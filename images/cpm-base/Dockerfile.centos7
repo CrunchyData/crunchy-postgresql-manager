@@ -4,13 +4,15 @@ MAINTAINER crunchy
 RUN yum -y update; yum clean all
 
 # Install postgresql deps
-RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-2.noarch.rpm
+RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
 RUN rpm -Uvh http://yum.postgresql.org/9.3/redhat/rhel-7-x86_64/pgdg-centos93-9.3-1.noarch.rpm
-RUN yum install -y postgresql93 postgresql93-contrib postgresql93-server libxslt unzip openssh-clients hostname bind-utils
+RUN yum install -y procps-ng postgresql93 postgresql93-contrib postgresql93-server libxslt unzip openssh-clients hostname bind-utils
+
 
 # set up cluster directory
 #
 RUN mkdir -p /cluster/bin
+RUN chown -R postgres:postgres /cluster
 
 # set environment vars
 ENV PGROOT /usr/pgsql-9.3
@@ -23,14 +25,14 @@ ADD conf/.bash_profile /var/lib/pgsql/
 VOLUME ["/pgdata"]
 RUN chown -R postgres:postgres /pgdata
 
+VOLUME ["/cpmlogs"]
+RUN chown -R postgres:postgres /cpmlogs
+
 # open up the postgres port
 EXPOSE 5432
-# open up the cpmagent port
-EXPOSE 13000
 
 ADD bin /cluster/bin
 ADD conf /cluster/conf
 
 USER postgres
 
-CMD ["/cluster/bin/start-cpmagentserver.sh"]

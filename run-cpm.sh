@@ -29,9 +29,13 @@ docker run --name=cpm -d \
 
 sleep 2
 docker rm cpm-admin
+DBDIR=/var/lib/pgsql/cpm-admin
+sudo mkdir -p $DBDIR
+sudo chown postgres:postgres $DBDIR
+sudo chcon -Rt svirt_sandbox_file_t $DBDIR
 docker run -e DB_HOST=127.0.0.1 \
 	-e DB_PORT=5432 -e DB_USER=postgres \
-	--name=cpm-admin -d -v $LOGDIR:/cpmlogs -v /var/lib/pgsql/cpm-admin:/pgdata cpm-admin
+	--name=cpm-admin -d -v $LOGDIR:/cpmlogs -v $DBDIR:/pgdata cpm-admin
 
 sleep 2
 docker rm cpm-backup
@@ -43,6 +47,7 @@ docker run -e DB_HOST=cpm-admin.crunchy.lab \
 sleep 2
 docker rm cpm-mon
 INFLUXDIR=/tmp/influxdb
+sudo mkdir -p $INFLUXDIR
 sudo chcon -Rt svirt_sandbox_file_t $INFLUXDIR
 docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-e DB_PORT=5432 -e DB_USER=postgres \

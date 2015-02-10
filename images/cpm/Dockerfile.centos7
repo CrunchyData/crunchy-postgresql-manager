@@ -1,37 +1,28 @@
 FROM centos:centos7
 MAINTAINER crunchy
 
-#
-# this is the stuff that made systemd work on fedora 20
-#
-RUN yum -y update; yum clean all
-RUN yum -y install systemd; yum clean all; \
-(cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
-rm -f /lib/systemd/system/multi-user.target.wants/*;\
-rm -f /etc/systemd/system/*.wants/*;\
-rm -f /lib/systemd/system/local-fs.target.wants/*; \
-rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
-rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
-rm -f /lib/systemd/system/basic.target.wants/*;\
-rm -f /lib/systemd/system/anaconda.target.wants/*;
-VOLUME [ "/sys/fs/cgroup" ]
 RUN rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
-RUN yum install -y nginx which openssh-server openssh-clients hostname
+RUN yum install -y procps-ng nginx which hostname
 
-RUN systemctl enable sshd.service
-RUN systemctl enable nginx.service
 
-# overlay the default nginx config file with our own
-ADD default.conf /etc/nginx/conf.d/
-
-ADD bin/id_rsa.pub /root/.ssh/authorized_keys
-RUN chmod 600 /root/.ssh/authorized_keys
-
-# add volumes to allow backup of postgres files
 VOLUME ["/www"]
+RUN chown -R daemon:daemon /www
 
-# open up the ssh port
-EXPOSE 22
-EXPOSE 80
+VOLUME ["/cpmlogs"]
+RUN chown -R daemon:daemon /cpmlogs
 
-CMD ["/usr/sbin/init"]
+EXPOSE 10000
+
+# set up cluster directory
+#
+RUN mkdir -p /cluster/bin
+RUN mkdir -p /cluster/conf
+ADD bin /cluster/bin
+ADD conf /cluster/conf
+RUN chown -R daemon:daemon /cluster
+
+USER daemon
+
+CMD ["/cluster/bin/startnginx.sh"]
+
+
