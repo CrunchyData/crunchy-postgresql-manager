@@ -19,7 +19,7 @@
 		<br>
 		<div class="modal-footer">
 			<input type="submit" class="btn btn-primary" ng-disabled="myForm.Name.$pristine || myForm.Name.$dirty && myForm.Name.$invalid"/>
-			<button class="btn btn-primary" ng-click="cancel()">Cancel</button>
+			<button type="button" class="btn btn-primary" ng-click="cancel()">Cancel</button>
 			<alert ng-repeat="alert in alerts" type="danger">{{alert.msg}}</alert>
 		</div>
 	</form>
