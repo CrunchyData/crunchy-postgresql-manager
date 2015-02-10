@@ -46,6 +46,7 @@ docker run -e DB_HOST=cpm-admin.crunchy.lab \
 sleep 2
 docker rm cpm-mon
 INFLUXDIR=/tmp/influxdb
+sudo mkdir -p $INFLUXDIR
 sudo chcon -Rt svirt_sandbox_file_t $INFLUXDIR
 docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-e DB_PORT=5432 -e DB_USER=postgres \
