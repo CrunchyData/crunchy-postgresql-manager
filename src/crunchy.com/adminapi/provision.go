@@ -141,7 +141,7 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 
 	glog.Infoln("PROFILE provisionImpl 2 about to provision volume")
 	if params.Image != "crunchy-pgpool" {
-		responseStr, err = cpmagent.AgentCommand("/cluster/bin/provisionvolume.sh",
+		responseStr, err = cpmagent.AgentCommand(CPMBIN+"provisionvolume.sh",
 			params.PGDataPath,
 			server.IPAddress)
 		if err != nil {
@@ -172,7 +172,7 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 			return err
 		}
 		glog.Infoln("PROFILE provisionImpl remove old container end")
-		params.CommandPath = "/cluster/bin/docker-run.sh"
+		params.CommandPath = CPMBIN + "docker-run.sh"
 		output, err = cpmagent.AgentDockerRun(*params, server.IPAddress)
 
 		if err != nil {

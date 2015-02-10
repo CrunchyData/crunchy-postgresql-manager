@@ -15,7 +15,7 @@
 # limitations under the License.
 
 #
-# script to update local CPM cluster directory with new binaries and scripts
+# script to update local server's CPM directory with new binaries and scripts
 #
 
 server=espresso.crunchy.lab
@@ -24,7 +24,7 @@ ssh root@$server "systemctl stop cpmagent.service"
 
 	scp ./bin/*  \
 	./sql/loadtest.sql  \
-	root@$server:/cluster/bin/
+	root@$server:/opt/cpm/bin/
 
 ssh root@$server "systemctl start cpmagent.service"
 

@@ -20,4 +20,4 @@
 
 killall cpmagentserver
 sleep 2
-/cluster/bin/start-cpmagent.sh
+/opt/cpm/bin/start-cpmagent.sh

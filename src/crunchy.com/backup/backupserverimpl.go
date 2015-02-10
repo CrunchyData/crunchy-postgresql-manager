@@ -74,6 +74,8 @@ type BackupSchedule struct {
 //global cron instance that gets started, stopped, restarted
 var CRONInstance *cron.Cron
 
+var CPMBIN = "/opt/cpm/bin/"
+
 //called by backup jobs as they execute
 func (t *Command) AddStatus(status *BackupStatus, reply *Command) error {
 

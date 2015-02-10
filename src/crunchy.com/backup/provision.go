@@ -86,7 +86,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 
 	//provision the volume
 	var responseStr string
-	responseStr, err = cpmagent.AgentCommand("/cluster/bin/provisionvolume.sh",
+	responseStr, err = cpmagent.AgentCommand(CPMBIN+"provisionvolume.sh",
 		params.PGDataPath,
 		server.IPAddress)
 	glog.Infoln(responseStr)
@@ -95,7 +95,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 
 	if !kubeEnv {
 		var output string
-		params.CommandPath = "/cluster/bin/docker-run-backup.sh"
+		params.CommandPath = CPMBIN + "docker-run-backup.sh"
 
 		output, err = cpmagent.AgentDockerRun(params, server.IPAddress)
 

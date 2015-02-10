@@ -23,11 +23,11 @@ remoteservers=(jeff1.crunchy.lab espresso.crunchy.lab)
 for i in "${remoteservers[@]}"
 do
 	echo $i
-	ssh root@$i "mkdir -p /cluster/bin"
+	ssh root@$i "mkdir -p /opt/cpm/bin"
 	scp ./bin/*  \
 	./sbin/*  \
 	./sql/*  \
-	root@$i:/cluster/bin/
+	root@$i:/opt/cpm/bin/
 	scp  ./config/cpm.sh  root@$i:/etc/profile.d/cpm.sh
 	scp  ./config/cpmagent.service  \
 	 root@$i:/usr/lib/systemd/system
@@ -37,10 +37,10 @@ done
 
 # copy all required admin files to the admin server
 
-ssh root@$adminserver "mkdir -p /cluster/bin"
+ssh root@$adminserver "mkdir -p /opt/cpm/bin"
 scp ./bin/* \
 ./sbin/* \
-root@$adminserver:/cluster/bin
+root@$adminserver:/opt/cpm/bin
 
 scp ./config/cpmagent.service root@$adminserver:/usr/lib/systemd/system
 

@@ -7,10 +7,10 @@ Type=forking
 TimeoutSec=120
 User=postgres
 Group=postgres
-Environment="PATH=/cluster/bin:/usr/pgsql-9.3/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"
+Environment="PATH=/opt/cpm/bin:/usr/pgsql-9.3/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"
 SyslogIdentifier=postgresql
 
-ExecStart=/cluster/bin/start-pg-wrapper-admin.sh
+ExecStart=/opt/cpm/bin/start-pg-wrapper-admin.sh
 ExecReload=/usr/pgsql-9.3/bin/pg_ctl -s -D /pgdata reload
 ExecStop=/usr/pgsql-9.3/bin/pg_ctl -s -D /pgdata stop -m fast
 

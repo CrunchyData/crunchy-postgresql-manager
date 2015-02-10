@@ -132,7 +132,7 @@ configured correctly:
 	http://github.com/crunchyds/docker-pg-cluster/network-test.sh
 
 
-** copy server config files and binaries  to /cluster/bin and /usr/lib/systemd/system:
+** copy server config files and binaries  to /opt/cpm/bin and /usr/lib/systemd/system:
 if you have not already cloned the repo:
 
 	git clone git@github.com:crunchyds/docker-pg-cluster.git

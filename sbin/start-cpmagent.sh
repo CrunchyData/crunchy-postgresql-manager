@@ -17,4 +17,4 @@
 # start up the cpm agent
 #
 
-/cluster/bin/cpmagentserver &
+/opt/cpm/bin/cpmagentserver &

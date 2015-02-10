@@ -131,7 +131,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var output string
-	output, err = cpmagent.AgentCommand("/cluster/bin/"+Metric, "", server.IPAddress)
+	output, err = cpmagent.AgentCommand(CPMBIN+Metric, "", server.IPAddress)
 	if err != nil {
 		glog.Errorln("MonitorServerGetInfo:" + err.Error())
 		rest.Error(w, err.Error(), 400)

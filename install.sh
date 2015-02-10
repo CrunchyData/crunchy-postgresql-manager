@@ -38,15 +38,20 @@ source $INSTALLDIR/setpath.sh
 
 make
 
-sudo mkdir -p /cluster/bin
+export TARGET=/opt/cpm
+
+sudo mkdir -p $TARGET/bin
+sudo mkdir -p $TARGET/config
+sudo mkdir -p $TARGET/data
+sudo mkdir -p $TARGET/logs
 
 server=$(hostname)
 
 scp bin/* sql/loadtest.sql  \
-	root@$server:/cluster/bin/
+	root@$server:$TARGET/bin
 
 scp sbin/*  \
-	root@$server:/cluster/bin/
+	root@$server:$TARGET/bin
 
 sudo scp config/cpmagent.service  \
 	root@$server:/usr/lib/systemd/system

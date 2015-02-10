@@ -520,7 +520,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		}
 
 		//send the server a deletevolume command
-		output, err = cpmagent.AgentCommand("deletevolume", server.PGDataPath+"/"+containers[i].Name, server.IPAddress)
+		output, err = cpmagent.AgentCommand(CPMBIN+"deletevolume", server.PGDataPath+"/"+containers[i].Name, server.IPAddress)
 		glog.Infoln("DeleteCluster:" + output)
 
 		i++

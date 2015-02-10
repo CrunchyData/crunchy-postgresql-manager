@@ -39,6 +39,9 @@ func init() {
 	flag.Parse()
 }
 
+var CPMDIR = "/opt/cpm/"
+var CPMBIN = CPMDIR + "bin/"
+
 func main() {
 
 	fmt.Println("at top of adminapi main")
