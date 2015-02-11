@@ -47,7 +47,7 @@
 		<br>
 		<div class="modal-footer">
 			<input type="submit" class="btn btn-primary" ng-disabled="myForm.Name.$pristine || myForm.IPAddress.$pristine || myForm.DockerBridgeIP.$pristine || myForm.PGDataPath.$pristine || (myForm.Name.$dirty && myForm.Name.$invalid) || (myForm.IPAddress.$dirty && myForm.IPAddress.$invalid) || (myForm.PGDataPath.$dirty && myForm.PGDataPath.$invalid) || (myForm.DockerBridgeIP.$dirty && myForm.DockerBridgeIP.$invalid)" />
-			<button class="btn btn-primary" ng-click="cancel()">Cancel</button>
+			<button type="button" class="btn btn-primary" ng-click="cancel()">Cancel</button>
 			<alert ng-repeat="alert in alerts" type="danger">{{alert.msg}}</alert>
 		</div> 
 	</form>
