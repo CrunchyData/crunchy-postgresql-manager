@@ -6,20 +6,20 @@ RUN yum install -y tar procps-ng nginx which hostname wget
 
 # set up cluster directory
 #
-RUN mkdir -p /cluster/conf
-RUN mkdir -p /cluster/bin
-ADD conf /cluster/conf
-ADD bin /cluster/bin
+RUN mkdir -p /opt/cpm/conf
+RUN mkdir -p /opt/cpm/bin
+ADD conf /opt/cpm/conf
+ADD bin /opt/cpm/bin
 
-WORKDIR /cluster
+WORKDIR /opt/cpm
 
 RUN wget http://grafanarel.s3.amazonaws.com/grafana-1.9.1.tar.gz
 RUN gunzip grafana-1.9.1.tar.gz
 RUN tar -xf grafana-1.9.1.tar
-ADD conf/config.js /cluster/grafana-1.9.1/
+ADD conf/config.js /opt/cpm/grafana-1.9.1/
 
-RUN chown -R daemon:daemon /cluster
+RUN chown -R daemon:daemon /opt/cpm
 
 USER daemon
 
-CMD ["/cluster/bin/startnginx.sh"]
+CMD ["/opt/cpm/bin/startnginx.sh"]

@@ -9,10 +9,12 @@ RUN rpm -Uvh http://yum.postgresql.org/9.3/redhat/rhel-7-x86_64/pgdg-centos93-9.
 RUN yum install -y procps-ng postgresql93 postgresql93-contrib postgresql93-server libxslt unzip openssh-clients hostname bind-utils
 
 
-# set up cluster directory
+# set up cpm directory
 #
-RUN mkdir -p /cluster/bin
-RUN chown -R postgres:postgres /cluster
+RUN mkdir -p /opt/cpm/bin
+RUN mkdir -p /opt/cpm/conf
+
+RUN chown -R postgres:postgres /opt/cpm
 
 # set environment vars
 ENV PGROOT /usr/pgsql-9.3
@@ -31,8 +33,8 @@ RUN chown -R postgres:postgres /cpmlogs
 # open up the postgres port
 EXPOSE 5432
 
-ADD bin /cluster/bin
-ADD conf /cluster/conf
+ADD bin /opt/cpm/bin
+ADD conf /opt/cpm/conf
 
 USER postgres
 

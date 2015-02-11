@@ -39,6 +39,7 @@ var backupUser string
 var backupAgentURL string
 var StatusID = ""
 var filename = "/tmp/backupjob.log"
+var CPMBIN = "/opt/cpm/bin/"
 var file *os.File
 
 func init() {
@@ -56,6 +57,8 @@ func main() {
 	if err != nil {
 		glog.Errorln(err.Error())
 	}
+
+	defer closeLog()
 
 	getEnvVars()
 	s := backup.BackupStatus{}
@@ -79,6 +82,9 @@ func main() {
 	//send final stats to backup
 	finalstats("end")
 
+}
+
+func closeLog() {
 	//copy the output log into the backup directory
 	file.Close()
 	var out bytes.Buffer
@@ -87,12 +93,11 @@ func main() {
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
 
-	err = cmd.Run()
+	err := cmd.Run()
 	if err != nil {
 		glog.Errorln(err.Error())
 		io.WriteString(file, err.Error())
 	}
-
 }
 
 //report stats back to the cpm-admin for this backup job
@@ -136,7 +141,7 @@ func backupfunc(str string) {
 	io.WriteString(file, "doing backup on "+backupHost+"\n")
 
 	//create base backup from master
-	cmd := exec.Command("/cluster/bin/basebackup.sh",
+	cmd := exec.Command(CPMBIN+"basebackup.sh",
 		backupHost)
 	var out bytes.Buffer
 	var stderr bytes.Buffer

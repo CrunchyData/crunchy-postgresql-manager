@@ -17,6 +17,6 @@
 # report linux stats to cluster
 #
 
-source /cluster/bin/setenv.sh
+source /opt/cpm/bin/setenv.sh
 
 echo report linux stats >> $CLUSTER_LOG

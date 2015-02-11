@@ -9,12 +9,12 @@ EXPOSE 13000
 
 USER root
 
-ADD bin /cluster/bin
-ADD conf /cluster/conf
+ADD bin /opt/cpm/bin
+ADD conf /opt/cpm/conf
 
 # get influxdb
 RUN rpm -Uvh http://s3.amazonaws.com/influxdb/influxdb-latest-1.x86_64.rpm
 
 RUN chown -R root:root /monitordata
 
-CMD ["/cluster/bin/start-mon.sh"]
+CMD ["/opt/cpm/bin/start-mon.sh"]

@@ -251,7 +251,7 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 		//initdb on the new node
 
 		glog.Infoln("PROFILE running initdb on the node")
-		output, err = PGCommand("/cluster/bin/initdb.sh", fqdn)
+		output, err = PGCommand(CPMBIN+"initdb.sh", fqdn)
 		if err != nil {
 			glog.Errorln("Provision:" + err.Error())
 			return err
@@ -285,7 +285,7 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 		}
 		glog.Infoln("PROFILE templates all built and copied to node")
 		//start pg on new node
-		output, err = PGCommand("/cluster/bin/startpg.sh", fqdn)
+		output, err = PGCommand(CPMBIN+"startpg.sh", fqdn)
 		if err != nil {
 			glog.Errorln("Provision:" + err.Error())
 			return err
@@ -293,7 +293,7 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 		glog.Infoln("startpg output was" + output)
 
 		//seed database with initial objects
-		output, err = PGCommand("/cluster/bin/seed.sh", fqdn)
+		output, err = PGCommand(CPMBIN+"seed.sh", fqdn)
 		if err != nil {
 			glog.Errorln("Provision:" + err.Error())
 			return err

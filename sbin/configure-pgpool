@@ -18,7 +18,7 @@
 # $1 is the list of server names colon delimited e.g. server1:server2
 #
 
-source /cluster/bin/setenv.sh
+source /opt/cpm/bin/setenv.sh
 export DOMAIN=crunchy.lab
 # format the user ip list
 IFS=":"
@@ -47,7 +47,7 @@ systemctl stop pgpool.service
 
 echo configure pgpool config files >> $CLUSTER_LOG
 
-pgtemplates -i /cluster/conf/pgpool/pgpool.conf.template  \
+pgtemplates -i /opt/cpm/conf/pgpool/pgpool.conf.template  \
 	-t pgpool.conf \
 	-m pgpool \
 	-o /etc/pgpool-II-93/pgpool.conf \

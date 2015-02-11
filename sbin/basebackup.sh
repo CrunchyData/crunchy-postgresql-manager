@@ -21,6 +21,6 @@
 # have done a backup of this database if they wanted it
 rm -rf /pgdata/*
 
-source /cluster/bin/setenv.sh
+source /opt/cpm/bin/setenv.sh
 
 pg_basebackup -R --pgdata /pgdata --host=$1 --port=5432 -U postgres

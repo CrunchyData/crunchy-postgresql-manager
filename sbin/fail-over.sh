@@ -17,7 +17,7 @@
 # fail over
 #
 
-source /cluster/bin/setenv.sh
+source /opt/cpm/bin/setenv.sh
 
 echo "fail-over PostgreSQL" >> $CLUSTER_LOG
 

@@ -47,7 +47,7 @@ func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var output string
-	output, err = cpmagent.AgentCommand("/cluster/bin/startpg.sh", "", dbNode.Name)
+	output, err = cpmagent.AgentCommand(CPMBIN+"startpg.sh", "", dbNode.Name)
 	if err != nil {
 		glog.Errorln("AdminStartpg:" + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -90,7 +90,7 @@ func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 	glog.Infoln("AdminStoppg: in stop with dbnode")
 
 	var output string
-	output, err = cpmagent.AgentCommand("/cluster/bin/stoppg.sh", "", dbNode.Name)
+	output, err = cpmagent.AgentCommand(CPMBIN+"stoppg.sh", "", dbNode.Name)
 	if err != nil {
 		glog.Errorln("AdminStoppg:" + err.Error())
 		rest.Error(w, err.Error(), 400)

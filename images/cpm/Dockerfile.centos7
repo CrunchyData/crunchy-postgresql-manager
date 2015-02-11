@@ -15,14 +15,14 @@ EXPOSE 10000
 
 # set up cluster directory
 #
-RUN mkdir -p /cluster/bin
-RUN mkdir -p /cluster/conf
-ADD bin /cluster/bin
-ADD conf /cluster/conf
-RUN chown -R daemon:daemon /cluster
+RUN mkdir -p /opt/cpm/bin
+RUN mkdir -p /opt/cpm/conf
+ADD bin /opt/cpm/bin
+ADD conf /opt/cpm/conf
+RUN chown -R daemon:daemon /opt/cpm
 
 USER daemon
 
-CMD ["/cluster/bin/startnginx.sh"]
+CMD ["/opt/cpm/bin/startnginx.sh"]
 
 

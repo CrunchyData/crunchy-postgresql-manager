@@ -15,10 +15,10 @@
 # limitations under the License.
 
 sleep 3
-/cluster/bin/initdb.sh > /tmp/initdb.log 2> /tmp/initdb.err
+/opt/cpm/bin/initdb.sh > /tmp/initdb.log 2> /tmp/initdb.err
 echo "host all all 0.0.0.0/0 md5" >> /pgdata/pg_hba.conf
 echo "listen_addresses='*'" >> /pgdata/postgresql.conf
-/cluster/bin/startpg.sh > /tmp/startpg.log
+/opt/cpm/bin/startpg.sh > /tmp/startpg.log
 sleep 3
-/cluster/bin/seed.sh > /tmp/seed.log
-/cluster/bin/start-cpmagentserver.sh 
+/opt/cpm/bin/seed.sh > /tmp/seed.log
+/opt/cpm/bin/start-cpmagentserver.sh 

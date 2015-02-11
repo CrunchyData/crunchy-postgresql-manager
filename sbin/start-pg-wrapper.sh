@@ -17,7 +17,7 @@
 # start pg, will initdb if /pgdata is empty as a way to bootstrap
 #
 
-source /cluster/bin/setenv.sh
+source /opt/cpm/bin/setenv.sh
 
 chgrp postgres $CLUSTER_LOG
 chmod g+w $CLUSTER_LOG

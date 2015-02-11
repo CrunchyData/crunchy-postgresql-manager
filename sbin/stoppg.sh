@@ -14,5 +14,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-source /cluster/bin/setenv.sh
+source /opt/cpm/bin/setenv.sh
 pg_ctl --mode immediate -D /pgdata stop 2> /tmp/stoppg.err > /tmp/stoppg.log

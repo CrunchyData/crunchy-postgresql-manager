@@ -23,4 +23,4 @@
 # $5 - database
 
 export PGPASSWORD=$4
-psql -h $1 -p $2 -E -q -t -U $3 $5 < /cluster/bin/statreplication.sql
+psql -h $1 -p $2 -E -q -t -U $3 $5 < /opt/cpm/bin/statreplication.sql

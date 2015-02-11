@@ -19,14 +19,14 @@
 
 env > /tmp/envvars.out
 
-source /cluster/bin/setenv.sh
+source /opt/cpm/bin/setenv.sh
 
-/cluster/bin/start-pg-wrapper-admin.sh &
+/opt/cpm/bin/start-pg-wrapper-admin.sh &
 export KUBE_URL=$KUBE_URL
 
 # log output will go to /tmp into files created by glog
 # named similar to adminapi.7869c0a96e4c.postgres.log.INFO.20150204-192844.2313
-/cluster/bin/adminapi -log_dir=/cpmlogs -logtostderr=false &
+/opt/cpm/bin/adminapi -log_dir=/cpmlogs -logtostderr=false &
 
-/cluster/bin/dummyserver > /tmp/dummyserver.log 
+/opt/cpm/bin/dummyserver > /tmp/dummyserver.log 
 

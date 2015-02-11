@@ -4,9 +4,9 @@ MAINTAINER crunchy
 # open up the backupserver port
 EXPOSE 13010
 
-ADD bin /cluster/bin
-ADD conf /cluster/conf
+ADD bin /opt/cpm/bin
+ADD conf /opt/cpm/conf
 
 USER root
 
-CMD ["/cluster/bin/start-backupserver.sh"]
+CMD ["/opt/cpm/bin/start-backupserver.sh"]

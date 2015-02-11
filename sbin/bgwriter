@@ -23,6 +23,6 @@
 # $4 - password
 # $5 - database
 
-source /cluster/bin/setenv.sh
+source /opt/cpm/bin/setenv.sh
 export PGPASSWORD=$4
-psql -h $1 -p $2 -E -q -t -U $3 $5 < /cluster/bin/bgwriter.sql
+psql -h $1 -p $2 -E -q -t -U $3 $5 < /opt/cpm/bin/bgwriter.sql

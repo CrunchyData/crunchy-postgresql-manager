@@ -19,7 +19,7 @@
 
 env > /tmp/envvars.out
 
-source /cluster/bin/setenv.sh
+source /opt/cpm/bin/setenv.sh
 
 HOSTNAME=`hostname`
 #

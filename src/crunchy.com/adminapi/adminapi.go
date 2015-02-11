@@ -333,7 +333,7 @@ func MonitorContainerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	var password = "cpmtest"
 	var database = "cpmtest"
 
-	cmd := exec.Command("/cluster/bin/"+Metric,
+	cmd := exec.Command(CPMBIN+Metric,
 		node.Name,
 		port,
 		user,
@@ -394,7 +394,7 @@ func MonitorContainerLoadtest(w rest.ResponseWriter, r *rest.Request) {
 	var output string
 	var port = "5432"
 
-	output, err = cpmagent.AgentCommandConfigureNode("/cluster/bin/loadtest", node.Name,
+	output, err = cpmagent.AgentCommandConfigureNode(CPMBIN+"loadtest", node.Name,
 		port, Writes, "", "", "", "", server.IPAddress)
 	if err != nil {
 		glog.Errorln("MonitorContainerGetInfo:" + err.Error())

@@ -16,6 +16,6 @@
 
 ls -l /
 id
-source /cluster/bin/setenv.sh
+source /opt/cpm/bin/setenv.sh
 initdb /pgdata
 

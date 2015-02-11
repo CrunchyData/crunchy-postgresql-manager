@@ -13,4 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-/bin/pgpool -a /cluster/bin/pool_hba.conf -f /cluster/bin/pgpool.conf > /tmp/pgpoolstart.log 2> /tmp/pgpoolstart.err
+/bin/pgpool -a /opt/cpm/bin/pool_hba.conf -f /opt/cpm/bin/pgpool.conf > /tmp/pgpoolstart.log 2> /tmp/pgpoolstart.err

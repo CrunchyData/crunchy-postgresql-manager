@@ -3,7 +3,7 @@
 # $1 is the host we are going to do the backup from
 #
 
-source /cluster/bin/setenv.sh
+source /opt/cpm/bin/setenv.sh
 
 # sleep to give DNS time to register the backup job
 sleep 7

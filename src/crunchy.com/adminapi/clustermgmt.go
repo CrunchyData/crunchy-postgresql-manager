@@ -149,14 +149,14 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 
 	//restart postgres after the config file changes
 	var commandoutput string
-	commandoutput, err = PGCommand("/cluster/bin/stoppg.sh", master.Name)
+	commandoutput, err = PGCommand(CPMBIN+"stoppg.sh", master.Name)
 	if err != nil {
 		glog.Errorln("configureCluster:" + err.Error())
 		return err
 	}
 	glog.Infoln("configureCluster: master stoppg output was" + commandoutput)
 
-	commandoutput, err = PGCommand("/cluster/bin/startpg.sh", master.Name)
+	commandoutput, err = PGCommand(CPMBIN+"startpg.sh", master.Name)
 	if err != nil {
 		glog.Errorln("configureCluster:" + err.Error())
 		return err
@@ -194,7 +194,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 
 			//stop standby
 			if !autocluster {
-				commandoutput, err = PGCommand("/cluster/bin/stoppg.sh", standbynodes[i].Name)
+				commandoutput, err = PGCommand(CPMBIN+"stoppg.sh", standbynodes[i].Name)
 				if err != nil {
 					glog.Errorln("configureCluster:" + err.Error())
 					return err
@@ -203,7 +203,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 			}
 
 			//create base backup from master
-			commandoutput, err = cpmagent.Command1("/cluster/bin/basebackup.sh", master.Name+"."+domainname.Value, standbynodes[i].Name)
+			commandoutput, err = cpmagent.Command1(CPMBIN+"basebackup.sh", master.Name+"."+domainname.Value, standbynodes[i].Name)
 			if err != nil {
 				glog.Errorln("configureCluster:" + err.Error())
 				return err
@@ -258,7 +258,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 
 			//start standby
 
-			commandoutput, err = PGCommand("/cluster/bin/startpgonstandby.sh", standbynodes[i].Name)
+			commandoutput, err = PGCommand(CPMBIN+"startpgonstandby.sh", standbynodes[i].Name)
 			if err != nil {
 				glog.Errorln("configureCluster:" + err.Error())
 				return err
@@ -298,7 +298,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 	glog.Infoln("configureCluster:pgpool pgpool.conf generated")
 
 	//write pgpool.conf to remote pool node
-	err = RemoteWritefile("/cluster/bin/pgpool.conf", data, pgpoolNode.Name)
+	err = RemoteWritefile(CPMBIN+"pgpool.conf", data, pgpoolNode.Name)
 	if err != nil {
 		glog.Errorln("configureCluster:" + err.Error())
 		return err
@@ -315,7 +315,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 	glog.Infoln("configureCluster:pgpool pool_passwd generated")
 
 	//write pgpool.conf to remote pool node
-	err = RemoteWritefile("/cluster/bin/pool_passwd", data, pgpoolNode.Name)
+	err = RemoteWritefile(CPMBIN+"pool_passwd", data, pgpoolNode.Name)
 	if err != nil {
 		glog.Errorln("configureCluster:" + err.Error())
 		return err
@@ -332,7 +332,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 	glog.Infoln("configureCluster:pgpool pool_hba generated")
 
 	//write pgpool.conf to remote pool node
-	err = RemoteWritefile("/cluster/bin/pool_hba.conf", data, pgpoolNode.Name)
+	err = RemoteWritefile(CPMBIN+"pool_hba.conf", data, pgpoolNode.Name)
 	if err != nil {
 		glog.Errorln("configureCluster:" + err.Error())
 		return err
@@ -340,7 +340,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 	glog.Infoln("configureCluster:pgpool pool_hba copied remotely")
 
 	//start pgpool
-	commandoutput, err = PGCommand("/cluster/bin/startpgpool.sh", pgpoolNode.Name)
+	commandoutput, err = PGCommand(CPMBIN+"startpgpool.sh", pgpoolNode.Name)
 	if err != nil {
 		glog.Errorln("configureCluster: " + err.Error())
 		return err
@@ -578,7 +578,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	output, err = cpmagent.AgentCommand("/cluster/bin/fail-over.sh", dbNode.Name, dbNode.Name)
+	output, err = cpmagent.AgentCommand(CPMBIN+"fail-over.sh", dbNode.Name, dbNode.Name)
 	if err != nil {
 		glog.Errorln("AdminFailover: fail-over error " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -615,7 +615,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	//stop pg on the old master
 	//params.IPAddress1 = oldMaster.IPAddress
 
-	output, err = cpmagent.AgentCommand("/cluster/bin/stoppg.sh", oldMaster.Name, oldMaster.Name)
+	output, err = cpmagent.AgentCommand(CPMBIN+"stoppg.sh", oldMaster.Name, oldMaster.Name)
 	if err != nil {
 		glog.Errorln("AdminFailover: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -644,7 +644,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 				glog.Infoln("AdminFailover: fail-over is reconfiguring standby  " + clusterNodes[i].Name)
 				//stop standby
 				var commandoutput string
-				commandoutput, err = PGCommand("/cluster/bin/stoppg.sh", clusterNodes[i].Name)
+				commandoutput, err = PGCommand(CPMBIN+"stoppg.sh", clusterNodes[i].Name)
 				if err != nil {
 					glog.Errorln("AdminFailover:" + err.Error())
 					rest.Error(w, err.Error(), 400)
@@ -659,7 +659,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 					rest.Error(w, err.Error(), 400)
 				}
 				//create base backup from master
-				commandoutput, err = cpmagent.Command1("/cluster/bin/basebackup.sh", dbNode.Name+"."+domainname.Value, clusterNodes[i].Name)
+				commandoutput, err = cpmagent.Command1(CPMBIN+"basebackup.sh", dbNode.Name+"."+domainname.Value, clusterNodes[i].Name)
 				if err != nil {
 					glog.Errorln("AdminFailover:" + err.Error())
 					rest.Error(w, err.Error(), 400)
@@ -726,7 +726,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 
 				//start standby
 
-				commandoutput, err = PGCommand("/cluster/bin/startpgonstandby.sh", clusterNodes[i].Name)
+				commandoutput, err = PGCommand(CPMBIN+"startpgonstandby.sh", clusterNodes[i].Name)
 				if err != nil {
 					glog.Errorln("AdminFailover:" + err.Error())
 					rest.Error(w, err.Error(), 400)

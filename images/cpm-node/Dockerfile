@@ -4,9 +4,9 @@ MAINTAINER crunchy
 # open up the cpmagent port
 EXPOSE 13000
 
-ADD bin /cluster/bin
-ADD conf /cluster/conf
+ADD bin /opt/cpm/bin
+ADD conf /opt/cpm/conf
 
 USER postgres
 
-CMD ["/cluster/bin/start-cpmagentserver.sh"]
+CMD ["/opt/cpm/bin/start-cpmagentserver.sh"]

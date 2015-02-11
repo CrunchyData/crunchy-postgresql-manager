@@ -25,6 +25,8 @@ import (
 	"time"
 )
 
+var CPMBIN = "/opt/cpm/bin/"
+
 type DBMetric struct {
 	MetricType string
 	Value      float64
@@ -118,7 +120,7 @@ func cpu(server string) (DBMetric, error) {
 	values.MetricType = "cpu"
 	var output string
 
-	output, err = cpmagent.AgentCommand("/cluster/bin/monitor-load", "", server)
+	output, err = cpmagent.AgentCommand(CPMBIN+"monitor-load", "", server)
 	if err != nil {
 		glog.Errorln("cpu metric error:" + err.Error())
 		return values, err
@@ -143,7 +145,7 @@ func mem(server string) (DBMetric, error) {
 	values.MetricType = "mem"
 	var output string
 
-	output, err = cpmagent.AgentCommand("/cluster/bin/monitor-mem", "", server)
+	output, err = cpmagent.AgentCommand(CPMBIN+"monitor-mem", "", server)
 	if err != nil {
 		glog.Errorln("mem metric error:" + err.Error())
 		return values, err

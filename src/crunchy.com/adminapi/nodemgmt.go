@@ -72,7 +72,7 @@ func GetPGStatus(hostname string) (string, error) {
 	var currentStatus = "UNKNOWN"
 	var err error
 
-	cmd := exec.Command("/cluster/bin/pgstatus",
+	cmd := exec.Command(CPMBIN+"pgstatus",
 		hostname,
 		"5432",
 		"cpmtest",
@@ -277,7 +277,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//send the server a deletevolume command
-	output, err = cpmagent.AgentCommand("/cluster/bin/deletevolume", server.PGDataPath+"/"+dbNode.Name, server.IPAddress)
+	output, err = cpmagent.AgentCommand(CPMBIN+"deletevolume", server.PGDataPath+"/"+dbNode.Name, server.IPAddress)
 	glog.Infoln(output)
 
 	//we should not have to delete the DNS entries because

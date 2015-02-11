@@ -19,7 +19,7 @@
 
 export LD_LIBRARY_PATH=/usr/pgsql-9.3/lib
 
-source /cluster/bin/setenv.sh
+source /opt/cpm/bin/setenv.sh
 
 
 #
@@ -28,14 +28,14 @@ source /cluster/bin/setenv.sh
 if [ ! -f /pgdata/postgresql.conf ]; then
         echo "pgdata is empty"
         initdb -D /pgdata  > /tmp/initdb.log &> /tmp/initdb.err
-	cp /cluster/conf/admin/pg_hba.conf /pgdata/
-	cp /cluster/conf/admin/postgresql.conf /pgdata/
+	cp /opt/cpm/conf/admin/pg_hba.conf /pgdata/
+	cp /opt/cpm/conf/admin/postgresql.conf /pgdata/
 	echo "starting db" > /tmp/start-db.log
 
         pg_ctl -D /pgdata start 
         sleep 3
 	echo "building clusteradmin db" > /tmp/start-db.log
-        psql -U postgres < /cluster/bin/setup.sql
+        psql -U postgres < /opt/cpm/bin/setup.sql
         exit
 fi
 
