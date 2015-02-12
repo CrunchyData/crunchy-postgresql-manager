@@ -24,7 +24,7 @@ firewall-cmd --permanent --zone=public --add-port=8080/tcp
 firewall-cmd --zone=public --list-all
 systemctl restart firewall.service
 ```
-	
+
 
 ##### Step 1 - install docker private registry
 
@@ -50,7 +50,7 @@ docker pull  atcol/docker-registry-ui
 docker run -d --name=docker-registry-ui -p 8080:8080 -e REG1=http://192.168.56.120:5000/v1/ atcol/docker-registry-ui
 ```
 
-##### Step 2 - install openshift 
+##### Step 2 - install openshift
 
 I install openshift on it's own server, openshift.crunchy.lab.
 
@@ -95,13 +95,13 @@ To add a new pod:
 
 ```
 openshift kube create pods -c ./examples/crunchy-cpm/crunchy-cpm-pod.json
-openshift kube list pods 
+openshift kube list pods
 ```
 
 To remove a pod:
 
 ```
-openshift kube list pods 
+openshift kube list pods
 openshift kube delete pods/someid
 ```
 
@@ -117,7 +117,7 @@ it is not a good idea to have to run as privlidged anyway.
 
 To fix this, I removed systemd, it also is a good practice to not
 run sshd in a container so I removed sshd as well.  From now on
-you will have to ssh into the Docker host, then use nsenter to 
+you will have to ssh into the Docker host, then use nsenter to
 'get into' the running container.
 
 Removing systemd greatly alters the Dockerfile for all images.
@@ -132,7 +132,7 @@ at:
 
 http://stackoverflow.com/questions/24288616/permission-denied-on-accessing-host-directory-in-docker
 
-I followed this path to set the selinux file settings for the 
+I followed this path to set the selinux file settings for the
 mounted volume and the permission problems went away.
 
 You can temporarily issue
@@ -144,7 +144,9 @@ chcon -Rt svirt_sandbox_file_t /path/to/volume
 
 I chose the 'chcon' command.  It is my guess at this point that I will
 be able to run that command when I provision the volumes under openshift,
-if so, we are fine, if not, then I'll probably have to run the 
+if so, we are fine, if not, then I'll probably have to run the
 containers as 'priviledged', that is, if Openshift/Kube will allow that!
 
-
+For Kube deployment:
+	cd ~/cpm/images/crunchy-admin/conf
+	openshift kube create pods -c ./cpm-admin-pod.json
