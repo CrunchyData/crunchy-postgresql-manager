@@ -138,7 +138,7 @@ func main() {
 		&rest.Route{"POST", "/sec/addrole", AddRole},
 		&rest.Route{"GET", "/sec/deleterole/:ID.:Token", DeleteRole},
 		&rest.Route{"GET", "/sec/getroles/:Token", GetAllRoles},
-		&rest.Route{"GET", "/sec/getrole/:Token", GetRole},
+		&rest.Route{"GET", "/sec/getrole/:Name.:Token", GetRole},
 		&rest.Route{"POST", "/backup/now", BackupNow},
 		&rest.Route{"POST", "/backup/addschedule", AddSchedule},
 		&rest.Route{"GET", "/backup/deleteschedule/:ID.:Token", DeleteSchedule},

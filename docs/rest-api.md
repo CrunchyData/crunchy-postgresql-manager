@@ -1,11 +1,10 @@
 Authentication
 ---------------
 
-/sec/login/:ID.:PSW
------------------
+###GET /sec/login/:ID.:PSW
+
 login and return an auth token
 
-###GET
 
 ###Example
 
@@ -16,42 +15,54 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/clusters/:Token
------------------
+###GET /clusters/:Token
+
 
 returns all clusters
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl http://cpm-admin.crunchy.lab:8080/clusters/789c31ff-b18f-47b3-bb63-1fd603895aa5
+[
+  {
+    "ID": "2",
+    "Name": "aa",
+    "ClusterType": "asynchronous",
+    "Status": "initialized",
+    "CreateDate": "02-11-2015 09:18:13",
+    "Token": ""
+  }
+]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/servers/:Token
------------------
+###GET /servers/:Token
+
 returns all servers
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl http://cpm-admin.crunchy.lab:8080/servers/789c31ff-b18f-47b3-bb63-1fd603895aa5
+[
+  {
+    "ID": "1",
+    "Name": "espresso",
+    "IPAddress": "192.168.0.106",
+    "DockerBridgeIP": "",
+    "PGDataPath": "/var/lib/pgsql",
+    "ServerClass": "low",
+    "CreateDate": "02-10-2015 14:35:34"
+  }
+]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/cluster
------------------
+###POST /cluster
+
 updates or adds a cluster
 
-POST
 
 ###Example
 
@@ -64,12 +75,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 
 curl -i -d '{"ID":"1","ClusterID":"1"}' http://cpm-admin.crunchy.lab:8080/event/join-cluster
 
-/autocluster
------------------
+###POST /autocluster
 
 performs an auto-cluster
 
-POST
 
 ###Example
 
@@ -80,12 +89,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/savesettings
------------------
+###POST /savesettings
 
 saves settings
 
-POST
 
 ###Example
 
@@ -96,12 +103,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/saveprofiles
------------------
+###POST /saveprofiles
 
 saves profiles
 
-POST
 
 ###Example
 
@@ -112,12 +117,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/saveclusterprofiles
------------------
+###POST /saveclusterprofiles
 
 saves cluster profiles
 
-POST
 
 ###Example
 
@@ -128,76 +131,86 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/settings/:Token
------------------
+###GET /settings/:Token
 
 returns all settings
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl http://cpm-admin.crunchy.lab:8080/settings/789c31ff-b18f-7b3-bb63-1fd603895aa5
+[
+  {
+    "Name": "CP-LG-ALGO",
+    "Value": "round-robin",
+    "UpdateDate": "02-10-2015 13:50:57"
+  },
+  {
+    "Name": "CP-LG-COUNT",
+    "Value": "1",
+    "UpdateDate": "02-10-2015 13:50:57"
+  },
+]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/addserver
------------------
+###GET /addserver
 
 add a server
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
+curl http://cpm-admin.crunchy.lab:8080/addserver
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/server/:ID.:Token
------------------
+###GET /server/:ID.:Token
 
 return a server
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
+curl http://cpm-admin.crunchy.lab:8080/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d
 {
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
+  "ID": "1",
+  "Name": "espresso",
+  "IPAddress": "192.168.0.106",
+  "DockerBridgeIP": "172.17.42.1",
+  "PGDataPath": "/var/lib/pgsql",
+  "ServerClass": "low",
+  "CreateDate": "02-10-2015 14:35:34"
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/cluster/:ID.:Token
------------------
+###GET /cluster/:ID.:Token
 
 return a cluster
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
+curl http://cpm-admin.crunchy.lab:8080/cluster/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2
 {
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
+  "ID": "2",
+  "Name": "aa",
+  "ClusterType": "asynchronous",
+  "Status": "initialized",
+  "CreateDate": "02-11-2015 09:18:13",
+  "Token": ""
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/cluster/configure/:ID.:Token
------------------
+###GET /cluster/configure/:ID.:Token
 
 configure a cluster
 
-###GET
 
 ###Example
 
@@ -208,12 +221,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/cluster/delete/:ID.:Token
------------------
+###GET /cluster/delete/:ID.:Token
 
 delete a cluster
 
-###GET
 
 ###Example
 
@@ -224,12 +235,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/deleteserver/:ID.:Token
------------------
+###GET /deleteserver/:ID.:Token
 
 delete a server
 
-###GET
 
 ###Example
 
@@ -240,86 +249,151 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/nodes/:Token
------------------
+###GET /nodes/:Token
 
 return all containers
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl http://cpm-admin.crunchy.lab:8080/nodes/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+[
+  {
+    "ID": "9",
+    "ClusterID": "2",
+    "ServerID": "1",
+    "Name": "aa-master",
+    "Role": "master",
+    "Image": "cpm-node",
+    "CreateDate": "02-11-2015 09:18:14",
+    "Status": "UNKNOWN"
+  },
+  {
+    "ID": "11",
+    "ClusterID": "2",
+    "ServerID": "1",
+    "Name": "aa-pgpool",
+    "Role": "pgpool",
+    "Image": "cpm-pgpool",
+    "CreateDate": "02-11-2015 09:18:20",
+    "Status": "UNKNOWN"
+  },
+]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/nodes/nocluster/:Token
------------------
+###GET /nodes/nocluster/:Token
 
 return all containers not in a cluster
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl http://cpm-admin.crunchy.lab:8080/nodes/nocluster/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+[
+  {
+    "ID": "8",
+    "ClusterID": "-1",
+    "ServerID": "1",
+    "Name": "tc",
+    "Role": "unassigned",
+    "Image": "cpm-node",
+    "CreateDate": "02-11-2015 09:17:43",
+    "Status": "UNKNOWN"
+  }
+]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/clusternodes/:ClusterID.:Token
------------------
+###GET /clusternodes/:ClusterID.:Token
 
 return all containers for a given cluster
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl http://cpm-admin.crunchy.lab:8080/clusternodes/2.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+[
+  {
+    "ID": "9",
+    "ClusterID": "2",
+    "ServerID": "1",
+    "Name": "aa-master",
+    "Role": "master",
+    "Image": "cpm-node",
+    "CreateDate": "02-11-2015 09:18:14",
+    "Status": "UNKNOWN"
+  },
+  {
+    "ID": "11",
+    "ClusterID": "2",
+    "ServerID": "1",
+    "Name": "aa-pgpool",
+    "Role": "pgpool",
+    "Image": "cpm-pgpool",
+    "CreateDate": "02-11-2015 09:18:20",
+    "Status": "UNKNOWN"
+  },
+  {
+    "ID": "10",
+    "ClusterID": "2",
+    "ServerID": "1",
+    "Name": "aa-standby-0",
+    "Role": "standby",
+    "Image": "cpm-node",
+    "CreateDate": "02-11-2015 09:18:19",
+    "Status": "UNKNOWN"
+  }
+]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/nodes/forserver/:ServerID.:Token
------------------
+###GET /nodes/forserver/:ServerID.:Token
 
 return all containers for a server
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl http://cpm-admin.crunchy.lab:8080/nodes/forserver/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+[
+  {
+    "ID": "9",
+    "ClusterID": "2",
+    "ServerID": "1",
+    "Name": "aa-master",
+    "Role": "master",
+    "Image": "cpm-node",
+    "CreateDate": "02-11-2015 09:18:14",
+    "Status": "down"
+  },
+  {
+    "ID": "11",
+    "ClusterID": "2",
+    "ServerID": "1",
+    "Name": "aa-pgpool",
+    "Role": "pgpool",
+    "Image": "cpm-pgpool",
+    "CreateDate": "02-11-2015 09:18:20",
+    "Status": "down"
+  },
+]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/node
+###POST /node
 -----------------
 
 PostNode
 
-POST
 
 ###Example
 
 
-/provision/:Profile.:Image.:ServerID.:ContainerName.:Standalone.:Token
------------------
+###GET /provision/:Profile.:Image.:ServerID.:ContainerName.:Standalone.:Token
 
 provision a new container
 
-###GET
 
 ###Example
 
@@ -330,44 +404,45 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/node/:ID.:Token
------------------
+###GET /node/:ID.:Token
 
 return a container
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
+curl http://cpm-admin.crunchy.lab:8080/node/8.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 {
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
+  "ID": "8",
+  "ClusterID": "-1",
+  "ServerID": "1",
+  "Name": "tc",
+  "Role": "unassigned",
+  "Image": "cpm-node",
+  "CreateDate": "02-11-2015 09:17:43",
+  "Status": "OFFLINE"
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/kube/:Token
------------------
+###GET /kube/:Token
 
 return boolean of kube configuration
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
+curl http://cpm-admin.crunchy.lab:8080/kube/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 {
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
+  "URL": "KUBE_URL is not set"
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/deletenode/:ID.:Token
------------------
+###GET /deletenode/:ID.:Token
 
 delete a container
 
-###GET
 
 ###Example
 
@@ -376,98 +451,93 @@ curl -X DELETE http://cpm-admin.crunchy.lab:8080/node/17
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-/monitor/server-getinfo/:ServerID.:Metric.:Token
------------------
+###GET /monitor/server-getinfo/:ServerID.:Metric.:Token
 
 return server monitoring data
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl http://cpm-admin.crunchy.lab:8080/monitor/server-getinfo/.cpmdf.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+{"df":[
+{"filesystem":"/dev/mapper/centos-root","total":"32G","used":"7G","available":"26G","pctused":"20%","mountpt":"/"}
+,
+{"filesystem":"devtmpfs","total":"8G","used":"0G","available":"8G","pctused":"0%","mountpt":"/dev"}
+,
+{"filesystem":"tmpfs","total":"8G","used":"1G","available":"8G","pctused":"1%","mountpt":"/dev/shm"}
+,
+{"filesystem":"tmpfs","total":"8G","used":"1G","available":"8G","pctused":"1%","mountpt":"/run"}
+,
+{"filesystem":"tmpfs","total":"8G","used":"0G","available":"8G","pctused":"0%","mountpt":"/sys/fs/cgroup"}
+,
+{"filesystem":"/dev/sda1","total":"1G","used":"1G","available":"1G","pctused":"29%","mountpt":"/boot"}
+,
+{"filesystem":"/dev/mapper/centos-home","total":"16G","used":"2G","available":"14G","pctused":"12%","mountpt":"/home"}
+]}
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/monitor/container-getinfo/:ID.:Metric.:Token
------------------
+###GET /monitor/container-getinfo/:ID.:Metric.:Token
 
 return container monitoring data
 
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-/monitor/container-loadtest/:ID.:Metric.:Writes.:Token
------------------
+###GET /monitor/container-loadtest/:ID.:Metric.:Writes.:Token
 
 perform a load test and return the results
 
-###GET
 
 ###Example
 
 
-/admin/start-pg/:ID.:Token
------------------
+###GET /admin/start-pg/:ID.:Token
 
 start a container's postgres
 
-###GET
 
 ###Example
 
 
-/admin/start/:ID.:Token
------------------
+###GET /admin/start/:ID.:Token
 
 start a container
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
+curl http://cpm-admin.crunchy.lab:8080/admin/start/8.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 {
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
+  "Status": "OK"
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/admin/stop/:ID.:Token
------------------
+###GET /admin/stop/:ID.:Token
 
 stop a container
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
+curl http://cpm-admin.crunchy.lab:8080/admin/stop/8.1efbfd50-9b2-43a0-8c91-b6f4a837a4f2
 {
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
+  "Status": "OK"
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/admin/failover/:ID.:Token
------------------
+###GET /admin/failover/:ID.:Token
 
 cause a postgres fail over
 
-###GET
 
 ###Example
 
@@ -478,28 +548,24 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/admin/stop-pg/:ID.:Token
------------------
+###GET /admin/stop-pg/:ID.:Token
 
 stop a container's postgres
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
+curl http://cpm-admin.crunchy.lab:8080/admin/stop-pg/8.1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2
 {
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
+  "Status": "OK"
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/event/join-cluster/:IDList.:MasterID.:ClusterID.:Token
------------------
+###GET /event/join-cluster/:IDList.:MasterID.:ClusterID.:Token
 
 add a node to a cluster
 
-###GET
 
 ###Example
 
@@ -511,29 +577,25 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-/sec/logout/:Token
------------------
+###GET /sec/logout/:Token
 
 logout Logout
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
+curl http://cpm-admin.crunchy.lab:8080/sec/logout/ab3ba695-533-43a4-a3c0-9a4c55288c14
 {
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
+  "Status": "OK"
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-/sec/updateuser
------------------
+###POST /sec/updateuser
 
 update a user's account into UpdateUser
 
-POST
 
 ###Example
 
@@ -544,22 +606,18 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/sec/cp
------------------
+###POST /sec/cp
 
 change a user's password ChangePassword
 
-POST
 
 ###Example
 
 
-/sec/adduser
------------------
+###POST /sec/adduser
 
 add a user AddUser
 
-POST
 
 ###Example
 
@@ -570,44 +628,83 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/sec/getuser/:ID.:Token
------------------
+###GET /sec/getuser/:ID.:Token
 
 return a user's information GetUser
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
+curl http://cpm-admin.crunchy.lab:8080/sec/getuser/cpm.1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2
 {
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
+  "Status": "OK"
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/sec/getusers/:Token
------------------
+###GET /sec/getusers/:Token
 
 return all users information GetAllUsers
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl http://cpm-admin.crunchy.lab:8080/sec/getusers/1efbfd50-9b2-43a0-8c91-b6f4a837a4f2
+[
+  {
+    "Name": "cpm",
+    "Password": "dd6ced",
+    "Roles": {
+      "superuser": {
+        "Name": "superuser",
+        "Selected": true,
+        "Permissions": {
+          "perm-backup": {
+            "Name": "perm-backup",
+            "Description": "perform backups",
+            "Selected": true
+          },
+          "perm-cluster": {
+            "Name": "perm-cluster",
+            "Description": "maintain clusters",
+            "Selected": true
+          },
+          "perm-container": {
+            "Name": "perm-container",
+            "Description": "maintain containers",
+            "Selected": true
+          },
+          "perm-server": {
+            "Name": "perm-server",
+            "Description": "maintain servers",
+            "Selected": true
+          },
+          "perm-setting": {
+            "Name": "perm-setting",
+            "Description": "maintain settings",
+            "Selected": true
+          },
+          "perm-user": {
+            "Name": "perm-user",
+            "Description": "maintain users",
+            "Selected": true
+          }
+        },
+        "UpdateDate": "",
+        "Token": ""
+      }
+    },
+    "UpdateDate": "",
+    "Token": ""
+  }
+]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/sec/deleteuser/:ID.:Token
------------------
+###GET /sec/deleteuser/:ID.:Token
 
 delete a user DeleteUser
 
-###GET
 
 ###Example
 
@@ -618,12 +715,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/sec/updaterole
------------------
+###POST /sec/updaterole
 
 update a CPM role UpdateRole
 
-POST
 
 ###Example
 
@@ -634,12 +729,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/sec/addrole
------------------
+###POST /sec/addrole
 
 add a CPM role AddRole
 
-POST
 
 ###Example
 
@@ -650,12 +743,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/sec/deleterole/:ID.:Token
------------------
+###GET /sec/deleterole/:ID.:Token
 
 delete a CPM role DeleteRole
 
-###GET
 
 ###Example
 
@@ -666,44 +757,79 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/sec/getroles/:Token
------------------
+###GET /sec/getroles/:Token
 
 get all CPM roles GetAllRoles
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl http://cpm-admin.crunchy.lab:8080/sec/getroles/1efbfd50-9b2-43a0-8c91-b6f4a837a4f2
+[
+  {
+    "Name": "superuser",
+    "Selected": false,
+    "Permissions": {
+      "perm-backup": {
+        "Name": "perm-backup",
+        "Description": "perform backups",
+        "Selected": true
+      },
+      "perm-cluster": {
+        "Name": "perm-cluster",
+        "Description": "maintain clusters",
+        "Selected": true
+      },
+      "perm-container": {
+        "Name": "perm-container",
+        "Description": "maintain containers",
+        "Selected": true
+      },
+      "perm-server": {
+        "Name": "perm-server",
+        "Description": "maintain servers",
+        "Selected": true
+      },
+      "perm-setting": {
+        "Name": "perm-setting",
+        "Description": "maintain settings",
+        "Selected": true
+      },
+      "perm-user": {
+        "Name": "perm-user",
+        "Description": "maintain users",
+        "Selected": true
+      }
+    },
+    "UpdateDate": "",
+    "Token": ""
+  }
+]
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/sec/getrole/:Token
------------------
+###GET /sec/getrole/:Name.:Token
 
-get a CPM role GetRole
+get a CPM role GetRole (CURRENTLY NOT USED)
 
-###GET
 
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
+curl http://cpm-admin.crunchy.lab:8080sec/getrole/superuser.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 {
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
+  "Name": "",
+  "Selected": false,
+  "Permissions": null,
+  "UpdateDate": "",
+  "Token": ""
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/backup/now
------------------
+###POST /backup/now
 
 perform a postgres backup BackupNow
 
-POST
 
 ###Example
 
@@ -714,12 +840,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/backup/addschedule
------------------
+###POST /backup/addschedule
 
 add a new container admin schedule AddSchedule
 
-POST
 
 ###Example
 
@@ -730,12 +854,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/backup/deleteschedule/:ID.:Token
------------------
+###GET /backup/deleteschedule/:ID.:Token
 
 remove a container schedule DeleteSchedule
 
-###GET
 
 ###Example
 
@@ -746,12 +868,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/backup/updateschedule
------------------
+###POST /backup/updateschedule
 
 update a container schedule UpdateSchedule
 
-POST
 
 ###Example
 
@@ -762,12 +882,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/backup/getschedules/:ContainerName.:Token
------------------
+###GET /backup/getschedules/:ContainerName.:Token
 
 get all schedules for a container GetAllSchedules
 
-###GET
 
 ###Example
 
@@ -778,12 +896,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/backup/getschedule/:ID.:Token
------------------
+###GET /backup/getschedule/:ID.:Token
 
 get a container schedule GetSchedule
 
-###GET
 
 ###Example
 
@@ -794,12 +910,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/backup/getstatus/:ID.:Token
------------------
+###GET /backup/getstatus/:ID.:Token
 
 get a schedule job's status GetStatus
 
-###GET
 
 ###Example
 
@@ -810,12 +924,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/backup/getallstatus/:ID.:Token
------------------
+###GET /backup/getallstatus/:ID.:Token
 
 get all scheduled job's status for a container GetAllStatus
 
-###GET
 
 ###Example
 
@@ -826,12 +938,10 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-/backup/nodes/:Token
------------------
+###GET /backup/nodes/:Token
 
 GetBackupNodes
 
-###GET
 
 ###Example
 
