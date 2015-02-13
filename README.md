@@ -1,7 +1,44 @@
 Crunchy Postgresql Manager
+==========================
 
-Build Requirements
+Crunchy Postgresql Manager (CPM) is a Docker-based solution that
+provides an on-premise PostgreSQL-as-a-Service platform.
+
+CPM allows for the quick provisioning of Postgresql databases
+and streaming replication clusters.
+
+CPM also allows you to monitor and administer provisioned Postgres
+databases.
+
+Installation
+------------
+
+There are 2 installs of CPM available, a user install and a developer
+install.
+
+The user install allows you to get CPM up and running quickly by
+downloading pre-built binaries and Docker images.
+
+For performing a user install, see the docs/user-install.md 
+documentation.
+
+The developer install is more difficult but allows you to build, 
+configure, and develop new CPM functionality to suit your needs.
+
+Pre-requisite Installation
+============
+
+Install the skybridge or dnsbridge program before installing this one.
+
+skybridge is the preferred DNS bridge solution and is found
+at the following location: https://github.com/CrunchyData/skybridge
+
+
+
+Developer Build Requirements
 ==================
+
+Build and install CPM from source by running the install.sh script
 
 Building CPM requires development tools like the GCC compiler, along with
 the Go language.  On Fedora and RedHat Linux distributions, those packages
@@ -9,11 +46,6 @@ can be installed as root like this:
 
     yum install -y gcc
     yum install -y golang
-
-Obtaining some updates to the CPM code may require the Git package manager.
-It can be installed on Fedora/RH with this command:
-
-    yum install -y git
 
 CPM also requires the Docker program is installed, running, and will stay
 running after a restart:
@@ -36,12 +68,6 @@ by running its info command:
 
     docker info
 
-Installation
-============
-
-Install the dnsbridge program before installing this one.
-
-Build and install CPM by running the install.sh script
 
 Running CPM
 ===========
@@ -102,16 +128,10 @@ To shut down CPM, run the following commands:
 	docker stop cluster-admin
 	
 
-Restarting CPM
-===========
-
-To restart CPM, run the following commands:
+To start CPM, run the following commands:
 
 	docker start cpm
 	docker start cluster-backup
 	docker start cluster-mon
 	docker start cluster-admin
 	
-
- 
-

@@ -14,42 +14,68 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This install script assumes a registered RHEL 7 server is the installation host OS.
+# This install script assumes a registered RHEL 7 or CentOS 7 server is the installation host OS.
 #
 
 # Exit installation on any unexpected error
 set -e
 
 # set the istall directory
-export INSTALLDIR=/opt/cpm
+export WORKDIR=$HOME/cpm
+export TMPDIR=/tmp/opt/cpm
+export ARCHIVE=/tmp/cpm.1.0.0-linux-amd64.tar.gz
 
 # verify running as root user
 
-# push docker images to dockerhub
+createArchive () {
+	mkdir -p $TMPDIR/bin
 
-docker tag cpm jmccormick2001/cpm
-docker push jmccormick2001/cpm
+	cp $WORKDIR/sbin/* $TMPDIR/bin
+	cp $WORKDIR/bin/* $TMPDIR/bin
+	cp $WORKDIR/sbin/basic-user-install.sh $TMPDIR
 
-docker tag cpm-pgpool jmccormick2001/cpm-pgpool
-docker push jmccormick2001/cpm-pgpool
+	mkdir -p $TMPDIR/config
+	cp $WORKDIR/config/* $TMPDIR/config
 
-docker tag cpm-admin jmccormick2001/cpm-admin
-docker push jmccormick2001/cpm-admin
+	mkdir -p $TMPDIR/www
+	cp -r $WORKDIR/images/cpm/www/* $TMPDIR/www/
 
-docker tag cpm-base jmccormick2001/cpm-base
-docker push jmccormick2001/cpm-base
+	cd $TMPDIR
 
-docker tag cpm-mon jmccormick2001/cpm-mon
-docker push jmccormick2001/cpm-mon
+	tar cvzf $ARCHIVE .
 
-docker tag cpm-backup jmccormick2001/cpm-backup
-docker push jmccormick2001/cpm-backup
+}
 
-docker tag cpm-backup-job jmccormick2001/cpm-backup-job
-docker push jmccormick2001/cpm-backup-job
+pushImages () {
+	# push docker images to dockerhub
 
-docker tag cpm-node jmccormick2001/cpm-node
-docker push jmccormick2001/cpm-node
+	docker tag cpm crunchydata/cpm
+	docker push crunchydata/cpm
 
-docker tag cpm-dashboard jmccormick2001/cpm-dashboard
-docker push jmccormick2001/cpm-dashboard
+	docker tag cpm-pgpool crunchydata/cpm-pgpool
+	docker push crunchydata/cpm-pgpool
+
+	docker tag cpm-admin crunchydata/cpm-admin
+	docker push crunchydata/cpm-admin
+
+	docker tag cpm-base crunchydata/cpm-base
+	docker push crunchydata/cpm-base
+
+	docker tag cpm-mon crunchydata/cpm-mon
+	docker push crunchydata/cpm-mon
+
+	docker tag cpm-backup crunchydata/cpm-backup
+	docker push crunchydata/cpm-backup
+
+	docker tag cpm-backup-job crunchydata/cpm-backup-job
+	docker push crunchydata/cpm-backup-job
+
+	docker tag cpm-node crunchydata/cpm-node
+	docker push crunchydata/cpm-node
+
+	docker tag cpm-dashboard crunchydata/cpm-dashboard
+	docker push crunchydata/cpm-dashboard
+}
+
+createArchive
+#pushImages

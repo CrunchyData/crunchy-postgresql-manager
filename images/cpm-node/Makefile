@@ -11,4 +11,5 @@ build:
 		cp ../../bin/cpmagentserver ./bin
 		cp ../../config/cpmagent.service ./bin
 	        docker build -t cpm-node .
+		docker tag cpm-node:latest crunchydata/cpm-node
 

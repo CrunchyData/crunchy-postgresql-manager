@@ -6,4 +6,5 @@ build:
 		cp ../../bin/backupserver ./bin
 		cp ../../bin/dummyserver ./bin
 	        docker build -t cpm-backup .
+		docker tag cpm-backup:latest crunchydata/cpm-backup
 

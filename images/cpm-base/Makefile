@@ -17,4 +17,5 @@ endif
 		cp ../../sbin/* bin/
 		cp ../../config/postgresql.service bin/
 	        docker build -t cpm-base .
+		docker tag cpm-base:latest crunchydata/cpm-base
 

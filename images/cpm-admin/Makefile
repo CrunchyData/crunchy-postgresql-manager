@@ -13,4 +13,5 @@ build:
 	        cp ../../bin/dummyclient  ./bin
 	        cp ../../bin/dummyserver  ./bin
 	        docker build -t cpm-admin .
+		docker tag cpm-admin:latest crunchydata/cpm-admin
 
