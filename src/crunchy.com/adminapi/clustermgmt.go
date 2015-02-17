@@ -781,6 +781,8 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	var idList = strings.Split(IDList, "_")
 	i := 0
+	pgpoolCount := 0
+
 	origDBNode := admindb.DBClusterNode{}
 	for i = range idList {
 		if idList[i] != "" {
@@ -798,7 +800,15 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 				origDBNode.Role = "standby"
 			} else {
 				origDBNode.Role = "pgpool"
+				pgpoolCount++
 			}
+
+			if pgpoolCount > 1 {
+				glog.Errorln("EventJoinCluster: more than 1 pgpool is in the cluster")
+				rest.Error(w, "only 1 pgpool is allowed in a cluster", 400)
+				return
+			}
+
 			err = admindb.UpdateDBNode(origDBNode)
 			if err != nil {
 				glog.Errorln("EventJoinCluster:" + err.Error())
