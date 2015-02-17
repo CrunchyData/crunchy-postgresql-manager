@@ -40,6 +40,31 @@ cpmApp.run(function($rootScope) {
     });
 });
 
+cpmApp.directive('aDisabled', function() {
+    return {
+        compile: function(tElement, tAttrs, transclude) {
+            //Disable ngClick
+            tAttrs["ngClick"] = "!("+tAttrs["aDisabled"]+") && ("+tAttrs["ngClick"]+")";
+
+            //Toggle "disabled" to class when aDisabled becomes true
+            return function (scope, iElement, iAttrs) {
+                scope.$watch(iAttrs["aDisabled"], function(newValue) {
+                    if (newValue !== undefined) {
+                        iElement.toggleClass("disabled", newValue);
+                    }
+                });
+
+                //Disable href on click
+                iElement.on("click", function(e) {
+                    if (scope.$eval(iAttrs["aDisabled"])) {
+                        e.preventDefault();
+                    }
+                });
+            };
+        }
+    };
+});
+
 
 var StopContainerModalInstanceCtrl = function($rootScope, $scope, $http, $modalInstance, $cookies, $cookieStore, value) {
 
@@ -316,6 +341,8 @@ cpmApp.controller('GetAllContainersController', function($rootScope, $scope, $ht
 
 
 cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, $modal, $cookies, $cookieStore, $routeParams) {
+    $scope.isRunning;
+    $scope.isFound;
     $scope.results = [];
     $scope.clusters = [];
     $scope.myCluster = [];
@@ -419,6 +446,16 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
             console.log('here is ServerID=' + $scope.results.ServerID);
             console.log('here is ClusterID=' + $scope.results.ClusterID);
             console.log('here is Status=' + $scope.results.Status);
+	    if ($scope.results.Status == 'RUNNING') {
+		$scope.isRunning = true;
+	    } else {
+		$scope.isRunning = false;
+	    }
+	    if ($scope.results.Status == 'CONTAINER NOT FOUND') {
+		$scope.isFound = false;
+	    } else {
+		$scope.isFound = true;
+	    }
 
             if ($scope.results.ClusterID == -1) {
                 console.log('setting myCluster to unassigne value');

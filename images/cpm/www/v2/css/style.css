@@ -86,3 +86,18 @@ table.gridtable td {
 	background-color: #ffffff;
 }
 
+a {
+	cursor: pointer;
+}
+
+a {
+	cursor:hand;
+}
+
+a.disabled {
+	color: #AAAAAA;
+	cursor: default;
+	pointer-events: none;
+	text-decoration: none;
+}
+

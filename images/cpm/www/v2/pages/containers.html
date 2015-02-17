@@ -24,10 +24,10 @@
   				<ul class="dropdown-menu" role="menu">
   					<li><a ng-click="handlePlusClick()" href="#/containers"><i class="fa fa-plus fa-fw"></i>Add Container</a></li>
   					<li><a ng-click="handleMinusClick()" href="#/containers"><i class="fa fa-trash-o fa-fw"></i>Delete Container</a></li>
-  					<li><a ng-click="handleMonitorClick()" href="#/containers"><i class="fa fa-bar-chart fa-fw"></i>Monitor Database</a></li>
-  					<li><a ng-click="handleBackupClick()" href="#/containers"><i class="fa fa-wrench fa-fw"></i>Admin Tasks</a></li>
-  					<li><a ng-click="handleStart()" href="#/containers"><i class="fa fa-play fa-fw"></i>Start Database</a></li>
-  					<li><a ng-click="handleStop()" href="#/containers"><i class="fa fa-stop fa-fw"></i>Stop Database</a></li>
+  					<li ng-if="isRunning"><a ng-click="handleMonitorClick()" href="#/containers"><i class="fa fa-bar-chart fa-fw"></i>Monitor Database</a></li>
+  					<li ng-if="isFound" ><a ng-click="handleBackupClick()" href="#/containers"><i class="fa fa-wrench fa-fw"></i>Admin Tasks</a></li>
+  					<li ng-if="isFound && isRunning == false"><a ng-click="handleStart()" href="#/containers"><i class="fa fa-play fa-fw"></i>Start Database</a></li>
+  					<li ng-if="isRunning"><a ng-click="handleStop()" href="#/containers"><i class="fa fa-stop fa-fw"></i>Stop Database</a></li>
   				</ul>
   			</div>
   		</td>
