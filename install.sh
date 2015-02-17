@@ -33,6 +33,9 @@ sudo usermod -a -G docker $USER
 # install deps
 export INSTALLDIR=$(pwd)
 
+sudo rpm -Uvh http://yum.postgresql.org/9.3/redhat/rhel-7-x86_64/pgdg-centos93-9.3-1.noarch.rpm
+sudo yum install -y postgresql93 postgresql93-contrib postgresql93-server
+
 # set the gopath
 source $INSTALLDIR/setpath.sh
 
