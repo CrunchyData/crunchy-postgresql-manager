@@ -422,7 +422,7 @@ func (t *Command) DockerInspect2Command(args *Args, reply *InspectCommandOutput)
 	container, err3 := docker.InspectContainer(containerName)
 	if err3 != nil {
 		glog.Infoln("can't inspect container " + containerName)
-		return nil
+		return err3
 	}
 
 	if container != nil {

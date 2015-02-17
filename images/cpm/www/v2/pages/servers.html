@@ -97,8 +97,9 @@
   						{{container.Image}}
   					</td>
   					<td header-class="text-left" data-title="'Container Status'" width="100">
-  						<a ng-if="container.Status != 'up'" href=""><i class="fa fa-close"></i></a>
+  						<a ng-if="container.Status == 'down'" href=""><i class="fa fa-close"></i></a>
   						<a ng-if="container.Status == 'up'" href=""><i class="fa fa-cog fa-spin"></i></a>
+  						<a tooltip="container not found" style="color:red" ng-if="container.Status == 'notfound'" href=""><i class="fa fa-warning"></i></a>
   					</td>
 
   				</tr>

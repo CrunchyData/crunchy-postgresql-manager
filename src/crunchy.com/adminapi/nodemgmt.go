@@ -53,14 +53,31 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	//ping the db on that node to get current status
 	var currentStatus = "UNKNOWN"
 
-	currentStatus, err = GetPGStatus(results.Name)
+	//go get the docker server IPAddress
+	server := admindb.DBServer{}
+	server, err = admindb.GetDBServer(results.ServerID)
 	if err != nil {
-		glog.Errorln("GetNode:" + err.Error())
+		glog.Errorln("GetNode: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
+	}
+
+	_, err = cpmagent.DockerInspect2Command(results.Name, server.IPAddress)
+	if err != nil {
+		glog.Errorln("GetNode: " + err.Error())
+		currentStatus = "CONTAINER NOT FOUND"
+	} else {
+
+		//ping the db on that node to get current status
+
+		currentStatus, err = GetPGStatus(results.Name)
+		if err != nil {
+			glog.Errorln("GetNode:" + err.Error())
+			rest.Error(w, err.Error(), 400)
+			return
+		}
 	}
 
 	node := ClusterNode{results.ID, results.ClusterID, results.ServerID,
@@ -340,6 +357,7 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 		if e != nil {
 			glog.Errorln("GetAllNodesForServer:" + e.Error())
 			glog.Errorln(e.Error())
+			nodes[i].Status = "notfound"
 		} else {
 			glog.Infoln("GetAllNodesForServer: setting " + results[i].Name + " to " + output.RunningState)
 			nodes[i].Status = output.RunningState
