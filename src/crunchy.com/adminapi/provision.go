@@ -140,7 +140,7 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 	params.PGDataPath = server.PGDataPath + "/" + params.ContainerName
 
 	glog.Infoln("PROFILE provisionImpl 2 about to provision volume")
-	if params.Image != "crunchy-pgpool" {
+	if params.Image != "cpm-pgpool" {
 		responseStr, err = cpmagent.AgentCommand(CPMBIN+"provisionvolume.sh",
 			params.PGDataPath,
 			server.IPAddress)
@@ -222,7 +222,7 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 	}
 	dbnode.ID = newid
 
-	if params.Image == "crunchy-pgpool" {
+	if params.Image == "cpm-pgpool" {
 		return nil
 	}
 

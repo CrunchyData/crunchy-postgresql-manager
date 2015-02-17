@@ -39,6 +39,14 @@
 
 		</script>
 		<p class="myerror">{{errorText}}</p>
+		<table width="400px">
+		<tr>
+		<td>
+		<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+		</td>
+		</tr>
+		</table>
+
 	</form>
 </div>
 

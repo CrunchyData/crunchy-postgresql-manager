@@ -348,6 +348,7 @@ cpmApp.controller('GACController', function($rootScope, $scope, $http, $modal, $
 
 var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $modalInstance, $cookies, $cookieStore, value, ngTableParams) {
 
+    $scope.alerts = [];
     $scope.value = value;
     $scope.errorText = '';
     $scope.containers = [];
@@ -359,6 +360,11 @@ var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $
         'checked': true,
         items: {}
     };
+
+    $scope.closeAlert = function(index) {
+	            $scope.alerts.splice(index, 1);
+	};
+
     //var containers = [];
 
     var token = $cookieStore.get('cpmsession');
@@ -455,16 +461,30 @@ var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $
 
 
     $scope.OnSubmitClick = function() {
+
         var names = '';
         var token = $cookieStore.get('cpmsession');
+
         if (token === void 0) {
             console.log('cookie was undefined');
             alert('login required');
             return;
         }
+
+	var poolCount=0;
+	var standbyCount=0;
+
         angular.forEach($scope.containers, function(item) {
             if (angular.isDefined(item.ID)) {
                 if ($scope.checkboxes.items[item.ID]) {
+		    if (item.Image == 'cpm-pgpool') {
+			    console.log('cpm-pgpool found');
+			    poolCount++;
+		    } else {
+			    if (item.NodeType == 'standby') {
+				    console.log('standby selected');
+			    }
+		    }
                     if (item.ID != $scope.currentMasterID) {
                         names += item.ID + "_";
                     }
@@ -474,8 +494,20 @@ var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $
 
         $scope.errorText = '';
 
+	if (poolCount > 1) {
+		$scope.alerts = [{ type: 'danger',
+			msg: 'only 1 pgpool is allowed in a cluster' }];
+		return;
+	} 
+	if (poolCount == 0) {
+		$scope.alerts = [{ type: 'danger',
+			msg: 'A pgpool is required in a cluster' }];
+		return;
+	}
+
         if (names == '') {
-            $scope.errorText = 'no containers are selected';
+		$scope.alerts = [{ type: 'danger',
+			msg: 'cluster needs at least 1 master and standby selected' }];
             return;
         }
 
@@ -484,10 +516,12 @@ var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $
         }
 
         if ($scope.currentMasterID == '' && $scope.value.Status != 'initialized') {
-            $scope.errorText = 'master is required to be selected cluster status is ' + $scope.value.Status;
+		$scope.alerts = [{ type: 'danger',
+			msg: 'master is required to be selected' }];
             console.log('no master defined');
         } else {
             console.log(names + ' current master=' + $scope.currentMasterID);
+
             $http.get($cookies.AdminURL + '/event/join-cluster/' + names + '.' + $scope.currentMasterID + '.' + $scope.currentCluster.ID + '.' + token).then(function(result) {
                 $scope.results = result;
                 console.log('success in join-cluster');
@@ -498,9 +532,12 @@ var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $
                     message: ""
                 });
             }, function(result) {
+		$scope.alerts = [{ type: 'danger',
+			msg: error.message }];
                 console.log('error:AddClusterContainerModal.http.get');
                 console.log(error.message);
             });
+
 
             $modalInstance.close();
         }
