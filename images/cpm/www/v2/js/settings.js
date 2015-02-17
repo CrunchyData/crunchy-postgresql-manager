@@ -95,6 +95,7 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
 
     this.selectTab4 = function(setTab) {
         console.log(' set tab to ' + setTab);
+	$scope.alerts = [];
         this.tab = setTab;
     };
     $scope.saveSettings = function() {
