@@ -24,8 +24,8 @@
 # $DB_USER pg user we are connecting with
 #
 
-export LD_LIBRARY_PATH=/usr/pgsql-9.3/lib
-export PATH=$PATH:/usr/pgsql-9.3/bin
+export LD_LIBRARY_PATH=/usr/pgsql-9.4/lib
+export PATH=$PATH:/usr/pgsql-9.4/bin
 
 #
 # start influx

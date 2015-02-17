@@ -17,7 +17,7 @@
 # start pg, will initdb if /pgdata is empty as a way to bootstrap
 #
 
-export LD_LIBRARY_PATH=/usr/pgsql-9.3/lib
+export LD_LIBRARY_PATH=/usr/pgsql-9.4/lib
 
 source /opt/cpm/bin/setenv.sh
 

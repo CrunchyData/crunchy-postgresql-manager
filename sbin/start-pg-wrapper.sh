@@ -22,7 +22,7 @@ source /opt/cpm/bin/setenv.sh
 chgrp postgres $CLUSTER_LOG
 chmod g+w $CLUSTER_LOG
 
-export LD_LIBRARY_PATH=/usr/pgsql-9.3/lib
+export LD_LIBRARY_PATH=/usr/pgsql-9.4/lib
 
 #
 # the normal startup of pg

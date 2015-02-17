@@ -18,11 +18,11 @@
 # script to update local server's CPM directory with new binaries and scripts
 #
 
-server=espresso.crunchy.lab
+server=dev.crunchy.lab
 ssh root@$server "systemctl stop cpmagent.service"
 
 
-	scp ./bin/*  \
+scp ./bin/* ./sbin/* \
 	./sql/loadtest.sql  \
 	root@$server:/opt/cpm/bin/
 

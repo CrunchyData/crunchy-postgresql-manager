@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-PGROOT=/usr/pgsql-9.3
+PGROOT=/usr/pgsql-9.4
 PGDATA=/pgdata
 PG_LOG=/tmp/pg.log
 CLUSTER_LOG=/tmp/cluster-admin.log

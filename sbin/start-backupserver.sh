@@ -27,8 +27,8 @@
 
 env > /tmp/envvars.out
 
-export LD_LIBRARY_PATH=/usr/pgsql-9.3/lib
-export PATH=$PATH:/usr/pgsql-9.3/bin
+export LD_LIBRARY_PATH=/usr/pgsql-9.4/lib
+export PATH=$PATH:/usr/pgsql-9.4/bin
 
 /opt/cpm/bin/backupserver -log_dir=/cpmlogs -logtostderr=false &
 
