@@ -58,6 +58,7 @@ func RunMonJob(args *MonRequest) error {
 	}
 
 	var value DBMetric
+	var values []DBMetric
 	x := 0
 	for x = range servers {
 		//get connection to server
@@ -102,18 +103,21 @@ func RunMonJob(args *MonRequest) error {
 			for i = range metrics {
 				if metrics[i].ScheduleName == args.Schedule.Name {
 					if metrics[i].MetricType == "database" {
-						value, err = collectContainerMetrics(metrics[i].Name, databaseConn)
-						glog.Infoln(metrics[i].Name + " value " + strconv.FormatFloat(value.Value, 'f', 3, 64))
-						//add value to influxdb here
-						series := &client.Series{
-							Name:    metrics[i].Name,
-							Columns: []string{"value", "database"},
-							Points: [][]interface{}{
-								{value.Value, nodes[y].Name},
-							},
-						}
-						if err = c.WriteSeries([]*client.Series{series}); err != nil {
-							glog.Errorln("error writing to influxdb " + err.Error())
+						values, err = collectContainerMetrics(metrics[i].Name, databaseConn)
+						j := 0
+						for j = range values {
+							glog.Infoln(metrics[i].Name + " value " + strconv.FormatFloat(values[j].Value, 'f', 3, 64))
+							//add value to influxdb here
+							series := &client.Series{
+								Name:    metrics[i].Name,
+								Columns: []string{"value", "container", "database"},
+								Points: [][]interface{}{
+									{values[j].Value, nodes[y].Name, values[j].Name},
+								},
+							}
+							if err = c.WriteSeries([]*client.Series{series}); err != nil {
+								glog.Errorln("error writing to influxdb " + err.Error())
+							}
 						}
 					} else if metrics[i].MetricType == "healthck" {
 						glog.Infoln("healthck metric database run on schedule " + args.Schedule.Name)
