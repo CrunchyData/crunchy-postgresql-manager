@@ -7,12 +7,6 @@ cpmApp.controller('containersController', function($scope, $rootScope, $cookies,
     //var param1 = $routeParams.param1;
 
     $scope.message = 'containers page.';
-    if ($cookies.AdminURL) {
-        $rootScope.isLoading = false;
-    } else {
-        alert('CPM AdminURL setting is NOT defined, please update on the Settings page before using CPM');
-    }
-
 });
 
 
@@ -77,7 +71,7 @@ var StopContainerModalInstanceCtrl = function($rootScope, $scope, $http, $modalI
         //$rootScope.$emit('LoadingEvent', { message: "" });
         $scope.isLoading = true;
 
-        var token = $cookieStore.get('cpmsession');
+        var token = $cookieStore.get('cpm_token');
         if (token === void 0) {
             console.log('cookie was undefined');
             alert('login required');
@@ -115,7 +109,7 @@ var StartContainerModalInstanceCtrl = function($rootScope, $scope,
 
         //$rootScope.$emit('LoadingEvent', { message: "" });
         $scope.isLoading = true;
-        var token = $cookieStore.get('cpmsession');
+        var token = $cookieStore.get('cpm_token');
         if (token === void 0) {
             console.log('cookie was undefined');
             alert('login required');
@@ -151,7 +145,7 @@ var CreateContainerModalInstanceCtrl = function($rootScope, $scope, $http, $moda
     $scope.standalone = 'false';
     $scope.isLoading = false;
 
-    var token = $cookieStore.get('cpmsession');
+    var token = $cookieStore.get('cpm_token');
     if (token === void 0) {
         console.log('cookie was undefined');
         alert('login required');
@@ -184,7 +178,7 @@ var CreateContainerModalInstanceCtrl = function($rootScope, $scope, $http, $moda
         $scope.isLoading = true;
         //$rootScope.$emit('LoadingEvent', { message: "" });
         //
-        var token = $cookieStore.get('cpmsession');
+        var token = $cookieStore.get('cpm_token');
         if (token === void 0) {
             console.log('cookie was undefined');
             alert('login required');
@@ -222,7 +216,7 @@ var DeleteContainerModalInstanceCtrl = function($rootScope, $scope, $http, $moda
     $scope.ok = function() {
         console.log('in DeleteContainerModalInstanceCtrl with value ' + value);
         $scope.isLoading = true;
-        var token = $cookieStore.get('cpmsession');
+        var token = $cookieStore.get('cpm_token');
         if (token === void 0) {
             console.log('cookie was undefined');
             alert('login required');
@@ -275,7 +269,7 @@ cpmApp.controller('GetAllContainersController', function($rootScope, $scope, $ht
     function postit() {
         console.log('in GetAllContainers postit');
 
-        var token = $cookieStore.get('cpmsession');
+        var token = $cookieStore.get('cpm_token');
         if (token === void 0) {
             console.log('cookie was undefined');
             alert('login required');
@@ -293,13 +287,13 @@ cpmApp.controller('GetAllContainersController', function($rootScope, $scope, $ht
 
     var init = function() {
         console.log('GetAllContainers init called');
-        var token = $cookieStore.get('cpmsession');
+        var token = $cookieStore.get('cpm_token');
         if (token === void 0) {
             console.log('cookie was undefined');
             alert('login required');
             return;
         }
-        $http.get($cookies.AdminURL + '/nodes/' + token).
+        $http.get($cookieStore.get('AdminURL') + '/nodes/' + token).
         success(function(data, status, headers, config) {
             $scope.results = data;
             console.log('containers has ' + $scope.results.length);
@@ -434,12 +428,7 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
     function postit(container) {
         $scope.currentContainer = container;
         console.log('in GetContainer postit with containerid=' + container.ID);
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
         $http.get($cookies.AdminURL + '/node/' + container.ID + "." + token).
         success(function(data, status, headers, config) {
             $scope.results = data;

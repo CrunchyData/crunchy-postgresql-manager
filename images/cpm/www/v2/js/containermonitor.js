@@ -52,15 +52,10 @@
         $scope.statdbresults = [];
         $scope.statreplresults = [];
         $scope.bgwriterresults = [];
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
         $scope.containerid = window.containerid;
-        $http.get($cookies.AdminURL + '/node/' + window.containerid + '.' + token).success(function(data, status, headers, config) {
+        $http.get($cookieStore.get('AdminURL') + '/node/' + window.containerid + '.' + token).success(function(data, status, headers, config) {
             $scope.container = data;
         }).error(function(data, status, headers, config) {
             alert('error in get container');
@@ -76,14 +71,9 @@
         $scope.handleRefresh = function() {
             $scope.isLoading = true;
             console.log('refresh pressed slider=' + $scope.slidervalue);
-            var token = $cookieStore.get('cpmsession');
-            if (token === void 0) {
-                console.log('cookie was undefined');
-                alert('login required');
-                return;
-            }
+            var token = $cookieStore.get('cpm_token');
 
-            var thing4 = $cookies.AdminURL + '/monitor/container-loadtest/' + $scope.containerid + '.loadtest.' + $scope.slidervalue + "." + token;
+            var thing4 = $cookieStore.get('AdminURL') + '/monitor/container-loadtest/' + $scope.containerid + '.loadtest.' + $scope.slidervalue + "." + token;
             $http.get(thing4).success(function(data, status, headers, config) {
                 console.log('got loadtest results');
                 console.log('now=' + data);
@@ -101,14 +91,9 @@
         $scope.handleRefresh = function() {
             console.log('working on repl');
 
-            var token = $cookieStore.get('cpmsession');
-            if (token === void 0) {
-                console.log('cookie was undefined');
-                alert('login required');
-                return;
-            }
+            var token = $cookieStore.get('cpm_token');
 
-            var thing2 = $cookies.AdminURL + '/monitor/container-getinfo/' + $scope.containerid + '.statreplication.' + token;
+            var thing2 = $cookieStore.get('AdminURL') + '/monitor/container-getinfo/' + $scope.containerid + '.statreplication.' + token;
             console.log('url=' + thing2);
             $http.get(thing2).success(function(data, status, headers, config) {
                 console.log('got statrepl results');
@@ -125,14 +110,9 @@
 
     app.controller('bgwriterController', function($rootScope, $scope, $route, $http, $cookies, $cookieStore) {
         $scope.handleRefresh = function() {
-            var token = $cookieStore.get('cpmsession');
-            if (token === void 0) {
-                console.log('cookie was undefined');
-                alert('login required');
-                return;
-            }
+            var token = $cookieStore.get('cpm_token');
             console.log('working on bgwriter');
-            var thing3 = $cookies.AdminURL + '/monitor/container-getinfo/' + $scope.containerid + '.bgwriter.' + token;
+            var thing3 = $cookieStore.get('AdminURL') + '/monitor/container-getinfo/' + $scope.containerid + '.bgwriter.' + token;
             console.log('url=' + thing3);
             $http.get(thing3).success(function(data, status, headers, config) {
                 console.log('got bgwriter results');
@@ -148,13 +128,8 @@
 
     app.controller('statsController', function($rootScope, $scope, $route, $http, $cookies, $cookieStore) {
         $scope.handleRefresh = function() {
-            var token = $cookieStore.get('cpmsession');
-            if (token === void 0) {
-                console.log('cookie was undefined');
-                alert('login required');
-                return;
-            }
-            var thing = $cookies.AdminURL + '/monitor/container-getinfo/' + $scope.containerid + '.statdatabase.' + token;
+            var token = $cookieStore.get('cpm_token');
+            var thing = $cookieStore.get('AdminURL') + '/monitor/container-getinfo/' + $scope.containerid + '.statdatabase.' + token;
             console.log('url=' + thing);
             $http.get(thing).success(function(data, status, headers, config) {
                 console.log('got statdb results');
@@ -182,11 +157,7 @@
 	$scope.refreshTime1w = '1w';
 
         $scope.pg1handleRefresh = function(interval) {
-            var token = $cookieStore.get('cpmsession');
-            if (token === void 0) {
-                alert('login required');
-                return;
-            }
+            var token = $cookieStore.get('cpm_token');
             console.log('graphing pg1 stats interval=' + interval);
             var query = 'http://cpm-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=';
             var query2 = 'select * from pg1 where database = \'' + $scope.container.Name + '\'  and time > now() - ' + interval + ' order asc limit 1000';
@@ -207,11 +178,7 @@
         $scope.pg1handleRefresh($scope.refreshTime8h);
 
         $scope.pg2handleRefresh = function(interval) {
-            var token = $cookieStore.get('cpmsession');
-            if (token === void 0) {
-                alert('login required');
-                return;
-            }
+            var token = $cookieStore.get('cpm_token');
             console.log('graphing pg2 with interval ' + interval);
             var query = 'http://cpm-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=';
             var query2 = 'select * from pg2 where database = \'' + $scope.container.Name + '\'  and time > now() - ' + interval + ' order asc limit 1000';

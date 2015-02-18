@@ -1,6 +1,7 @@
 <html ng-app="cpmApp">
 
 <head>
+  <meta charset="UTF-8"/>
   <!-- SCROLLS -->
   <link rel="stylesheet" href="css/bootstrap.min.css" />
   <link rel="stylesheet" href="css/style.css" />
@@ -39,8 +40,7 @@
       <li><a href="#clusters"><i class="fa fa-exchange"></i> Clusters</a></li>
       <!--li><a href="#tools"><i class="fa fa-wrench"></i> Tools</a></li -->
       <li><a href="#settings"><i class="fa fa-gear"></i> Settings</a></li>
-      <li ng-if="loginValue == ''"><a ng-click="doLogin()" href="#"><i class="fa fa-sign-in"></i> Login</a></li>
-      <li ng-if="loginValue != ''"><a ng-click="doLogout()" href="#"><i class="fa fa-sign-out"></i> Logout</a></li>
+      <li ng-if="cpm_user_id != ''"><a ng-click="doLogout()" href="#"><i class="fa fa-sign-out"></i> Logout</a></li>
     </ul>
   </div>
 </nav>
@@ -59,7 +59,7 @@
 
 <footer class="text-center">
   <p>Copyright 2014 <a href="http://crunchydatasolutions.com">Crunchy Data Solutions, Inc.</a></p>
-  <p>Logged in as {{loginValue}}</p>
+  <p ng-if="cpm_user_id != ''">Logged in as {{$root.cpm_user_id}}</p>
 </footer>
 
 </body>

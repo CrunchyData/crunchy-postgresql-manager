@@ -46,12 +46,7 @@ var csm = function($rootScope, $scope, $modalInstance, $http, $cookies, $cookieS
         console.log('cleaned IP=' + cleanIP);
         cleanPath = this.PGDataPath.replace(/\//g, "_");
 
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
         $http.get($cookies.AdminURL + '/addserver/' + ID + "." + this.Name + "." + cleanIP + "." + cleanBridgeIP + "." + cleanPath + "." + this.ServerClass + "." + token).success(function(data, status, headers, config) {
             $scope.results = data;
@@ -87,12 +82,7 @@ var UpdateServerModalInstanceCtrl = function($rootScope, $scope, $http, $modalIn
         console.log('cleaned IP=' + cleanIP);
         cleanPath = $scope.value.PGDataPath.replace(/\//g, "_");
 
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
         $http.get($cookies.AdminURL + '/addserver/' +
             $scope.value.ID + "." +
@@ -124,12 +114,7 @@ var DeleteServerModalInstanceCtrl = function($rootScope, $scope, $http, $modalIn
 
     $scope.ok = function() {
         console.log('in DeleteServerModalInstanceCtrl with ID ' + $scope.value.ID);
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
         $http.get($cookies.AdminURL + '/deleteserver/' + $scope.value.ID + "." + token).success(function(data, status, headers, config) {
             $scope.results = data;
@@ -200,14 +185,9 @@ cpmApp.controller('getAllServersController', function($rootScope, $scope, $http,
     });
 
     $rootScope.$on('changeServerPage2Target', function(event, args) {
-        if ($cookieStore.get('cpmsession') === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
-        console.log("cookiestore = [" + $cookieStore.get('cpmsession') + "]");
+        console.log("cookiestore = [" + $cookieStore.get('cpm_token') + "]");
         console.log('server was updated....here in getAllServers ' + args.message.Name);
-        $http.get($cookies.AdminURL + '/servers/' + $cookieStore.get('cpmsession')).
+        $http.get($cookies.AdminURL + '/servers/' + $cookieStore.get('cpm_token')).
         success(function(data, status, headers, config) {
             $scope.results = data;
         }).error(function(data, status, headers, config) {
@@ -229,12 +209,7 @@ cpmApp.controller('getAllServersController', function($rootScope, $scope, $http,
     });
 
     var postit = function() {
-        if ($cookieStore.get('cpmsession') === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
-        $http.get($cookies.AdminURL + '/servers/' + $cookieStore.get('cpmsession')).
+        $http.get($cookieStore.get('AdminURL') + '/servers/' + $cookieStore.get('cpm_token')).
         success(function(data, status, headers, config) {
             $scope.results = data;
             if (data.length > 0) {
@@ -314,12 +289,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
     }, true);
 
     function postit(serverid) {
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
         console.log('in GetServerController id=' + serverid);
         $http.get($cookies.AdminURL + '/server/' + serverid + "." + token).
         success(function(data, status, headers, config) {
@@ -344,12 +314,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
     $scope.stopContainers = function() {
         console.log('stopContainers called');
         var names = '';
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
         angular.forEach($scope.users, function(item) {
             if (angular.isDefined(item.ID)) {
                 if ($scope.checkboxes.items[item.ID]) {
@@ -384,12 +349,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
             message: ""
         });
         console.log('startContainers called');
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
         var names = '';
         angular.forEach($scope.users, function(item) {
             if (angular.isDefined(item.ID)) {

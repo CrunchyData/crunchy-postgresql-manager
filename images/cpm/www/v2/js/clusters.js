@@ -4,10 +4,6 @@ var cpmApp = angular.module('cpmApp.clusters', ['ngRoute', 'ngTable', 'ngCookies
 cpmApp.controller('clustersController', function($scope, $cookies) {
     console.log('hi from clusters controller');
     $scope.message = 'clusters page.';
-    if ($cookies.AdminURL) {} else {
-        alert('CPM AdminURL setting is NOT defined, please update on the Settings page before using CPM');
-    }
-
 });
 
 cpmApp.run(function($rootScope) {
@@ -40,15 +36,10 @@ cpmApp.run(function($rootScope) {
       $scope.results = [];
 
       $scope.ok = function() {
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
          console.log('in FailoverModalInstanceCtrl with container ' + value.Name + " ID=" + value.ID);
-        $http.get($cookies.AdminURL + '/admin/failover/' + $scope.value.ID + "." + token).success(function(data, status, headers, config) {
+        $http.get($cookieStore.get('AdminURL') + '/admin/failover/' + $scope.value.ID + "." + token).success(function(data, status, headers, config) {
             $scope.results = data;
          }).
          error(function(data, status, headers, config) {
@@ -81,14 +72,9 @@ var CreateClusterModalInstanceCtrl = function($rootScope, $scope, $http, $modalI
         console.log('in CreateClusterModalInstanceCtrl');
         console.log('    with Name =' + this.Name);
         console.log('    with ClusterType =' + this.ClusterType);
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
-        $http.post($cookies.AdminURL + '/cluster', {
+        $http.post($cookieStore.get('AdminURL') + '/cluster', {
             'Name': this.Name,
             'Status': 'uninitialized',
             'ClusterType': this.ClusterType,
@@ -127,14 +113,9 @@ var AutoClusterModalInstanceCtrl = function($rootScope, $scope, $http, $modalIns
         console.log('    with ClusterProfile =' + this.ClusterProfile);
 
         $scope.isLoading = true;
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
-        $http.post($cookies.AdminURL + '/autocluster', {
+        $http.post($cookieStore.get('AdminURL') + '/autocluster', {
             'Name': this.Name,
             'ClusterType': this.ClusterType,
             'ClusterProfile': this.ClusterProfile,
@@ -168,13 +149,8 @@ var DeleteClusterModalInstanceCtrl = function($rootScope, $scope, $http, $modalI
 
         //$rootScope.$emit('LoadingEvent', { message: "" });
         $scope.isLoading = true;
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
-        $http.get($cookies.AdminURL + '/cluster/delete/' + $scope.value.ID + "." + token).success(function(data, status, headers, config) {
+        var token = $cookieStore.get('cpm_token');
+        $http.get($cookieStore.get('AdminURL') + '/cluster/delete/' + $scope.value.ID + "." + token).success(function(data, status, headers, config) {
             $scope.results = data;
             $rootScope.$emit('deleteClusterEvent', {
                 message: ""
@@ -210,14 +186,9 @@ var ConfigureClusterModalInstanceCtrl = function($rootScope, $scope, $http, $mod
     $scope.ok = function() {
         $scope.isLoading = true;
         console.log('in ConfigureClusterModalInstanceCtrl with value ' + value);
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
-
-        $http.get($cookies.AdminURL + '/cluster/configure/' + $scope.value.ID + "." + token).success(function(data, status, headers, config) {
+        var token = $cookieStore.get('cpm_token');
+        
+		$http.get($cookieStore.get('AdminURL') + '/cluster/configure/' + $scope.value.ID + "." + token).success(function(data, status, headers, config) {
             $scope.results = data;
             $scope.isLoading = false;
             $modalInstance.close();
@@ -274,14 +245,9 @@ cpmApp.controller('GACController', function($rootScope, $scope, $http, $modal, $
 
 
     function postit() {
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
-        $http.get($cookies.AdminURL + '/clusters/' + token).
+        $http.get($cookieStore.get('AdminURL') + '/clusters/' + token).
         success(function(data, status, headers, config) {
             $scope.results = data;
         }).
@@ -291,13 +257,8 @@ cpmApp.controller('GACController', function($rootScope, $scope, $http, $modal, $
     };
 
     var init = function() {
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
-        $http.get($cookies.AdminURL + '/clusters/' + token).
+        var token = $cookieStore.get('cpm_token');
+        $http.get($cookieStore.get('AdminURL') + '/clusters/' + token).
         success(function(data, status, headers, config) {
             $scope.results = data;
             console.log('clusters has ' + $scope.results.length);
@@ -367,13 +328,8 @@ var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $
 
     //var containers = [];
 
-    var token = $cookieStore.get('cpmsession');
-    if (token === void 0) {
-        console.log('cookie was undefined');
-        alert('login required');
-        return;
-    }
-    $http.get($cookies.AdminURL + '/nodes/nocluster/' + token).
+    var token = $cookieStore.get('cpm_token');
+    $http.get($cookieStore.get('AdminURL') + '/nodes/nocluster/' + token).
     success(function(data, status, headers, config) {
         $scope.containers = data;
         console.log('got containers len=' + data.length);
@@ -391,13 +347,8 @@ var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $
     }, {
         total: 0, // length of data
         getData: function($defer, params) {
-            var token = $cookieStore.get('cpmsession');
-            if (token === void 0) {
-                console.log('cookie was undefined');
-                alert('login required');
-                return;
-            }
-            $http.get($cookies.AdminURL + '/nodes/nocluster/' + token).
+            var token = $cookieStore.get('cpm_token');
+            $http.get($cookieStore.get('AdminURL') + '/nodes/nocluster/' + token).
             success(function(data, status, headers, config) {
                 $scope.containers = data;
                 console.log('got containers len=' + data.length);
@@ -463,13 +414,7 @@ var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $
     $scope.OnSubmitClick = function() {
 
         var names = '';
-        var token = $cookieStore.get('cpmsession');
-
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
 	var poolCount=0;
 	var standbyCount=0;
@@ -522,7 +467,7 @@ var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $
         } else {
             console.log(names + ' current master=' + $scope.currentMasterID);
 
-            $http.get($cookies.AdminURL + '/event/join-cluster/' + names + '.' + $scope.currentMasterID + '.' + $scope.currentCluster.ID + '.' + token).then(function(result) {
+            $http.get($cookieStore.get('AdminURL') + '/event/join-cluster/' + names + '.' + $scope.currentMasterID + '.' + $scope.currentCluster.ID + '.' + token).then(function(result) {
                 $scope.results = result;
                 console.log('success in join-cluster');
                 $rootScope.$emit('updateClusterPage', {
@@ -615,13 +560,8 @@ cpmApp.controller('GetClusterController', function($rootScope, $scope, $http, $r
 
     function postit(clusterid) {
         console.log('in junkit id=' + clusterid);
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
-        $http.get($cookies.AdminURL + '/cluster/' + clusterid + "." + token).
+        var token = $cookieStore.get('cpm_token');
+        $http.get($cookieStore.get('AdminURL') + '/cluster/' + clusterid + "." + token).
         success(function(data, status, headers, config) {
             $scope.results = data;
             if (data.Status == 'initialized') {
@@ -684,13 +624,8 @@ cpmApp.controller('GetAllContainersForClusterController', function($rootScope, $
 
     function postit(v) {
         console.log('in GetAllContainersForCluster postit');
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
-        $http.get($cookies.AdminURL + '/clusternodes/' + v + "." + token).
+        var token = $cookieStore.get('cpm_token');
+        $http.get($cookieStore.get('AdminURL') + '/clusternodes/' + v + "." + token).
         success(function(data, status, headers, config) {
             $scope.results = data;
             //console.log('calling tableParams.reload');

@@ -205,14 +205,9 @@
 
     $scope.containerid = window.containerid;
 
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
-    $http.get($cookies.AdminURL + '/servers/' + token).
+    $http.get($cookieStore.get('AdminURL') + '/servers/' + token).
     success(function(data, status, headers, config) {
         $scope.servers = data;
         console.log('got servers len=' + data.length);
@@ -221,7 +216,7 @@
         console.log('error in fetch of servers');
     });
 
-     $http.get($cookies.AdminURL + '/node/' + window.containerid + '.' + token).success(function(data, status, headers, config) {
+     $http.get($cookieStore.get('AdminURL') + '/node/' + window.containerid + '.' + token).success(function(data, status, headers, config) {
 		$scope.currentContainer = data;
 	}).error(function(data, status, headers, config) {
 		alert('error in get container');
@@ -402,16 +397,11 @@
 
  	function postit(schedule) {
 		console.log('schedule posted is ' + schedule.Name);
-        	var token = $cookieStore.get('cpmsession');
-        	if (token === void 0) {
-            		console.log('cookie was undefined');
-            		alert('login required');
-            		return;
-        	}
+        	var token = $cookieStore.get('cpm_token');
 
 			clearSchedule();
 
-     		$http.get($cookies.AdminURL + '/backup/getschedule/' + schedule.ID + '.' + token).success(function(data, status, headers, config) {
+     		$http.get($cookieStore.get('AdminURL') + '/backup/getschedule/' + schedule.ID + '.' + token).success(function(data, status, headers, config) {
 			$scope.currentSchedule = data;
 			console.log('got schedule data ' + $scope.currentSchedule.Name);
 			updateScheduleOnScreen();
@@ -420,7 +410,7 @@
 		});
 
 		console.log('calling getallstatus with id=' + schedule.ID);
-		$http.get($cookies.AdminURL + '/backup/getallstatus/' + schedule.ID + "." + token).success(function(data2, status, headers, config) {
+		$http.get($cookieStore.get('AdminURL') + '/backup/getallstatus/' + schedule.ID + "." + token).success(function(data2, status, headers, config) {
                     	$scope.stats = data2;
             	}).error(function(data, status, headers, config) {
                     	console.log('error:GetContainer.postit.getallstatus');
@@ -561,16 +551,9 @@
     $scope.isLoading = false;
     $scope.containerid = window.containerid;
 
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
-
-
-     $http.get($cookies.AdminURL + '/node/' + window.containerid + '.' + token).success(function(data, status, headers, config) {
+     $http.get($cookieStore.get('AdminURL') + '/node/' + window.containerid + '.' + token).success(function(data, status, headers, config) {
 		$scope.currentContainer = data;
 	}).error(function(data, status, headers, config) {
 		alert('error in get container');
@@ -592,14 +575,9 @@
     function postit() {
         console.log('in GetAllContainers postit');
 
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
-        $http.get($cookies.AdminURL + '/backup/getschedules/' + window.containerid + "." + token).
+        $http.get($cookieStore.get('AdminURL') + '/backup/getschedules/' + window.containerid + "." + token).
         success(function(data, status, headers, config) {
             $scope.results = data;
         }).
@@ -610,13 +588,8 @@
 
     var init = function() {
         console.log('GetAllContainers init called');
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
-        $http.get($cookies.AdminURL + '/backup/getschedules/' + window.containerid + "." + token).
+        var token = $cookieStore.get('cpm_token');
+        $http.get($cookieStore.get('AdminURL') + '/backup/getschedules/' + window.containerid + "." + token).
         success(function(data, status, headers, config) {
             $scope.results = data;
             console.log('containers has ' + $scope.results.length);
@@ -648,7 +621,7 @@
         console.log('GetAllController deleteScheduleTarget received ');
         init();
     });
-    if ($cookies.AdminURL) {
+    if ($cookieStore.get('AdminURL')) {
         init();
     } else {
         alert('CPM AdminURL setting is NOT defined, please update on the Settings page before using CPM');
@@ -664,14 +637,9 @@ var CreateScheduleCtrl = function($rootScope, $scope, $http, $modalInstance, $co
 	$scope.value = value;
     $scope.isLoading = false;
 
-    var token = $cookieStore.get('cpmsession');
-    if (token === void 0) {
-        console.log('cookie was undefined');
-        alert('login required');
-        return;
-    }
+    var token = $cookieStore.get('cpm_token');
 
-    $http.get($cookies.AdminURL + '/servers/' + token).
+    $http.get($cookieStore.get('AdminURL') + '/servers/' + token).
     success(function(data, status, headers, config) {
         $scope.servers = data;
         console.log('got servers len=' + data.length);
@@ -686,7 +654,7 @@ var CreateScheduleCtrl = function($rootScope, $scope, $http, $modalInstance, $co
 
  	$scope.ok = function() {
 
-		$http.post($cookies.AdminURL + '/backup/addschedule', {
+		$http.post($cookieStore.get('AdminURL') + '/backup/addschedule', {
 		    'Token': token,
 		    'ServerID': this.myServer.ID,
 		    'ContainerName': $scope.value.Name,
@@ -715,20 +683,14 @@ var DeleteScheduleCtrl = function($rootScope, $scope, $http, $modalInstance, $co
 	$scope.value = value;
     $scope.isLoading = false;
 
-    var token = $cookieStore.get('cpmsession');
-    if (token === void 0) {
-        console.log('cookie was undefined');
-        alert('login required');
-        return;
-    }
-
+    var token = $cookieStore.get('cpm_token');
 
     $scope.cancel = function() {
         $modalInstance.close();
     };
 
  	$scope.ok = function() {
-    		$http.get($cookies.AdminURL + '/backup/deleteschedule/' + value.ID + "." + token).
+    		$http.get($cookieStore.get('AdminURL') + '/backup/deleteschedule/' + value.ID + "." + token).
     		success(function(data, status, headers, config) {
 	    		console.log('success in delete of schedule ' + value.ID);
 		    $rootScope.$emit('deleteScheduleEvent', {
@@ -755,14 +717,9 @@ var UpdateScheduleCtrl = function($rootScope, $scope, $http, $modalInstance, $co
 	$scope.value = value;
     $scope.isLoading = false;
 
-    var token = $cookieStore.get('cpmsession');
-    if (token === void 0) {
-        console.log('cookie was undefined');
-        alert('login required');
-        return;
-    }
+    var token = $cookieStore.get('cpm_token');
 
-    $http.get($cookies.AdminURL + '/servers/' + token).
+    $http.get($cookieStore.get('AdminURL') + '/servers/' + token).
     success(function(data, status, headers, config) {
         $scope.servers = data;
         console.log('got servers len=' + data.length);
@@ -799,7 +756,7 @@ var UpdateScheduleCtrl = function($rootScope, $scope, $http, $modalInstance, $co
 			xdow = '*';
 		}
 
-		$http.post($cookies.AdminURL + '/backup/updateschedule', {
+		$http.post($cookieStore.get('AdminURL') + '/backup/updateschedule', {
 		    'Token': token,
 		    'ID': $scope.value.ID,
 		    'ServerID': this.myServer.ID,
@@ -835,14 +792,9 @@ var BackupNowCtrl = function($rootScope, $scope, $http, $modalInstance, $cookies
     $scope.currentSchedule = value;
     $scope.isLoading = false;
 
-    var token = $cookieStore.get('cpmsession');
-    if (token === void 0) {
-        console.log('cookie was undefined');
-        alert('login required');
-        return;
-    }
+    var token = $cookieStore.get('cpm_token');
 
-    $http.get($cookies.AdminURL + '/servers/' + token).
+    $http.get($cookieStore.get('AdminURL') + '/servers/' + token).
     success(function(data, status, headers, config) {
         $scope.servers = data;
         console.log('got servers len=' + data.length);
@@ -857,7 +809,7 @@ var BackupNowCtrl = function($rootScope, $scope, $http, $modalInstance, $cookies
 
  	$scope.ok = function() {
 
-		$http.post($cookies.AdminURL + '/backup/now', {
+		$http.post($cookieStore.get('AdminURL') + '/backup/now', {
 		    'Token': token,
 		    'ServerID': this.myServer.ID,
 		    'ProfileName': $scope.ProfileName,

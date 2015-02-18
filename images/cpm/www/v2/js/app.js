@@ -1,5 +1,5 @@
 (function(){
-	  var app = angular.module('cpm', ['ui.bootstrap', 'ngRoute' ]);
+	var app = angular.module('cpm', ['ui.bootstrap', 'ngRoute' ]);
 
 	app.config(['$routeProvider',
 			  function($routeProvider) {
