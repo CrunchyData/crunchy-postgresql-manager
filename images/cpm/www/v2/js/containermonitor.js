@@ -168,8 +168,6 @@
     });
 
     app.controller('monitor1Controller', function($rootScope, $scope, $route, $http, $cookies, $cookieStore) {
-	    console.log('hi from monitor1Controller parent 1 is ' + window.containerid);
-	    console.log('hi from monitor1Controller parent 2 is ' + $scope.container.Name);
 
         var loaded = false;
         var pg2seriesData = [];
@@ -211,18 +209,10 @@
                 alert('login required');
                 return;
             }
-            console.log('graphing pg2 with interval ' + interval);
 	    var query = $cookies.AdminURL + '/mon/container/pg2/' + $scope.container.Name + '.' + interval + '.' + token;
-		console.log(query);
+		//console.log(query);
             $http.get(query).success(function(data, status, headers, config) {
                 //console.log('pg2 query results 1 ' + JSON.stringify(data[0]));
-                //console.log('pg2 query results color ' + data[0].Color);
-                //console.log('pg2 query results name ' + data[0].Name);
-                //console.log('pg2 query results data len ' + data[0].Data.length);
-                //console.log('pg2 query results name ' + data[0].name);
-                //console.log('pg2 query results data ' + data[0].data);
-                //console.log('pg2 query results ' + data[0].points);
-                //console.log('pg2 first point t=' + data[0].points[0][0] + " v=" + data[0].points[0][2]);
                     pg2loadSeries(data);
 		if (loaded == false) {
 			var pg2legend = new Rickshaw.Graph.Legend( {
@@ -241,34 +231,21 @@
 
         function pg2loadSeries(data) {
 		
-                //console.log('pg2 query results name ' + data[0].Name);
-                //console.log('pg2 query results data len ' + data[0].Data[0].points.length);
 		//remove all existing data
 		len = pg2seriesData.length;
 		for (i=0; i<len; i++) {
 			pg2seriesData.shift();
 		}
+	
+		var palette = new Rickshaw.Color.Palette( { scheme: 'colorwheel' } );
 
-		myColors = ['#c05020', '#30c020', '#6060c0', 'black'];
-		c = 0;
 		//add new data
                 angular.forEach(data, function(d) {
-			console.log('data=' + JSON.stringify(d.Data));
-                        //pg2seriesData.push( { color: d.Color, data: [{y:1424210217,x:12}], name: d.Name } );
-			//myData = [];
-			//for (k=0;k<d.Data.length; k++) {
-			//	myData.push( {x: d.Data[k].x, y: d.Data[k].x});
-			//}
-                        //pg2seriesData.push( { color: myColors[c], data: myData, name: d.Name } );
-                        pg2seriesData.push( { color: myColors[c], data: d.Data, name: d.Name } );
-			//total hack for selecting colors!
-			c++;
-			if (c > 3) {
-				c = 0;
-			}
+			//console.log('data=' + JSON.stringify(d.Data));
+                        pg2seriesData.push( { color: palette.color(), data: d.Data, name: d.Name } );
 
                 });
-                console.log('pg2seriesData  ' + JSON.stringify(pg2seriesData));
+                //console.log('pg2seriesData  ' + JSON.stringify(pg2seriesData));
 
 		//refresh graph
 		pg2graph.update();
