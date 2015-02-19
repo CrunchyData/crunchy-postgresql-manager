@@ -48,7 +48,7 @@ var csm = function($rootScope, $scope, $modalInstance, $http, $cookies, $cookieS
 
         var token = $cookieStore.get('cpm_token');
 
-        $http.get($cookies.AdminURL + '/addserver/' + ID + "." + this.Name + "." + cleanIP + "." + cleanBridgeIP + "." + cleanPath + "." + this.ServerClass + "." + token).success(function(data, status, headers, config) {
+        $http.get($cookieStore.get('AdminURL') + '/addserver/' + ID + "." + this.Name + "." + cleanIP + "." + cleanBridgeIP + "." + cleanPath + "." + this.ServerClass + "." + token).success(function(data, status, headers, config) {
             $scope.results = data;
             $rootScope.$emit('createServerEvent', {
                 message: $scope.results
@@ -84,7 +84,7 @@ var UpdateServerModalInstanceCtrl = function($rootScope, $scope, $http, $modalIn
 
         var token = $cookieStore.get('cpm_token');
 
-        $http.get($cookies.AdminURL + '/addserver/' +
+        $http.get($cookieStore.get('AdminURL') + '/addserver/' +
             $scope.value.ID + "." +
             $scope.value.Name + "." +
             cleanIP + "." +
@@ -116,7 +116,7 @@ var DeleteServerModalInstanceCtrl = function($rootScope, $scope, $http, $modalIn
         console.log('in DeleteServerModalInstanceCtrl with ID ' + $scope.value.ID);
         var token = $cookieStore.get('cpm_token');
 
-        $http.get($cookies.AdminURL + '/deleteserver/' + $scope.value.ID + "." + token).success(function(data, status, headers, config) {
+        $http.get($cookieStore.get('AdminURL') + '/deleteserver/' + $scope.value.ID + "." + token).success(function(data, status, headers, config) {
             $scope.results = data;
             $rootScope.$emit('deleteServerEvent', {
                 message: ""
@@ -159,7 +159,7 @@ cpmApp.controller('getAllServersController', function($rootScope, $scope, $http,
     console.log('getAllServersController');
     $scope.results = [];
 
-    if ($cookies.AdminURL) {} else {
+    if ($cookieStore.get('AdminURL')) {} else {
         alert('AdminURL setting is NOT defined, please update on the Settings page before using CPM');
     }
 
@@ -187,7 +187,7 @@ cpmApp.controller('getAllServersController', function($rootScope, $scope, $http,
     $rootScope.$on('changeServerPage2Target', function(event, args) {
         console.log("cookiestore = [" + $cookieStore.get('cpm_token') + "]");
         console.log('server was updated....here in getAllServers ' + args.message.Name);
-        $http.get($cookies.AdminURL + '/servers/' + $cookieStore.get('cpm_token')).
+        $http.get($cookieStore.get('AdminURL') + '/servers/' + $cookieStore.get('cpm_token')).
         success(function(data, status, headers, config) {
             $scope.results = data;
         }).error(function(data, status, headers, config) {
@@ -291,7 +291,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
     function postit(serverid) {
         var token = $cookieStore.get('cpm_token');
         console.log('in GetServerController id=' + serverid);
-        $http.get($cookies.AdminURL + '/server/' + serverid + "." + token).
+        $http.get($cookieStore.get('AdminURL') + '/server/' + serverid + "." + token).
         success(function(data, status, headers, config) {
             $scope.results = data;
             $rootScope.$broadcast('CurrentServer', data);
@@ -300,7 +300,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
             console.log('error GetServerController http.get');
         });
 
-        $http.get($cookies.AdminURL + '/nodes/forserver/' + serverid + "." + token).
+        $http.get($cookieStore.get('AdminURL') + '/nodes/forserver/' + serverid + "." + token).
         success(function(data, status, headers, config) {
             $scope.containers = data;
             $scope.tableParams.reload();
@@ -322,7 +322,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
                     $rootScope.$emit('LoadingEvent', {
                         message: ""
                     });
-                    $http.get($cookies.AdminURL + '/admin/stop/' + item.ID + '.' + token).success(function(data, status, headers, config) {
+                    $http.get($cookieStore.get('AdminURL') + '/admin/stop/' + item.ID + '.' + token).success(function(data, status, headers, config) {
                         console.log('stop container success id=' + item.ID);
                         for (index = 0; index < $scope.containers.length; index++) {
                             if ($scope.containers[index].ID == item.ID) {
@@ -355,7 +355,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
             if (angular.isDefined(item.ID)) {
                 if ($scope.checkboxes.items[item.ID]) {
                     names += ' ' + item.ID;
-                    $http.get($cookies.AdminURL + '/admin/start/' + item.ID + '.' + token).success(function(data, status, headers, config) {
+                    $http.get($cookieStore.get('AdminURL') + '/admin/start/' + item.ID + '.' + token).success(function(data, status, headers, config) {
                         console.log('start container success id=' + item.ID);
                         for (index = 0; index < $scope.containers.length; index++) {
                             if ($scope.containers[index].ID == item.ID) {
