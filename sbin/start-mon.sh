@@ -24,8 +24,7 @@
 # $DB_USER pg user we are connecting with
 #
 
-export LD_LIBRARY_PATH=/usr/pgsql-9.4/lib
-export PATH=$PATH:/usr/pgsql-9.4/bin
+source /opt/cpm/bin/setenv.sh
 
 #
 # start influx
@@ -34,9 +33,9 @@ export PATH=$PATH:/usr/pgsql-9.4/bin
 
 sleep 2
 
-/opt/cpm/bin/monserver -log_dir=/cpmlogs  -logtostderr=false  &
+monserver -log_dir=/cpmlogs  -logtostderr=false  &
 
 #
 # block with the dummy server, allows for hot swapping the backupserver# when needed
 
-/opt/cpm/bin/dummyserver > /tmp/dummy.log 
+dummyserver > /tmp/dummy.log 
