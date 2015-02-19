@@ -57,6 +57,13 @@ func RunMonJob(args *MonRequest) error {
 		return err
 	}
 
+	var domain string
+	domain, err = admindb.GetDomain()
+	if err != nil {
+		glog.Errorln("error: RunMonJob " + err.Error())
+		return err
+	}
+
 	var value DBMetric
 	var values []DBMetric
 	x := 0
@@ -95,8 +102,7 @@ func RunMonJob(args *MonRequest) error {
 		glog.Infoln("collecting for node " + nodes[y].Name)
 		var databaseConn *sql.DB
 
-		//TODO get domain
-		databaseConn, err = util.GetMonitoringConnection(nodes[y].Name+".crunchy.lab", "postgres", "5432", "postgres")
+		databaseConn, err = util.GetMonitoringConnection(nodes[y].Name+"."+domain, "postgres", "5432", "postgres")
 		if err != nil {
 			glog.Errorln("error in getting connection to " + nodes[y].Name)
 		} else {

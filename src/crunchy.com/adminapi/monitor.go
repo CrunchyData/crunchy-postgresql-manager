@@ -73,8 +73,16 @@ func GetServerMetrics(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	var domain string
+	domain, err = admindb.GetDomain()
+	if err != nil {
+		glog.Errorln("GetServerCPUMetrics: " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+	}
+
 	c, err := client.NewClient(&client.ClientConfig{
-		Host:     "cpm-mon.crunchy.lab:8086",
+		Host:     "cpm-mon" + "." + domain + ":8086",
 		Username: "root",
 		Password: "root",
 		Database: "cpm",
@@ -123,8 +131,12 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	//get domain name
+	var domain string
+	domain, err = admindb.GetDomain()
+
 	c, err := client.NewClient(&client.ClientConfig{
-		Host:     "cpm-mon.crunchy.lab:8086",
+		Host:     "cpm-mon." + domain + ":8086",
 		Username: "root",
 		Password: "root",
 		Database: "cpm",
@@ -136,12 +148,9 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	//get domain name
-	var domain = ".crunchy.lab"
-
 	//get list of databases on node
 	var databaseConn *sql.DB
-	databaseConn, err = util.GetMonitoringConnection(Name+domain, "postgres", "5432", "postgres")
+	databaseConn, err = util.GetMonitoringConnection(Name+"."+domain, "postgres", "5432", "postgres")
 	defer databaseConn.Close()
 
 	var databases []string

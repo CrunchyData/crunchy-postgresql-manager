@@ -22,6 +22,7 @@ import (
 	_ "github.com/lib/pq"
 	"log"
 	"strconv"
+	"strings"
 )
 
 type DBSetting struct {
@@ -667,4 +668,16 @@ func GetAllDBSettingsMap() (map[string]string, error) {
 
 func Test() {
 	glog.Info("hi from Test")
+}
+
+func GetDomain() (string, error) {
+	tmp, err := GetDBSetting("DOMAIN-NAME")
+
+	if err != nil {
+		return "", err
+	}
+	//we trim off any leading . characters
+	domain := strings.Trim(tmp.Value, ".")
+
+	return domain, nil
 }

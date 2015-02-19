@@ -16,6 +16,7 @@
 package main
 
 import (
+	"crunchy.com/admindb"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/golang/glog"
 	"github.com/influxdb/influxdb/client"
@@ -31,10 +32,11 @@ func GetHC1(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	//TODO get domain
+	var domain string
+	domain, err = admindb.GetDomain()
 
 	c, err := client.NewClient(&client.ClientConfig{
-		Host:     "cpm-mon.crunchy.lab:8086",
+		Host:     "cpm-mon." + domain + ":8086",
 		Username: "root",
 		Password: "root",
 		Database: "cpm",
