@@ -951,3 +951,97 @@ curl http://cpm-admin.crunchy.lab:8080/sec/login/cpm.cpm
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+###GET /mon/server/:Metric.:ServerID.:Interval.:Token
+
+GetServerMetrics
+
+###Example
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl http://cpm-admin.crunchy.lab:8080/mon/server/cpu.1.1w.18c0bb2a-2fa2-422e-a583-9df68948802f
+[
+  {
+    "name": "cpu",
+    "columns": [
+      "time",
+      "sequence_number",
+      "server",
+      "value"
+    ],
+    "points": [
+      [
+        1.424206259245e+12,
+        150001,
+        "espresso",
+        0.21
+      ],
+      [
+        1.424206559231e+12,
+        340001,
+        "espresso",
+        1.21
+      ],
+
+     ]
+  }
+]
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###GET /mon/container/pg2/:Name.:Interval.:Token
+
+GetPG2 - container database sizes
+
+###Example
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl http://cpm-admin.crunchy.lab:8080/mon/container/pg2/pga.1w.a1459da5-8db1-48ac-b1f0-3bb3427f96e2
+[
+ {
+    "Color": "#c05020",
+    "Data": [
+      {
+        "name": "pg2",
+        "columns": [
+          "time",
+          "sequence_number",
+          "database",
+          "value"
+        ],
+        "points": [
+
+          [
+            1.424221017122e+12,
+            9.080001e+06,
+            "cpmtest",
+            9
+          ]
+        ]
+      }
+    ],
+    "Name": "cpmtest"
+  },
+ {
+    "Color": "#c05020",
+    "Data": [
+      {
+        "name": "pg2",
+        "columns": [
+          "time",
+          "sequence_number",
+          "database",
+          "value"
+        ],
+        "points": [
+
+          [
+            1.424221017122e+12,
+            9.080001e+06,
+            "postgres",
+            9
+          ]
+        ]
+      }
+    ],
+    "Name": "postgres"
+  }
+]
+~~~~~~~~~~~~~~~~~~~~~~~~

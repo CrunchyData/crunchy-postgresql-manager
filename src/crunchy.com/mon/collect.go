@@ -102,7 +102,7 @@ func pg1(databaseConn *sql.DB) ([]DBMetric, error) {
 func pg2(databaseConn *sql.DB) ([]DBMetric, error) {
 	values := []DBMetric{}
 
-	thisTime := time.Now()
+	//thisTime := time.Now()
 	var intValue int
 	var databaseName string
 
@@ -119,7 +119,8 @@ func pg2(databaseConn *sql.DB) ([]DBMetric, error) {
 			return nil, err
 		}
 		m.Name = databaseName
-		m.Timestamp = thisTime
+		//m.Timestamp = thisTime
+		m.Timestamp = time.Now()
 		m.MetricType = "pg2"
 		m.Value = float64(intValue)
 		values = append(values, m)
