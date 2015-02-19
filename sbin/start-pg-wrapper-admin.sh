@@ -17,10 +17,7 @@
 # start pg, will initdb if /pgdata is empty as a way to bootstrap
 #
 
-export LD_LIBRARY_PATH=/usr/pgsql-9.4/lib
-
 source /opt/cpm/bin/setenv.sh
-
 
 #
 # the initial start of postgres will create the clusteradmin database
@@ -28,13 +25,15 @@ source /opt/cpm/bin/setenv.sh
 if [ ! -f /pgdata/postgresql.conf ]; then
         echo "pgdata is empty"
         initdb -D /pgdata  > /tmp/initdb.log &> /tmp/initdb.err
+	echo "setting domain to " $THISDOMAIN >> /tmp/start-db.log
+	sed -i "s/crunchy.lab/$THISDOMAIN/g" /opt/cpm/conf/admin/pg_hba.conf
 	cp /opt/cpm/conf/admin/pg_hba.conf /pgdata/
 	cp /opt/cpm/conf/admin/postgresql.conf /pgdata/
-	echo "starting db" > /tmp/start-db.log
+	echo "starting db" >> /tmp/start-db.log
 
         pg_ctl -D /pgdata start 
         sleep 3
-	echo "building clusteradmin db" > /tmp/start-db.log
+	echo "building clusteradmin db" >> /tmp/start-db.log
         psql -U postgres < /opt/cpm/bin/setup.sql
         exit
 fi

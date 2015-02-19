@@ -36,6 +36,7 @@ sudo mkdir -p $DBDIR
 sudo chown postgres:postgres $DBDIR
 sudo chcon -Rt svirt_sandbox_file_t $DBDIR
 docker run -e DB_HOST=127.0.0.1 \
+	-e DOMAIN=crunchy.lab \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cpm-admin -d -v $LOGDIR:/cpmlogs -v $DBDIR:/pgdata cpm-admin
 

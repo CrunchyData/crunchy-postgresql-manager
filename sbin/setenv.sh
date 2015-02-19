@@ -13,18 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-PGROOT=/usr/pgsql-9.4
-PGDATA=/pgdata
-PG_LOG=/tmp/pg.log
-CLUSTER_LOG=/tmp/cluster-admin.log
-PATH=/opt/cpm/bin:$PGROOT/bin:$PATH
-LD_LIBRARY_PATH=$PGROOT/lib
-DOMAIN=crunchy.lab
+export PGROOT=/usr/pgsql-9.4
+export PGDATA=/pgdata
+export PG_LOG=/tmp/pg.log
+export CLUSTER_LOG=/tmp/cluster-admin.log
+export PATH=/opt/cpm/bin:$PGROOT/bin:$PATH
+export LD_LIBRARY_PATH=$PGROOT/lib
 
 hostip() {
 	grep `hostname` /etc/hosts | cut -f 1
 }
 
-PG_HOST_IP=`hostip`
-DOMAIN=crunchy.lab
+export PG_HOST_IP=`hostip`
 

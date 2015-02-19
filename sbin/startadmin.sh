@@ -17,6 +17,7 @@
 # start up the adminapi agent
 #
 
+export THISDOMAIN=$DOMAIN
 env > /tmp/envvars.out
 
 source /opt/cpm/bin/setenv.sh
