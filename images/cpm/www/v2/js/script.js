@@ -136,43 +136,31 @@ function convertUTCDateToLocalDate(date) {
             }
 
             console.log('getStatus called ');
-            var queryroot = 'http://cpm-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=';
-            var query1 = 'select seconds, service, servicetype, status from hc1 limit 1';
-	    console.log(queryroot + query1);
+	    var query = $cookies.AdminURL + '/mon/hc1/' + token;
 
-            $http.get(queryroot + query1).
+            $http.get(query).
             success(function(data, status, headers, config) {
-                console.log('hc1 first row results ' + data[0].points[0]);
-                console.log('hc1 first row ts ' + data[0].points[0][2]);
-		firstRow = data;
-            	query2 = 'select seconds, service, servicetype, status from hc1 where seconds = ' + data[0].points[0][2];
-		console.log(queryroot + query2);
-
-            	$http.get(queryroot + query2).
-            	success(function(data, status, headers, config) {
-                	console.log('hc1 full results ' + data[0].points);
-			$scope.hc = data[0].points;
-			var date = new Date(null);
-			date.setSeconds(data[0].points[0][2]);
-			//$scope.hcts = date.toISOString();
-			$scope.hcts = convertUTCDateToLocalDate(date).toUTCString();
-			//overlay for tooltip hover	
-			for (i = 0; i < $scope.hc.length; i++) {
-				$scope.hc[i][2] = 'database down';
-				$scope.hc[i][4] = 'Database -' + $scope.hc[i][3];
-			}
+                console.log('hc1: first row results ' + data[0].points[0]);
+                console.log('hc1: first row ts ' + data[0].points[0][2]);
+		console.log('hc1: full results ' + data[0].points);
+		$scope.hc = data[0].points;
+		var date = new Date(null);
+		date.setSeconds(data[0].points[0][2]);
+		//$scope.hcts = date.toISOString();
+		$scope.hcts = convertUTCDateToLocalDate(date).toUTCString();
+		//overlay for tooltip hover	
+		for (i = 0; i < $scope.hc.length; i++) {
+			$scope.hc[i][2] = 'database down';
+			$scope.hc[i][4] = 'Database -' + $scope.hc[i][3];
+		}
 			
-            	}).error(function(data, status, headers, config) {
-                	alert('error 1');
-            	});
-
             }).error(function(data, status, headers, config) {
+		    console.log(data);
                 alert('error 2');
             });
 
         };
 
-	//$scope.getStatus();
 });
 
 var LoginController = function($http, $scope, $cookies, $cookieStore, $modalInstance, value) {

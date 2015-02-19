@@ -94,6 +94,8 @@ func RunMonJob(args *MonRequest) error {
 		//get connection to database
 		glog.Infoln("collecting for node " + nodes[y].Name)
 		var databaseConn *sql.DB
+
+		//TODO get domain
 		databaseConn, err = util.GetMonitoringConnection(nodes[y].Name+".crunchy.lab", "postgres", "5432", "postgres")
 		if err != nil {
 			glog.Errorln("error in getting connection to " + nodes[y].Name)
@@ -121,19 +123,8 @@ func RunMonJob(args *MonRequest) error {
 						}
 					} else if metrics[i].MetricType == "healthck" {
 						glog.Infoln("healthck metric database run on schedule " + args.Schedule.Name)
-						err = hc1(databaseConn)
-						if err != nil {
-							series := &client.Series{
-								Name:    "hc1",
-								Columns: []string{"seconds", "service", "servicetype", "status"},
-								Points: [][]interface{}{
-									{scheduleTS, nodes[y].Name, "db", "down"},
-								},
-							}
-							if err = c.WriteSeries([]*client.Series{series}); err != nil {
-								glog.Errorln("error writing to influxdb " + err.Error())
-							}
-						}
+						//hc1 - database down condition
+						hc1(scheduleTS, nodes[y].Name, databaseConn, c)
 					}
 				}
 			}

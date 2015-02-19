@@ -1045,3 +1045,59 @@ curl http://cpm-admin.crunchy.lab:8080/mon/container/pg2/pga.1w.a1459da5-8db1-48
   }
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+###GET /mon/hc1/:Token
+
+GetHC1 - health check 1 - databases down
+
+###Example
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl http://cpm-admin.crunchy.lab:8080/mon/h1/24c715ca-2468-4450-8fee-6e2a9f7714dc
+[
+  {
+    "name": "hc1",
+    "columns": [
+      "time",
+      "sequence_number",
+      "seconds",
+      "service",
+      "servicetype",
+      "status"
+    ],
+    "points": [
+      [
+        1.424353939047e+12,
+        1.2470001e+07,
+        1.42435393e+09,
+        "pga",
+        "db",
+        "down"
+      ],
+      [
+        1.424353936039e+12,
+        1.2440001e+07,
+        1.42435393e+09,
+        "ac-standby-0",
+        "db",
+        "down"
+      ],
+      [
+        1.424353933032e+12,
+        1.2430001e+07,
+        1.42435393e+09,
+        "ac-pgpool",
+        "db",
+        "down"
+      ],
+      [
+        1.424353930021e+12,
+        1.2380001e+07,
+        1.42435393e+09,
+        "ac-master",
+        "db",
+        "down"
+      ]
+    ]
+  }
+]
+~~~~~~~~~~~~~~~~~~~~~~~~

@@ -150,6 +150,7 @@ func main() {
 		&rest.Route{"GET", "/backup/nodes/:Token", GetBackupNodes},
 		&rest.Route{"GET", "/mon/server/:Metric.:ServerID.:Interval.:Token", GetServerMetrics},
 		&rest.Route{"GET", "/mon/container/pg2/:Name.:Interval.:Token", GetPG2},
+		&rest.Route{"GET", "/mon/hc1/:Token", GetHC1},
 	)
 	if err != nil {
 		log.Fatal(err)

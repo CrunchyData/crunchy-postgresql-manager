@@ -20,6 +20,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/golang/glog"
+	"github.com/myinfluxdb/client"
 	"strconv"
 	"strings"
 	"time"
@@ -183,10 +184,25 @@ func mem(server string) (DBMetric, error) {
 	return values, err
 }
 
-func hc1(databaseConn *sql.DB) error {
+func hc1(scheduleTS int64, nodeName string, databaseConn *sql.DB, c *client.Client) {
 	var err error
 	var strValue string
 
 	err = databaseConn.QueryRow(fmt.Sprintf("select now()::text")).Scan(&strValue)
-	return err
+	if err != nil {
+		glog.Errorln(err.Error())
+		//hc1 - database down condition
+		series := &client.Series{
+			Name:    "hc1",
+			Columns: []string{"seconds", "service", "servicetype", "status"},
+			Points: [][]interface{}{
+				{scheduleTS, nodeName, "db", "down"},
+			},
+		}
+		if err = c.WriteSeries([]*client.Series{series}); err != nil {
+			glog.Errorln("hc1 error writing to influxdb " + err.Error())
+		}
+
+	}
+
 }

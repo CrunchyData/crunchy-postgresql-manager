@@ -3,10 +3,18 @@
 		  <h2>Container - {{container.Name}}</h2>
                         <div id="pg2_container">
                                 <div><h3>Database Size (MB)</h3></div>
+				<table>
+					<tr>
+						<td>
                                 <div id="pg2chart"></div>
+						</td>
+						<td>
                                 <div id="pg2legend_container">
 					<div id="smoother" title="Smoothing"></div>
-                                <div id="pg2legend"></div>
+                                	<div id="pg2legend"></div>
+						</td>
+					</tr>
+				</table>
 				</div>
                                 <div>
                                         <a class="btn btn-primary" ng-click="pg2handleRefresh(refreshTime8h)" ><i class="fa fa-refresh fa-lg"></i>8 hr</a></td>
