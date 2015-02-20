@@ -24,24 +24,20 @@
         $scope.server = [];
         $scope.dfresults = [];
         $scope.iostatresults = [];
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
 	$scope.currentUser = [];
 	$scope.currentUser = $cookieStore.get('cpmuser');
 	console.log('currentUser is ' + $scope.currentUser);
 
-        $http.get($cookies.AdminURL + '/server/' + window.serverid + '.' + token).success(function(data, status, headers, config) {
+        $http.get($cookieStore.get('AdminURL') + '/server/' + window.serverid + '.' + token).success(function(data, status, headers, config) {
             $scope.server = data;
         }).error(function(data, status, headers, config) {
             alert('error in get server');
         });
 
         console.log('working on iostat');
-        $http.get($cookies.AdminURL + '/monitor/server-getinfo/' + serverid + ".cpmiostat." + token).
+        $http.get($cookieStore.get('AdminURL') + '/monitor/server-getinfo/' + serverid + ".cpmiostat." + token).
         success(function(data, status, headers, config) {
             $scope.iostatresults = data.iostat;
             console.log('getinfo results set ' + data);
@@ -56,13 +52,9 @@
 
 
         $scope.handleRefresh = function() {
-            var token = $cookieStore.get('cpmsession');
-            if (token === void 0) {
-                alert('login required');
-                return;
-            }
+            var token = $cookieStore.get('cpm_token');
             console.log('working on iostat');
-            $http.get($cookies.AdminURL + '/monitor/server-getinfo/' + serverid + ".cpmiostat." + token).
+            $http.get($cookieStore.get('AdminURL') + '/monitor/server-getinfo/' + serverid + ".cpmiostat." + token).
             success(function(data, status, headers, config) {
                 $scope.iostatresults = data.iostat;
                 console.log('getinfo results set ' + data);
@@ -79,14 +71,10 @@
 
 
         $scope.handleRefresh = function() {
-            var token = $cookieStore.get('cpmsession');
-            if (token === void 0) {
-                alert('login required');
-                return;
-            }
+            var token = $cookieStore.get('cpm_token');
             console.log('working on df');
             console.log('calling getinfo service');
-            $http.get($cookies.AdminURL + '/monitor/server-getinfo/' + serverid + ".cpmdf." + token).
+            $http.get($cookieStore.get('AdminURL') + '/monitor/server-getinfo/' + serverid + ".cpmdf." + token).
             success(function(data, status, headers, config) {
                 $scope.dfresults = data.df;
                 console.log('getinfo results set ' + data.df);
@@ -171,11 +159,7 @@
 	}
 
         $scope.handleRefresh = function(interval) {
-            var token = $cookieStore.get('cpmsession');
-            if (token === void 0) {
-                alert('login required');
-                return;
-            }
+            var token = $cookieStore.get('cpm_token');
             console.log('graphing cpu interval= ' + interval);
 
             $http.get($cookies.AdminURL + '/mon/server/' + 'cpu' + '.' + $scope.server.ID + '.' + interval + '.' + token).
@@ -218,12 +202,7 @@
 	memyAxis.render();
 
         $scope.memhandleRefresh = function(interval) {
-            var token = $cookieStore.get('cpmsession');
-            if (token === void 0) {
-                alert('login required');
-                return;
-            }
-
+            var token = $cookieStore.get('cpm_token');
             $http.get($cookies.AdminURL + '/mon/server/' + 'mem' + '.' + $scope.server.ID + '.' + interval + '.' + token).
             success(function(data, status, headers, config) {
 		memloadSeries(data[0].points);

@@ -12,13 +12,13 @@ cpmApp.run(function($rootScope) {
 
 cpmApp.controller('settingsController', function($rootScope, $scope, $http, $cookies, $modal, $cookieStore) {
     $scope.AdminURL = 'http://cpm-admin.crunchy.lab:8080';
-    if ($cookies.AdminURL) {} else {
+    if ($cookieStore.get('AdminURL')) {} else {
         alert('AdminURL setting is NOT defined, please update before using CPM');
     }
 
     $scope.alerts = [];
     $scope.items = ['item1', 'item2'];
-    $scope.AdminURL = $cookies.AdminURL;
+    $scope.AdminURL = $cookieStore.get('AdminURL');
     $scope.DockerRegistry = 'registry:5000';
     $scope.PGPort = '5432';
     $scope.DomainName = 'crunchy.lab';
@@ -100,16 +100,9 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
     };
     $scope.saveSettings = function() {
         console.log(' save settings called');
-        console.log(' setting AdminURL cookie to ' + this.AdminURL);
-        $cookies.AdminURL = this.AdminURL;
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
-        $http.post($scope.AdminURL + '/savesettings', {
+        $http.post($cookieStore.get('AdminURL') + '/savesettings', {
             'DockerRegistry': this.DockerRegistry,
             'PGPort': this.PGPort,
             'DomainName': this.DomainName,
@@ -131,14 +124,9 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
     $scope.saveProfiles = function() {
         console.log(' save Profiles called');
 
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
-        $http.post($cookies.AdminURL + '/saveprofiles', {
+        $http.post($cookieStore.get('AdminURL') + '/saveprofiles', {
             'SmallCPU': this.smallCPU,
             'SmallMEM': this.smallMEM,
             'MediumCPU': this.mediumCPU,
@@ -176,14 +164,9 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
 
     $scope.getUsers = function() {
         console.log(' get users ');
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
-        $http.get($cookies.AdminURL + '/sec/getusers/' + token).
+        $http.get($cookieStore.get('AdminURL') + '/sec/getusers/' + token).
         success(function(data, status, headers, config) {
             //console.log('recv users len=' + data.length);
             $scope.users = data;
@@ -199,14 +182,9 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
 
     $scope.getRoles = function() {
         console.log(' get roles ');
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
-        $http.get($cookies.AdminURL + '/sec/getroles/' + token).
+        $http.get($cookieStore.get('AdminURL') + '/sec/getroles/' + token).
         success(function(data, status, headers, config) {
             //console.log('recv roles len=' + data.length);
             $scope.roles = data;
@@ -223,16 +201,11 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
         console.log(' save role ');
         console.log(' role is ' + $scope.roles[$scope.roleIndex].Name);
         console.log($scope.roles[$scope.roleIndex]);
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
         $scope.roles[$scope.roleIndex].Token = token;
 
-        $http.post($cookies.AdminURL + '/sec/updaterole',
+        $http.post($cookieStore.get('AdminURL') + '/sec/updaterole',
             $scope.roles[$scope.roleIndex]
         ).success(function(data, status, headers, config) {
             //console.log('recv users len=' + data.length);
@@ -255,16 +228,11 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
         console.log(' user is ' + $scope.users[$scope.userIndex].Name);
         console.log($scope.users[$scope.userIndex]);
 
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
         $scope.users[$scope.userIndex].Token = token;
 
-        $http.post($cookies.AdminURL + '/sec/updateuser',
+        $http.post($cookieStore.get('AdminURL') + '/sec/updateuser',
             $scope.users[$scope.userIndex]
         ).success(function(data, status, headers, config) {
             //console.log('recv users len=' + data.length);
@@ -314,14 +282,9 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
     $scope.getSettings = function() {
         console.log(' get settings ');
 
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
-        $http.get($cookies.AdminURL + '/settings/' + token).
+        $http.get($cookieStore.get('AdminURL') + '/settings/' + token).
         success(function(data, status, headers, config) {
             console.log('recv settings len=' + data.length);
             $scope.settings = data;
@@ -431,13 +394,8 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
 
     $scope.saveSmallClusterProfiles = function() {
         console.log(' save SmallClusterProfiles called');
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
-        $http.post($cookies.AdminURL + '/saveclusterprofiles', {
+        var token = $cookieStore.get('cpm_token');
+        $http.post($cookieStore.get('AdminURL') + '/saveclusterprofiles', {
             'Size': 'SM',
             'Count': this.CPsmCount,
             'Algo': this.CPsmAlgo,
@@ -463,13 +421,8 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
     };
     $scope.saveMediumClusterProfiles = function() {
         console.log(' save MediumClusterProfiles called');
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
-        $http.post($cookies.AdminURL + '/saveclusterprofiles', {
+        var token = $cookieStore.get('cpm_token');
+        $http.post($cookieStore.get('AdminURL') + '/saveclusterprofiles', {
             'Size': 'MED',
             'Count': this.CPmedCount,
             'Algo': this.CPmedAlgo,
@@ -495,13 +448,8 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
     };
     $scope.saveLargeClusterProfiles = function() {
         console.log(' save LargeClusterProfiles called');
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
-        $http.post($cookies.AdminURL + '/saveclusterprofiles', {
+        var token = $cookieStore.get('cpm_token');
+        $http.post($cookieStore.get('AdminURL') + '/saveclusterprofiles', {
             'Size': 'LG',
             'Count': this.CPlgCount,
             'Algo': this.CPlgAlgo,
@@ -605,14 +553,9 @@ var AddUserController = function($rootScope, $scope, $cookies, $cookieStore, $ht
         console.log(' doSomething called');
     }
     $scope.ok = function() {
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
         console.log(' login ok called id=' + $scope.ID + ' psw=' + $scope.Password);
-        $http.post($cookies.AdminURL + '/sec/adduser', {
+        $http.post($cookieStore.get('AdminURL') + '/sec/adduser', {
             'Name': $scope.ID,
             'Password': $scope.Password,
             'Token': token
@@ -644,13 +587,8 @@ var DeleteUserController = function($rootScope, $http, $cookies, $scope, $modalI
     $scope.value = value;
     $scope.ok = function() {
         console.log(' delete user name=' + value)
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
-        $http.get($cookies.AdminURL + '/sec/deleteuser/' + value + '.' + token).success(function(data, status, headers, config) {
+        var token = $cookieStore.get('cpm_token');
+        $http.get($cookieStore.get('AdminURL') + '/sec/deleteuser/' + value + '.' + token).success(function(data, status, headers, config) {
 
             console.log('user was deleted');
             $scope.alerts = [{
@@ -683,13 +621,8 @@ var AddRoleController = function($rootScope, $scope, $cookies, $cookieStore, $ht
     console.log('AddRoleController called');
     $scope.ok = function() {
         console.log(' add role name=' + $scope.Name);
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
-        $http.post($cookies.AdminURL + '/sec/addrole', {
+        var token = $cookieStore.get('cpm_token');
+        $http.post($cookieStore.get('AdminURL') + '/sec/addrole', {
             'Name': $scope.Name,
             'Token': token
         }).success(function(data, status, headers, config) {
@@ -720,14 +653,9 @@ var DeleteRoleController = function($rootScope, $http, $cookies, $scope, $modalI
     console.log('DeleteRoleController called Name=' + value);
     $scope.value = value;
     $scope.ok = function() {
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
         console.log(' delete role name=' + value)
-        $http.get($cookies.AdminURL + '/sec/deleterole/' + value + '.' + token).success(function(data, status, headers, config) {
+        $http.get($cookieStore.get('AdminURL') + '/sec/deleterole/' + value + '.' + token).success(function(data, status, headers, config) {
 
             console.log('role was deleted');
             $scope.alerts = [{
@@ -762,12 +690,7 @@ var ChangePasswordController = function($rootScope, $scope, $cookies, $cookieSto
 
     console.log('ChangePasswordController called');
     $scope.ok = function() {
-        var token = $cookieStore.get('cpmsession');
-        if (token === void 0) {
-            console.log('cookie was undefined');
-            alert('login required');
-            return;
-        }
+        var token = $cookieStore.get('cpm_token');
 
         console.log(' psw=' + $scope.Password + ' psw2=' + $scope.ConfirmPassword);
         if ($scope.Password != $scope.ConfirmPassword) {
@@ -779,7 +702,7 @@ var ChangePasswordController = function($rootScope, $scope, $cookies, $cookieSto
             return;
         }
 
-        $http.post($cookies.AdminURL + '/sec/cp', {
+        $http.post($cookieStore.get('AdminURL') + '/sec/cp', {
             'Username': $scope.value,
             'Password': $scope.Password,
             'Token': token
