@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html ng-app="cpmApp">
 
 <head>
@@ -11,7 +12,6 @@
   <script src="js/angular.min.js"></script>
   <script src="js/angular-route.min.js"></script>
   <script src="js/angular-cookies.min.js"></script>
-  <script src="js/angular-local-storage.min.js"></script>
   <script src="js/ui-bootstrap-tpls-0.11.0.min.js"></script>
   <script src="js/script.js"></script>
   <script src="js/servers.js"></script>
@@ -60,7 +60,7 @@
 
 <footer class="text-center">
   <p>Copyright 2014 <a href="http://crunchydatasolutions.com">Crunchy Data Solutions, Inc.</a></p>
-  <p ng-if="cpm_user_id != ''">Logged in as {{$root.cpm_user_id}}</p>
+  <p ng-if="$root.cpm_user_id != ''">Logged in as {{$root.cpm_user_id}}</p>
 </footer>
 
 </body>

@@ -4,7 +4,6 @@ var cpmApp = angular.module('cpmApp',
 	 'ngTable',
 	 'ui.bootstrap',
 	 'ngCookies',
-	 'LocalStorageModule',
 	 'cpmApp.servers',
 	 'cpmApp.clusters',
 	 'cpmApp.containers',
@@ -12,10 +11,6 @@ var cpmApp = angular.module('cpmApp',
 	 'cpmApp.settings'
 	]
 );
-
-cpmApp.config(function (localStorageServiceProvider) {
-  localStorageServiceProvider.setPrefix('cpm');
-});
 
 // configure our routes
 cpmApp.config(function($routeProvider) {
@@ -57,20 +52,6 @@ cpmApp.config(function($routeProvider) {
 	.otherwise({ redirectTo: '/' });
 });
 
-cpmApp.service('Session', function() {
-	this.create = function(user_id, token) {
-		this.user_id = user_id;
-		this.token = token;
-	};
-
-	this.destroy = function() {
-		this.user_id = null;
-		this.token = null;
-	}
-
-	return this;
-});
-
 cpmApp.run( function($rootScope, $location, $cookieStore) {
 	$rootScope.$on( "$locationChangeStart", function(event, next, current) {
 		if ($cookieStore.get('cpm_token') == null) {
@@ -83,12 +64,13 @@ cpmApp.run( function($rootScope, $location, $cookieStore) {
 cpmApp.controller('mainController',
 	[
 	 "$scope",
+	 "$rootScope",
 	 "$http",
 	 "$location",
 	 "$cookieStore",
 	 "$cookies",
 	 "ngTableParams",
-	function($scope, $http, $location, $cookieStore, $cookies, ngTableParams) {
+	function($scope, $rootScope, $http, $location, $cookieStore, $cookies, ngTableParams) {
 
 	// create a message to display in our view
 	$scope.message = 'PostgreSQL Container Management!';
@@ -100,7 +82,7 @@ cpmApp.controller('mainController',
 	$scope.results = [];
 	$scope.items = ['item1', 'item2'];
 
-	// console.log('User Id: ' + $scope.cpm_user_id);
+	$rootScope.cpm_user_id = '';
 
 	$scope.doLogout = function() {
 		var token = $cookieStore.get('cpm_token');
@@ -109,7 +91,7 @@ cpmApp.controller('mainController',
 			success(function(data, status, headers, config) {
 				console.log('logout ok');
 				$cookieStore.remove('cpm_token');
-				$scope.cpm_user_id = '';
+				$rootScope.cpm_user_id = '';
 				$location.path('/login');
 				
 				$scope.alerts = [{
@@ -178,29 +160,17 @@ function convertUTCDateToLocalDate(date) {
 	};
 }]);
 
-
-
-var LoginController = function($http, $rootScope, $scope, $cookieStore, $location, localStorageService) {
-
-	$scope.urls = localStorageService.get('admin_url');
-
+var LoginController = function($http, $rootScope, $scope, $cookieStore, $location) {
 	$scope.submit = function() {
-		var user_id = $scope.login.user_id;
-		var password = $scope.login.password;
-		var admin_url = $scope.login.admin_url;
-		
+		var user_id = $scope.user_id;
+		var password = $scope.password;
+		var admin_url = $scope.admin_url;
+
 		var loginUrl = admin_url + '/sec/login/' + user_id + "." + password;
 
 		$http.get(loginUrl).
 			success(function(data, status, headers, config) {
-				var urls = localStorageService.get('admin_url');
-
-				if (!(admin_url in urls)) {
-					urls.push(admin_url);
-				}
-
 				$rootScope.cpm_user_id = user_id;
-				localStorageService.set('urls', urls);
 				$cookieStore.put('AdminURL', admin_url);
 				$cookieStore.put('cpm_token', data.Contents);
 				$location.path('/home');
