@@ -151,6 +151,9 @@ function convertUTCDateToLocalDate(date) {
 }]);
 
 var LoginController = function($http, $rootScope, $scope, $cookieStore, $location) {
+
+	$scope.admin_url = $cookieStore.get('AdminURL');
+
 	$scope.submit = function() {
 		var user_id = $scope.user_id;
 		var password = $scope.password;
