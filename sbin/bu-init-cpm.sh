@@ -50,7 +50,7 @@ docker run -e DB_HOST=127.0.0.1 \
 
 echo "restarting cpm-backup container..."
 sleep 2
-docker rm cpm-admin
+docker rm cpm-backup
 docker run -e DB_HOST=cpm-admin.$DOMAIN \
 	-v $LOGDIR:/cpmlogs \
 	-e DB_PORT=5432 -e DB_USER=postgres \

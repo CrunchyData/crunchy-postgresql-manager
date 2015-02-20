@@ -65,8 +65,11 @@ sudo systemctl enable docker.service
 sudo systemctl start docker.service
 
 # move the CPM media to the /opt/cpm installation directory
+sudo rm -rf $INSTALLDIR/bin/*
 sudo mv `pwd`/bin/* $INSTALLDIR/bin
+sudo rm -rf $INSTALLDIR/config/*
 sudo mv `pwd`/config/* $INSTALLDIR/config
+sudo rm -rf $INSTALLDIR/www/*
 sudo mv `pwd`/www/* $INSTALLDIR/www
 
 echo "SECURITY WARNING- turning off and disabling your firewall!"
@@ -78,6 +81,8 @@ echo "starting cpmagent...."
 sudo cp $INSTALLDIR/config/cpmagent.service /usr/lib/systemd/system
 sudo systemctl enable cpmagent.service
 sudo systemctl start cpmagent.service
+
+sed -i "s/crunchy.lab/$DOMAIN/g" ./bu-init-cpm.sh
 
 # pull down CPM Docker images from dockerhub
 echo "pulling down cpm docker images...."
@@ -91,4 +96,3 @@ docker pull crunchydata/cpm-backup-job
 docker pull crunchydata/cpm-node
 docker pull crunchydata/cpm-dashboard
 
-sed -i "s/crunchy.lab/$DOMAIN/g" ./bu-init-cpm.sh

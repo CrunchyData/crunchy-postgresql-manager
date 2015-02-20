@@ -33,6 +33,7 @@ createArchive () {
 	cp $WORKDIR/sbin/* $TMPDIR/bin
 	cp $WORKDIR/bin/* $TMPDIR/bin
 	cp $WORKDIR/sbin/basic-user-install.sh $TMPDIR
+	cp $WORKDIR/sbin/bu-*.sh $TMPDIR
 
 	mkdir -p $TMPDIR/config
 	cp $WORKDIR/config/* $TMPDIR/config
@@ -51,31 +52,40 @@ pushImages () {
 
 	docker tag cpm crunchydata/cpm
 	docker push crunchydata/cpm
+	docker save crunchydata/cpm > /tmp/cpm.tar
 
 	docker tag cpm-pgpool crunchydata/cpm-pgpool
 	docker push crunchydata/cpm-pgpool
+	docker save crunchydata/cpm-pgpool > /tmp/cpm-pgpool.tar
 
 	docker tag cpm-admin crunchydata/cpm-admin
 	docker push crunchydata/cpm-admin
+	docker save crunchydata/cpm-admin > /tmp/cpm-admin.tar
 
 	docker tag cpm-base crunchydata/cpm-base
 	docker push crunchydata/cpm-base
+	docker save crunchydata/cpm-base > /tmp/cpm-base.tar
 
 	docker tag cpm-mon crunchydata/cpm-mon
 	docker push crunchydata/cpm-mon
+	docker save crunchydata/cpm-mon > /tmp/cpm-mon.tar
 
 	docker tag cpm-backup crunchydata/cpm-backup
 	docker push crunchydata/cpm-backup
+	docker save crunchydata/cpm-backup > /tmp/cpm-backup.tar
 
 	docker tag cpm-backup-job crunchydata/cpm-backup-job
 	docker push crunchydata/cpm-backup-job
+	docker save crunchydata/cpm-backup-job > /tmp/cpm-backup-job.tar
 
 	docker tag cpm-node crunchydata/cpm-node
 	docker push crunchydata/cpm-node
+	docker save crunchydata/cpm-node > /tmp/cpm-node.tar
 
 	docker tag cpm-dashboard crunchydata/cpm-dashboard
 	docker push crunchydata/cpm-dashboard
+	docker save crunchydata/cpm-dashboard > /tmp/cpm-dashboard.tar
 }
 
 createArchive
-pushImages
+#pushImages

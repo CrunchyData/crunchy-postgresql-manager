@@ -19,22 +19,27 @@
 
 source /opt/cpm/bin/setenv.sh
 
+HBA=/opt/cpm/conf/admin/pg_hba.conf
 #
 # the initial start of postgres will create the clusteradmin database
 #
 if [ ! -f /pgdata/postgresql.conf ]; then
         echo "pgdata is empty"
         initdb -D /pgdata  > /tmp/initdb.log &> /tmp/initdb.err
-	echo "setting domain to " $THISDOMAIN >> /tmp/start-db.log
-	sed -i "s/crunchy.lab/$THISDOMAIN/g" /opt/cpm/conf/admin/pg_hba.conf
-	sed -i "s/crunchy.lab/$THISDOMAIN/g" /opt/cpm/bin/clusteradmin.sql
-	cp /opt/cpm/conf/admin/pg_hba.conf /pgdata/
-	cp /opt/cpm/conf/admin/postgresql.conf /pgdata/
-	echo "starting db" >> /tmp/start-db.log
+        echo "setting domain to " $THISDOMAIN >> /tmp/start-db.log
 
-        pg_ctl -D /pgdata start 
+        cp $HBA /tmp
+        sed "s/crunchy.lab/$THISDOMAIN/g" /tmp/pg_hba.conf > /pgdata/pg_hba.conf
+        cat /pgdata/pg_hba.conf >> /tmp/start-db.log
+
+        sed -i "s/crunchy.lab/$THISDOMAIN/g" /opt/cpm/bin/clusteradmin.sql
+
+        cp /opt/cpm/conf/admin/postgresql.conf /pgdata/
+        echo "starting db" >> /tmp/start-db.log
+
+        pg_ctl -D /pgdata start
         sleep 3
-	echo "building clusteradmin db" >> /tmp/start-db.log
+        echo "building clusteradmin db" >> /tmp/start-db.log
         psql -U postgres < /opt/cpm/bin/setup.sql
         exit
 fi
