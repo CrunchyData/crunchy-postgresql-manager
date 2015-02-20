@@ -82,7 +82,7 @@ cpmApp.controller('mainController',
 	$scope.results = [];
 	$scope.items = ['item1', 'item2'];
 
-	$rootScope.cpm_user_id = '';
+	$rootScope.cpm_user_id = $cookieStore.get('cpm_user_id');
 
 	$scope.doLogout = function() {
 		var token = $cookieStore.get('cpm_token');
@@ -161,6 +161,7 @@ var LoginController = function($http, $rootScope, $scope, $cookieStore, $locatio
 		$http.get(loginUrl).
 			success(function(data, status, headers, config) {
 				$rootScope.cpm_user_id = user_id;
+				$cookieStore.put('cpm_user_id', user_id);
 				$cookieStore.put('AdminURL', admin_url);
 				$cookieStore.put('cpm_token', data.Contents);
 				$location.path('/home');
