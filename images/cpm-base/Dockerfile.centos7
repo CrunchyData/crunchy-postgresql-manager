@@ -5,8 +5,8 @@ RUN yum -y update; yum clean all
 
 # Install postgresql deps
 RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
-RUN rpm -Uvh http://yum.postgresql.org/9.3/redhat/rhel-7-x86_64/pgdg-centos93-9.3-1.noarch.rpm
-RUN yum install -y procps-ng postgresql93 postgresql93-contrib postgresql93-server libxslt unzip openssh-clients hostname bind-utils
+RUN rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
+RUN yum install -y procps-ng postgresql94 postgresql94-contrib postgresql94-server libxslt unzip openssh-clients hostname bind-utils
 
 
 # set up cpm directory
@@ -17,7 +17,7 @@ RUN mkdir -p /opt/cpm/conf
 RUN chown -R postgres:postgres /opt/cpm
 
 # set environment vars
-ENV PGROOT /usr/pgsql-9.3
+ENV PGROOT /usr/pgsql-9.4
 ENV PGDATA /pgdata
 
 # add path settings for postgres user

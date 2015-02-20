@@ -143,53 +143,54 @@
     });
 
     app.controller('monitor1Controller', function($rootScope, $scope, $route, $http, $cookies, $cookieStore) {
-	    console.log('hi from monitor1Controller parent is ' + $scope.container.Name);
 
-        var pg1seriesData;
-        var pg1graph, pg2graph;
-        var pg1axes, pg2axes;
-        var pg1yAxis, pg2yAxis;
-        var pg1graphCreated = false;
-        var pg2graphCreated = false;
+        var loaded = false;
+        var pg2seriesData = [];
+        var pg2graph;
+        var pg2axes;
+        var pg2yAxis;
 	$scope.refreshTime8h = '8h';
 	$scope.refreshTime24h = '24h';
 	$scope.refreshTime48h = '48h';
 	$scope.refreshTime1w = '1w';
 
-        $scope.pg1handleRefresh = function(interval) {
-            var token = $cookieStore.get('cpm_token');
-            console.log('graphing pg1 stats interval=' + interval);
-            var query = 'http://cpm-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=';
-            var query2 = 'select * from pg1 where database = \'' + $scope.container.Name + '\'  and time > now() - ' + interval + ' order asc limit 1000';
-	    var es = escape(query2);
+	var pg2graph = new Rickshaw.Graph( {
+                        width: 800,
+                        height: 300,
+                        element: document.getElementById('pg2chart'),
+                        renderer: 'line',
+                        series: pg2seriesData,
+	} );
 
-            $http.get(query + es).
-            success(function(data, status, headers, config) {
-                    pg1loadSeries(data[0].points);
-                    pg1render();
-                //console.log('pg1 flux query results ' + data[0].points);
-                //console.log('pg1 first point t=' + data[0].points[0][0] + " v=" + data[0].points[0][2]);
-            }).error(function(data, status, headers, config) {
-                alert('error happended');
-            });
 
-        };
 
-        $scope.pg1handleRefresh($scope.refreshTime8h);
+       	var pg2hoverDetail = new Rickshaw.Graph.HoverDetail( { graph: pg2graph } );
+
+	pg2axes = new Rickshaw.Graph.Axis.Time( { graph: pg2graph } );
+
+        pg2yAxis = new Rickshaw.Graph.Axis.Y( {
+                                graph: pg2graph,
+                                tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+                                ticksTreatment: 'glow'
+	} );
+	pg2graph.render();
+       	pg2axes.render();
+       	pg2yAxis.render();
 
         $scope.pg2handleRefresh = function(interval) {
             var token = $cookieStore.get('cpm_token');
-            console.log('graphing pg2 with interval ' + interval);
-            var query = 'http://cpm-mon.crunchy.lab:8086/db/cpm/series?u=root&p=root&q=';
-            var query2 = 'select * from pg2 where database = \'' + $scope.container.Name + '\'  and time > now() - ' + interval + ' order asc limit 1000';
-	    var es = escape(query2);
-
-            $http.get(query + es).
-            success(function(data, status, headers, config) {
-                    pg2loadSeries(data[0].points);
-                    pg2render();
-                //console.log('pg2 query results ' + data[0].points);
-                //console.log('pg2 first point t=' + data[0].points[0][0] + " v=" + data[0].points[0][2]);
+	    var query = $cookies.AdminURL + '/mon/container/pg2/' + $scope.container.Name + '.' + interval + '.' + token;
+		//console.log(query);
+		$http.get(query).success(function(data, status, headers, config) {
+			//console.log('pg2 query results 1 ' + JSON.stringify(data[0]));
+			pg2loadSeries(data);
+			if (loaded == false) {
+				var pg2legend = new Rickshaw.Graph.Legend( {
+					graph: pg2graph,
+					element: document.getElementById('pg2legend')
+				});
+				loaded = true;
+			}
             }).error(function(data, status, headers, config) {
                 alert('error happended');
             });
@@ -198,95 +199,28 @@
 
         $scope.pg2handleRefresh($scope.refreshTime8h);
 
-        function pg1render() {
+        function pg2loadSeries(data) {
+		
+		//remove all existing data
+		len = pg2seriesData.length;
+		for (i=0; i<len; i++) {
+			pg2seriesData.shift();
+		}
+	
+		var palette = new Rickshaw.Color.Palette( { scheme: 'colorwheel' } );
 
-                if (!pg1graphCreated) {
-                        pg1graph = new Rickshaw.Graph( {
-                        element: document.getElementById("pg1chart"),
-                        width: 800,
-                        height: 300,
-                        renderer: 'line',
-                        series: [
-                        {
-                        color: "#c05020",
-                        data: pg1seriesData,
-                        name: 'PG1' } ]
-                        } );
+		//add new data
+                angular.forEach(data, function(d) {
+			//console.log('data=' + JSON.stringify(d.Data));
+                        pg2seriesData.push( { color: palette.color(), data: d.Data, name: d.Name } );
 
-                        var pg1hoverDetail = new Rickshaw.Graph.HoverDetail( {
-                        graph: pg1graph
-                        } );
-
-                        var ticksTreatment = 'glow';
-                        pg1axes = new Rickshaw.Graph.Axis.Time( {
-                                graph: pg1graph
-                        } );
-                        pg1yAxis = new Rickshaw.Graph.Axis.Y( {
-                                graph: pg1graph,
-                                tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
-                                ticksTreatment: ticksTreatment
-                        } );
-
-                        pg1graphCreated = true;
-                }
-
-                pg1graph.render();
-                pg1axes.render();
-                pg1yAxis.render();
-        }
-
-        function pg1loadSeries(points) {
-                pg1seriesData = [];
-                angular.forEach(points, function(p) {
-                        //console.log('pg1 loading point x=' + p[0] + ' y=' + p[2]);
-			xval = Math.round(p[0] / 1000 );
-
-                        pg1seriesData.push( { x: xval, y: p[2] } );
                 });
+                //console.log('pg2seriesData  ' + JSON.stringify(pg2seriesData));
+
+		//refresh graph
+		pg2graph.update();
         }
 
-        function pg2loadSeries(points) {
-                pg2seriesData = [];
-                angular.forEach(points, function(p) {
-                        //console.log('pg2 loading point x=' + p[0] + ' y=' + p[2]);
-			xval = Math.round(p[0] / 1000 );
-                        pg2seriesData.push( { x: xval, y: p[2] } );
-                });
-        }
-
-        function pg2render() {
-
-                if (!pg2graphCreated) {
-                        pg2graph = new Rickshaw.Graph( {
-                        width: 800,
-                        height: 300,
-                        element: document.getElementById('pg2chart'),
-                        renderer: 'line',
-                        series: [
-                        { color: "#c05020", data: pg2seriesData,
-                        name: 'PG 2' } ]
-                        } );
-
-                        var pg2hoverDetail = new Rickshaw.Graph.HoverDetail( {
-                                graph: pg2graph
-                        } );
-
-                        pg2axes = new Rickshaw.Graph.Axis.Time( {
-                                graph: pg2graph
-                        } );
-                        pg2yAxis = new Rickshaw.Graph.Axis.Y( {
-                                graph: pg2graph,
-                                tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
-                                ticksTreatment: 'glow'
-                        } );
-
-                        pg2graphCreated = true;
-                }
-
-                pg2graph.render();
-                pg2axes.render();
-                pg2yAxis.render();
-        }
 
     }); /* end of monitor1controller */
 

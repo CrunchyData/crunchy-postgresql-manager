@@ -78,4 +78,4 @@ pushImages () {
 }
 
 createArchive
-#pushImages
+pushImages

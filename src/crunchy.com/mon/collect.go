@@ -20,6 +20,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/golang/glog"
+	"github.com/myinfluxdb/client"
 	"strconv"
 	"strings"
 	"time"
@@ -29,6 +30,7 @@ var CPMBIN = "/opt/cpm/bin/"
 
 type DBMetric struct {
 	MetricType string
+	Name       string
 	Value      float64
 	Timestamp  time.Time
 }
@@ -56,8 +58,8 @@ func collectServerMetrics(metricName string, server string) (DBMetric, error) {
 	return values, nil
 }
 
-func collectContainerMetrics(metricName string, databaseConn *sql.DB) (DBMetric, error) {
-	var values DBMetric
+func collectContainerMetrics(metricName string, databaseConn *sql.DB) ([]DBMetric, error) {
+	var values []DBMetric
 	var err error
 
 	glog.Infoln("collecting metric..." + metricName)
@@ -78,11 +80,13 @@ func collectContainerMetrics(metricName string, databaseConn *sql.DB) (DBMetric,
 	return values, nil
 }
 
-func pg1(databaseConn *sql.DB) (DBMetric, error) {
-	values := DBMetric{}
+//dummy random value
+func pg1(databaseConn *sql.DB) ([]DBMetric, error) {
+	values := make([]DBMetric, 1)
 	var err error
-	values.Timestamp = time.Now()
-	values.MetricType = "pg1"
+	values[0].Timestamp = time.Now()
+	values[0].Name = "a"
+	values[0].MetricType = "pg1"
 	var intValue int
 
 	err = databaseConn.QueryRow(fmt.Sprintf("select trunc(random() * 10 + 1) from  generate_series(1,1)")).Scan(&intValue)
@@ -90,23 +94,42 @@ func pg1(databaseConn *sql.DB) (DBMetric, error) {
 		glog.Errorln("pg1:error:" + err.Error())
 		return values, err
 	}
-	values.Value = float64(intValue)
+	values[0].Value = float64(intValue)
 
 	return values, err
 }
-func pg2(databaseConn *sql.DB) (DBMetric, error) {
-	values := DBMetric{}
-	var err error
-	values.Timestamp = time.Now()
-	values.MetricType = "pg2"
-	var intValue int
 
-	err = databaseConn.QueryRow(fmt.Sprintf("select trunc(random() * 10 + 1) from  generate_series(1,1)")).Scan(&intValue)
+//database size in megabytes
+func pg2(databaseConn *sql.DB) ([]DBMetric, error) {
+	values := []DBMetric{}
+
+	//thisTime := time.Now()
+	var intValue int
+	var databaseName string
+
+	rows, err := databaseConn.Query("select datname, pg_database_size(d.oid)/1024/1024 from pg_database d")
 	if err != nil {
-		glog.Errorln("pg1:error:" + err.Error())
-		return values, err
+		return nil, err
 	}
-	values.Value = float64(intValue)
+	defer rows.Close()
+	for rows.Next() {
+		m := DBMetric{}
+		if err = rows.Scan(
+			&databaseName,
+			&intValue); err != nil {
+			return nil, err
+		}
+		m.Name = databaseName
+		//m.Timestamp = thisTime
+		m.Timestamp = time.Now()
+		m.MetricType = "pg2"
+		m.Value = float64(intValue)
+		values = append(values, m)
+	}
+	if err = rows.Err(); err != nil {
+		glog.Errorln("pg2:error:" + err.Error())
+		return nil, err
+	}
 
 	return values, err
 }
@@ -161,10 +184,25 @@ func mem(server string) (DBMetric, error) {
 	return values, err
 }
 
-func hc1(databaseConn *sql.DB) error {
+func hc1(scheduleTS int64, nodeName string, databaseConn *sql.DB, c *client.Client) {
 	var err error
 	var strValue string
 
 	err = databaseConn.QueryRow(fmt.Sprintf("select now()::text")).Scan(&strValue)
-	return err
+	if err != nil {
+		glog.Errorln(err.Error())
+		//hc1 - database down condition
+		series := &client.Series{
+			Name:    "hc1",
+			Columns: []string{"seconds", "service", "servicetype", "status"},
+			Points: [][]interface{}{
+				{scheduleTS, nodeName, "db", "down"},
+			},
+		}
+		if err = c.WriteSeries([]*client.Series{series}); err != nil {
+			glog.Errorln("hc1 error writing to influxdb " + err.Error())
+		}
+
+	}
+
 }

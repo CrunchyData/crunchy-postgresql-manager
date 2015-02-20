@@ -14,10 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-INSTALLDIR=$HOME/cpm
+INSTALLDIR=/opt/cpm
+
+DOMAIN=example.com
 
 echo "setting up log dir..."
-LOGDIR=/opt/cpm/logs
+LOGDIR=$INSTALLDIR/logs
 sudo mkdir -p $LOGDIR
 sudo chmod -R 777 $LOGDIR
 sudo chcon -Rt svirt_sandbox_file_t $LOGDIR
@@ -26,66 +28,53 @@ echo "deleting all old log files...."
 sudo rm -rf $LOGDIR/*
 
 echo "restarting cpm container..."
-docker stop cpm
+sudo chcon -Rt svirt_sandbox_file_t $INSTALLDIR/www/v2
 docker rm cpm
-sudo chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v2
 docker run --name=cpm -d \
 	-v $LOGDIR:/cpmlogs \
-	-v $INSTALLDIR/images/cpm/www/v2:/www cpm
+	-v $INSTALLDIR/www/v2:/www \
+	crunchydata/cpm
 
 echo "restarting cpm-admin container..."
 sleep 2
-docker stop cpm-admin
-docker rm cpm-admin
-DBDIR=/var/lib/pgsql/cpm-admin
+DBDIR=$INSTALLDIR/data/cpm-admin
 sudo mkdir -p $DBDIR
 sudo chown postgres:postgres $DBDIR
 sudo chcon -Rt svirt_sandbox_file_t $DBDIR
+docker rm cpm-admin
 docker run -e DB_HOST=127.0.0.1 \
-	-e DOMAIN=crunchy.lab \
+	-e DOMAIN=$DOMAIN \
 	-e DB_PORT=5432 -e DB_USER=postgres \
-	--name=cpm-admin -d -v $LOGDIR:/cpmlogs -v $DBDIR:/pgdata cpm-admin
+	--name=cpm-admin -d -v $LOGDIR:/cpmlogs -v $DBDIR:/pgdata \
+	crunchydata/cpm-admin
 
 echo "restarting cpm-backup container..."
 sleep 2
-docker stop cpm-backup
-docker rm cpm-backup
-docker run -e DB_HOST=cpm-admin.crunchy.lab \
+docker rm cpm-admin
+docker run -e DB_HOST=cpm-admin.$DOMAIN \
 	-v $LOGDIR:/cpmlogs \
 	-e DB_PORT=5432 -e DB_USER=postgres \
-	--name=cpm-backup -d cpm-backup
+	--name=cpm-backup -d \
+	crunchydata/cpm-backup
 
 echo "restarting cpm-mon container..."
 sleep 2
-docker stop cpm-mon
-docker rm cpm-mon
-INFLUXDIR=/tmp/influxdb
+INFLUXDIR=$INSTALLDIR/data/influxdb
 sudo mkdir -p $INFLUXDIR
 sudo chcon -Rt svirt_sandbox_file_t $INFLUXDIR
-docker run -e DB_HOST=cpm-admin.crunchy.lab \
+docker rm cpm-mon
+docker run -e DB_HOST=cpm-admin.$DOMAIN \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	-v $LOGDIR:/cpmlogs \
 	-v $INFLUXDIR:/monitordata \
-	-d --name=cpm-mon cpm-mon
+	-d --name=cpm-mon \
+	crunchydata/cpm-mon
 
 sleep 2
 echo "testing containers for DNS resolution...."
-ping -c 2 cpm.crunchy.lab
-ping -c 2 cpm-admin.crunchy.lab
-ping -c 2 cpm-backup.crunchy.lab
-ping -c 2 cpm-mon.crunchy.lab
+ping -c 2 cpm.$DOMAIN
+ping -c 2 cpm-admin.$DOMAIN
+ping -c 2 cpm-backup.$DOMAIN
+ping -c 2 cpm-mon.$DOMAIN
 
-exit
-
-docker rm cpm-dashboard
-docker run --name=cpm-dashboard -d cpm-dashboard
-
-docker run --name=backup-job-blah \
-	-e BACKUP_HOST=blah.crunchy.lab \
-	-e BACKUP_PORT=5432 \
-	-e BACKUP_USER=postgres \
-	-e BACKUP_SERVER_URL=cpm-backup.crunchy.lab:13010 \
-	-v $LOGDIR:/opt/cpm/logs \
-	-v /var/lib/pgsql/blah-backup-201412181707:/pgdata \
-	-d cpm-backup-job
 

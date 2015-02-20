@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 # Copyright 2015 Crunchy Data Solutions, Inc.
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,19 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#
-# start pg, will initdb if /pgdata is empty as a way to bootstrap
-#
+echo "stopping cpm container..."
+docker stop cpm
 
-source /opt/cpm/bin/setenv.sh
+echo "stopping cpm-admin container..."
+docker stop cpm-admin
 
-chgrp postgres $CLUSTER_LOG
-chmod g+w $CLUSTER_LOG
+echo "stopping cpm-backup container..."
+docker stop cpm-backup
 
-export LD_LIBRARY_PATH=/usr/pgsql-9.4/lib
-
-#
-# the normal startup of pg
-#
-su - postgres -c 'pg_ctl -D /pgdata  start'
+echo "stopping cpm-mon container..."
+docker stop cpm-mon
 

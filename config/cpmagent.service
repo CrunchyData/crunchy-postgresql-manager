@@ -8,7 +8,7 @@ TimeoutSec=120
 User=root
 Group=root
 
-Environment="PATH=/opt/cpm/bin:/usr/pgsql-9.3/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"
+Environment="PATH=/opt/cpm/bin:/usr/pgsql-9.4/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"
 SyslogIdentifier=cpmagent
 
 

@@ -27,12 +27,11 @@
 
 env > /tmp/envvars.out
 
-export LD_LIBRARY_PATH=/usr/pgsql-9.3/lib
-export PATH=$PATH:/usr/pgsql-9.3/bin
+source /opt/cpm/bin/setenv.sh
 
-/opt/cpm/bin/backupserver -log_dir=/cpmlogs -logtostderr=false &
+backupserver -log_dir=/cpmlogs -logtostderr=false &
 
 #
 # block with the dummy server, allows for hot swapping the backupserver# when needed
 
-/opt/cpm/bin/dummyserver > /tmp/dummy.log 
+dummyserver > /tmp/dummy.log 

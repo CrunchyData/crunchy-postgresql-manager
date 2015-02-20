@@ -16,9 +16,7 @@
 #
 #
 
-export LD_LIBRARY_PATH=/usr/pgsql-9.3/lib
-export PATH=$PATH:/usr/pgsql-9.3/bin
 source /opt/cpm/bin/setenv.sh
 
-/opt/cpm/bin/cpmagentserver > /tmp/cpmagent.log 2> /tmp/cpmagent.err
+cpmagentserver > /tmp/cpmagent.log 2> /tmp/cpmagent.err
 
