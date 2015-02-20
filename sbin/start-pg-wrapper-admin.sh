@@ -27,6 +27,7 @@ if [ ! -f /pgdata/postgresql.conf ]; then
         initdb -D /pgdata  > /tmp/initdb.log &> /tmp/initdb.err
 	echo "setting domain to " $THISDOMAIN >> /tmp/start-db.log
 	sed -i "s/crunchy.lab/$THISDOMAIN/g" /opt/cpm/conf/admin/pg_hba.conf
+	sed -i "s/crunchy.lab/$THISDOMAIN/g" /opt/cpm/bin/clusteradmin.sql
 	cp /opt/cpm/conf/admin/pg_hba.conf /pgdata/
 	cp /opt/cpm/conf/admin/postgresql.conf /pgdata/
 	echo "starting db" >> /tmp/start-db.log

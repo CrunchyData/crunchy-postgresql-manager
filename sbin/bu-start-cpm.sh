@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 # Copyright 2015 Crunchy Data Solutions, Inc.
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#
-#
+echo "starting cpm container..."
+docker start cpm
 
-source /opt/cpm/bin/setenv.sh
+sleep 2
+echo "starting cpm-admin container..."
+docker start cpm-admin
 
-cpmagentserver > /tmp/cpmagent.log 2> /tmp/cpmagent.err
+sleep 2
+echo "starting cpm-backup container..."
+docker start cpm-backup
+
+sleep 2
+echo "starting cpm-mon container..."
+docker start cpm-mon
 
