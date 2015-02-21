@@ -21,32 +21,26 @@ cpmApp.config(function($routeProvider) {
 
     .when('/servers', {
         templateUrl: 'pages/servers.html',
-        controller: 'serversController'
     })
 
     .when('/containers', {
         templateUrl: 'pages/containers.html',
-        controller: 'containersController'
     })
 
     .when('/clusters', {
         templateUrl: 'pages/clusters.html',
-        controller: 'clustersController'
     })
 
     .when('/tools', {
         templateUrl: 'pages/tools.html',
-        controller: 'toolsController'
     })
 
     .when('/settings', {
         templateUrl: 'pages/settings.html',
-        controller: 'settingsController'
     })
 
 	.when('/login', {
 		templateUrl: 'pages/login.html',
-		controller: 'LoginController'
 	})
 
 	.otherwise({ redirectTo: '/' });
