@@ -1,0 +1,58 @@
+<div class="modal-header">
+	<h1>Add Containers to Cluster</h1>
+</div>
+
+<div class="modal-body">
+	<form class="form-horizontal">
+		<table ng-table="tableParams" template-pagination="custom/pager" show-filter="false" class="table">
+			<tr ng-repeat="container in tableParams.data" ng-class="{ 'emphasis': checkboxes.items[container.ID] == true  }">
+				<td width="30" style="text-align: left" >
+					<input type="checkbox" ng-model="checkboxes.items[container.ID]" />
+				</td>
+				<td data-title="'Name'" width="200" header-class="text-left">
+					{{container.Name}}
+				</td>
+				<td data-title="'Image'"  width="200" header-class="text-left">
+					{{container.Image}}
+				</td>
+				<td data-title="'Actions'" width="100" header-class="text-left">
+					<a ng-if="!container.$edit && container.Image == 'cpm-node'" href="" class="btn btn-default btn-xs" ng-click="OnStandbyClick(container)">Standby</a>
+					<a ng-if="container.$edit && container.Image == 'cpm-node'" href="" class="btn btn-primary btn-xs" ng-click="OnMasterClick(container)">Master</a>
+					<a ng-if="container.Image == 'cpm-pgpool'" href="" class="btn btn-default btn-xs" ></a>
+				</td>
+			</tr>
+		</table>
+
+		<script type="text/ng-template" id="ng-table/headers/checkbox.html">
+		</script>
+
+		<script type="text/ng-template" id="custom/pager">
+
+		<ul class="pager ng-cloak">
+		<li ng-repeat="page in pages"
+		ng-class="{'disabled': !page.active, 'previous': page.type == 'prev', 'next': page.type == 'next'}"
+		ng-show="page.type == 'prev' || page.type == 'next'" ng-switch="page.type">
+		<a ng-switch-when="prev" ng-click="params.page(page.number)" href="">&laquo; Previous</a>
+		<a ng-switch-when="next" ng-click="params.page(page.number)" href="">Next &raquo;</a>
+		</li>
+		</ul>
+
+		</script>
+		<p class="myerror">{{errorText}}</p>
+		<table width="400px">
+		<tr>
+		<td>
+		<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+		</td>
+		</tr>
+		</table>
+
+	</form>
+</div>
+
+<div class="modal-footer">
+	<button type="button" class="btn btn-primary" ng-click="OnSubmitClick()">Add</button>
+	<button class="btn btn-primary" ng-click="cancel()">Cancel</button>
+</div> 
+
+

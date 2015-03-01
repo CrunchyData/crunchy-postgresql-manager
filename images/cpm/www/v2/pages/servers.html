@@ -1,0 +1,129 @@
+  <div ng-controller="getServerController as gsc">
+  	<table style="background-color: white; width:100%">
+  		<tr>
+  			<td valign="top" bgcolor="white" width="10%">
+  				<table style="background-color: white;width:200px;">
+  					<tr style="background-color: white; color: gray;">
+  						<td align="center" style="align: center;">
+  						</td>
+  					</tr>
+  				</table>
+
+  				<ul ng-controller="getAllServersController as gas" style="overflow:hidden; overflow-y:scroll;height:300px; width:200px;"
+  				class="nav nav-pills nav-stacked">
+  				<li ng-repeat="result in results" ng-class="{ active:isSelected(result.ID) }"><a href="" ng-click="selectTab(result)">{{result.Name}}</a></li>
+  			</ul>
+  			<div class="btn-group" dropdown is-open="status.isopen">
+  				<button style="width:120px" type="button" class="btn btn-danger">Action</button>
+  				<button style="height:34px" type="button" class="btn btn-danger dropdown-toggle" ng-disabled="disabled">
+  					<span class="caret"></span>
+  					<span class="sr-only">Split button!</span>
+  				</button>
+  				<ul class="dropdown-menu" role="menu">
+  					<li><a ng-click="handleAddClick()" href="#/servers"><i class="fa fa-plus fa-fw"></i>Add Server</a></li>
+  					<li><a ng-click="handleDeleteClick()" href="#/servers"><i class="fa fa-trash-o fa-fw"></i>Delete Server</a></li>
+  					<li><a ng-click="handleMonitorClick()" href="#/servers"><i class="fa fa-bar-chart fa-fw"></i>Monitor Server</a></li>
+  					<li><a ng-click="startContainers()" href="#/servers"><i class="fa fa-play fa-fw"></i>Start Containers</a></li>
+  					<li><a ng-click="stopContainers()" href="#/servers"><i class="fa fa-power-off fa-fw"></i>Stop Containers</a></li>
+  					<li><a ng-click="updateServer()" href="#/servers"><i class="fa fa-edit fa-fw"></i>Update Server</a></li>
+  				</ul>
+  			</div>
+  			<!-- here -->
+  		</td>
+
+  		<td width="3%">
+  			&nbsp;
+  		</td>
+  		<!-- CONTENT GOES IN THIS TD -->
+  		<td width="70%" valign="top" >
+  			<h3>Servers</h3>
+  			<table>
+  				<tr>
+  					<td>
+  						<h4>Name</h4>
+  						<input class="form-control" name="name" type="text" ng-model="results.Name" size="10">
+  					</td>
+  					<td>&nbsp;&nbsp;
+  					</td>
+  					<td>
+  						<h4>IP Address</h4>
+  						<input class="form-control" name="name" type="text" ng-model="results.IPAddress" size="15">
+  					</td>
+  				</tr>
+
+  				<tr>
+  					<td>
+  						<h4>PG Data Path</h4>
+  						<input class="form-control" name="name" type="text" ng-model="results.PGDataPath" size="30">
+  					</td>
+  					<td>&nbsp;&nbsp;
+  					</td>
+  					<td>
+  						<h4>Docker Bridge</h4>
+  						<input class="form-control" name="name" type="text" ng-model="results.DockerBridgeIP" size="30">
+  					</td>
+  				</tr>
+
+  				<tr>
+  					<td>
+  						<h4>Containers Count</h4>
+  						<input disabled class="form-control" name="name" type="text" ng-model="containers.length" size="30">
+  					</td>
+  					<td>&nbsp;&nbsp;
+  					</td>
+  					<td>
+  						<h4>Server Class</h4>
+  						<select class="form-control" ng-model="results.ServerClass" >
+  							<option value="low" >low</option>
+  							<option value="medium" >medium</option>
+  							<option value="high" >high</option>
+  						</select>
+  					</td>
+  				</tr>
+  				<tr>
+  					<td>&nbsp;</td>
+  				</tr>
+
+  			</table>
+  			<table ng-show="users.length > 0" ng-table="tableParams" template-pagination="custom/pager" show-filter="false" class="table">
+  				<tr ng-repeat="container in users" ng-class="{ 'emphasis': checkboxes.items[container.ID] == true  }">
+  					<td width="30" style="text-align: left" header="'ng-table/headers/checkbox.html'">
+  						<input type="checkbox" ng-model="checkboxes.items[container.ID]" />
+  					</td>
+  					<td header-class="text-left" data-title="'Name'" width="200">
+  						{{container.Name}}
+  					</td>
+  					<td header-class="text-left" data-title="'Image'"  width="200">
+  						{{container.Image}}
+  					</td>
+  					<td header-class="text-left" data-title="'Container Status'" width="100">
+  						<a ng-if="container.Status == 'down'" href=""><i class="fa fa-close"></i></a>
+  						<a ng-if="container.Status == 'up'" href=""><i class="fa fa-cog fa-spin"></i></a>
+  						<a tooltip="container not found" style="color:red" ng-if="container.Status == 'notfound'" href=""><i class="fa fa-warning"></i></a>
+  					</td>
+
+  				</tr>
+  			</table>
+  		</td>
+  	</tr>
+  </table>
+
+  <script type="text/ng-template" id="ng-table/headers/checkbox.html">
+  <input type="checkbox" ng-model="checkboxes.checked" id="select_all" name="filter-checkbox" value="" />
+  </script>
+
+  <script type="text/ng-template" id="custom/pager">
+  <ul class="pager ng-cloak">
+  <li ng-repeat="page in pages"
+  ng-class="{'disabled': !page.active, 'previous': page.type == 'prev', 'next': page.type == 'next'}"
+  ng-show="page.type == 'prev' || page.type == 'next'" ng-switch="page.type">
+  <a ng-switch-when="prev" ng-click="params.page(page.number)" href="">&laquo; Previous</a>
+  <a ng-switch-when="next" ng-click="params.page(page.number)" href="">Next &raquo;</a>
+  </li>
+  </ul>
+  </script>
+
+  <div id="veil" ng-show="isLoading"></div>
+  <div id="feedLoading" ng-show="isLoading">Working...</div>
+
+</div>

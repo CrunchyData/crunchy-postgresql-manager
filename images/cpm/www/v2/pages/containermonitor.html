@@ -1,0 +1,127 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Crunchy Database Monitor</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../css/bootstrap.min.css"> 
+  <link rel="stylesheet" href="../css/style.css"> 
+  <link rel="stylesheet" href="../font-awesome-4.2.0/css/font-awesome.min.css"> 
+
+	<link type="text/css" rel="stylesheet" href="../css/graph.css">
+	<link type="text/css" rel="stylesheet" href="../css/detail.css">
+	<link type="text/css" rel="stylesheet" href="../css/legend.css">
+	<link type="text/css" rel="stylesheet" href="../css/lines.css">
+
+  <!--link rel="stylesheet" href="../css/servermonitor.css"--> 
+  <link rel="stylesheet" href="../css/slider.css"> 
+  <script type="text/javascript" src="../js/angular.min.js"></script>
+  <script type="text/javascript" src="../js/angular-cookies.min.js"></script>
+  <script type="text/javascript" src="../js/angular-route.min.js"></script>
+  <script type="text/javascript" src="../js/ui-bootstrap-tpls-0.11.0.min.js"></script>
+  <script type="text/javascript" src="../js/containermonitor.js"></script>
+  <script type="text/javascript" src="../js/slider.js"></script>
+
+      
+ 	<script src="../js/d3.v3.js"></script>
+	<script src="../js/rickshaw.js"></script>
+	<script src="../js/Rickshaw.Graph.Axis.Time.js"></script>
+	<script src="../js/Rickshaw.Fixtures.Time.js"></script>
+	<script src="../js/Rickshaw.Fixtures.Time.Local.js"></script>
+	<script src="../js/Rickshaw.Graph.Axis.Y.js"></script>
+	<script src="../js/jquery.min.js"></script>
+	<script>jQuery.noConflict();</script>
+
+</head>
+
+<body>
+
+ <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" ><img src="../images/logo.png"/></a>
+    </div>
+
+  </div>
+</nav>
+
+<div>
+  &nbsp;
+</div>
+
+<div id="main" ng-app="TabsApp" ng-controller="TabsCtrl as ctrl">
+
+ <table style="background-color: white; width:100%">
+  <tr>
+   <td valign="top" bgcolor="white" width="10%">
+    <table style="background-color: white;width:200px;">
+      <tr style="background-color: white; color: gray;">
+        <td align="center">
+          <div class="btn-group">
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- here is the left accordian start -->
+    <accordion>
+      <accordion-group is-open="backupstatus.open">
+      <accordion-heading>
+      Statistics<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': backupstatus.open, 'glyphicon-chevron-right': !backupstatus.open}"></i>
+    </accordion-heading>
+    <div>
+     <a href="#">pg_stat_database</a><br>
+     <a href="#bgwriter">bgwriter</a><br>
+     <a href="#repl">pg_stat_replication</a><br>
+     <a href="#settings">pg_settings</a><br>
+     <a href="#controldata">pg_controldata</a><br>
+   </div>
+ </accordion-group>
+ <accordion-group is-open="accessstatus.open">
+ <accordion-heading>
+ Load Test<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': accessstatus.open, 'glyphicon-chevron-right': !accessstatus.open}"></i>
+</accordion-heading>
+<div>
+ <a href="#loadtest">Simple</a><br>
+</div>
+</accordion-group>
+ <accordion-group is-open="monitorstatus.open">
+ <accordion-heading>
+ Monitor<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': accessstatus.open, 'glyphicon-chevron-right': !accessstatus.open}"></i>
+</accordion-heading>
+<div>
+ <a href="#monitor1">Database Size</a><br>
+</div>
+</accordion-group>
+</accordion>
+<!-- here is the left accordian end -->
+</td>
+
+<td width="3%">
+  &nbsp;
+</td>
+
+<!-- CONTENT GOES IN THIS TD -->
+<td width="70%" valign="top" >
+  <!-- this is where content will be injected -->
+  <div ng-view></div>
+</td>
+</tr>
+
+<div id="veil" ng-show="isLoading"></div>
+<div id="feedLoading" ng-show="isLoading">Working...</div>
+
+</table>
+
+<footer class="text-center">
+  <p>Copyright 2014 <a href="http://crunchydatasolutions.com">Crunchy Data Solutions, Inc.</a></p>
+  <p>Logged in as {{currentUser}}</p>
+</footer>
+</div> <!-- main -->
+
+
+
+</body>
+
+</html>

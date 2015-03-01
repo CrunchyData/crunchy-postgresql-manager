@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "test - about to sleep for 2 seconds to give etcd time to start..."
+sleep 2

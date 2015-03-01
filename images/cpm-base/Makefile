@@ -1,0 +1,19 @@
+
+OSFLAVOR=centos7
+
+all:
+ifeq ($(OSFLAVOR),centos7)
+	cp Dockerfile.centos7 Dockerfile
+else
+	cp Dockerfile.rhel7 Dockerfile
+endif
+		rm -rf bin
+		mkdir bin
+		cp ../../config/.bash_profile conf/
+		cp ../../sql/node-setup.sql bin/setup.sql
+		cp ../../sql/loadtestfunc.sql bin/
+		cp ../../sbin/* bin/
+		cp ../../config/postgresql.service bin/
+	        docker build -t cpm-base .
+		docker tag cpm-base:latest crunchydata/cpm-base
+

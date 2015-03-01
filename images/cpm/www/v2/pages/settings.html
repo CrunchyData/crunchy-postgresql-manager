@@ -1,0 +1,378 @@
+  <div ng-controller="settingsController as sack">
+    <table style="background-color: white; width:100%">
+      <tr>
+        <td valign="top" bgcolor="white" width="10%">
+          <table style="background-color: white;width:200px;">
+            <tr style="background-color: white; color: gray;">
+              <td align="center">
+                  <div class="btn-group">
+                  </div>
+              </td>
+          </tr>
+      </table>
+
+      <!-- here is the left accordian start -->
+      <accordion close-others="sack.oneAtATime">
+        <accordion-group is-open="adminstatus.open">
+        <accordion-heading>
+        General Settings<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': adminstatus.open, 'glyphicon-chevron-right': !adminstatus.open}"></i>
+    </accordion-heading>
+    <div>
+        <a href="" ng-click="sack.selectTab4(1)">Settings</a><br>
+    </div>
+</accordion-group>
+<accordion-group is-open="profilestatus.open">
+<accordion-heading>
+Profiles<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': profilestatus.open, 'glyphicon-chevron-right': !profilestatus.open}"></i>
+</accordion-heading>
+<div>
+    <a href="" ng-click="sack.selectTab4(2)">Docker</a><br>
+    <a href="" ng-click="sack.selectTab4(3)">Cluster - Small</a><br>
+    <a href="" ng-click="sack.selectTab4(4)">Cluster - Medium</a><br>
+    <a href="" ng-click="sack.selectTab4(5)">Cluster - Large</a><br>
+</div>
+</accordion-group>
+<accordion-group is-open="rolestatus.open">
+<accordion-heading>
+Roles<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': rolestatus.open, 'glyphicon-chevron-right': !rolestatus.open}"></i>
+</accordion-heading>
+<div>
+  <ul style="list-style-type: none;padding:0;margin:0">
+     <li ng-repeat="role in roles"><a href="" ng-click="sack.selectRole($index)" >{{role.Name}}</a></li>
+ </ul>
+</div>
+</accordion-group>
+<accordion-group is-open="userstatus.open">
+<accordion-heading>
+Users<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': userstatus.open, 'glyphicon-chevron-right': !userstatus.open}"></i>
+</accordion-heading>
+<div>
+  <ul style="list-style-type: none;padding:0;margin:0">
+     <li ng-repeat="user in users"><a href="" ng-click="sack.selectUser($index)" >{{user.Name}}</a></li>
+ </ul>
+</div>
+</accordion-group>
+</accordion>
+<!-- here is the left accordian end -->
+</td>
+
+<td width="3%">
+  &nbsp;
+</td>
+<!-- CONTENT GOES IN THIS TD -->
+<td width="50%" valign="top" >
+ <!-- this is where content will be injected -->
+ <div ng-show="sack.isSelected(1)">
+
+     <form name="myForm1" novalidate ng-submit="saveSettings();">
+        <h3>General Settings</h3>
+        <table class="table">
+            <tbody>
+                <thead>
+                    <th width="30%">Setting</th>
+                    <th width="40%">Value</th>
+                    <th width="30%"></th>
+                </thead>
+                <tr>
+                    <td>Admin Service URL</td>
+                    <td ><input class="form-control" type="text" ng-model="AdminURL" ng-maxlength="40"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Docker Registry</td>
+                    <td ><input class="form-control" type="text" ng-model="DockerRegistry" ng-maxlength="20"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>PG Port</td>
+                    <td ><input class="form-control" type="text" ng-model="PGPort" ng-maxlength="20"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Domain Name</td>
+                    <td ><input class="form-control" type="text" ng-model="DomainName" ng-maxlength="20"></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+        <input value="Save" type="submit" class="btn btn-primary" ng-click="handleSave()">
+    </form>
+</div>
+<div ng-show="sack.isSelected(2)">
+ <form name="myForm" novalidate ng-submit="saveProfiles();">
+    <h3>Docker Profile Settings</h3>
+    <table class="table">
+        <thead>
+            <th width="20%">Resource Size</th>
+            <th width="20%">CPU Shares</th>
+            <th width="20%">Memory Limit</th>
+            <th width="40%"></th>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="20%">Small</td>
+                <td width="20%"><input class="form-control" type="text" ng-model="smallCPU" ng-maxlength="20"></td>
+                <td width="20%"><input class="form-control" type="text" ng-model="smallMEM" ng-maxlength="20" ></td>
+                <td width="40%"></td>
+            </tr>
+            <tr>
+                <td width="20%">Medium</td>
+                <td width="20%"><input class="form-control" type="text" ng-model="mediumCPU" ng-maxlength="20" ></td>
+                <td width="20%"><input class="form-control" type="text" ng-model="mediumMEM" ng-maxlength="20" ></td>
+                <td width="40%"></td>
+            </tr>
+            <tr>
+                <td width="20%">Large</td>
+                <td width="20%"><input class="form-control" type="text" ng-model="largeCPU" ng-maxlength="20" ></td>
+                <td width="20%"><input class="form-control" type="text" ng-model="largeMEM" ng-maxlength="20" ></td>
+                <td width="40%"></td>
+            </tr>
+        </tbody>
+    </table>
+    <input value="Save" type="submit" class="btn btn-primary" ng-click="handleSave()">
+</form>
+
+</div>
+<div ng-show="sack.isSelected(3)">
+ <form name="myForm" novalidate ng-submit="saveSmallClusterProfiles();">
+    <h3>Small Cluster Profile Settings</h3>
+    <table class="table">
+        <thead>
+            <th width="20%">Standby Count</th>
+            <th width="30%">Master Docker Profile</th>
+            <th width="30%">Standby Docker Profile</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="20%"><select class="form-control" id="Image" ng-model="CPsmCount" >
+                    <option value="1" >1</option>
+                    <option value="2" >2</option>
+                    <option value="3" >3</option>
+                    <option value="4" >4</option>
+                    <option value="5" >5</option>
+                    <option value="6" >6</option>
+                    <option value="7" >7</option>
+                </select></td>
+                <td width="30%"><select class="form-control" id="Image" ng-model="CPsmMProfile" >
+                    <option value="small" >small</option>
+                    <option value="medium" >medium</option>
+                    <option value="large" >large</option>
+                </select></td>
+                <td width="30%"><select class="form-control" id="Image" ng-model="CPsmSProfile" >
+                    <option value="small" >small</option>
+                    <option value="medium" >medium</option>
+                    <option value="large" >large</option>
+                </select></td>
+            </tr>
+            <tr>
+                <th width="20%">Provision Algorithm</th>
+                <th width="30%">Master Server Class</th>
+                <th width="30%">Standby Server Class</th>
+            </tr>
+            <tr>
+                <td width="20%"><select class="form-control" id="Image" ng-model="CPsmAlgo" >
+                    <option value="round-robin" >round-robin</option>
+                </select></td>
+                <td width="30%"><select class="form-control" id="Image" ng-model="CPsmMServer" >
+                    <option value="any" >any</option>
+                    <option value="low" >low</option>
+                    <option value="medium" >medium</option>
+                    <option value="high" >high</option>
+                </select></td>
+                <td width="30%"><select class="form-control" id="Image" ng-model="CPsmSServer" >
+                    <option value="any" >any</option>
+                    <option value="low" >low</option>
+                    <option value="medium" >medium</option>
+                    <option value="high" >high</option>
+                </select></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <input value="Save" type="submit" class="btn btn-primary" ng-click="saveSmallClusterProfiles()">
+</form>
+
+</div>
+<div ng-show="sack.isSelected(4)">
+ <form name="myForm" novalidate ng-submit="saveMediumClusterProfiles();">
+    <h3>Medium Cluster Profile Settings</h3>
+    <table class="table">
+        <thead>
+            <th width="20%">Standby Count</th>
+            <th width="30%">Master Docker Profile</th>
+            <th width="30%">Standby Docker Profile</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="20%"><select class="form-control" id="Image" ng-model="CPmedCount" >
+                    <option value="1" >1</option>
+                    <option value="2" >2</option>
+                    <option value="3" >3</option>
+                    <option value="4" >4</option>
+                    <option value="5" >5</option>
+                    <option value="6" >6</option>
+                    <option value="7" >7</option>
+                </select></td>
+                <td width="30%"><select class="form-control" id="Image" ng-model="CPmedMProfile" >
+                    <option value="small" >small</option>
+                    <option value="medium" >medium</option>
+                    <option value="large" >large</option>
+                </select></td>
+                <td width="30%"><select class="form-control" id="Image" ng-model="CPmedSProfile" >
+                    <option value="small" >small</option>
+                    <option value="medium" >medium</option>
+                    <option value="large" >large</option>
+                </select></td>
+            </tr>
+            <tr>
+                <th width="20%">Provision Algorithm</th>
+                <th width="30%">Master Server Class</th>
+                <th width="30%">Standby Server Class</th>
+            </tr>
+            <tr>
+                <td width="20%"><select class="form-control" id="Image" ng-model="CPmedAlgo" >
+                    <option value="round-robin" >round-robin</option>
+                </select></td>
+                <td width="30%"><select class="form-control" id="Image" ng-model="CPmedMServer" >
+                    <option value="any" >any</option>
+                    <option value="low" >low</option>
+                    <option value="medium" >medium</option>
+                    <option value="high" >high</option>
+                </select></td>
+                <td width="30%"><select class="form-control" id="Image" ng-model="CPmedSServer" >
+                    <option value="any" >any</option>
+                    <option value="low" >low</option>
+                    <option value="medium" >medium</option>
+                    <option value="high" >high</option>
+                </select></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <input value="Save" type="submit" class="btn btn-primary" ng-click="saveMediumClusterProfiles()">
+</form>
+
+</div>
+
+<div ng-show="sack.isSelected(5)">
+ <form name="myForm" novalidate ng-submit="saveLargeClusterProfiles();">
+    <h3>Large Cluster Profile Settings</h3>
+    <table class="table">
+        <thead>
+            <th width="20%">Standby Count</th>
+            <th width="30%">Master Docker Profile</th>
+            <th width="30%">Standby Docker Profile</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="20%"><select class="form-control" id="Image" ng-model="CPlgCount" >
+                    <option value="1" >1</option>
+                    <option value="2" >2</option>
+                    <option value="3" >3</option>
+                    <option value="4" >4</option>
+                    <option value="5" >5</option>
+                    <option value="6" >6</option>
+                    <option value="7" >7</option>
+                </select></td>
+                <td width="30%"><select class="form-control" id="Image" ng-model="CPlgMProfile" >
+                    <option value="any" >any</option>
+                    <option value="small" >small</option>
+                    <option value="medium" >medium</option>
+                    <option value="large" >large</option>
+                </select></td>
+                <td width="30%"><select class="form-control" id="Image" ng-model="CPlgSProfile" >
+                    <option value="any" >any</option>
+                    <option value="small" >small</option>
+                    <option value="medium" >medium</option>
+                    <option value="large" >large</option>
+                </select></td>
+            </tr>
+            <tr>
+                <th width="20%">Provision Algorithm</th>
+                <th width="30%">Master Server Class</th>
+                <th width="30%">Standby Server Class</th>
+            </tr>
+            <tr>
+                <td width="20%"><select class="form-control" id="Image" ng-model="CPlgAlgo" >
+                    <option value="round-robin" >round-robin</option>
+                </select></td>
+                <td width="30%"><select class="form-control" id="Image" ng-model="CPlgMServer" >
+                    <option value="any" >any</option>
+                    <option value="low" >low</option>
+                    <option value="medium" >medium</option>
+                    <option value="high" >high</option>
+                </select></td>
+                <td width="30%"><select class="form-control" id="Image" ng-model="CPlgSServer" >
+                    <option value="any" >any</option>
+                    <option value="low" >low</option>
+                    <option value="medium" >medium</option>
+                    <option value="high" >high</option>
+                </select></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <input value="Save" type="submit" class="btn btn-primary" ng-click="saveLargeClusterProfiles()">
+</form>
+
+</div>
+
+<div ng-show="sack.isSelected(6)">
+ <h3>{{roles[roleIndex].Name}}</h3>
+ <form>
+    <table>
+       <thead>
+           <th width="10%">Selected</th>
+           <th width="60%">Permission</th>
+       </thead>
+       <tr ng-repeat="perm in roles[roleIndex].Permissions">
+           <td width="10%">
+               <input class="checkbox" type="checkbox" ng-model="perm.Selected">
+           </td>
+           <td width="60%">{{perm.Name}}</td>
+       </tr>
+   </table>
+
+   <br>
+   <input value="Save" type="submit" class="btn btn-primary" ng-click="saveRole()">
+   <input value="Delete Role" type="submit" class="btn btn-danger" ng-click="deleteRole()">
+   <input value="New Role" type="submit" class="btn btn-primary" ng-click="sack.addRole()">
+</form>
+</div>
+
+<div ng-show="sack.isSelected(7)">
+ <h3>{{users[userIndex].Name}}</h3>
+ <form>
+    <table>
+       <thead>
+           <th width="10%">Selected</th>
+           <th width="60%">Role</th>
+       </thead>
+       <tr ng-repeat="role in users[userIndex].Roles">
+           <td width="10%">
+               <input class="checkbox" type="checkbox" ng-model="role.Selected">
+           </td>
+           <td width="60%">{{role.Name}}</td>
+       </tr>
+   </table>
+
+   <br>
+   <input value="Save" type="submit" class="btn btn-primary" ng-click="saveUser()">
+   <input value="Delete User" type="submit" class="btn btn-danger" ng-click="deleteUser()">
+   <input value="Change Password" type="submit" class="btn btn-primary" ng-click="sack.changePassword()">
+   <input value="New User" type="submit" class="btn btn-primary" ng-click="sack.addUser()">
+</form>
+</div>
+
+<table width="400px">
+ <tr>
+     <td> 
+         <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+     </td>
+ </tr>
+</table>
+</td>
+</tr>
+
+</table>
+</div>

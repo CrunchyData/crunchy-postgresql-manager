@@ -1,0 +1,21 @@
+[Unit]
+Description=cpmagent
+After=network.target
+
+[Service]
+Type=forking
+TimeoutSec=120
+User=root
+Group=root
+
+Environment="PATH=/opt/cpm/bin:/usr/pgsql-9.4/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"
+SyslogIdentifier=cpmagent
+
+
+ExecStart=/opt/cpm/bin/start-cpmagent.sh
+ExecReload=/opt/cpm/bin/reload-cpmagent.sh
+ExecStop=/bin/killall cpmagentserver
+
+[Install]
+WantedBy=multi-user.target
+

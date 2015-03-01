@@ -1,0 +1,80 @@
+{
+  "id": "admin",
+  "kind": "Template",
+  "apiVersion": "v1beta1",
+  "name": "admin-example",
+  "description": "Example shows how to deploy the crunchy-admin image",
+  "parameters": [
+    {
+      "name": "ADMIN_USERNAME",
+      "description": "administrator username",
+      "generate": "expression",
+      "from": "admin[A-Z0-9]{3}"
+    },
+    {
+      "name": "ADMIN_PASSWORD",
+      "description": "administrator password",
+      "generate": "expression",
+      "from": "[a-zA-Z0-9]{8}"
+    }
+  ],
+  "items": [
+    {
+      "id": "admin",
+      "kind": "Service",
+      "apiVersion": "v1beta1",
+      "port": 8080,
+      "selector": {
+        "name": "admin"
+      }
+    },
+    {
+      "id": "admin-pod",
+      "kind": "Pod",
+      "apiVersion": "v1beta1",
+      "desiredState": {
+        "manifest": {
+          "version": "v1beta1",
+          "id": "admin-pod",
+          "volumes": [
+          	{
+               	"name": "pgdata",
+               	"source":
+               		{
+                       	"hostDir":
+                       		{
+                               	"path": "/var/lib/pgsql/cluster-admin"
+                               	}
+			}
+
+		}
+          ],
+          "containers": [{
+            "name": "master",
+            "image": "registry:5000/crunchy-admin",
+        	"volumeMounts": [
+                                    {
+                                        "name": "pgdata",
+                                        "mountPath": "/pgdata",
+                                        "readOnly": false
+                                    }
+                 ],
+
+            "env": [
+              {
+                "name": "ADMIN_PASSWORD",
+                "value": "${ADMIN_PASSWORD}"
+              }
+            ],
+            "ports": [{
+              "containerPort": 8080
+            }]
+          }]
+        }
+      },
+      "labels": {
+        "name": "admin"
+      }
+    }
+  ]
+}

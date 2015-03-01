@@ -1,0 +1,38 @@
+FROM centos:centos7
+MAINTAINER crunchy
+
+# Install postgresql deps
+RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+RUN rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
+RUN yum install -y procps-ng postgresql94 postgresql94-contrib postgresql94-server libxslt unzip openssh-clients hostname bind-utils && yum clean all -y
+
+
+# set up cpm directory
+#
+RUN mkdir -p /opt/cpm/bin
+RUN mkdir -p /opt/cpm/conf
+
+RUN chown -R postgres:postgres /opt/cpm
+
+# set environment vars
+ENV PGROOT /usr/pgsql-9.4
+ENV PGDATA /pgdata
+
+# add path settings for postgres user
+ADD conf/.bash_profile /var/lib/pgsql/
+
+# add volumes to allow backup of postgres files
+VOLUME ["/pgdata"]
+RUN chown -R postgres:postgres /pgdata
+
+VOLUME ["/cpmlogs"]
+RUN chown -R postgres:postgres /cpmlogs
+
+# open up the postgres port
+EXPOSE 5432
+
+ADD bin /opt/cpm/bin
+ADD conf /opt/cpm/conf
+
+USER postgres
+

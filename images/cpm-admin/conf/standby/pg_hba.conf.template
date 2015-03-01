@@ -1,0 +1,23 @@
+
+#
+#jeff
+# Allow all users to connect over the local socket
+local   all         all                                 trust
+
+# Allow all users to connect over the network with valid credentials
+host    all         all           {{.PG_HOST_IP}}             trust
+
+host    all         postgres    {{.PGPOOL_HOST}}                   trust
+host    all         all    {{.PGPOOL_HOST}}                   md5
+
+{{range .BRIDGE_IP_LIST}}
+#host    all      	all       {{.}}/16                   md5
+{{end}}
+
+{{range .SERVER_IP_LIST}}
+host    all      	all       {{.}}/32                   md5
+{{end}}
+
+host    all             all             {{.MONITOR_HOST}}           trust
+host    all             all             {{.ADMIN_HOST}}           trust
+

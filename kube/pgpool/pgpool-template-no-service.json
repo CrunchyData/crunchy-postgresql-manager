@@ -1,0 +1,50 @@
+{
+  "id": "pgpool",
+  "kind": "Template",
+  "apiVersion": "v1beta1",
+  "name": "pgpool-example",
+  "description": "Example shows how to deploy the crunchy-pgpool image",
+  "parameters": [
+    {
+      "name": "ADMIN_USERNAME",
+      "description": "pgpoolistrator username",
+      "generate": "expression",
+      "from": "pgpool[A-Z0-9]{3}"
+    },
+    {
+      "name": "ADMIN_PASSWORD",
+      "description": "pgpoolistrator password",
+      "generate": "expression",
+      "from": "[a-zA-Z0-9]{8}"
+    }
+  ],
+  "items": [
+    {
+      "id": "pgpool-pod",
+      "kind": "Pod",
+      "apiVersion": "v1beta1",
+      "desiredState": {
+        "manifest": {
+          "version": "v1beta1",
+          "id": "pgpool-pod",
+          "containers": [{
+            "name": "master",
+            "image": "registry:5000/crunchy-pgpool",
+            "env": [
+              {
+                "name": "ADMIN_PASSWORD",
+                "value": "${ADMIN_PASSWORD}"
+              }
+            ],
+            "ports": [{
+              "containerPort": 13000
+            }]
+          }]
+        }
+      },
+      "labels": {
+        "name": "pgpool"
+      }
+    }
+  ]
+}

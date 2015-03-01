@@ -1,0 +1,52 @@
+	 <div class="modal-header">
+		 <h1>Backup Now for {{$parent.currentSchedule.Name}}</h1>
+	 </div>
+	 <div class="modal-body">
+	 	<form class="equal">
+	 		<table width="200px">
+	 			<tr>
+	 				<td>
+	 					<h4>Name</h4>
+	 					<input disabled class="form-control" type="text" id="Name" name="Name" ng-model="$parent.currentSchedule.Name">
+	 				</td>
+	 			</tr>
+	 		</table>
+
+	 		
+	 		<table width="400px">
+	 			<tr>
+	 				<td width="40%">
+	 					<h4>Profile</h4>
+	 					<select class="form-control" id="Image" ng-model="$parent.currentSchedule.ProfileName" >
+	 						<option value="pg_basebackup" selected>pg_basebackup</option>
+	 						<option value="pg_other" selected>pg_other</option>
+	 					</select>
+	 				</td>
+	 				<td>&nbsp;</td>
+	 				<td width="40%">
+	 				</td>
+	 			</tr>
+	 		</table>
+	 		<div id="veil" ng-show="$parent.isLoading"><i class="fa fa-circle-o-notch fa-spin fa-3x"></i></div>
+	 		<div id="feedLoading" ng-show="$parent.isLoading"></div>
+	 		
+	 		<table width="400px">
+	 			<tr>
+	 				<td width="40%">
+	 					<h4>Server</h4>
+	 					<select class="form-control" id="server" name="server" type="text" ng-model="$parent.myServer" ng-options="server.Name for server in $parent.servers">
+	 					</select>
+	 				</td>
+	 				<td>&nbsp;</td>
+	 				<td width="40%">
+	 				</td>
+	 			</tr>
+	 		</table>	
+	 	</form>
+	 </div>
+
+	 <div class="modal-footer">
+	 	<button type="button" class="btn btn-primary" ng-click="ok()">Start Backup</button>
+	 	<button class="btn btn-primary" ng-click="cancel()">Cancel</button>
+	 	<alert ng-repeat="alert in alerts" type="danger">{{alert.msg}}</alert>
+	 </div> 

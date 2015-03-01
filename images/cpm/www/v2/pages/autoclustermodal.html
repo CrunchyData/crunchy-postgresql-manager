@@ -1,0 +1,39 @@
+<div class="modal-header">
+	<table>
+		<tr>
+			<td><h1 id="myModalLabel">Automatic Cluster</h1></td>
+		</tr>
+	</table>
+</div>
+
+<div class="modal-body">
+	<form class="form-horizontal" name="myForm" novalidate">
+		<h4>Cluster Name</h4>
+		<input required  class="form-control" type="text" name="Name" ng-model="$parent.Name" ng-pattern="/^[a-zA-Z0-9-]*$/" ng-maxlength="20"/>
+		<h4>Replication Type</h4>
+		<select class="form-control" ng-model="$parent.ClusterType">
+			<option value="asynchronous" selected>asynchronous</option>
+			<option value="synchronous" selected>synchronous</option>
+		</select>
+		<h4>Cluster Profile</h4>
+		<select class="form-control" ng-model="$parent.ClusterProfile">
+			<option value="SM" selected>small</option>
+			<option value="MED" selected>medium</option>
+			<option value="LG" selected>large</option>
+		</select>
+		<br>
+		<div class="modal-footer">
+			<button class="btn btn-primary" ng-click="ok()" ng-disabled="myForm.Name.$pristine || myForm.Name.$dirty && myForm.Name.$invalid">Submit</button>
+			<button class="btn btn-primary" ng-click="cancel()">Cancel</button>
+		</div>
+	</form>
+</div>
+
+<div id="veil" ng-show="$parent.isLoading"><i class="fa fa-circle-o-notch fa-spin fa-3x"></i></div>
+<div id="feedLoading" ng-show="$parent.isLoading"></div>
+
+
+<div class="modal-footer">
+	<alert ng-repeat="alert in alerts" type="danger">{{alert.msg}}</alert>
+</div>
+
