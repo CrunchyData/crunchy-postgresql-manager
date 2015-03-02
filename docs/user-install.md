@@ -11,8 +11,8 @@ Obtain the Media
 ------------------------------
 Download the binary install archives for skybridge and CPM
 from the following:
-http://s3.amazon.com/crunchydata/cpm.beta.tar.gz
-http://s3.amazon.com/crunchydata/skybridge.beta.tar.gz
+https://s3.amazonaws.com/crunchydata/cpm.0.9.0-linux-amd64.tar.gz
+https://s3.amazonaws.com/crunchydata/skybridge.1.0.0-linux-amd64.tar.gz
 
 Install
 ----------
@@ -21,20 +21,61 @@ Here is an example of how to perform the installation:
 ~~~~~~~~~~~~~~~~~
 mkdir skybridge-install
 cd skybridge-install
-tar xvzf ../skybridge.beta.tar.gz
+tar xvzf ../skybridge.1.0.0-linux-amd64.tar.gz
 ./install.sh
 
 mkdir cpm-install
 cd cpm-install
-tar xvzf ../cpm.beta.tar.gz
+tar xvzf ../cpm.0.9.0-linux-amd64.tar.gz
+
 ./basic-user-install.sh
 ~~~~~~~~~~~~~~~~~
 
 You will be prompted for your IP address and the domain name
 you want to use for the installation.
 
+Self signed certificates will be generated, this means you will
+have to accept the certificate warnings in your browser.  With Firefox
+you will need to adjust your Cross-Origin security settings to 
+allow access:
+https://blog.nraboy.com/2014/08/bypass-cors-errors-testing-apis-locally/
+
 The DNS installation will enable and configure the Docker service
 to specify the DNS server as the primary DNS nameserver.  This
 DNS server will also be your primary nameserver in your /etc/resolv.conf
 configuration.
+
+Next, run this script to create the CPM containers:
+~~~~~~~~~~~~~~~~~
+./bu-init-cpm.sh
+~~~~~~~~~~~~~~~~~
+
+To manually stop the CPM containers, run this script:
+~~~~~~~~~~~~~~~~~
+./bu-init-stop.sh
+~~~~~~~~~~~~~~~~~
+
+To manually start the CPM containers, run this script:
+~~~~~~~~~~~~~~~~~
+./bu-init-start.sh
+~~~~~~~~~~~~~~~~~
+
+systemd unit files for CPM are found in:
+~~~~~~~~~~~~~~~~~
+/opt/cpm/config/cpm.service
+~~~~~~~~~~~~~~~~~
+
+Initial Login
+-------------
+When you first access CPM, you will receive a Login dialog, on that
+page enter 'cpm' for the userid, 'cpm' for the password, and
+'https://cpm-admin.example.com:13000' for the Admin URL.
+
+Refer to the CPM User Guide for details on how to use the application, but
+generally you would first create a Server.  Your current host is
+what you would define as your CPM Server.  Use the Docker Bridge value
+of 172.17.42.1, and the PG Data Path is /opt/cpm/data/pgsql.
+
+After that, you can create a PG container and PG clusters.
+
 
