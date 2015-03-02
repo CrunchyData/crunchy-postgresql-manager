@@ -428,7 +428,7 @@ func MonitorContainerLoadtest(w rest.ResponseWriter, r *rest.Request) {
 
 func GetVersion(w rest.ResponseWriter, r *rest.Request) {
 
-	w.(http.ResponseWriter).Write([]byte("1.0.0"))
+	w.(http.ResponseWriter).Write([]byte("0.9.0"))
 }
 
 func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
