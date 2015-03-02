@@ -502,11 +502,18 @@ func DBAddSession(uuid string, id string) error {
 
 func DBDeleteSession(uuid string) error {
 	glog.Infoln("secdb:DBDeleteSession:called")
+
+	//if the uuid is not there, return
+	_, err := DBGetSession(uuid)
+	if err == sql.ErrNoRows {
+		return nil
+	}
+
 	queryStr := fmt.Sprintf("delete from secsession where token='%s' returning token", uuid)
 	glog.Infoln("secdb:DeleteSession:" + queryStr)
 
 	var theToken string
-	err := dbConn.QueryRow(queryStr).Scan(&theToken)
+	err = dbConn.QueryRow(queryStr).Scan(&theToken)
 	switch {
 	case err != nil:
 		glog.Errorln(err.Error())

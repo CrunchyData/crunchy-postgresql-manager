@@ -85,15 +85,15 @@ sed -i "s/crunchy.lab/$DOMAIN/g" ./bu-init-cpm.sh
 
 # pull down CPM Docker images from dockerhub
 echo "pulling down cpm docker images...."
-docker pull crunchydata/cpm
-docker pull crunchydata/cpm-pgpool
-docker pull crunchydata/cpm-admin
-docker pull crunchydata/cpm-base
-docker pull crunchydata/cpm-mon
-docker pull crunchydata/cpm-backup
-docker pull crunchydata/cpm-backup-job
-docker pull crunchydata/cpm-node
-docker pull crunchydata/cpm-dashboard
+docker pull crunchydata/cpm:latest
+docker pull crunchydata/cpm-pgpool:latest
+docker pull crunchydata/cpm-admin:latest
+docker pull crunchydata/cpm-base:latest
+docker pull crunchydata/cpm-mon:latest
+docker pull crunchydata/cpm-backup:latest
+docker pull crunchydata/cpm-backup-job:latest
+docker pull crunchydata/cpm-node:latest
+docker pull crunchydata/cpm-dashboard:latest
 
 # generate keys for cpm and cpm-admin
 echo "generating keys for cpm and cpm-admin containers..."

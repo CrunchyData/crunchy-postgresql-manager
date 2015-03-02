@@ -16,6 +16,7 @@
 
 INSTALLDIR=$HOME/cpm
 
+
 echo "setting up log dir..."
 LOGDIR=/opt/cpm/logs
 sudo mkdir -p $LOGDIR
@@ -36,13 +37,13 @@ sudo chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v2
 docker run --name=cpm -d \
 	-v $LOGDIR:/cpmlogs \
 	-v $KEYSDIR:/cpmkeys \
-	-v $INSTALLDIR/images/cpm/www/v2:/www cpm
+	-v $INSTALLDIR/images/cpm/www/v2:/www crunchydata/cpm:latest
 
 echo "restarting cpm-admin container..."
 sleep 2
 docker stop cpm-admin
 docker rm cpm-admin
-DBDIR=/var/lib/pgsql/cpm-admin
+DBDIR=/opt/cpm/data/pgsql/cpm-admin
 sudo mkdir -p $DBDIR
 sudo chown postgres:postgres $DBDIR
 sudo chcon -Rt svirt_sandbox_file_t $DBDIR
@@ -52,7 +53,7 @@ docker run -e DB_HOST=127.0.0.1 \
 	--name=cpm-admin -d  \
 	-v $KEYSDIR:/cpmkeys \
 	-v $LOGDIR:/cpmlogs \
-	-v $DBDIR:/pgdata cpm-admin
+	-v $DBDIR:/pgdata crunchydata/cpm-admin:latest
 
 echo "restarting cpm-backup container..."
 sleep 2
@@ -61,7 +62,7 @@ docker rm cpm-backup
 docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-v $LOGDIR:/cpmlogs \
 	-e DB_PORT=5432 -e DB_USER=postgres \
-	--name=cpm-backup -d cpm-backup
+	--name=cpm-backup -d crunchydata/cpm-backup:latest
 
 echo "restarting cpm-mon container..."
 sleep 2
@@ -75,7 +76,7 @@ docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	-v $LOGDIR:/cpmlogs \
 	-v $INFLUXDIR:/monitordata \
-	-d --name=cpm-mon cpm-mon
+	-d --name=cpm-mon crunchydata/cpm-mon:latest
 
 sleep 2
 echo "testing containers for DNS resolution...."
@@ -87,14 +88,5 @@ ping -c 2 cpm-mon.crunchy.lab
 exit
 
 docker rm cpm-dashboard
-docker run --name=cpm-dashboard -d cpm-dashboard
-
-docker run --name=backup-job-blah \
-	-e BACKUP_HOST=blah.crunchy.lab \
-	-e BACKUP_PORT=5432 \
-	-e BACKUP_USER=postgres \
-	-e BACKUP_SERVER_URL=cpm-backup.crunchy.lab:13010 \
-	-v $LOGDIR:/opt/cpm/logs \
-	-v /var/lib/pgsql/blah-backup-201412181707:/pgdata \
-	-d cpm-backup-job
+docker run --name=cpm-dashboard -d crunchydata/cpm-dashboard:latest
 

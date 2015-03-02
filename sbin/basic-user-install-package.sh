@@ -24,7 +24,7 @@ set -e
 export VERSION=0.9.0
 export WORKDIR=$HOME/cpm
 export TMPDIR=/tmp/opt/cpm
-export ARCHIVE=/tmp/cpm.1.0.0-linux-amd64.tar.gz
+export ARCHIVE=/tmp/cpm.$VERSION-linux-amd64.tar.gz
 
 # verify running as root user
 
@@ -53,47 +53,65 @@ pushImages () {
 
 	echo "saving cpm image"
 	docker tag cpm crunchydata/cpm:$VERSION
+	docker tag cpm crunchydata/cpm:latest
 	docker push crunchydata/cpm:$VERSION
+	docker push crunchydata/cpm:latest
 #	docker save crunchydata/cpm > /tmp/cpm.tar
 
 	echo "saving cpm-pgpool image"
 	docker tag cpm-pgpool crunchydata/cpm-pgpool:$VERSION
+	docker tag cpm-pgpool crunchydata/cpm-pgpool:latest
 	docker push crunchydata/cpm-pgpool:$VERSION
+	docker push crunchydata/cpm-pgpool:latest
 #	docker save crunchydata/cpm-pgpool > /tmp/cpm-pgpool.tar
 
 	echo "saving cpm-admin image"
 	docker tag cpm-admin crunchydata/cpm-admin:$VERSION
+	docker tag cpm-admin crunchydata/cpm-admin:latest
 	docker push crunchydata/cpm-admin:$VERSION
+	docker push crunchydata/cpm-admin:latest
 #	docker save crunchydata/cpm-admin > /tmp/cpm-admin.tar
 
 	echo "saving cpm-base image"
 	docker tag cpm-base crunchydata/cpm-base:$VERSION
+	docker tag cpm-base crunchydata/cpm-base:latest
 	docker push crunchydata/cpm-base:$VERSION
+	docker push crunchydata/cpm-base:
 #	docker save crunchydata/cpm-base > /tmp/cpm-base.tar
 
 	echo "saving cpm-mon image"
 	docker tag cpm-mon crunchydata/cpm-mon:$VERSION
+	docker tag cpm-mon crunchydata/cpm-mon:latest
 	docker push crunchydata/cpm-mon:$VERSION
+	docker push crunchydata/cpm-mon:latest
 #	docker save crunchydata/cpm-mon > /tmp/cpm-mon.tar
 
 	echo "saving cpm-backup image"
 	docker tag cpm-backup crunchydata/cpm-backup:$VERSION
+	docker tag cpm-backup crunchydata/cpm-backup:latest
 	docker push crunchydata/cpm-backup:$VERSION
+	docker push crunchydata/cpm-backup:latest
 #	docker save crunchydata/cpm-backup > /tmp/cpm-backup.tar
 
 	echo "saving cpm-backup-job image"
 	docker tag cpm-backup-job crunchydata/cpm-backup-job:$VERSION
+	docker tag cpm-backup-job crunchydata/cpm-backup-job:latest
 	docker push crunchydata/cpm-backup-job:$VERSION
+	docker push crunchydata/cpm-backup-job:latest
 #	docker save crunchydata/cpm-backup-job > /tmp/cpm-backup-job.tar
 
 	echo "saving cpm-node image"
 	docker tag cpm-node crunchydata/cpm-node:$VERSION
+	docker tag cpm-node crunchydata/cpm-node:latest
 	docker push crunchydata/cpm-node:$VERSION
+	docker push crunchydata/cpm-node:latest
 #	docker save crunchydata/cpm-node > /tmp/cpm-node.tar
 
 	echo "saving cpm-dashboard image"
 	docker tag cpm-dashboard crunchydata/cpm-dashboard:$VERSION
+	docker tag cpm-dashboard crunchydata/cpm-dashboard:latest
 	docker push crunchydata/cpm-dashboard:$VERSION
+	docker push crunchydata/cpm-dashboard:latest
 #	docker save crunchydata/cpm-dashboard > /tmp/cpm-dashboard.tar
 }
 
