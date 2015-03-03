@@ -556,22 +556,7 @@ curl --insecure https://cpm-admin.crunchy.lab:13000/monitor/server-getinfo/.cpmd
 ]}
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-###GET /monitor/container-getinfo/:ID.:Metric.:Token
-
-+ Token : the generated auth token for this session
-
-return container monitoring data
-
-
-
-###Example
-
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-###GET /monitor/container-loadtest/:ID.:Metric.:Writes.:Token
+###GET /monitor/container/loadtest/:ID.:Writes.:Token
 
 + Token : the generated auth token for this session
 
@@ -579,6 +564,15 @@ perform a load test and return the results
 
 
 ###Example
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl --insecure https://cpm-admin:13000/monior/container/loadtest/1.1000.9a8f9a1e-9c81-4e4f-9f52-01d2ea6cd741
+ 
+
+[{"operation":"inserts","count":1000,"results":44.979},{"operation":"selects","count":1000,"results":31.952},{"operation":"updates","count":1000,"results":40.442},{"operation":"deletes","count":1000,"results":30.374}]
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ###GET /admin/start-pg/:ID.:Token
@@ -1255,4 +1249,143 @@ returns the CPM version number
 ~~~~~~~~~~~~~~~~~~~~~~~~
 curl --insecure https://cpm-admin.crunchy.lab:13000/version
 1.0.0
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###GET /monitor/container/settings/:ID.Token
+
++ ID : the container ID
++ Token : the generated auth token for this session
+
+return container pg_settings data
+
+
+###Example
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl --insecure https://cpm-admin.crunchy.lab:13000/monitor/container/settings/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###GET /monitor/container/repl/:ID.Token
+
++ ID : the container ID
++ Token : the generated auth token for this session
+
+return container pg_replication data
+
+
+###Example
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl --insecure https://cpm-admin.crunchy.lab:13000/monitor/container/repl/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+[
+  {
+    "Pid": "39",
+    "Usesysid": "10",
+    "Usename": "postgres",
+    "AppName": "walreceiver",
+    "ClientAddr": "172.17.0.8",
+    "ClientHostname": "ac-standby-0.crunchy.lab",
+    "ClientPort": "58959",
+    "BackendStart": "2015-03-03 11:04-02",
+    "State": "streaming",
+    "SentLocation": "0/307DF40",
+    "WriteLocation": "0/307DF40",
+    "FlushLocation": "0/307DF40",
+    "ReplayLocation": "0/307DF40",
+    "SyncPriority": "0",
+    "SyncState": "async"
+  }
+]
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###GET /monitor/container/database/:ID.Token
+
++ ID : the container ID
++ Token : the generated auth token for this session
+
+return container pg_databases data
+
+
+###Example
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl --insecure https://cpm-admin.crunchy.lab:13000/monitor/container/database/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+[
+  {
+    "Datname": "template1",
+    "BlksRead": "0",
+    "TupReturned": "0",
+    "TupFetched": "0",
+    "TupInserted": "0",
+    "TupUpdated": "0",
+    "TupDeleted": "0",
+    "StatsReset": " "
+  },
+  {
+    "Datname": "template0",
+    "BlksRead": "0",
+    "TupReturned": "0",
+    "TupFetched": "0",
+    "TupInserted": "0",
+    "TupUpdated": "0",
+    "TupDeleted": "0",
+    "StatsReset": " "
+  },
+  {
+    "Datname": "postgres",
+    "BlksRead": "151",
+    "TupReturned": "19513",
+    "TupFetched": "1347",
+    "TupInserted": "0",
+    "TupUpdated": "0",
+    "TupDeleted": "0",
+    "StatsReset": "2015-03-03 15:39:15"
+  },
+  {
+    "Datname": "cpmtest",
+    "BlksRead": "76",
+    "TupReturned": "18125",
+    "TupFetched": "694",
+    "TupInserted": "0",
+    "TupUpdated": "0",
+    "TupDeleted": "0",
+    "StatsReset": "2015-03-03 15:41:24"
+  }
+]
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###GET /monitor/container/bgwriter/:ID.Token
+
++ ID : the container ID
++ Token : the generated auth token for this session
+
+return container bgwriter data
+
+
+###Example
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl --insecure https://cpm-admin.crunchy.lab:13000/monitor/container/bgwriter/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+{
+  "Now": "03/03/15 04:00:38",
+  "AllocMbps": ".0015",
+  "CheckpointMbps": "0.",
+  "CleanMbps": "0.",
+  "BackendMbps": "0.",
+  "WriteMbps": "0."
+}
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###GET /monitor/container/controldata/:ID.Token
+
++ ID : the container ID
++ Token : the generated auth token for this session
+
+return container controldata data
+
+
+###Example
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl --insecure https://cpm-admin.crunchy.lab:13000/monitor/container/controldata/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ~~~~~~~~~~~~~~~~~~~~~~~~

@@ -80,10 +80,10 @@
             console.log('refresh pressed slider=' + $scope.slidervalue);
             var token = $cookieStore.get('cpm_token');
 
-            var thing4 = $cookieStore.get('AdminURL') + '/monitor/container-loadtest/' + $scope.containerid + '.loadtest.' + $scope.slidervalue + "." + token;
+            var thing4 = $cookieStore.get('AdminURL') + '/monitor/container/loadtest/' + $scope.containerid + '.' + $scope.slidervalue + "." + token;
             $http.get(thing4).success(function(data, status, headers, config) {
-                console.log('got loadtest results');
-                console.log('now=' + data);
+                //console.log('got loadtest results');
+                //console.log('now=' + data);
                 $scope.loadtestresults = data;
                 $scope.isLoading = false;
             }).error(function(data, status, headers, config) {
@@ -100,11 +100,11 @@
 
             var token = $cookieStore.get('cpm_token');
 
-            var thing2 = $cookieStore.get('AdminURL') + '/monitor/container-getinfo/' + $scope.containerid + '.statreplication.' + token;
+            var thing2 = $cookieStore.get('AdminURL') + '/monitor/container/repl/' + $scope.containerid + '.' + token;
             console.log('url=' + thing2);
             $http.get(thing2).success(function(data, status, headers, config) {
-                console.log('got statrepl results');
-                console.log('pid=' + data[0].pid);
+                //console.log('got statrepl results');
+                //console.log('pid=' + data[0].pid);
                 $scope.statreplresults = data;
             }).error(function(data, status, headers, config) {
                 alert('error in monitor container statrepl');
@@ -161,11 +161,11 @@
         $scope.handleRefresh = function() {
             var token = $cookieStore.get('cpm_token');
             console.log('working on bgwriter');
-            var thing3 = $cookieStore.get('AdminURL') + '/monitor/container-getinfo/' + $scope.containerid + '.bgwriter.' + token;
+            var thing3 = $cookieStore.get('AdminURL') + '/monitor/container/bgwriter/' + $scope.containerid + '.' + token;
             console.log('url=' + thing3);
             $http.get(thing3).success(function(data, status, headers, config) {
-                console.log('got bgwriter results');
-                console.log('now=' + data.now);
+                //console.log('got bgwriter results');
+                //console.log('now=' + data.now);
                 $scope.bgwriterresults = data;
             }).error(function(data, status, headers, config) {
                 alert('error in monitor container bgwriter');
@@ -178,7 +178,7 @@
     app.controller('statsController', function($rootScope, $scope, $route, $http, $cookies, $cookieStore) {
         $scope.handleRefresh = function() {
             var token = $cookieStore.get('cpm_token');
-            var thing = $cookieStore.get('AdminURL') + '/monitor/container-getinfo/' + $scope.containerid + '.statdatabase.' + token;
+            var thing = $cookieStore.get('AdminURL') + '/monitor/container/database/' + $scope.containerid + '.' + token;
             console.log('url=' + thing);
             $http.get(thing).success(function(data, status, headers, config) {
                 console.log('got statdb results');

@@ -16,13 +16,10 @@
 package main
 
 import (
-	"bytes"
 	"crunchy.com/admindb"
 	"crunchy.com/backup"
-	"crunchy.com/cpmagent"
 	"crunchy.com/util"
 	"database/sql"
-	"errors"
 	"flag"
 	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
@@ -30,8 +27,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
-	"strings"
 	"time"
 )
 
@@ -113,16 +108,17 @@ func main() {
 		&rest.Route{"GET", "/nodes/nocluster/:Token", GetAllNodesNotInCluster},
 		&rest.Route{"GET", "/clusternodes/:ClusterID.:Token", GetAllNodesForCluster},
 		&rest.Route{"GET", "/nodes/forserver/:ServerID.:Token", GetAllNodesForServer},
-		//&rest.Route{"POST", "/node", PostNode},
 		&rest.Route{"GET", "/provision/:Profile.:Image.:ServerID.:ContainerName.:Standalone.:Token", Provision},
 		&rest.Route{"GET", "/node/:ID.:Token", GetNode},
 		&rest.Route{"GET", "/kube/:Token", Kube},
 		&rest.Route{"GET", "/deletenode/:ID.:Token", DeleteNode},
 		&rest.Route{"GET", "/monitor/server-getinfo/:ServerID.:Metric.:Token", MonitorServerGetInfo},
-		&rest.Route{"GET", "/monitor/container-getinfo/:ID.:Metric.:Token", MonitorContainerGetInfo},
 		&rest.Route{"GET", "/monitor/container/settings/:ID.:Token", MonitorContainerSettings},
+		&rest.Route{"GET", "/monitor/container/repl/:ID.:Token", ContainerInfoStatrepl},
+		&rest.Route{"GET", "/monitor/container/database/:ID.:Token", ContainerInfoStatdatabase},
+		&rest.Route{"GET", "/monitor/container/bgwriter/:ID.:Token", ContainerInfoBgwriter},
 		&rest.Route{"GET", "/monitor/container/controldata/:ID.:Token", MonitorContainerControldata},
-		&rest.Route{"GET", "/monitor/container-loadtest/:ID.:Metric.:Writes.:Token", MonitorContainerGetInfo},
+		&rest.Route{"GET", "/monitor/container/loadtest/:ID.:Writes.:Token", ContainerLoadTest},
 		&rest.Route{"GET", "/admin/start-pg/:ID.:Token", AdminStartpg},
 		&rest.Route{"GET", "/admin/start/:ID.:Token", AdminStartNode},
 		&rest.Route{"GET", "/admin/stop/:ID.:Token", AdminStopNode},
@@ -292,250 +288,7 @@ func Kube(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
-func MonitorContainerGetInfo(w rest.ResponseWriter, r *rest.Request) {
-	var err error
-
-	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
-	if err != nil {
-		glog.Errorln("MonitorContainerGetInfo: authorize error " + err.Error())
-		rest.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	ID := r.PathParam("ID")
-	Metric := r.PathParam("Metric")
-
-	if ID == "" {
-		rest.Error(w, "ID required", http.StatusBadRequest)
-		return
-	}
-	if Metric == "" {
-		rest.Error(w, "Metric required", http.StatusBadRequest)
-		return
-	}
-
-	if Metric == "statreplication" ||
-		Metric == "loadtest" || Metric == "bgwriter" ||
-		Metric == "statdatabase" {
-	} else {
-		glog.Errorln("MonitorContainerGetInfo: error-invalid metric type")
-		err = errors.New("invalid metric type")
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	var InsertCount = ""
-	if Metric == "loadtest" {
-		InsertCount = r.PathParam("Writes")
-		if InsertCount == "" {
-			rest.Error(w, "Writes param required", http.StatusBadRequest)
-			return
-		}
-	}
-
-	node, err := admindb.GetDBNode(ID)
-	if err != nil {
-		glog.Errorln("MonitorContainerGetInfo:" + err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	//$1 - host node.Name
-	//$2 - port "5432"
-	//$3 - user "cpmtest"
-	//$4 - password "cpmtest"
-	//$5 - database "cpmtest"
-	//$6 - insert count - only valid for loadtest Metric
-
-	//hardcoded for now, TODO pull from metadata
-	var port = "5432"
-	var user = "cpmtest"
-	var password = "cpmtest"
-	var database = "cpmtest"
-
-	cmd := exec.Command(CPMBIN+Metric,
-		node.Name,
-		port,
-		user,
-		password,
-		database,
-		InsertCount)
-
-	for i := 0; i < len(cmd.Args); i++ {
-		glog.Infoln("MonitorContainerGetInfo:" + cmd.Args[i])
-	}
-
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-	err = cmd.Run()
-	if err != nil {
-		glog.Errorln("MonitorContainerGetInfo:" + err.Error())
-		glog.Flush()
-		errorString := fmt.Sprintf("%s\n%s\n%s\n", err.Error(), out.String(), stderr.String())
-		rest.Error(w, errorString, http.StatusBadRequest)
-		return
-	}
-	glog.Infoln("MonitorContainerGetInfo: command output was " + out.String())
-
-	//w.(http.ResponseWriter).Write([]byte(output))
-	w.(http.ResponseWriter).Write([]byte(out.String()))
-	w.WriteHeader(http.StatusOK)
-}
-
-func MonitorContainerLoadtest(w rest.ResponseWriter, r *rest.Request) {
-	ID := r.PathParam("ID")
-	Writes := r.PathParam("Writes")
-
-	if ID == "" {
-		rest.Error(w, "ID required", http.StatusBadRequest)
-		return
-	}
-	if Writes == "" {
-		rest.Error(w, "Writes required", http.StatusBadRequest)
-		return
-	}
-
-	node, err := admindb.GetDBNode(ID)
-	if err != nil {
-		glog.Errorln("MonitorContainerGetInfo:" + err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	server, err2 := admindb.GetDBServer(node.ServerID)
-	if err2 != nil {
-		glog.Errorln("MonitorContainerGetInfo:" + err2.Error())
-		rest.Error(w, err2.Error(), http.StatusBadRequest)
-		return
-	}
-
-	var output string
-	var port = "5432"
-
-	output, err = cpmagent.AgentCommandConfigureNode(CPMBIN+"loadtest", node.Name,
-		port, Writes, "", "", "", "", server.IPAddress)
-	if err != nil {
-		glog.Errorln("MonitorContainerGetInfo:" + err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	w.(http.ResponseWriter).Write([]byte(output))
-	w.WriteHeader(http.StatusOK)
-}
-
 func GetVersion(w rest.ResponseWriter, r *rest.Request) {
 
 	w.(http.ResponseWriter).Write([]byte("0.9.0"))
-}
-
-func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
-	if err != nil {
-		glog.Errorln("MonitorContainerSettings: authorize error " + err.Error())
-		rest.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	ID := r.PathParam("ID")
-	if ID == "" {
-		rest.Error(w, "ID required", http.StatusBadRequest)
-		return
-	}
-
-	node, err := admindb.GetDBNode(ID)
-	if err != nil {
-		glog.Errorln("MonitorContainerGetInfo:" + err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	dbConn, err := util.GetMonitoringConnection(node.Name, "postgres", "5432", "postgres")
-	defer dbConn.Close()
-
-	settings := make([]PostgresSetting, 0)
-	var rows *sql.Rows
-
-	rows, err = dbConn.Query("select name, current_setting(name), source from pg_settings where source not in ('default','override')")
-	if err != nil {
-		glog.Errorln("MonitorContainerSettings:" + err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	defer rows.Close()
-	for rows.Next() {
-		setting := PostgresSetting{}
-		if err = rows.Scan(
-			&setting.Name,
-			&setting.CurrentSetting,
-			&setting.Source,
-		); err != nil {
-			glog.Errorln("MonitorContainerSettings:" + err.Error())
-			rest.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		settings = append(settings, setting)
-	}
-	if err = rows.Err(); err != nil {
-		glog.Errorln("MonitorContainerSettings:" + err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.WriteJson(&settings)
-}
-
-func MonitorContainerControldata(w rest.ResponseWriter, r *rest.Request) {
-	var err error
-	var output string
-	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
-	if err != nil {
-		glog.Errorln("MonitorContainerControldata: authorize error " + err.Error())
-		rest.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	ID := r.PathParam("ID")
-	if ID == "" {
-		rest.Error(w, "ID required", http.StatusBadRequest)
-		return
-	}
-
-	node, err := admindb.GetDBNode(ID)
-	if err != nil {
-		glog.Errorln("MonitorContainerControldata:" + err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	settings := make([]PostgresControldata, 0)
-
-	//send the container a pg_controldata command
-	output, err = cpmagent.AgentCommand(PGBIN+"pg_controldata", "/pgdata", node.Name)
-	if err != nil {
-		glog.Errorln("MonitorContainerControldata:" + err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	glog.Infoln(output)
-
-	lines := strings.Split(output, "\n")
-	//fmt.Println(len(lines))
-	for i := range lines {
-		//fmt.Println(len(lines[i]))
-		if len(lines[i]) > 1 {
-			setting := PostgresControldata{}
-			columns := strings.Split(lines[i], ":")
-			setting.Name = strings.TrimSpace(columns[0])
-			setting.Value = strings.TrimSpace(columns[1])
-			//fmt.Println("name=[" + strings.TrimSpace(columns[0]) + "] value=[" + strings.TrimSpace(columns[1]) + "]")
-			settings = append(settings, setting)
-		}
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.WriteJson(&settings)
 }
