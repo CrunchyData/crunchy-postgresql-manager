@@ -31,6 +31,11 @@ tar xvzf ../cpm.0.9.0-linux-amd64.tar.gz
 ./basic-user-install.sh
 ~~~~~~~~~~~~~~~~~
 
+The DNS installation will enable and configure the Docker service
+to specify the DNS server as the primary DNS nameserver.  This
+DNS server will also be your primary nameserver in your /etc/resolv.conf
+configuration.
+
 You will be prompted for your IP address and the domain name
 you want to use for the installation.
 
@@ -40,10 +45,14 @@ you will need to adjust your Cross-Origin security settings to
 allow access:
 https://blog.nraboy.com/2014/08/bypass-cors-errors-testing-apis-locally/
 
-The DNS installation will enable and configure the Docker service
-to specify the DNS server as the primary DNS nameserver.  This
-DNS server will also be your primary nameserver in your /etc/resolv.conf
-configuration.
+
+You can generate your own self-signed keys by following this:
+
+http://www.hydrogen18.com/blog/your-own-pki-tls-golang.html
+
+You can avoid browser warnings for the self-signed keys by following this:
+
+http://portal.threatpulse.com/docs/sol/Content/03Solutions/ManagePolicy/SSL/ssl_chrome_cert_ta.htm
 
 Next, run this script to create the CPM containers:
 ~~~~~~~~~~~~~~~~~
