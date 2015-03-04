@@ -4,11 +4,19 @@ Firewall Configuration
 This is a set of steps that can be followed to allow you 
 to enable firewalld (on Centos7 and RHEL 7) and run CPM.
 
+
+
 ###disable network manager
 ~~~~~~~~~~~~~~~~~~~~~~~~
 systemctl disable NetworkManager.service
 systemctl stop NetworkManager.service
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+NOTE: I found the following bugzilla ticket which led me to believe
+I should turn off NetworkManager in RHEL/CentoS 7.0, I am assuming
+this will be fixed in 7.1 but am not sure:
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1098281
 
 ###Enable IP Forwarding
 ~~~~~~~~~~~~~~~~~~~~~~~~
