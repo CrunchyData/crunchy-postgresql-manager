@@ -10,7 +10,7 @@ host    all         all           127.0.0.1/32          trust
 # on initial pg startup, we calculate the docker bridge to supply PG_HOST_IP 
 
 {{range .BRIDGE_IP_LIST}}
-#host    all             all       {{.}}/16                   md5
+host    cpmtest             cpmtest       {{.}}/16                   md5
 {{end}}
 
 {{range .SERVER_IP_LIST}}

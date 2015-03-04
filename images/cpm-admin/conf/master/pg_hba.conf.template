@@ -13,7 +13,7 @@ host    all     postgres	{{.}}            trust
 {{end}}
 
 {{range .BRIDGE_IP_LIST}}
-#host    all     	all 		{{.}}/16            	md5
+host    cpmtest     	cpmtest 		{{.}}/16            	md5
 host    replication     postgres	{{.}}/16            trust
 {{end}}
 

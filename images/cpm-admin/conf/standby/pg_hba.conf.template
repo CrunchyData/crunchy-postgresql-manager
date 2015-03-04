@@ -11,7 +11,7 @@ host    all         postgres    {{.PGPOOL_HOST}}                   trust
 host    all         all    {{.PGPOOL_HOST}}                   md5
 
 {{range .BRIDGE_IP_LIST}}
-#host    all      	all       {{.}}/16                   md5
+host    cpmtest      	cpmtest       {{.}}/16                   md5
 {{end}}
 
 {{range .SERVER_IP_LIST}}
