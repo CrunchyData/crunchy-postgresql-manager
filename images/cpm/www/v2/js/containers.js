@@ -22,6 +22,9 @@ cpmApp.run(function($rootScope) {
     $rootScope.$on('deleteContainerEvent', function(event, args) {
         $rootScope.$broadcast('deleteContainerTarget', args);
     });
+    $rootScope.$on('noContainerEvent', function(event, args) {
+        $rootScope.$broadcast('noContainerTarget', args);
+    });
     $rootScope.$on('updateContainerPage', function(event, args) {
         $rootScope.$broadcast('updateContainerPageTarget', args);
     });
@@ -286,6 +289,7 @@ cpmApp.controller('GetAllContainersController', function($rootScope, $scope, $ht
     }
 
     var init = function() {
+
         console.log('GetAllContainers init called');
         var token = $cookieStore.get('cpm_token');
         if (token === void 0) {
@@ -304,7 +308,11 @@ cpmApp.controller('GetAllContainersController', function($rootScope, $scope, $ht
                 });
                 $scope.activeClass = $scope.results[0].ID;
 		$scope.selectTab2($scope.results[0]);
-            }
+            } else {
+                $rootScope.$emit('noContainerEvent', {
+                    message: 'hi'
+                });
+	    }
         }).
         error(function(data, status, headers, config) {
             console.log('error:GetAllContainers:init');
@@ -487,6 +495,12 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
     $rootScope.$on('setContainerTarget', function(event, args) {
         console.log('GetContainerController setContainerTarget ' + args.message.ID);
         postit(args.message);
+    });
+    $rootScope.$on('noContainerTarget', function(event, args) {
+        console.log('GetContainerController noContainerTarget received');
+            $scope.results = [];
+		$scope.myCluster = [];
+		$scope.myServer = [];
     });
 
     $rootScope.$on('updateContainerPageTarget', function(event, args) {

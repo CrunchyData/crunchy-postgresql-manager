@@ -17,6 +17,11 @@
 # start pg, will initdb if /pgdata is empty as a way to bootstrap
 #
 
+#
+# clean up any previous PG lock files
+#
+rm /tmp/.s.PGSQL*
+
 source /opt/cpm/bin/setenv.sh
 
 HBA=/opt/cpm/conf/admin/pg_hba.conf

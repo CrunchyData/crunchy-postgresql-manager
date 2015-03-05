@@ -13,6 +13,9 @@ cpmApp.run(function($rootScope) {
     $rootScope.$on('updateServerPage', function(event, args) {
         $rootScope.$broadcast('updateServerPageTarget', args);
     });
+    $rootScope.$on('noServerEvent', function(event, args) {
+        $rootScope.$broadcast('noServerTarget', args);
+    });
     $rootScope.$on('reloadServers', function(event, args) {
         $rootScope.$broadcast('reloadServersTarget', args);
     });
@@ -215,7 +218,11 @@ cpmApp.controller('getAllServersController', function($rootScope, $scope, $http,
             if (data.length > 0) {
                 console.log('setting tab to ' + data[0].ID);
 		$scope.selectTab(data[0]);
-            }
+            } else {
+        	$rootScope.$emit('noServerEvent', {
+            	message: 'hi'
+        	});
+	    }
         }).error(function(data, status, headers, config) {
             console.log('error:GetAllServersController.http.get');
         });
@@ -428,6 +435,13 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
         $scope.message = args.message.ID;
         $scope.entryID = $scope.message.ID;
         postit(args.message.ID);
+    });
+
+    $rootScope.$on('noServerTarget', function(event, args) {
+        console.log('no server event received');
+        $scope.currentServer = [];
+    	$scope.results = [];
+    	$scope.containers = [];
     });
 
 

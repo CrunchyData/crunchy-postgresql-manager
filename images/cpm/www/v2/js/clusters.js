@@ -22,6 +22,9 @@ cpmApp.run(function($rootScope) {
     $rootScope.$on('deleteClusterEvent', function(event, args) {
         $rootScope.$broadcast('deleteClusterTarget', args);
     });
+    $rootScope.$on('noClusterEvent', function(event, args) {
+        $rootScope.$broadcast('noClusterTarget', args);
+    });
     $rootScope.$on('configureClusterEvent', function(event, args) {
         $rootScope.$broadcast('configureClusterTarget', args);
     });
@@ -269,7 +272,11 @@ cpmApp.controller('GACController', function($rootScope, $scope, $http, $modal, $
                 });
                 $scope.activeClass = $scope.results[0].ID;
 		$scope.selectTab3($scope.results[0]);
-            }
+            } else {
+                $rootScope.$emit('noClusterEvent', {
+                    message: 'hi'
+                });
+	    }
         }).
         error(function(data, status, headers, config) {
             console.log('error happended');
@@ -575,6 +582,10 @@ cpmApp.controller('GetClusterController', function($rootScope, $scope, $http, $r
             console.log('error:GetClusterController:http.get');
         });
     }
+    $rootScope.$on('noClusterTarget', function(event, args) {
+	    console.log('no cluster target received, blanking current cluster');
+        $scope.results = [];
+    });
     $rootScope.$on('updateClusterPageTarget', function(event, args) {
         console.log('here in target ' + args.message);
         $scope.message = args.message;
@@ -635,6 +646,13 @@ cpmApp.controller('GetAllContainersForClusterController', function($rootScope, $
             console.log('error:GetAllContainersForCluster:htt.get');
         });
     }
+
+    $rootScope.$on('noClusterTarget', function(event, args) {
+	    console.log('no cluster target received in get all containers');
+        $scope.results = [];
+            $scope.tableParams.reload();
+    });
+
     $rootScope.$on('updateClusterPageTarget', function(event, args) {
         console.log('here in GetAllContainersForClusterCtrl target ' + args.message.Name);
         $scope.message = args.message;
