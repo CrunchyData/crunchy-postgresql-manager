@@ -17,6 +17,9 @@
     $rootScope.$on('updateSchedulePage', function(event, args) {
         $rootScope.$broadcast('updateSchedulePageTarget', args);
     });
+    $rootScope.$on('noSchedule', function(event, args) {
+        $rootScope.$broadcast('noScheduleTarget', args);
+    });
     $rootScope.$on('setSchedule', function(event, args) {
         $rootScope.$broadcast('setScheduleTarget', args);
     });
@@ -535,6 +538,10 @@
         	console.log('setScheduleTarget ' + args.message.ID);
         	postit(args.message);
     	});
+ 	$rootScope.$on('noScheduleTarget', function(event, args) {
+        	console.log('no schedule event received here ');
+        	$scope.currentSchedule = [];
+    	});
 
    });      
 
@@ -599,12 +606,21 @@
                     message: $scope.results[0]
                 });
                 $scope.activeClass = $scope.results[0].ID;
-            }
+            } else {
+                $rootScope.$emit('noSchedule', {
+                    message: 'hi'
+                });
+	    }
         }).
         error(function(data, status, headers, config) {
             console.log('error:GetAllContainers:init');
         });
     };
+
+    $rootScope.$on('noScheduleTarget', function(event, args) {
+        console.log('no schedule event received');
+        $scope.results = [];
+    });
 
     $rootScope.$on('updateSchedulePageTarget', function(event, args) {
         console.log('updating list of schedules ' + args.message);
