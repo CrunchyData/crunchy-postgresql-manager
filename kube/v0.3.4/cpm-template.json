@@ -39,7 +39,7 @@
           "volumes": [
           	{
                	"name": "www",
-               	"source": { "hostDir": { "path": "/opt/cpm//www/v2" } }
+               	"source": { "hostDir": { "path": "/opt/cpm/www/v2" } }
 		}
           ],
           "containers": [{

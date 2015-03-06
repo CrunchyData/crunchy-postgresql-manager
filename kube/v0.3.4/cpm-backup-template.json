@@ -19,6 +19,15 @@
     }
   ],
   "items": [
+   {
+      "id": "cpm-backup",
+      "kind": "Service",
+      "apiVersion": "v1beta1",
+      "port": 13000,
+      "selector": {
+        "name": "cpm-backup"
+      }
+    },
     {
       "id": "cpm-backup",
       "kind": "Pod",

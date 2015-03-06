@@ -21,6 +21,15 @@
   "items": [
     {
       "id": "cpm-admin",
+      "kind": "Service",
+      "apiVersion": "v1beta1",
+      "port": 13000,
+      "selector": {
+        "name": "cpm-admin"
+      }
+    },
+    {
+      "id": "cpm-admin",
       "kind": "Pod",
       "apiVersion": "v1beta1",
       "desiredState": {
