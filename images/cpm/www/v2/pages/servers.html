@@ -4,8 +4,8 @@
   			<td valign="top" bgcolor="white" width="10%">
   				<table style="background-color: white;width:200px;">
   					<tr style="background-color: white; color: gray;">
-  						<td align="center" style="align: center;">
-  						</td>
+					<td align="center" style="align: center;">
+					</td>
   					</tr>
   				</table>
 
@@ -13,21 +13,6 @@
   				class="nav nav-pills nav-stacked">
   				<li ng-repeat="result in results" ng-class="{ active:isSelected(result.ID) }"><a href="" ng-click="selectTab(result)">{{result.Name}}</a></li>
   			</ul>
-  			<div class="btn-group" dropdown is-open="status.isopen">
-  				<button style="width:120px" type="button" class="btn btn-danger">Action</button>
-  				<button style="height:34px" type="button" class="btn btn-danger dropdown-toggle" ng-disabled="disabled">
-  					<span class="caret"></span>
-  					<span class="sr-only">Split button!</span>
-  				</button>
-  				<ul class="dropdown-menu" role="menu">
-  					<li><a ng-click="handleAddClick()" href="#/servers"><i class="fa fa-plus fa-fw"></i>Add Server</a></li>
-  					<li><a ng-click="handleDeleteClick()" href="#/servers"><i class="fa fa-trash-o fa-fw"></i>Delete Server</a></li>
-  					<li><a ng-click="handleMonitorClick()" href="#/servers"><i class="fa fa-bar-chart fa-fw"></i>Monitor Server</a></li>
-  					<li><a ng-click="startContainers()" href="#/servers"><i class="fa fa-play fa-fw"></i>Start Containers</a></li>
-  					<li><a ng-click="stopContainers()" href="#/servers"><i class="fa fa-power-off fa-fw"></i>Stop Containers</a></li>
-  					<li><a ng-click="updateServer()" href="#/servers"><i class="fa fa-edit fa-fw"></i>Update Server</a></li>
-  				</ul>
-  			</div>
   			<!-- here -->
   		</td>
 
@@ -36,7 +21,29 @@
   		</td>
   		<!-- CONTENT GOES IN THIS TD -->
   		<td width="70%" valign="top" >
-  			<h3>Servers</h3>
+			<table>
+			<tr>
+				<td>
+  				<h3>Servers</h3>
+				</td>
+				<td>&nbsp;</td>
+				<td>
+  			<div class="btn-group" dropdown is-open="status.isopen">
+  				<button style="height:32px" type="button" class="btn btn-danger dropdown-toggle" ng-disabled="disabled">
+  					<span class="fa fa-navicon"></span>
+  				</button>
+  				<ul class="dropdown-menu" role="menu">
+  					<li><a ng-click="handleAddClick()" href="#servers"><i class="fa fa-plus fa-fw"></i>Add Server</a></li>
+  					<li><a ng-click="handleDeleteClick()" href="#servers"><i class="fa fa-trash-o fa-fw"></i>Delete Server</a></li>
+  					<li><a ng-click="handleMonitorClick()" href="#servers"><i class="fa fa-bar-chart fa-fw"></i>Monitor Server</a></li>
+  					<li><a ng-click="startContainers()" href="#servers"><i class="fa fa-play fa-fw"></i>Start Containers</a></li>
+  					<li><a ng-click="stopContainers()" href="#servers"><i class="fa fa-power-off fa-fw"></i>Stop Containers</a></li>
+  					<li><a ng-click="updateServer()" href="#servers"><i class="fa fa-edit fa-fw"></i>Update Server</a></li>
+  				</ul>
+  			</div>
+				</td>
+			</tr>
+			</table>
   			<table>
   				<tr>
   					<td>

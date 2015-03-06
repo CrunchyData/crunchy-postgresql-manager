@@ -510,6 +510,7 @@ cpmApp.controller('GetClusterController', function($rootScope, $scope, $http, $r
     }];
 
     $scope.handleMinusClick = function() {
+	    $scope.status.isopen = false;
         console.log('hi from handleMinusClick id=' + $scope.results.ID);
         var modalInstance = $modal.open({
             templateUrl: 'pages/deleteclustermodal.html',
@@ -522,6 +523,7 @@ cpmApp.controller('GetClusterController', function($rootScope, $scope, $http, $r
         });
     };
     $scope.handleConfigureClick = function() {
+	    $scope.status.isopen = false;
         console.log('hi from handleConfigureClick id=' + $scope.results.ID);
         var modalInstance = $modal.open({
             templateUrl: 'pages/configureclustermodal.html',
@@ -535,6 +537,7 @@ cpmApp.controller('GetClusterController', function($rootScope, $scope, $http, $r
     };
 
     $scope.addNewContainer = function() {
+	    $scope.status.isopen = false;
         console.log('update cluster add container clicked');
         var modalInstance = $modal.open({
             templateUrl: 'pages/addclustercontainermodal.html',
@@ -549,6 +552,7 @@ cpmApp.controller('GetClusterController', function($rootScope, $scope, $http, $r
 
 
     $scope.handleAutoClick = function() {
+	    $scope.status.isopen = false;
         console.log('hi from handleAutoClick');
         var modalInstance = $modal.open({
             templateUrl: 'pages/autoclustermodal.html',
@@ -557,6 +561,7 @@ cpmApp.controller('GetClusterController', function($rootScope, $scope, $http, $r
         modalInstance.result.then(function(response) {});
     };
     $scope.handlePlusClick = function() {
+	    $scope.status.isopen = false;
         console.log('hi from handlePlusClick');
         var modalInstance = $modal.open({
             templateUrl: 'pages/createclustermodal.html',

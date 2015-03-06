@@ -14,11 +14,23 @@
   				class="nav nav-pills nav-stacked">
   				<li ng-repeat="result in results" ng-class="{ active:isSelected2(result.ID) }"><a href="" ng-click="selectTab2(result)">{{result.Name}}</a></li>
   			</ul>
+  		</td>
+
+  		<td width="3%">
+  			&nbsp;
+  		</td>
+  		<!-- CONTENT GOES IN THIS TD -->
+  		<td width="70%" valign="top" >
+			<table>
+			<tr>
+				<td>
+  			<h3>Containers</h3>
+				</td>
+				<td>&nbsp;</td>
+				<td>
   			<div class="btn-group" dropdown is-open="status.isopen">
-  				<button style="width:120px" type="button" class="btn btn-danger">Action</button>
-  				<button style="height:34px" type="button" class="btn btn-danger dropdown-toggle" ng-disabled="disabled">
-  					<span class="caret"></span>      
-  					<span class="sr-only">Split button!</span>
+  				<button style="height:32px" type="button" class="btn btn-danger dropdown-toggle" ng-disabled="disabled">
+  					<span class="fa fa-navicon"></span>      
   				</button>
 
   				<ul class="dropdown-menu" role="menu">
@@ -30,14 +42,11 @@
   					<li ng-if="isRunning"><a ng-click="handleStop()" href="#/containers"><i class="fa fa-stop fa-fw"></i>Stop Database</a></li>
   				</ul>
   			</div>
-  		</td>
 
-  		<td width="3%">
-  			&nbsp;
-  		</td>
-  		<!-- CONTENT GOES IN THIS TD -->
-  		<td width="70%" valign="top" >
-  			<h3>Containers</h3>
+				</td>
+			</tr>
+			</table>
+
   			<table>
   				<tr>
   					<td width="40%">

@@ -353,6 +353,7 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
     $scope.currentContainer = [];
 
     $scope.handleStart = function() {
+	    $scope.status.isopen=false;
         console.log('starting db on ' + $scope.currentContainer.Name);
         var modalInstance = $modal.open({
             templateUrl: 'pages/containerstart.html',
@@ -366,6 +367,7 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
         modalInstance.result.then(function(response) {});
     };
     $scope.handleStop = function() {
+	    $scope.status.isopen=false;
         console.log('stopping db on ' + $scope.currentContainer.Name);
         var modalInstance = $modal.open({
             templateUrl: 'pages/containerstop.html',
@@ -380,6 +382,7 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
     };
 
     $scope.handleBackupClick = function() {
+	    $scope.status.isopen=false;
         console.log('hi from handleBackupClick id=' + $scope.currentContainer.ID);
         var popupWindow = window.open('pages/backups.html');
         console.log('in app.js setting child container=' + $scope.currentContainer.ID);
@@ -387,6 +390,7 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
     };
 
     $scope.handleOfflineClick = function(msg) {
+	    $scope.status.isopen=false;
         console.log('user wants ' + msg.Name + ' to go offline');
         var modalInstance = $modal.open({
             templateUrl: 'pages/stopcontainermodal.html',
@@ -400,6 +404,7 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
     };
 
     $scope.handleMinusClick = function() {
+	    $scope.status.isopen=false;
         console.log('hi from handleMinusClick id=' + $scope.currentContainer.ID);
         var modalInstance = $modal.open({
             templateUrl: 'pages/deletecontainermodal.html',
@@ -413,6 +418,7 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
     };
 
     $scope.handleMonitorClick = function() {
+	    $scope.status.isopen=false;
         console.log('hi from handleMonitorClick id=' + $scope.currentContainer.ID);
         var popupWindow = window.open('pages/containermonitor.html');
         console.log('in app.js setting child container=' + $scope.currentContainer.ID);
@@ -421,6 +427,7 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
     };
 
     $scope.handlePlusClick = function() {
+	    $scope.status.isopen=false;
         console.log('hi from handlePlusClick');
         var modalInstance = $modal.open({
             templateUrl: 'pages/createcontainermodal.html',

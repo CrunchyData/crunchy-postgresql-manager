@@ -319,6 +319,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
     }
 
     $scope.stopContainers = function() {
+	$scope.status.isopen = false;
         console.log('stopContainers called');
         var names = '';
         var token = $cookieStore.get('cpm_token');
@@ -352,6 +353,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
     }
 
     $scope.startContainers = function() {
+	$scope.status.isopen = false;
         $rootScope.$emit('LoadingEvent', {
             message: ""
         });
@@ -385,6 +387,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
     }
 
     $scope.updateServer = function() {
+	$scope.status.isopen = false;
         var modalInstance = $modal.open({
             templateUrl: 'pages/updateservermodal.html',
             controller: UpdateServerModalInstanceCtrl,
@@ -398,6 +401,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
 
     $scope.handleAddClick = function(msg) {
         console.log('handleAddClick');
+	$scope.status.isopen = false;
         var modalInstance = $modal.open({
             templateUrl: 'pages/createservermodal.html',
             controller: csm
@@ -410,6 +414,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
 
     $scope.handleDeleteClick = function(msg) {
         console.log('handleDeleteClick');
+	$scope.status.isopen = false;
         var modalInstance = $modal.open({
             templateUrl: 'pages/deleteservermodal.html',
             controller: DeleteServerModalInstanceCtrl,
@@ -422,6 +427,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
     };
 
     $scope.handleMonitorClick = function(msg) {
+	$scope.status.isopen = false;
         console.log('hi from handleAdminClick id=' + $scope.currentServer.ID);
         var popupWindow = window.open('pages/servermonitor.html');
         console.log('in app.js setting child serverid=' + $scope.currentServer.ID);

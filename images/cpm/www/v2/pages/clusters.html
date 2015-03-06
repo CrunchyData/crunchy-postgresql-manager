@@ -12,12 +12,24 @@
   				<ul ng-controller="GACController as gas" style="overflow:hidden; overflow-y:scroll;height:300px; width:200px;"
   				class="nav nav-pills nav-stacked">
   				<li ng-repeat="result in results" ng-class="{ active:isSelected3(result.ID) }"><a href="" ng-click="selectTab3(result)">{{result.Name}}</a></li>
-  			</ul>
+  				</ul>
+  		</td>
+
+  		<td width="3%">
+  			&nbsp;
+  		</td>
+  		<!-- CONTENT GOES IN THIS TD -->
+  		<td width="70%" valign="top" >
+			<table>
+			<tr>
+			<td>
+				<h3>Clusters</h3>
+			</td>
+			<td>&nbsp;</td>
+			<td>
   			<div class="btn-group" dropdown is-open="status.isopen">
-  				<button style="width:120px" type="button" class="btn btn-danger">Action</button>
-  				<button style="height:34px" type="button" class="btn btn-danger dropdown-toggle" ng-disabled="disabled">
-  					<span class="caret"></span>      
-  					<span class="sr-only">Split button!</span>
+  				<button style="height:32px" type="button" class="btn btn-danger dropdown-toggle" ng-disabled="disabled">
+  					<span class="fa fa-navicon"></span>      
   				</button>
   				<ul class="dropdown-menu" role="menu">
   					<li><a ng-click="handleAutoClick()" href="#/clusters"><i class="fa fa-cubes fa-fw"></i>Automatic Cluster</a></li>
@@ -26,15 +38,10 @@
   					<li><a ng-click="addNewContainer()" href="#/clusters"><i class="fa fa-plug fa-fw"></i>Add Container to Cluster</a></li>
   					<li><a ng-click="handleConfigureClick()" href="#/clusters"><i class="fa fa-gear fa-fw"></i>Configure Cluster</a></li>
   				</ul>
-  			</div>
-  		</td>
+			</div></td>
+			</tr>
+			</table>
 
-  		<td width="3%">
-  			&nbsp;
-  		</td>
-  		<!-- CONTENT GOES IN THIS TD -->
-  		<td width="70%" valign="top" >
-  			<h3>Clusters</h3>
   			<table>
   				<tr>
   					<td>
