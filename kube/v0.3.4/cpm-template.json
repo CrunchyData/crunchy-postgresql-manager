@@ -29,17 +29,25 @@
       }
     },
     {
-      "id": "cpm-pod",
+      "id": "cpm",
       "kind": "Pod",
       "apiVersion": "v1beta1",
       "desiredState": {
         "manifest": {
           "version": "v1beta1",
-          "id": "cpm-pod",
+          "id": "cpm",
           "volumes": [
           	{
                	"name": "www",
                	"source": { "hostDir": { "path": "/opt/cpm/www/v2" } }
+		},
+          	{
+               	"name": "cpmlogs",
+               	"source": { "hostDir": { "path": "/opt/cpm/logs" } }
+		},
+          	{
+               	"name": "cpmkeys",
+               	"source": { "hostDir": { "path": "/opt/cpm/keys" } }
 		}
           ],
           "containers": [{
@@ -49,6 +57,16 @@
 			{
                        	"name": "www",
                        	"mountPath": "/www",
+                       	"readOnly": false
+                       	},
+			{
+                       	"name": "cpmlogs",
+                       	"mountPath": "/cpmlogs",
+                       	"readOnly": false
+                       	},
+			{
+                       	"name": "cpmkeys",
+                       	"mountPath": "/cpmkeys",
                        	"readOnly": false
                        	}
                  ],
