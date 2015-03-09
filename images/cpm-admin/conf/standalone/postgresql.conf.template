@@ -10,6 +10,8 @@
 # For a full version of this file with comments, see:
 #   http://git.postgresql.org/gitweb/?p=postgresql.git;a=blob_plain;f=src/backend/utils/misc/postgresql.conf.sample;hb=REL9_2_STABLE
 
+huge_pages = off
+
 #------------------------------------------------------------------------------
 # FILE LOCATIONS
 #------------------------------------------------------------------------------
