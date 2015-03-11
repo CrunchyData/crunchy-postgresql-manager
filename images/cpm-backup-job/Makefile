@@ -1,6 +1,6 @@
 
 build:
-		mkdir bin
+		mkdir -p bin
 		cp ../../sbin/cpm.sh ./bin
 		cp ../../bin/backupjob ./bin
 		cp ../../bin/dummyserver ./bin
