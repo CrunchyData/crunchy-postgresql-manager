@@ -20,9 +20,9 @@
 		}
           ],
           "containers": [{
-            "name": "master",
-            "cpu": "{{.CPU}}",
-            "memory": "{{.MEM}}",
+            "name": "{{.ID}}",
+            "cpu": {{.CPU}},
+            "memory": {{.MEM}},
             "image": "{{.IMAGE}}",
         	"volumeMounts": [
                                     {
