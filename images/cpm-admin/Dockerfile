@@ -7,6 +7,8 @@ ADD conf /opt/cpm/conf/
 # the port for the adminapi REST API
 EXPOSE 13000
 
+VOLUME ["/kubekeys"]
+
 USER postgres
 
 CMD ["/opt/cpm/bin/startadmin.sh"]
