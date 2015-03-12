@@ -17,9 +17,9 @@ package main
 
 import (
 	"crunchy.com/template"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
-	client "github.com/GoogleCloudPlatform/kubernetes/pkg/client"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
+	//"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
+	//client "github.com/GoogleCloudPlatform/kubernetes/pkg/client"
+	//"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
 	"github.com/golang/glog"
 )
 
@@ -29,6 +29,7 @@ import (
 // it returns an error is there was a problem
 func DeletePod(kubeURL string, ID string) error {
 	glog.Infoln("deleting pod " + ID)
+	/**
 	var c *client.Client
 	c = client.NewOrDie(&client.Config{
 		Host:    kubeURL,
@@ -42,6 +43,7 @@ func DeletePod(kubeURL string, ID string) error {
 		glog.Errorln("DeletePod:" + err.Error())
 		return err
 	}
+	*/
 
 	return nil
 }
@@ -62,25 +64,27 @@ func CreatePod(kubeURL string, podInfo template.KubePodParams) error {
 
 	glog.Infoln(string(data[:]))
 
-	//use the kube api directly for now, later on probably an openshift wrapping api
-	var obj runtime.Object
-	wasCreated := true
-	var c *client.Client
-	c = client.NewOrDie(&client.Config{
-		Host:    kubeURL,
-		Version: "v1beta1",
-	})
-	if c != nil {
-		glog.Infoln("connection to kube ok....")
-	}
+	/*
+		//use the kube api directly for now, later on probably an openshift wrapping api
+		var obj runtime.Object
+		wasCreated := true
+		var c *client.Client
+		c = client.NewOrDie(&client.Config{
+			Host:    kubeURL,
+			Version: "v1beta1",
+		})
+		if c != nil {
+			glog.Infoln("connection to kube ok....")
+		}
 
-	obj, err = c.Verb("POST").Path("pods").Body(data).Do().WasCreated(&wasCreated).Get()
-	if err != nil {
-		glog.Errorln("CreatePod:" + err.Error())
-		return err
-	}
-	if obj != nil {
-		glog.Infoln("got the object from the kube pod create")
-	}
+		obj, err = c.Verb("POST").Path("pods").Body(data).Do().WasCreated(&wasCreated).Get()
+		if err != nil {
+			glog.Errorln("CreatePod:" + err.Error())
+			return err
+		}
+		if obj != nil {
+			glog.Infoln("got the object from the kube pod create")
+		}
+	*/
 	return nil
 }
