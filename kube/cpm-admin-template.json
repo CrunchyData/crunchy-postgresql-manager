@@ -38,6 +38,12 @@
           "id": "cpm-admin",
           "volumes": [
  		{
+               	"name":"kubekeys",
+               	"source":
+			{ "hostDir":{ "path":"/opt/cpm/kubekeys" }
+               	}
+                },
+ 		{
                	"name":"cpmlogs",
                	"source":
 			{ "hostDir":{ "path":"/opt/cpm/logs" }
@@ -60,6 +66,10 @@
             "name": "cpm-admin",
             "image": "crunchydata/cpm-admin",
         	"volumeMounts": [
+                                { "name": "kubekeys",
+                                        "mountPath": "/kubekeys",
+                                        "readOnly": true
+                                },
                                 { "name": "pgdata",
                                         "mountPath": "/pgdata",
                                         "readOnly": false

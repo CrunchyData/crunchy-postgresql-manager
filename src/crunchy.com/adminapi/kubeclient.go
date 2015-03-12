@@ -16,12 +16,68 @@
 package main
 
 import (
+	"bytes"
 	"crunchy.com/template"
-	//"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
-	//client "github.com/GoogleCloudPlatform/kubernetes/pkg/client"
-	//"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
+	"crypto/tls"
+	"crypto/x509"
+	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/golang/glog"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
 )
+
+func TestCreate(w rest.ResponseWriter, r *rest.Request) {
+
+	glog.Infoln("here in Test Create")
+
+	kubeURL := os.Getenv("KUBE_URL")
+	if kubeURL == "" {
+		glog.Errorln("TestCreate: KUBE_URL not set")
+		rest.Error(w, "KUBE_URL not set", http.StatusBadRequest)
+	}
+
+	podInfo := template.KubePodParams{
+		"testnode",
+		"0", "0",
+		"crunchydata/cpm-node",
+		"/opt/cpm/data/pgsql/testnode"}
+	err := CreatePod(kubeURL, podInfo)
+	if err != nil {
+		glog.Infoln(err.Error())
+		glog.Errorln("TestCreate:" + err.Error())
+	}
+	glog.Infoln("no error on create pod")
+
+	response := KubeResponse{}
+	response.URL = "here in TestCreate"
+	w.WriteHeader(http.StatusOK)
+	w.WriteJson(&response)
+}
+
+func TestDelete(w rest.ResponseWriter, r *rest.Request) {
+
+	glog.Infoln("here in Test Delete")
+	kubeURL := os.Getenv("KUBE_URL")
+	if kubeURL == "" {
+		glog.Errorln("TestDelete: KUBE_URL not set")
+		rest.Error(w, "KUBE_URL not set", http.StatusBadRequest)
+		return
+	}
+	err := DeletePod(kubeURL, "testnode")
+	if err != nil {
+		glog.Infoln(err.Error())
+		glog.Errorln("TestCreate:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	glog.Infoln("no error on delete pod")
+	response := KubeResponse{}
+	response.URL = "here in TestDelete"
+	w.WriteHeader(http.StatusOK)
+	w.WriteJson(&response)
+}
 
 // DeletePod deletes a kube pod that should already exist
 // kubeURL  - the URL to kube
@@ -29,21 +85,59 @@ import (
 // it returns an error is there was a problem
 func DeletePod(kubeURL string, ID string) error {
 	glog.Infoln("deleting pod " + ID)
-	/**
-	var c *client.Client
-	c = client.NewOrDie(&client.Config{
-		Host:    kubeURL,
-		Version: "v1beta1",
-	})
-	if c != nil {
-		glog.Infoln("connection to kube ok....")
-	}
-	err := c.Pods(api.NamespaceDefault).Delete(ID)
+
+	var caFile = "/kubekeys/root.crt"
+	var certFile = "/kubekeys/cert.crt"
+	var keyFile = "/kubekeys/key.key"
+
+	// Load client cert
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
-		glog.Errorln("DeletePod:" + err.Error())
+		glog.Errorln(err.Error())
+		return nil
+	}
+
+	// Load CA cert
+	caCert, err := ioutil.ReadFile(caFile)
+	if err != nil {
+		glog.Errorln(err.Error())
+		return nil
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	// Setup HTTPS client
+	tlsConfig := &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		RootCAs:      caCertPool,
+	}
+	tlsConfig.BuildNameToCertificate()
+	transport := &http.Transport{TLSClientConfig: tlsConfig}
+	client := &http.Client{Transport: transport}
+
+	// DELETE
+	var url = kubeURL + "/api/v1beta1/pods/" + ID
+	glog.Infoln("url is " + url)
+	request, err2 := http.NewRequest("DELETE", url, nil)
+	if err2 != nil {
+		glog.Errorln(err2.Error())
+		return err2
+	}
+
+	resp, err := client.Do(request)
+	if err != nil {
+		glog.Errorln(err.Error())
 		return err
 	}
-	*/
+	defer resp.Body.Close()
+
+	// Dump response
+	data, err2 := ioutil.ReadAll(resp.Body)
+	if err2 != nil {
+		glog.Errorln(err2.Error())
+		return nil
+	}
+	log.Println(string(data))
 
 	return nil
 }
@@ -53,6 +147,10 @@ func DeletePod(kubeURL string, ID string) error {
 // podInfo - the params used to configure the pod
 // return an error if anything goes wrong
 func CreatePod(kubeURL string, podInfo template.KubePodParams) error {
+	var caFile = "/kubekeys/root.crt"
+	var certFile = "/kubekeys/cert.crt"
+	var keyFile = "/kubekeys/key.key"
+
 	glog.Infoln("creating pod " + podInfo.ID)
 
 	//use a pod template to build the pod definition
@@ -64,27 +162,114 @@ func CreatePod(kubeURL string, podInfo template.KubePodParams) error {
 
 	glog.Infoln(string(data[:]))
 
-	/*
-		//use the kube api directly for now, later on probably an openshift wrapping api
-		var obj runtime.Object
-		wasCreated := true
-		var c *client.Client
-		c = client.NewOrDie(&client.Config{
-			Host:    kubeURL,
-			Version: "v1beta1",
-		})
-		if c != nil {
-			glog.Infoln("connection to kube ok....")
-		}
+	// Load client cert
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		glog.Errorln(err.Error())
+		return nil
+	}
 
-		obj, err = c.Verb("POST").Path("pods").Body(data).Do().WasCreated(&wasCreated).Get()
-		if err != nil {
-			glog.Errorln("CreatePod:" + err.Error())
-			return err
-		}
-		if obj != nil {
-			glog.Infoln("got the object from the kube pod create")
-		}
-	*/
+	// Load CA cert
+	caCert, err := ioutil.ReadFile(caFile)
+	if err != nil {
+		glog.Errorln(err.Error())
+		return nil
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	// Setup HTTPS client
+	tlsConfig := &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		RootCAs:      caCertPool,
+	}
+	tlsConfig.BuildNameToCertificate()
+	transport := &http.Transport{TLSClientConfig: tlsConfig}
+	client := &http.Client{Transport: transport}
+
+	// POST
+	var bodyType = "application/json"
+	var url = kubeURL + "/api/v1beta1/pods"
+	glog.Infoln("url is " + url)
+	resp, err := client.Post(url, bodyType, bytes.NewReader(data))
+	if err != nil {
+		glog.Errorln(err.Error())
+		return nil
+	}
+	defer resp.Body.Close()
+
+	// Dump response
+	data, err2 := ioutil.ReadAll(resp.Body)
+	if err2 != nil {
+		glog.Errorln(err2.Error())
+		return nil
+	}
+	log.Println(string(data))
+
+	return nil
+
+}
+
+// CreatePod creates a new pod using passed in values
+// kubeURL - the URL to the kube
+// podInfo - the params used to configure the pod
+// return an error if anything goes wrong
+func GetPods(kubeURL string, podInfo template.KubePodParams) error {
+	var caFile = "/kubekeys/root.crt"
+	var certFile = "/kubekeys/cert.crt"
+	var keyFile = "/kubekeys/key.key"
+
+	glog.Infoln("creating pod " + podInfo.ID)
+
+	//use a pod template to build the pod definition
+	data, err := template.KubeNodePod(podInfo)
+	if err != nil {
+		glog.Errorln("CreatePod:" + err.Error())
+		return err
+	}
+
+	glog.Infoln(string(data[:]))
+
+	// Load client cert
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		glog.Errorln(err.Error())
+		return nil
+	}
+
+	// Load CA cert
+	caCert, err := ioutil.ReadFile(caFile)
+	if err != nil {
+		glog.Errorln(err.Error())
+		return nil
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	// Setup HTTPS client
+	tlsConfig := &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		RootCAs:      caCertPool,
+	}
+	tlsConfig.BuildNameToCertificate()
+	transport := &http.Transport{TLSClientConfig: tlsConfig}
+	client := &http.Client{Transport: transport}
+
+	// Do GET something
+	resp, err := client.Get(kubeURL + "/api/v1beta1/pods")
+	if err != nil {
+		glog.Errorln(err.Error())
+		return nil
+	}
+	defer resp.Body.Close()
+
+	// Dump response
+	data, err2 := ioutil.ReadAll(resp.Body)
+	if err2 != nil {
+		glog.Errorln(err2.Error())
+		return nil
+	}
+	log.Println(string(data))
+
 	return nil
 }
