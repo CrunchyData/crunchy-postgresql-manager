@@ -2,7 +2,7 @@ FROM rhel7
 MAINTAINER crunchy
 
 RUN rpm -Uvh http://nginx.org/packages/rhel/7/noarch/RPMS/nginx-release-rhel-7-0.el7.ngx.noarch.rpm
-RUN yum install -y procps-ng nginx which hostname && yum clean all -y
+RUN yum install -y openssl procps-ng nginx which hostname && yum clean all -y
 
 VOLUME ["/www"]
 RUN chown -R daemon:daemon /www
