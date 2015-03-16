@@ -191,7 +191,7 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 		podInfo := template.KubePodParams{
 			params.ContainerName,
 			params.CPU, params.MEM,
-			"registry:5000/" + params.Image,
+			params.Image,
 			params.PGDataPath}
 		err = CreatePod(kube, podInfo)
 		if err != nil {

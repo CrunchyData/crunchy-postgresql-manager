@@ -87,6 +87,7 @@
                  ],
 
             "env": [
+ 		{ "name": "KUBE_URL", "value": "https://192.168.0.108:8443" },
  		{ "name": "DOMAIN", "value": "example.com" },
                	{ "name": "DB_PORT", "value": "5432" },
                	{ "name": "DB_USER", "value": "postgres" },
