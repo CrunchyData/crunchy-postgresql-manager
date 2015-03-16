@@ -22,7 +22,7 @@
           "containers": [{
             "name": "{{.ID}}",
             "cpu": {{.CPU}},
-            "memory": {{.MEM}},
+            "memory": 0,
             "image": "{{.IMAGE}}",
         	"volumeMounts": [
                                     {
@@ -39,7 +39,8 @@
               }
             ],
             "ports": [{
-              "containerPort": 5432
+              "containerPort": 5432,
+              "containerPort": 13000
             }]
           }]
         }

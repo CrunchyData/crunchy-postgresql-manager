@@ -20,6 +20,7 @@ import (
 	"crunchy.com/template"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/golang/glog"
 	"io/ioutil"
@@ -27,6 +28,12 @@ import (
 	"net/http"
 	"os"
 )
+
+type MyPod struct {
+	CurrentState struct {
+		Status string
+	}
+}
 
 func TestCreate(w rest.ResponseWriter, r *rest.Request) {
 
@@ -135,14 +142,14 @@ func DeletePod(kubeURL string, ID string) error {
 	data, err2 := ioutil.ReadAll(resp.Body)
 	if err2 != nil {
 		glog.Errorln(err2.Error())
-		return nil
+		return err2
 	}
-	log.Println(string(data))
+	glog.Infoln(string(data))
 
 	return nil
 }
 
-// CreatePod creates a new pod using passed in values
+// CreatePod creates a new pod and service using passed in values
 // kubeURL - the URL to the kube
 // podInfo - the params used to configure the pod
 // return an error if anything goes wrong
@@ -159,8 +166,16 @@ func CreatePod(kubeURL string, podInfo template.KubePodParams) error {
 		glog.Errorln("CreatePod:" + err.Error())
 		return err
 	}
-
 	glog.Infoln(string(data[:]))
+
+	//use a service template to build the service definition
+	servicedata, err := template.KubeNodeService(podInfo)
+	if err != nil {
+		glog.Errorln("CreatePod:" + err.Error())
+		return err
+	}
+
+	glog.Infoln(string(servicedata[:]))
 
 	// Load client cert
 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
@@ -187,7 +202,7 @@ func CreatePod(kubeURL string, podInfo template.KubePodParams) error {
 	transport := &http.Transport{TLSClientConfig: tlsConfig}
 	client := &http.Client{Transport: transport}
 
-	// POST
+	// POST POD
 	var bodyType = "application/json"
 	var url = kubeURL + "/api/v1beta1/pods"
 	glog.Infoln("url is " + url)
@@ -200,6 +215,24 @@ func CreatePod(kubeURL string, podInfo template.KubePodParams) error {
 
 	// Dump response
 	data, err2 := ioutil.ReadAll(resp.Body)
+	if err2 != nil {
+		glog.Errorln(err2.Error())
+		return nil
+	}
+	log.Println(string(data))
+
+	// POST SERVICE
+	url = kubeURL + "/api/v1beta1/services"
+	glog.Infoln("url is " + url)
+	resp, err = client.Post(url, bodyType, bytes.NewReader(servicedata))
+	if err != nil {
+		glog.Errorln(err.Error())
+		return nil
+	}
+	defer resp.Body.Close()
+
+	// Dump response
+	data, err2 = ioutil.ReadAll(resp.Body)
 	if err2 != nil {
 		glog.Errorln(err2.Error())
 		return nil
@@ -272,4 +305,65 @@ func GetPods(kubeURL string, podInfo template.KubePodParams) error {
 	log.Println(string(data))
 
 	return nil
+}
+
+// GetPod gets information about a single pod from kube
+// kubeURL - the URL to the kube
+// podName - the pod name
+// return an error if anything goes wrong
+func GetPod(kubeURL string, podName string) (MyPod, error) {
+	var podInfo MyPod
+	var caFile = "/kubekeys/root.crt"
+	var certFile = "/kubekeys/cert.crt"
+	var keyFile = "/kubekeys/key.key"
+
+	glog.Infoln("getting pod info " + podName)
+
+	// Load client cert
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		glog.Errorln(err.Error())
+		return podInfo, nil
+	}
+
+	// Load CA cert
+	caCert, err := ioutil.ReadFile(caFile)
+	if err != nil {
+		glog.Errorln(err.Error())
+		return podInfo, nil
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	// Setup HTTPS client
+	tlsConfig := &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		RootCAs:      caCertPool,
+	}
+	tlsConfig.BuildNameToCertificate()
+	transport := &http.Transport{TLSClientConfig: tlsConfig}
+	client := &http.Client{Transport: transport}
+
+	// Do GET something
+	resp, err := client.Get(kubeURL + "/api/v1beta1/pods/" + podName)
+	if err != nil {
+		glog.Errorln(err.Error())
+		return podInfo, nil
+	}
+	defer resp.Body.Close()
+
+	// Dump response
+	data, err2 := ioutil.ReadAll(resp.Body)
+	if err2 != nil {
+		glog.Errorln(err2.Error())
+		return podInfo, nil
+	}
+	log.Println(string(data))
+	err2 = json.Unmarshal(data, &podInfo)
+	if err2 != nil {
+		glog.Errorln("error in unmarshalling pod " + err2.Error())
+		return podInfo, err2
+	}
+
+	return podInfo, nil
 }
