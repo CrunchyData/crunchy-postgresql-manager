@@ -30,9 +30,19 @@ import (
 	"time"
 )
 
+var kubeEnv = false
+
 func init() {
 	fmt.Println("before parsing in init")
 	flag.Parse()
+
+	kube := os.Getenv("KUBE_URL")
+	glog.Infoln("KUBE_URL=[" + kube + "]")
+	if kube != "" {
+		glog.Infoln("KUBE_URL value set, assume Kube environment")
+		kubeEnv = true
+	}
+
 }
 
 var PGBIN = "/usr/pgsql-9.4/bin/"

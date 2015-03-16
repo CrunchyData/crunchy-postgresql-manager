@@ -1,4 +1,4 @@
-  <div ng-controller="GetContainerController as gsc">
+	<div>
   	<table style="background-color: white; width:100%">
   		<tr>
   			<td valign="top" bgcolor="white" width="10%">
@@ -20,7 +20,7 @@
   			&nbsp;
   		</td>
   		<!-- CONTENT GOES IN THIS TD -->
-  		<td width="70%" valign="top" >
+  		<td width="70%" valign="top" ng-controller="GetContainerController as gsc">
 			<table>
 			<tr>
 				<td>
@@ -82,8 +82,6 @@
   					<td>&nbsp;&nbsp;
   					</td>
   					<td width="40%">
-  						<h4>DB Status</h4>
-  						<input disabled class="form-control" name="status" type="text" ng-model="results.Status" size="10">
   					</td>
   				</tr>
   				<tr>

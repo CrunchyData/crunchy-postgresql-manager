@@ -26,7 +26,6 @@ import (
 	"github.com/golang/glog"
 	"net/http"
 	"os"
-	//	"os/exec"
 )
 
 func GetNode(w rest.ResponseWriter, r *rest.Request) {
@@ -66,22 +65,26 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	_, err = cpmagent.DockerInspect2Command(results.Name, server.IPAddress)
+	var domain string
+	domain, err = admindb.GetDomain()
 	if err != nil {
 		glog.Errorln("GetNode: " + err.Error())
-		currentStatus = "CONTAINER NOT FOUND"
-	} else {
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-		//ping the db on that node to get current status
-		var domain string
-		domain, err = admindb.GetDomain()
+	if kubeEnv {
+	} else {
+		_, err = cpmagent.DockerInspect2Command(results.Name, server.IPAddress)
 		if err != nil {
 			glog.Errorln("GetNode: " + err.Error())
-			rest.Error(w, err.Error(), http.StatusBadRequest)
-			return
+			currentStatus = "CONTAINER NOT FOUND"
 		}
 
+	}
+
+	if currentStatus != "CONTAINER NOT FOUND" {
+		//ping the db on that node to get current status
 		currentStatus, err = GetPGStatus2(results.Name + "." + domain)
 		if err != nil {
 			glog.Errorln("GetNode:" + err.Error())
@@ -92,6 +95,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 
 	node := ClusterNode{results.ID, results.ClusterID, results.ServerID,
 		results.Name, results.Role, results.Image, results.CreateDate, currentStatus}
+
 	w.WriteJson(node)
 }
 
@@ -153,7 +157,7 @@ func GetAllNodes(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].Role = results[i].Role
 		nodes[i].Image = results[i].Image
 		nodes[i].CreateDate = results[i].CreateDate
-		nodes[i].Status = "UNKNOWN"
+		//nodes[i].Status = "UNKNOWN"
 		i++
 	}
 
@@ -185,7 +189,7 @@ func GetAllNodesNotInCluster(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].Role = results[i].Role
 		nodes[i].Image = results[i].Image
 		nodes[i].CreateDate = results[i].CreateDate
-		nodes[i].Status = "UNKNOWN"
+		//nodes[i].Status = "UNKNOWN"
 		i++
 	}
 
@@ -223,7 +227,7 @@ func GetAllNodesForCluster(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].Role = results[i].Role
 		nodes[i].Image = results[i].Image
 		nodes[i].CreateDate = results[i].CreateDate
-		nodes[i].Status = "UNKNOWN"
+		//nodes[i].Status = "UNKNOWN"
 		i++
 	}
 
@@ -364,6 +368,7 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].Image = results[i].Image
 		nodes[i].CreateDate = results[i].CreateDate
 		nodes[i].Status = "down"
+
 		output, e = cpmagent.DockerInspect2Command(results[i].Name, server.IPAddress)
 		glog.Infoln("GetAllNodesForServer:" + results[i].Name + " " + output.IPAddress + " " + output.RunningState)
 		if e != nil {
@@ -374,6 +379,7 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 			glog.Infoln("GetAllNodesForServer: setting " + results[i].Name + " to " + output.RunningState)
 			nodes[i].Status = output.RunningState
 		}
+
 		i++
 	}
 
