@@ -79,17 +79,17 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 		var podInfo MyPod
 		podInfo, err = GetPod(kubeURL, results.Name)
 		if err != nil {
-			currentStatus = "CONTAINER NOT FOUND"
+			currentStatus = CONTAINER_NOT_FOUND
 		}
 		glog.Infoln("pod info status is " + podInfo.CurrentState.Status)
 		if podInfo.CurrentState.Status != "Running" {
-			currentStatus = "CONTAINER NOT FOUND"
+			currentStatus = CONTAINER_NOT_FOUND
 		}
 	} else {
 		_, err = cpmagent.DockerInspect2Command(results.Name, server.IPAddress)
 		if err != nil {
 			glog.Errorln("GetNode: " + err.Error())
-			currentStatus = "CONTAINER NOT FOUND"
+			currentStatus = CONTAINER_NOT_FOUND
 		}
 
 	}

@@ -195,7 +195,7 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 			params.ContainerName,
 			params.CPU, params.MEM,
 			params.Image,
-			params.PGDataPath}
+			params.PGDataPath, "13000"}
 		glog.Infoln("before create pod")
 		err = CreatePod(kube, podInfo)
 		glog.Infoln("after create pod")

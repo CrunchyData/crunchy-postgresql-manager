@@ -49,7 +49,7 @@ func TestCreate(w rest.ResponseWriter, r *rest.Request) {
 		"testnode",
 		"0", "0",
 		"crunchydata/cpm-node",
-		"/opt/cpm/data/pgsql/testnode"}
+		"/opt/cpm/data/pgsql/testnode", "13000"}
 	err := CreatePod(kubeURL, podInfo)
 	if err != nil {
 		glog.Infoln(err.Error())
@@ -158,25 +158,6 @@ func CreatePod(kubeURL string, podInfo template.KubePodParams) error {
 	var certFile = "/kubekeys/cert.crt"
 	var keyFile = "/kubekeys/key.key"
 
-	glog.Infoln("creating pod " + podInfo.ID)
-
-	//use a pod template to build the pod definition
-	data, err := template.KubeNodePod(podInfo)
-	if err != nil {
-		glog.Errorln("CreatePod:" + err.Error())
-		return err
-	}
-	glog.Infoln(string(data[:]))
-
-	//use a service template to build the service definition
-	servicedata, err := template.KubeNodeService(podInfo)
-	if err != nil {
-		glog.Errorln("CreatePod:" + err.Error())
-		return err
-	}
-
-	glog.Infoln(string(servicedata[:]))
-
 	// Load client cert
 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
@@ -202,10 +183,23 @@ func CreatePod(kubeURL string, podInfo template.KubePodParams) error {
 	transport := &http.Transport{TLSClientConfig: tlsConfig}
 	client := &http.Client{Transport: transport}
 
-	// POST POD
+	glog.Infoln("creating pod " + podInfo.ID)
+
+	//use a pod template to build the pod definition
+	data, err := template.KubeNodePod(podInfo)
+	if err != nil {
+		glog.Errorln("CreatePod:" + err.Error())
+		return err
+	}
+	glog.Infoln(string(data[:]))
+
 	var bodyType = "application/json"
 	var url = kubeURL + "/api/v1beta1/pods"
+	var serviceurl = kubeURL + "/api/v1beta1/services"
 	glog.Infoln("url is " + url)
+	glog.Infoln("serviceurl is " + serviceurl)
+
+	// POST POD
 	resp, err := client.Post(url, bodyType, bytes.NewReader(data))
 	if err != nil {
 		glog.Errorln(err.Error())
@@ -214,36 +208,73 @@ func CreatePod(kubeURL string, podInfo template.KubePodParams) error {
 	defer resp.Body.Close()
 
 	// Dump response
-	data, err2 := ioutil.ReadAll(resp.Body)
-	if err2 != nil {
-		glog.Errorln(err2.Error())
-		return nil
-	}
-	log.Println(string(data))
-
-	// POST SERVICE
-	url = kubeURL + "/api/v1beta1/services"
-	glog.Infoln("url is " + url)
-	resp, err = client.Post(url, bodyType, bytes.NewReader(servicedata))
+	data, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		glog.Errorln(err.Error())
 		return nil
 	}
-	defer resp.Body.Close()
+	log.Println(string(data))
+
+	//use a service template to build the service definition
+	//service 1 is for the admin port 13000
+	podInfo.PORT = "13000"
+	var s1data []byte
+	s1data, err = template.KubeNodeService(podInfo)
+	if err != nil {
+		glog.Errorln("CreatePod:" + err.Error())
+		return err
+	}
+	glog.Infoln("service 1 request...")
+	glog.Infoln(string(s1data[:]))
+
+	// POST admin SERVICE at port 13000
+	resp1, err1 := client.Post(serviceurl, bodyType, bytes.NewReader(s1data))
+	if err != nil {
+		glog.Errorln(err.Error())
+		return nil
+	}
+	defer resp1.Body.Close()
 
 	// Dump response
-	data, err2 = ioutil.ReadAll(resp.Body)
+	data, err = ioutil.ReadAll(resp1.Body)
+	if err != nil {
+		glog.Errorln(err1.Error())
+		return nil
+	}
+	log.Println("service 1 response..." + string(data))
+
+	// POST pg SERVICE at port 5432 adding "-db" as suffix to name
+	podInfo.PORT = "5432"
+	podInfo.ID = podInfo.ID + "-db"
+	var s2data []byte
+	s2data, err = template.KubeNodeService(podInfo)
+	if err != nil {
+		glog.Errorln("CreatePod:" + err.Error())
+		return err
+	}
+
+	glog.Infoln("service 2 request...")
+	glog.Infoln(string(s2data[:]))
+	resp2, err2 := client.Post(serviceurl, bodyType, bytes.NewReader(s2data))
 	if err2 != nil {
 		glog.Errorln(err2.Error())
 		return nil
 	}
-	log.Println(string(data))
+	defer resp2.Body.Close()
+
+	// Dump response
+	data, err = ioutil.ReadAll(resp2.Body)
+	if err != nil {
+		glog.Errorln(err.Error())
+		return nil
+	}
+	log.Println("service 2 response ..." + string(data))
 
 	return nil
 
 }
 
-// CreatePod creates a new pod using passed in values
+// GetPods gets all the pods
 // kubeURL - the URL to the kube
 // podInfo - the params used to configure the pod
 // return an error if anything goes wrong

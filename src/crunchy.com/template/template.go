@@ -45,6 +45,7 @@ type KubePodParams struct {
 	MEM    string
 	IMAGE  string
 	VOLUME string
+	PORT   string
 }
 
 type HBAParameters struct {
