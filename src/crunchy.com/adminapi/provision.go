@@ -186,14 +186,19 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 		//we only log an error, this is ok because
 		//we can get a 'not found' as an error
 		err = DeletePod(kube, params.ContainerName)
-		glog.Infoln("Provision:" + err.Error())
+		glog.Infoln("after delete pod")
+		if err != nil {
+			glog.Infoln("Provision:" + err.Error())
+		}
 
 		podInfo := template.KubePodParams{
 			params.ContainerName,
 			params.CPU, params.MEM,
 			params.Image,
-			params.PGDataPath}
+			params.PGDataPath, "13000"}
+		glog.Infoln("before create pod")
 		err = CreatePod(kube, podInfo)
+		glog.Infoln("after create pod")
 		if err != nil {
 			glog.Errorln("Provision:" + err.Error())
 			return err
@@ -360,7 +365,7 @@ func waitTillReady(container string) error {
 		err = RemoteWritefile("/tmp/waitTest", "waitTillReady was here", container)
 		if err != nil {
 			glog.Errorln("waitTillReady:waited for cpmagent on " + container)
-			time.Sleep(1000 * time.Millisecond)
+			time.Sleep(2000 * time.Millisecond)
 		} else {
 			glog.Infoln("waitTillReady:connected to cpmagent on " + container)
 			return nil

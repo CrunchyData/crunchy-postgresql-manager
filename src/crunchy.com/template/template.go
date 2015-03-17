@@ -45,6 +45,7 @@ type KubePodParams struct {
 	MEM    string
 	IMAGE  string
 	VOLUME string
+	PORT   string
 }
 
 type HBAParameters struct {
@@ -349,6 +350,26 @@ func KubeNodePod(info KubePodParams) ([]byte, error) {
 
 	var path string
 	path = CPMCONF + "kube.node.pod.template"
+
+	contents, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	tmpl, err := template.New("kube").Parse(string(contents))
+	if err != nil {
+		return nil, err
+	}
+	buff := bytes.NewBufferString("")
+	err = tmpl.Execute(buff, info)
+
+	return buff.Bytes(), nil
+}
+
+func KubeNodeService(info KubePodParams) ([]byte, error) {
+
+	var path string
+	path = CPMCONF + "kube.node.service.template"
 
 	contents, err := ioutil.ReadFile(path)
 	if err != nil {

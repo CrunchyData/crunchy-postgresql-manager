@@ -31,14 +31,15 @@ import (
 )
 
 var kubeEnv = false
+var kubeURL = ""
 
 func init() {
 	fmt.Println("before parsing in init")
 	flag.Parse()
 
-	kube := os.Getenv("KUBE_URL")
-	glog.Infoln("KUBE_URL=[" + kube + "]")
-	if kube != "" {
+	kubeURL = os.Getenv("KUBE_URL")
+	glog.Infoln("KUBE_URL=[" + kubeURL + "]")
+	if kubeURL != "" {
 		glog.Infoln("KUBE_URL value set, assume Kube environment")
 		kubeEnv = true
 	}

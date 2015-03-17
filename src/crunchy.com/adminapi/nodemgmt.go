@@ -28,6 +28,8 @@ import (
 	"os"
 )
 
+const CONTAINER_NOT_FOUND = "CONTAINER NOT FOUND"
+
 func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
@@ -74,11 +76,20 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	if kubeEnv {
+		var podInfo MyPod
+		podInfo, err = GetPod(kubeURL, results.Name)
+		if err != nil {
+			currentStatus = CONTAINER_NOT_FOUND
+		}
+		glog.Infoln("pod info status is " + podInfo.CurrentState.Status)
+		if podInfo.CurrentState.Status != "Running" {
+			currentStatus = CONTAINER_NOT_FOUND
+		}
 	} else {
 		_, err = cpmagent.DockerInspect2Command(results.Name, server.IPAddress)
 		if err != nil {
 			glog.Errorln("GetNode: " + err.Error())
-			currentStatus = "CONTAINER NOT FOUND"
+			currentStatus = CONTAINER_NOT_FOUND
 		}
 
 	}

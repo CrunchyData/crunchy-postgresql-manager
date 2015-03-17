@@ -29,6 +29,15 @@
       }
     },
     {
+      "id": "cpm-admin-db",
+      "kind": "Service",
+      "apiVersion": "v1beta1",
+      "port": 5432,
+      "selector": {
+        "name": "cpm-admin-db"
+      }
+    },
+    {
       "id": "cpm-admin",
       "kind": "Pod",
       "apiVersion": "v1beta1",
