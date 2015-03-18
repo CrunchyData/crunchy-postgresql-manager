@@ -28,7 +28,7 @@
 
 	$scope.currentUser = [];
 	$scope.currentUser = $cookieStore.get('cpmuser');
-	console.log('currentUser is ' + $scope.currentUser);
+	//console.log('currentUser is ' + $scope.currentUser);
 
         $http.get($cookieStore.get('AdminURL') + '/server/' + window.serverid + '.' + token).success(function(data, status, headers, config) {
             $scope.server = data;
@@ -36,11 +36,11 @@
             alert('error in get server');
         });
 
-        console.log('working on iostat');
+        //console.log('working on iostat');
         $http.get($cookieStore.get('AdminURL') + '/monitor/server-getinfo/' + serverid + ".cpmiostat." + token).
         success(function(data, status, headers, config) {
             $scope.iostatresults = data.iostat;
-            console.log('getinfo results set ' + data);
+            //console.log('getinfo results set ' + data);
         }).
         error(function(data, status, headers, config) {
             alert('error happended');
@@ -53,11 +53,11 @@
 
         $scope.handleRefresh = function() {
             var token = $cookieStore.get('cpm_token');
-            console.log('working on iostat');
+            //console.log('working on iostat');
             $http.get($cookieStore.get('AdminURL') + '/monitor/server-getinfo/' + serverid + ".cpmiostat." + token).
             success(function(data, status, headers, config) {
                 $scope.iostatresults = data.iostat;
-                console.log('getinfo results set ' + data);
+                //console.log('getinfo results set ' + data);
             }).
             error(function(data, status, headers, config) {
                 alert('error happended');
@@ -72,12 +72,12 @@
 
         $scope.handleRefresh = function() {
             var token = $cookieStore.get('cpm_token');
-            console.log('working on df');
-            console.log('calling getinfo service');
+            //console.log('working on df');
+            //console.log('calling getinfo service');
             $http.get($cookieStore.get('AdminURL') + '/monitor/server-getinfo/' + serverid + ".cpmdf." + token).
             success(function(data, status, headers, config) {
                 $scope.dfresults = data.df;
-                console.log('getinfo results set ' + data.df);
+                //console.log('getinfo results set ' + data.df);
             }).error(function(data, status, headers, config) {
                 alert('error happended');
             });
@@ -89,7 +89,7 @@
 
     app.controller('graphController', function($rootScope, $scope, $route, $http, $cookies, $cookieStore) {
 
-	    console.log('graphing server ' + $scope.server.Name); 
+	    //console.log('graphing server ' + $scope.server.Name); 
 	var seriesData2 = [];
 	var memseriesData2 = [];
 	var graph, memgraph;

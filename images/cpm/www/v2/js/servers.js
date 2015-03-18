@@ -37,16 +37,16 @@ var csm = function($rootScope, $scope, $modalInstance, $http, $cookies, $cookieS
     $scope.ServerClass = 'low';
 
     $scope.cancel = function() {
-        console.log('in cancel');
+        //console.log('in cancel');
         $modalInstance.dismiss('cancel');
     };
 
     $scope.ok = function() {
-        console.log('in CreateServerModalInstanceCtrl');
+        //console.log('in CreateServerModalInstanceCtrl');
         ID = "0";
         cleanIP = this.IPAddress.replace(/\./g, "_");
         cleanBridgeIP = this.DockerBridgeIP.replace(/\./g, "_");
-        console.log('cleaned IP=' + cleanIP);
+        //console.log('cleaned IP=' + cleanIP);
         cleanPath = this.PGDataPath.replace(/\//g, "_");
 
         var token = $cookieStore.get('cpm_token');
@@ -74,15 +74,15 @@ var UpdateServerModalInstanceCtrl = function($rootScope, $scope, $http, $modalIn
     $scope.currentServer = [];
 
     $scope.ok = function() {
-        console.log('updateServer called');
-        console.log('update server got ID=' + $scope.value.ID);
-        console.log('update server got name=' + $scope.value.Name);
-        console.log('update server got ip=' + $scope.value.IPAddress);
-        console.log('update server got dockerip=' + $scope.value.DockerBridgeIP);
-        console.log('update server got path=' + $scope.value.PGDataPath);
+        //console.log('updateServer called');
+        //console.log('update server got ID=' + $scope.value.ID);
+        //console.log('update server got name=' + $scope.value.Name);
+        //console.log('update server got ip=' + $scope.value.IPAddress);
+        //console.log('update server got dockerip=' + $scope.value.DockerBridgeIP);
+        //console.log('update server got path=' + $scope.value.PGDataPath);
         cleanIP = $scope.value.IPAddress.replace(/\./g, "_");
         cleanDockerIP = $scope.value.DockerBridgeIP.replace(/\./g, "_");
-        console.log('cleaned IP=' + cleanIP);
+        //console.log('cleaned IP=' + cleanIP);
         cleanPath = $scope.value.PGDataPath.replace(/\//g, "_");
 
         var token = $cookieStore.get('cpm_token');
@@ -104,7 +104,7 @@ var UpdateServerModalInstanceCtrl = function($rootScope, $scope, $http, $modalIn
     };
 
     $scope.cancel = function() {
-        console.log("current server=" + $scope.value.Name);
+        //console.log("current server=" + $scope.value.Name);
         $modalInstance.dismiss('cancel');
     };
 };
@@ -116,7 +116,7 @@ var DeleteServerModalInstanceCtrl = function($rootScope, $scope, $http, $modalIn
     $scope.currentServer = [];
 
     $scope.ok = function() {
-        console.log('in DeleteServerModalInstanceCtrl with ID ' + $scope.value.ID);
+        //console.log('in DeleteServerModalInstanceCtrl with ID ' + $scope.value.ID);
         var token = $cookieStore.get('cpm_token');
 
         $http.get($cookieStore.get('AdminURL') + '/deleteserver/' + $scope.value.ID + "." + token).success(function(data, status, headers, config) {
@@ -133,7 +133,7 @@ var DeleteServerModalInstanceCtrl = function($rootScope, $scope, $http, $modalIn
     };
 
     $scope.cancel = function() {
-        console.log("current server=" + $scope.value.Name);
+        //console.log("current server=" + $scope.value.Name);
         $modalInstance.dismiss('cancel');
     };
 };
@@ -147,10 +147,10 @@ cpmApp.controller('serversController', function($rootScope, $scope, $modal) {
     $scope.currentServer = [];
 
     $scope.toggled = function(open) {
-        console.log('Dropdown is now: ', open);
+        //console.log('Dropdown is now: ', open);
     };
 
-    console.log('hi from servers controller');
+    //console.log('hi from servers controller');
     $scope.message = 'servers page.';
 
 
@@ -159,7 +159,7 @@ cpmApp.controller('serversController', function($rootScope, $scope, $modal) {
 cpmApp.controller('getAllServersController', function($rootScope, $scope, $http, $modal, $cookies, $cookieStore) {
     $scope.tab = 1;
 
-    console.log('getAllServersController');
+    //console.log('getAllServersController');
     $scope.results = [];
 
     if ($cookieStore.get('AdminURL')) {} else {
@@ -170,7 +170,7 @@ cpmApp.controller('getAllServersController', function($rootScope, $scope, $http,
         return $scope.tab === checkTab;
     };
     $scope.selectTab = function(setTab) {
-        console.log('setting tab to ' + setTab.ID);
+        //console.log('setting tab to ' + setTab.ID);
         $scope.tab = setTab.ID;
         $scope.currentServer = setTab;
         $rootScope.$emit('changeServerPage', {
@@ -179,17 +179,17 @@ cpmApp.controller('getAllServersController', function($rootScope, $scope, $http,
     }
 
     $rootScope.$on('deleteServerTarget', function(event, args) {
-        console.log('server was deleted....here in getAllServers ' + args.message.Name);
+        //console.log('server was deleted....here in getAllServers ' + args.message.Name);
         postit();
     });
     $rootScope.$on('reloadServersTarget', function(event, args) {
-        console.log('reloading Servers list' + args.message.Name);
+        //console.log('reloading Servers list' + args.message.Name);
         postit();
     });
 
     $rootScope.$on('changeServerPage2Target', function(event, args) {
-        console.log("cookiestore = [" + $cookieStore.get('cpm_token') + "]");
-        console.log('server was updated....here in getAllServers ' + args.message.Name);
+        //console.log("cookiestore = [" + $cookieStore.get('cpm_token') + "]");
+        //console.log('server was updated....here in getAllServers ' + args.message.Name);
         $http.get($cookieStore.get('AdminURL') + '/servers/' + $cookieStore.get('cpm_token')).
         success(function(data, status, headers, config) {
             $scope.results = data;
@@ -199,7 +199,7 @@ cpmApp.controller('getAllServersController', function($rootScope, $scope, $http,
     });
 
     $rootScope.$on('createServerTarget', function(event, args) {
-        console.log('server was created....here in getAllServers ' + args.message.Name);
+        //console.log('server was created....here in getAllServers ' + args.message.Name);
         postit();
         for (i = 0; i < $scope.results.length; i++) {
             if ($scope.results[i].Name == args.message.Name) {
@@ -216,7 +216,7 @@ cpmApp.controller('getAllServersController', function($rootScope, $scope, $http,
         success(function(data, status, headers, config) {
             $scope.results = data;
             if (data.length > 0) {
-                console.log('setting tab to ' + data[0].ID);
+                //console.log('setting tab to ' + data[0].ID);
 		$scope.selectTab(data[0]);
             } else {
         	$rootScope.$emit('noServerEvent', {
@@ -234,7 +234,7 @@ cpmApp.controller('getAllServersController', function($rootScope, $scope, $http,
 
 
 cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q, $filter, $modal, $cookies, $cookieStore, ngTableParams) {
-    console.log('getServerController');
+    //console.log('getServerController');
 
     $scope.currentServer = [];
     $scope.currentServerID = [];
@@ -250,7 +250,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
     }, {
         total: $scope.containers.length, // length of data
         getData: function($defer, params) {
-            console.log('getData called containers=' + $scope.containers.length);
+            //console.log('getData called containers=' + $scope.containers.length);
             // use build-in angular filter
             var orderedData = $scope.containers;
 
@@ -297,7 +297,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
 
     function postit(serverid) {
         var token = $cookieStore.get('cpm_token');
-        console.log('in GetServerController id=' + serverid);
+        //console.log('in GetServerController id=' + serverid);
         $http.get($cookieStore.get('AdminURL') + '/server/' + serverid + "." + token).
         success(function(data, status, headers, config) {
             $scope.results = data;
@@ -311,7 +311,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
         success(function(data, status, headers, config) {
             $scope.containers = data;
             $scope.tableParams.reload();
-            console.log('containers has ' + $scope.containers.length);
+            //console.log('containers has ' + $scope.containers.length);
         }).
         error(function(data, status, headers, config) {
             console.log('error: GetServerController.http.get 2');
@@ -320,7 +320,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
 
     $scope.stopContainers = function() {
 	$scope.status.isopen = false;
-        console.log('stopContainers called');
+        //console.log('stopContainers called');
         var names = '';
         var token = $cookieStore.get('cpm_token');
         angular.forEach($scope.users, function(item) {
@@ -331,12 +331,12 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
                         message: ""
                     });
                     $http.get($cookieStore.get('AdminURL') + '/admin/stop/' + item.ID + '.' + token).success(function(data, status, headers, config) {
-                        console.log('stop container success id=' + item.ID);
+                        //console.log('stop container success id=' + item.ID);
                         for (index = 0; index < $scope.containers.length; index++) {
                             if ($scope.containers[index].ID == item.ID) {
                                 $scope.containers[index].Status = 'down';
                                 $scope.checkboxes.items[item.ID] = false;
-                                console.log('setting stopped container to down status');
+                                //console.log('setting stopped container to down status');
                             }
                         }
                         $rootScope.$emit('DoneLoadingEvent', {
@@ -349,7 +349,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
                 }
             }
         });
-        console.log('stop these:' + names);
+        //console.log('stop these:' + names);
     }
 
     $scope.startContainers = function() {
@@ -357,7 +357,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
         $rootScope.$emit('LoadingEvent', {
             message: ""
         });
-        console.log('startContainers called');
+        //console.log('startContainers called');
         var token = $cookieStore.get('cpm_token');
         var names = '';
         angular.forEach($scope.users, function(item) {
@@ -365,12 +365,12 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
                 if ($scope.checkboxes.items[item.ID]) {
                     names += ' ' + item.ID;
                     $http.get($cookieStore.get('AdminURL') + '/admin/start/' + item.ID + '.' + token).success(function(data, status, headers, config) {
-                        console.log('start container success id=' + item.ID);
+                        //console.log('start container success id=' + item.ID);
                         for (index = 0; index < $scope.containers.length; index++) {
                             if ($scope.containers[index].ID == item.ID) {
                                 $scope.containers[index].Status = 'up';
                                 $scope.checkboxes.items[item.ID] = false;
-                                console.log('setting started container to up status');
+                                //console.log('setting started container to up status');
                             }
                         }
                     }).
@@ -380,7 +380,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
                 }
             }
         });
-        console.log('start these:' + names);
+        //console.log('start these:' + names);
         $rootScope.$emit('DoneLoadingEvent', {
             message: ""
         });
@@ -400,20 +400,20 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
     }
 
     $scope.handleAddClick = function(msg) {
-        console.log('handleAddClick');
+        //console.log('handleAddClick');
 	$scope.status.isopen = false;
         var modalInstance = $modal.open({
             templateUrl: 'pages/createservermodal.html',
             controller: csm
         });
         modalInstance.result.then(function(response) {
-            console.log('jeff in handlePlusClick with response =' + response);
-            console.log('jeff in handlePlusClick with Name returned=' + this.name);
+            //console.log('jeff in handlePlusClick with response =' + response);
+            //console.log('jeff in handlePlusClick with Name returned=' + this.name);
         });
     };
 
     $scope.handleDeleteClick = function(msg) {
-        console.log('handleDeleteClick');
+        //console.log('handleDeleteClick');
 	$scope.status.isopen = false;
         var modalInstance = $modal.open({
             templateUrl: 'pages/deleteservermodal.html',
@@ -428,14 +428,14 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
 
     $scope.handleMonitorClick = function(msg) {
 	$scope.status.isopen = false;
-        console.log('hi from handleAdminClick id=' + $scope.currentServer.ID);
+        //console.log('hi from handleAdminClick id=' + $scope.currentServer.ID);
         var popupWindow = window.open('pages/servermonitor.html');
-        console.log('in app.js setting child serverid=' + $scope.currentServer.ID);
+        //console.log('in app.js setting child serverid=' + $scope.currentServer.ID);
         popupWindow.serverid = $scope.currentServer.ID;
     };
 
     $rootScope.$on('changeServerPageTarget', function(event, args) {
-        console.log('here in GetServer ' + args.message.Name);
+        //console.log('here in GetServer ' + args.message.Name);
         $scope.currentServer = args.message;
         $scope.currentServerID = args.message.ID;
         $scope.message = args.message.ID;
@@ -444,7 +444,7 @@ cpmApp.controller('getServerController', function($scope, $http, $rootScope, $q,
     });
 
     $rootScope.$on('noServerTarget', function(event, args) {
-        console.log('no server event received');
+        //console.log('no server event received');
         $scope.currentServer = [];
     	$scope.results = [];
     	$scope.containers = [];

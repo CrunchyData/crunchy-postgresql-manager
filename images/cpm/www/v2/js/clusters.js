@@ -2,7 +2,7 @@
 var cpmApp = angular.module('cpmApp.clusters', ['ngRoute', 'ngTable', 'ngCookies']);
 
 cpmApp.controller('clustersController', function($scope, $cookies) {
-    console.log('hi from clusters controller');
+    //console.log('hi from clusters controller');
     $scope.message = 'clusters page.';
 });
 
@@ -41,7 +41,7 @@ cpmApp.run(function($rootScope) {
       $scope.ok = function() {
         var token = $cookieStore.get('cpm_token');
 
-         console.log('in FailoverModalInstanceCtrl with container ' + value.Name + " ID=" + value.ID);
+         //console.log('in FailoverModalInstanceCtrl with container ' + value.Name + " ID=" + value.ID);
         $http.get($cookieStore.get('AdminURL') + '/admin/failover/' + $scope.value.ID + "." + token).success(function(data, status, headers, config) {
             $scope.results = data;
          }).
@@ -72,9 +72,9 @@ var CreateClusterModalInstanceCtrl = function($rootScope, $scope, $http, $modalI
     };
 
     $scope.ok = function() {
-        console.log('in CreateClusterModalInstanceCtrl');
-        console.log('    with Name =' + this.Name);
-        console.log('    with ClusterType =' + this.ClusterType);
+        //console.log('in CreateClusterModalInstanceCtrl');
+        //console.log('    with Name =' + this.Name);
+        //console.log('    with ClusterType =' + this.ClusterType);
         var token = $cookieStore.get('cpm_token');
 
         $http.post($cookieStore.get('AdminURL') + '/cluster', {
@@ -110,10 +110,10 @@ var AutoClusterModalInstanceCtrl = function($rootScope, $scope, $http, $modalIns
     };
 
     $scope.ok = function() {
-        console.log('in AutoClusterModalInstanceCtrl');
-        console.log('    with Name =' + this.Name);
-        console.log('    with ClusterType =' + this.ClusterType);
-        console.log('    with ClusterProfile =' + this.ClusterProfile);
+        //console.log('in AutoClusterModalInstanceCtrl');
+        //console.log('    with Name =' + this.Name);
+        //console.log('    with ClusterType =' + this.ClusterType);
+        //console.log('    with ClusterProfile =' + this.ClusterProfile);
 
         $scope.isLoading = true;
         var token = $cookieStore.get('cpm_token');
@@ -148,7 +148,7 @@ var DeleteClusterModalInstanceCtrl = function($rootScope, $scope, $http, $modalI
     $scope.alerts = [];
 
     $scope.ok = function() {
-        console.log('in DeleteClusterModalInstanceCtrl with value ' + value);
+        //console.log('in DeleteClusterModalInstanceCtrl with value ' + value);
 
         //$rootScope.$emit('LoadingEvent', { message: "" });
         $scope.isLoading = true;
@@ -188,7 +188,7 @@ var ConfigureClusterModalInstanceCtrl = function($rootScope, $scope, $http, $mod
 
     $scope.ok = function() {
         $scope.isLoading = true;
-        console.log('in ConfigureClusterModalInstanceCtrl with value ' + value);
+        //console.log('in ConfigureClusterModalInstanceCtrl with value ' + value);
         var token = $cookieStore.get('cpm_token');
         
 		$http.get($cookieStore.get('AdminURL') + '/cluster/configure/' + $scope.value.ID + "." + token).success(function(data, status, headers, config) {
@@ -222,14 +222,14 @@ cpmApp.controller('GACController', function($rootScope, $scope, $http, $modal, $
     $scope.results = [];
     $scope.tab = 1;
 
-    console.log('inside GACController!!!');
+    //console.log('inside GACController!!!');
 
     $scope.isSelected3 = function(checkTab) {
         return $scope.tab === checkTab;
     };
 
     $scope.selectTab3 = function(setTab) {
-        console.log('setting tab to ' + setTab.ID);
+        //console.log('setting tab to ' + setTab.ID);
         $scope.tab = setTab.ID;
         $scope.currentCluster = setTab;
         $rootScope.$emit('updateClusterPage', {
@@ -242,7 +242,7 @@ cpmApp.controller('GACController', function($rootScope, $scope, $http, $modal, $
         $rootScope.$emit('updateClusterPage', {
             message: msg
         });
-        console.log(msg.ID);
+        //console.log(msg.ID);
     };
 
 
@@ -255,7 +255,7 @@ cpmApp.controller('GACController', function($rootScope, $scope, $http, $modal, $
             $scope.results = data;
         }).
         error(function(data, status, headers, config) {
-            console.log('error happended');
+            console.log('error');
         });
     };
 
@@ -264,9 +264,9 @@ cpmApp.controller('GACController', function($rootScope, $scope, $http, $modal, $
         $http.get($cookieStore.get('AdminURL') + '/clusters/' + token).
         success(function(data, status, headers, config) {
             $scope.results = data;
-            console.log('clusters has ' + $scope.results.length);
+            //console.log('clusters has ' + $scope.results.length);
             if ($scope.results.length > 0) {
-                console.log('first cluster is ' + $scope.results[0].Name);
+                //console.log('first cluster is ' + $scope.results[0].Name);
                 $rootScope.$emit('updateClusterPage', {
                     message: $scope.results[0]
                 });
@@ -279,33 +279,33 @@ cpmApp.controller('GACController', function($rootScope, $scope, $http, $modal, $
 	    }
         }).
         error(function(data, status, headers, config) {
-            console.log('error happended');
+            console.log('error');
         });
     };
 
     $rootScope.$on('updateClusterPageTarget', function(event, args) {
-        console.log('here in GACController ' + args.message.Name);
+        //console.log('here in GACController ' + args.message.Name);
         postit();
     });
 
     $rootScope.$on('createClusterTarget', function(event, args) {
-        console.log('GACController createClusterTarget received ' + args.message);
+        //console.log('GACController createClusterTarget received ' + args.message);
         init();
     });
     $rootScope.$on('deleteClusterTarget', function(event, args) {
-        console.log('GACController deleteClusterTarget received ');
+        //console.log('GACController deleteClusterTarget received ');
         init();
     });
     $rootScope.$on('configureClusterTarget', function(event, args) {
-        console.log('GACController configureClusterTarget received ');
+        //console.log('GACController configureClusterTarget received ');
         init();
     });
     $rootScope.$on('LoadingEventTarget', function(event, args) {
-        console.log('GACController LoadingEventTarget received ');
+        //console.log('GACController LoadingEventTarget received ');
         $scope.isLoading = true;
     });
     $rootScope.$on('DoneLoadingEventTarget', function(event, args) {
-        console.log('GACController DoneLoadingEventTarget received ');
+        //console.log('GACController DoneLoadingEventTarget received ');
         $scope.isLoading = false;
     });
 
@@ -339,7 +339,7 @@ var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $
     $http.get($cookieStore.get('AdminURL') + '/nodes/nocluster/' + token).
     success(function(data, status, headers, config) {
         $scope.containers = data;
-        console.log('got containers len=' + data.length);
+        //console.log('got containers len=' + data.length);
     }).error(function(data, status, headers, config) {
         console.log('error:JoinController.http.geth');
     });
@@ -358,7 +358,7 @@ var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $
             $http.get($cookieStore.get('AdminURL') + '/nodes/nocluster/' + token).
             success(function(data, status, headers, config) {
                 $scope.containers = data;
-                console.log('got containers len=' + data.length);
+                //console.log('got containers len=' + data.length);
                 params.total(data.length);
 
                 data = data.slice((params.page() - 1) * params.count(), params.page() * params.count());
@@ -372,7 +372,7 @@ var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $
 
     // watch for check all checkbox
     $scope.$watch('checkboxes.checked', function(value) {
-        console.log('checkboxes.checked value=' + value);
+        //console.log('checkboxes.checked value=' + value);
         angular.forEach($scope.containers, function(item) {
             if (angular.isDefined(item.ID)) {
                 $scope.checkboxes.items[item.ID] = value;
@@ -383,7 +383,7 @@ var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $
     // watch for data checkboxes
     $scope.$watch('checkboxes.items', function(values) {
         if (!$scope.containers) {
-            console.log('here');
+            //console.log('here');
             return;
         }
         var checked = 0,
@@ -430,7 +430,7 @@ var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $
             if (angular.isDefined(item.ID)) {
                 if ($scope.checkboxes.items[item.ID]) {
 		    if (item.Image == 'cpm-pgpool') {
-			    console.log('cpm-pgpool found');
+			    //console.log('cpm-pgpool found');
 			    poolCount++;
 		    } else {
 			    if (item.NodeType == 'standby') {
@@ -476,7 +476,7 @@ var AddClusterContainerModalInstanceCtrl = function($rootScope, $scope, $http, $
 
             $http.get($cookieStore.get('AdminURL') + '/event/join-cluster/' + names + '.' + $scope.currentMasterID + '.' + $scope.currentCluster.ID + '.' + token).then(function(result) {
                 $scope.results = result;
-                console.log('success in join-cluster');
+                //console.log('success in join-cluster');
                 $rootScope.$emit('updateClusterPage', {
                     message: $scope.currentCluster
                 });
@@ -511,7 +511,7 @@ cpmApp.controller('GetClusterController', function($rootScope, $scope, $http, $r
 
     $scope.handleMinusClick = function() {
 	    $scope.status.isopen = false;
-        console.log('hi from handleMinusClick id=' + $scope.results.ID);
+        //console.log('hi from handleMinusClick id=' + $scope.results.ID);
         var modalInstance = $modal.open({
             templateUrl: 'pages/deleteclustermodal.html',
             controller: DeleteClusterModalInstanceCtrl,
@@ -524,7 +524,7 @@ cpmApp.controller('GetClusterController', function($rootScope, $scope, $http, $r
     };
     $scope.handleConfigureClick = function() {
 	    $scope.status.isopen = false;
-        console.log('hi from handleConfigureClick id=' + $scope.results.ID);
+        //console.log('hi from handleConfigureClick id=' + $scope.results.ID);
         var modalInstance = $modal.open({
             templateUrl: 'pages/configureclustermodal.html',
             controller: ConfigureClusterModalInstanceCtrl,
@@ -538,7 +538,7 @@ cpmApp.controller('GetClusterController', function($rootScope, $scope, $http, $r
 
     $scope.addNewContainer = function() {
 	    $scope.status.isopen = false;
-        console.log('update cluster add container clicked');
+        //console.log('update cluster add container clicked');
         var modalInstance = $modal.open({
             templateUrl: 'pages/addclustercontainermodal.html',
             controller: AddClusterContainerModalInstanceCtrl,
@@ -553,7 +553,7 @@ cpmApp.controller('GetClusterController', function($rootScope, $scope, $http, $r
 
     $scope.handleAutoClick = function() {
 	    $scope.status.isopen = false;
-        console.log('hi from handleAutoClick');
+        //console.log('hi from handleAutoClick');
         var modalInstance = $modal.open({
             templateUrl: 'pages/autoclustermodal.html',
             controller: AutoClusterModalInstanceCtrl
@@ -562,7 +562,7 @@ cpmApp.controller('GetClusterController', function($rootScope, $scope, $http, $r
     };
     $scope.handlePlusClick = function() {
 	    $scope.status.isopen = false;
-        console.log('hi from handlePlusClick');
+        //console.log('hi from handlePlusClick');
         var modalInstance = $modal.open({
             templateUrl: 'pages/createclustermodal.html',
             controller: CreateClusterModalInstanceCtrl
@@ -571,7 +571,7 @@ cpmApp.controller('GetClusterController', function($rootScope, $scope, $http, $r
     };
 
     function postit(clusterid) {
-        console.log('in junkit id=' + clusterid);
+        //console.log('in junkit id=' + clusterid);
         var token = $cookieStore.get('cpm_token');
         $http.get($cookieStore.get('AdminURL') + '/cluster/' + clusterid + "." + token).
         success(function(data, status, headers, config) {
@@ -588,11 +588,11 @@ cpmApp.controller('GetClusterController', function($rootScope, $scope, $http, $r
         });
     }
     $rootScope.$on('noClusterTarget', function(event, args) {
-	    console.log('no cluster target received, blanking current cluster');
+	    //console.log('no cluster target received, blanking current cluster');
         $scope.results = [];
     });
     $rootScope.$on('updateClusterPageTarget', function(event, args) {
-        console.log('here in target ' + args.message);
+        //console.log('here in target ' + args.message);
         $scope.message = args.message;
         $scope.entryID = $scope.message.ID;
         postit(args.message.ID);
@@ -625,7 +625,7 @@ cpmApp.controller('GetAllContainersForClusterController', function($rootScope, $
 
 
     $scope.failover = function(container) {
-        console.log('failover clicked for container ' + container.Name);
+        //console.log('failover clicked for container ' + container.Name);
         $scope.selectedContainers = container;
         var modalInstance = $modal.open({
             templateUrl: 'pages/failovermodal.html',
@@ -639,7 +639,7 @@ cpmApp.controller('GetAllContainersForClusterController', function($rootScope, $
     };
 
     function postit(v) {
-        console.log('in GetAllContainersForCluster postit');
+        //console.log('in GetAllContainersForCluster postit');
         var token = $cookieStore.get('cpm_token');
         $http.get($cookieStore.get('AdminURL') + '/clusternodes/' + v + "." + token).
         success(function(data, status, headers, config) {
@@ -653,13 +653,13 @@ cpmApp.controller('GetAllContainersForClusterController', function($rootScope, $
     }
 
     $rootScope.$on('noClusterTarget', function(event, args) {
-	    console.log('no cluster target received in get all containers');
+	    //console.log('no cluster target received in get all containers');
         $scope.results = [];
             $scope.tableParams.reload();
     });
 
     $rootScope.$on('updateClusterPageTarget', function(event, args) {
-        console.log('here in GetAllContainersForClusterCtrl target ' + args.message.Name);
+        //console.log('here in GetAllContainersForClusterCtrl target ' + args.message.Name);
         $scope.message = args.message;
         $scope.entryID = $scope.message.ID;
         postit(args.message.ID);

@@ -24,32 +24,32 @@
 
 	app.controller('PanelController', function($scope) {
 		$scope.mmessage = 'this is the panel controller';
-		console.log('in panel controller');
+		//console.log('in panel controller');
 	});
 	app.controller('HomeController', function($scope) {
 		$scope.mmessage = 'this is the home page';
-		console.log('in home controller');
+		//console.log('in home controller');
 	});
 
 	app.controller('ServersController', function($scope) {
 		$scope.mmessage = 'this is the servers page';
-		console.log('in serverscontroller');
+		//console.log('in serverscontroller');
 	});
 	app.controller('ContainersController', function($scope) {
 		$scope.mmessage = 'this is the Containersservers page';
-		console.log('in containerscontroller');
+		//console.log('in containerscontroller');
 	});
 	app.controller('ClustersController', function($scope) {
 		$scope.mmessage = 'this is the Clustersservers page';
-		console.log('in clusterscontroller');
+		//console.log('in clusterscontroller');
 	});
 	app.controller('ToolsController', function($scope) {
 		$scope.mmessage = 'this is the Tools page';
-		console.log('in toolscontroller');
+		//console.log('in toolscontroller');
 	});
 	app.controller('SettingsController', function($scope) {
 		$scope.mmessage = 'this is the settings page';
-		console.log('in settingscontroller');
+		//console.log('in settingscontroller');
 	});
 
 

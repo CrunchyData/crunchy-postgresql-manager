@@ -69,37 +69,37 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
     $scope.userName = '';
     $scope.userIndex = 0;
 
-    console.log('hi from settings controlle23r');
+    //console.log('hi from settings controlle23r');
     this.tab = 1;
 
     $rootScope.$on('deleteRoleTarget', function(event, args) {
-        console.log('role was deleted....reloading roles');
+        //console.log('role was deleted....reloading roles');
         $scope.getRoles();
         $scope.getUsers();
     });
     $rootScope.$on('deleteUserTarget', function(event, args) {
-        console.log('user was deleted....reloading user');
+        //console.log('user was deleted....reloading user');
         $scope.getUsers();
     });
 
     this.selectRole = function(roleIndex) {
-        console.log(' set role to ' + roleIndex);
+        //console.log(' set role to ' + roleIndex);
         $scope.roleIndex = roleIndex;
         this.tab = 6;
     };
     this.selectUser = function(userIndex) {
-        console.log(' set user to ' + userIndex);
+        //console.log(' set user to ' + userIndex);
         $scope.userIndex = userIndex;
         this.tab = 7;
     };
 
     this.selectTab4 = function(setTab) {
-        console.log(' set tab to ' + setTab);
+        //console.log(' set tab to ' + setTab);
 	$scope.alerts = [];
         this.tab = setTab;
     };
     $scope.saveSettings = function() {
-        console.log(' save settings called');
+        //console.log(' save settings called');
         var token = $cookieStore.get('cpm_token');
 
         $http.post($cookieStore.get('AdminURL') + '/savesettings', {
@@ -108,7 +108,7 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
             'DomainName': this.DomainName,
             'Token': token
         }).success(function(data, status, headers, config) {
-            console.log('Save settings success');
+            //console.log('Save settings success');
             $scope.alerts = [{
                 type: 'success',
                 msg: 'General Settings saved.'
@@ -122,7 +122,7 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
         });
     };
     $scope.saveProfiles = function() {
-        console.log(' save Profiles called');
+        //console.log(' save Profiles called');
 
         var token = $cookieStore.get('cpm_token');
 
@@ -135,7 +135,7 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
             'LargeMEM': this.largeMEM,
             'Token': token
         }).success(function(data, status, headers, config) {
-            console.log('save profiles success');
+            //console.log('save profiles success');
             $scope.alerts = [{
                 type: 'success',
                 msg: 'Docker profiles saved.'
@@ -163,7 +163,7 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
     };
 
     $scope.getUsers = function() {
-        console.log(' get users ');
+        //console.log(' get users ');
         var token = $cookieStore.get('cpm_token');
 
         $http.get($cookieStore.get('AdminURL') + '/sec/getusers/' + token).
@@ -181,7 +181,7 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
     };
 
     $scope.getRoles = function() {
-        console.log(' get roles ');
+        //console.log(' get roles ');
         var token = $cookieStore.get('cpm_token');
 
         $http.get($cookieStore.get('AdminURL') + '/sec/getroles/' + token).
@@ -198,9 +198,9 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
         });
     };
     $scope.saveRole = function() {
-        console.log(' save role ');
-        console.log(' role is ' + $scope.roles[$scope.roleIndex].Name);
-        console.log($scope.roles[$scope.roleIndex]);
+        //console.log(' save role ');
+        //console.log(' role is ' + $scope.roles[$scope.roleIndex].Name);
+        //console.log($scope.roles[$scope.roleIndex]);
         var token = $cookieStore.get('cpm_token');
 
         $scope.roles[$scope.roleIndex].Token = token;
@@ -224,9 +224,9 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
     };
 
     $scope.saveUser = function() {
-        console.log(' save users ');
-        console.log(' user is ' + $scope.users[$scope.userIndex].Name);
-        console.log($scope.users[$scope.userIndex]);
+        //console.log(' save users ');
+        //console.log(' user is ' + $scope.users[$scope.userIndex].Name);
+        //console.log($scope.users[$scope.userIndex]);
 
         var token = $cookieStore.get('cpm_token');
 
@@ -251,8 +251,8 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
     };
 
     $scope.deleteUser = function() {
-        console.log(' delete user ');
-        console.log(' user is ' + $scope.users[$scope.userIndex].Name);
+        //console.log(' delete user ');
+        //console.log(' user is ' + $scope.users[$scope.userIndex].Name);
         var modalInstance = $modal.open({
             size: 'sm',
             templateUrl: 'pages/deleteuser.html',
@@ -265,8 +265,8 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
         });
     };
     $scope.deleteRole = function() {
-        console.log(' delete role ');
-        console.log(' role is ' + $scope.roles[$scope.roleIndex].Name);
+        //console.log(' delete role ');
+        //console.log(' role is ' + $scope.roles[$scope.roleIndex].Name);
         var modalInstance = $modal.open({
             size: 'sm',
             templateUrl: 'pages/deleterole.html',
@@ -280,13 +280,13 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
     };
 
     $scope.getSettings = function() {
-        console.log(' get settings ');
+        //console.log(' get settings ');
 
         var token = $cookieStore.get('cpm_token');
 
         $http.get($cookieStore.get('AdminURL') + '/settings/' + token).
         success(function(data, status, headers, config) {
-            console.log('recv settings len=' + data.length);
+            //console.log('recv settings len=' + data.length);
             $scope.settings = data;
             getAllSettings(data);
         }).error(function(data, status, headers, config) {
@@ -295,13 +295,13 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
     };
 
     var getAllSettings = function(values) {
-        console.log(values.length + ' is the settings len');
+        //console.log(values.length + ' is the settings len');
         for (i = 0; i < values.length; i++) {
             key = values[i].Name;
             value = values[i].Value;
             switch (key) {
                 case 'S-DOCKER-PROFILE-CPU':
-                    console.log('key=' + key + ' value=' + value);
+                    //console.log('key=' + key + ' value=' + value);
                     $scope.smallCPU = value;
                     smallCPU = value;
                     break;
@@ -393,7 +393,7 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
     };
 
     $scope.saveSmallClusterProfiles = function() {
-        console.log(' save SmallClusterProfiles called');
+        //console.log(' save SmallClusterProfiles called');
         var token = $cookieStore.get('cpm_token');
         $http.post($cookieStore.get('AdminURL') + '/saveclusterprofiles', {
             'Size': 'SM',
@@ -405,7 +405,7 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
             'StandbyServer': this.CPsmSServer,
             'Token': token
         }).success(function(data, status, headers, config) {
-            console.log('save profiles success');
+            //console.log('save profiles success');
             $scope.alerts = [{
                 type: 'success',
                 msg: 'Cluster profiles saved.'
@@ -420,7 +420,7 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
 
     };
     $scope.saveMediumClusterProfiles = function() {
-        console.log(' save MediumClusterProfiles called');
+        //console.log(' save MediumClusterProfiles called');
         var token = $cookieStore.get('cpm_token');
         $http.post($cookieStore.get('AdminURL') + '/saveclusterprofiles', {
             'Size': 'MED',
@@ -432,7 +432,7 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
             'StandbyServer': this.CPmedSServer,
             'Token': token
         }).success(function(data, status, headers, config) {
-            console.log('save profiles success');
+            //console.log('save profiles success');
             $scope.alerts = [{
                 type: 'success',
                 msg: 'Cluster profiles saved.'
@@ -447,7 +447,7 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
 
     };
     $scope.saveLargeClusterProfiles = function() {
-        console.log(' save LargeClusterProfiles called');
+        //console.log(' save LargeClusterProfiles called');
         var token = $cookieStore.get('cpm_token');
         $http.post($cookieStore.get('AdminURL') + '/saveclusterprofiles', {
             'Size': 'LG',
@@ -459,7 +459,7 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
             'StandbyServer': this.CPlgSServer,
             'Token': token
         }).success(function(data, status, headers, config) {
-            console.log('save profiles success');
+            //console.log('save profiles success');
             $scope.alerts = [{
                 type: 'success',
                 msg: 'Cluster profiles saved.'
@@ -475,7 +475,7 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
     };
 
     this.addUser = function() {
-        console.log(' addUser called');
+        //console.log(' addUser called');
         var modalInstance = $modal.open({
             size: 'sm',
             templateUrl: 'pages/adduser.html',
@@ -490,12 +490,12 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
         modalInstance.result.then(function(alerts) {
             $scope.alerts = alerts;
         }, function() {
-            console.log('modal dismissed');
+            //console.log('modal dismissed');
         });
 
     }
     this.changePassword = function() {
-        console.log(' changePassword called');
+        //console.log(' changePassword called');
         var modalInstance = $modal.open({
             size: 'sm',
             templateUrl: 'pages/chpsw.html',
@@ -510,13 +510,13 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
         modalInstance.result.then(function(alerts) {
             $scope.alerts = alerts;
         }, function() {
-            console.log('modal dismissed');
+            //console.log('modal dismissed');
         });
 
     }
 
     this.addRole = function() {
-        console.log(' addRole called');
+        //console.log(' addRole called');
         var modalInstance = $modal.open({
             size: 'sm',
             templateUrl: 'pages/addrole.html',
@@ -531,7 +531,7 @@ cpmApp.controller('settingsController', function($rootScope, $scope, $http, $coo
         modalInstance.result.then(function(alerts) {
             $scope.alerts = alerts;
         }, function() {
-            console.log('modal dismissed');
+            //console.log('modal dismissed');
         });
 
     }
@@ -548,19 +548,19 @@ var AddUserController = function($rootScope, $scope, $cookies, $cookieStore, $ht
     $scope.Password = '';
     $scope.results = [];
 
-    console.log('AddUserController called');
+    //console.log('AddUserController called');
     $scope.doSomething = function() {
-        console.log(' doSomething called');
+        //console.log(' doSomething called');
     }
     $scope.ok = function() {
         var token = $cookieStore.get('cpm_token');
-        console.log(' login ok called id=' + $scope.ID + ' psw=' + $scope.Password);
+        //console.log(' login ok called id=' + $scope.ID + ' psw=' + $scope.Password);
         $http.post($cookieStore.get('AdminURL') + '/sec/adduser', {
             'Name': $scope.ID,
             'Password': $scope.Password,
             'Token': token
         }).success(function(data, status, headers, config) {
-            console.log('add user success');
+            //console.log('add user success');
             $modalInstance.close([{
                 type: 'success',
                 msg: 'Added user.'
@@ -583,14 +583,14 @@ var AddUserController = function($rootScope, $scope, $cookies, $cookieStore, $ht
 };
 
 var DeleteUserController = function($rootScope, $http, $cookies, $scope, $modalInstance, $cookieStore, value) {
-    console.log('DeleteUserController called user=' + value);
+    //console.log('DeleteUserController called user=' + value);
     $scope.value = value;
     $scope.ok = function() {
-        console.log(' delete user name=' + value)
+        //console.log(' delete user name=' + value)
         var token = $cookieStore.get('cpm_token');
         $http.get($cookieStore.get('AdminURL') + '/sec/deleteuser/' + value + '.' + token).success(function(data, status, headers, config) {
 
-            console.log('user was deleted');
+            //console.log('user was deleted');
             $scope.alerts = [{
                 type: 'success',
                 msg: 'User deleted.'
@@ -618,15 +618,15 @@ var AddRoleController = function($rootScope, $scope, $cookies, $cookieStore, $ht
     $scope.Name = '';
     $scope.results = [];
 
-    console.log('AddRoleController called');
+    //console.log('AddRoleController called');
     $scope.ok = function() {
-        console.log(' add role name=' + $scope.Name);
+        //console.log(' add role name=' + $scope.Name);
         var token = $cookieStore.get('cpm_token');
         $http.post($cookieStore.get('AdminURL') + '/sec/addrole', {
             'Name': $scope.Name,
             'Token': token
         }).success(function(data, status, headers, config) {
-            console.log('add role success');
+            //console.log('add role success');
             $scope.alerts = [{
                 type: 'success',
                 msg: 'Added role.'
@@ -650,14 +650,14 @@ var AddRoleController = function($rootScope, $scope, $cookies, $cookieStore, $ht
 };
 
 var DeleteRoleController = function($rootScope, $http, $cookies, $scope, $modalInstance, $cookieStore, value) {
-    console.log('DeleteRoleController called Name=' + value);
+    //console.log('DeleteRoleController called Name=' + value);
     $scope.value = value;
     $scope.ok = function() {
         var token = $cookieStore.get('cpm_token');
-        console.log(' delete role name=' + value)
+        //console.log(' delete role name=' + value)
         $http.get($cookieStore.get('AdminURL') + '/sec/deleterole/' + value + '.' + token).success(function(data, status, headers, config) {
 
-            console.log('role was deleted');
+            //console.log('role was deleted');
             $scope.alerts = [{
                 type: 'success',
                 msg: 'Role deleted.'
@@ -688,13 +688,13 @@ var ChangePasswordController = function($rootScope, $scope, $cookies, $cookieSto
     $scope.ConfirmPassword = '';
     $scope.results = [];
 
-    console.log('ChangePasswordController called');
+    //console.log('ChangePasswordController called');
     $scope.ok = function() {
         var token = $cookieStore.get('cpm_token');
 
-        console.log(' psw=' + $scope.Password + ' psw2=' + $scope.ConfirmPassword);
+        //console.log(' psw=' + $scope.Password + ' psw2=' + $scope.ConfirmPassword);
         if ($scope.Password != $scope.ConfirmPassword) {
-            console.log(' passwords did not match ');
+            //console.log(' passwords did not match ');
             $scope.alerts = [{
                 type: 'danger',
                 msg: 'passwords did not match'
@@ -707,7 +707,7 @@ var ChangePasswordController = function($rootScope, $scope, $cookies, $cookieSto
             'Password': $scope.Password,
             'Token': token
         }).success(function(data, status, headers, config) {
-            console.log('chg psw success');
+            //console.log('chg psw success');
             $modalInstance.close([{
                 type: 'success',
                 msg: 'Changed password.'

@@ -158,7 +158,7 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 
 	//get list of databases on node
 	var databaseConn *sql.DB
-	databaseConn, err = util.GetMonitoringConnection(Name+"."+domain, "postgres", "5432", "postgres")
+	databaseConn, err = util.GetMonitoringConnection(Name+"."+domain, "postgres", "5432", "postgres", "")
 	defer databaseConn.Close()
 
 	var databases []string

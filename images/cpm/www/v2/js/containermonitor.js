@@ -49,7 +49,7 @@
 
 	$scope.currentUser = [];
 	$scope.currentUser = $cookieStore.get('cpmuser');
-	console.log('currentUser is ' + $scope.currentUser);
+	//console.log('currentUser is ' + $scope.currentUser);
 
         $scope.oneAtATime = true;
         $scope.currenturl = [];
@@ -77,7 +77,7 @@
 
         $scope.handleRefresh = function() {
             $scope.isLoading = true;
-            console.log('refresh pressed slider=' + $scope.slidervalue);
+            //console.log('refresh pressed slider=' + $scope.slidervalue);
             var token = $cookieStore.get('cpm_token');
 
             var thing4 = $cookieStore.get('AdminURL') + '/monitor/container/loadtest/' + $scope.containerid + '.' + $scope.slidervalue + "." + token;
@@ -96,12 +96,12 @@
 
     app.controller('replController', function($rootScope, $scope, $route, $http, $cookies, $cookieStore) {
         $scope.handleRefresh = function() {
-            console.log('working on repl');
+            //console.log('working on repl');
 
             var token = $cookieStore.get('cpm_token');
 
             var thing2 = $cookieStore.get('AdminURL') + '/monitor/container/repl/' + $scope.containerid + '.' + token;
-            console.log('url=' + thing2);
+            //console.log('url=' + thing2);
             $http.get(thing2).success(function(data, status, headers, config) {
                 //console.log('got statrepl results');
                 //console.log('pid=' + data[0].pid);
@@ -117,14 +117,14 @@
 
     app.controller('controldataController', function($rootScope, $scope, $route, $http, $cookies, $cookieStore) {
         $scope.handleRefresh = function() {
-            console.log('working on controldata');
+            //console.log('working on controldata');
 
             var token = $cookieStore.get('cpm_token');
 
             var thing2 = $cookieStore.get('AdminURL') + '/monitor/container/controldata/' + $scope.containerid + '.' + token;
-            console.log('url=' + thing2);
+            //console.log('url=' + thing2);
             $http.get(thing2).success(function(data, status, headers, config) {
-                console.log('got controldata results');
+                //console.log('got controldata results');
                 //console.log('pid=' + data[0].pid);
                 $scope.controldataresults = data;
             }).error(function(data, status, headers, config) {
@@ -138,14 +138,14 @@
 
     app.controller('settingsController', function($rootScope, $scope, $route, $http, $cookies, $cookieStore) {
         $scope.handleRefresh = function() {
-            console.log('working on repl');
+            //console.log('working on repl');
 
             var token = $cookieStore.get('cpm_token');
 
             var thing2 = $cookieStore.get('AdminURL') + '/monitor/container/settings/' + $scope.containerid + '.' + token;
-            console.log('url=' + thing2);
+            //console.log('url=' + thing2);
             $http.get(thing2).success(function(data, status, headers, config) {
-                console.log('got settings results');
+                //console.log('got settings results');
                 //console.log('pid=' + data[0].pid);
                 $scope.settingsresults = data;
             }).error(function(data, status, headers, config) {
@@ -160,9 +160,9 @@
     app.controller('bgwriterController', function($rootScope, $scope, $route, $http, $cookies, $cookieStore) {
         $scope.handleRefresh = function() {
             var token = $cookieStore.get('cpm_token');
-            console.log('working on bgwriter');
+            //console.log('working on bgwriter');
             var thing3 = $cookieStore.get('AdminURL') + '/monitor/container/bgwriter/' + $scope.containerid + '.' + token;
-            console.log('url=' + thing3);
+            //console.log('url=' + thing3);
             $http.get(thing3).success(function(data, status, headers, config) {
                 //console.log('got bgwriter results');
                 //console.log('now=' + data.now);
@@ -179,9 +179,9 @@
         $scope.handleRefresh = function() {
             var token = $cookieStore.get('cpm_token');
             var thing = $cookieStore.get('AdminURL') + '/monitor/container/database/' + $scope.containerid + '.' + token;
-            console.log('url=' + thing);
+            //console.log('url=' + thing);
             $http.get(thing).success(function(data, status, headers, config) {
-                console.log('got statdb results');
+                //console.log('got statdb results');
                 $scope.statdbresults = data;
             }).error(function(data, status, headers, config) {
                 alert('error in monitor container statdb');
@@ -227,13 +227,13 @@
        	pg2yAxis.render();
 
         $scope.pg2handleRefresh = function(interval) {
-		console.log("calling pg2 metric");
+		//console.log("calling pg2 metric");
             var token = $cookieStore.get('cpm_token');
 	    var query = $cookieStore.get('AdminURL') + '/mon/container/pg2/' + $scope.container.Name + '.' + interval + '.' + token;
 		//console.log(query);
 		$http.get(query).success(function(data, status, headers, config) {
 			//console.log('pg2 query results 1 ' + JSON.stringify(data[0]));
-			console.log("loading pg2 metrics");
+			//console.log("loading pg2 metrics");
 			pg2loadSeries(data);
 			if (loaded == false) {
 				var pg2legend = new Rickshaw.Graph.Legend( {

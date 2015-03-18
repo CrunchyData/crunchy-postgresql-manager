@@ -24,6 +24,10 @@
 # $DB_USER pg user we are connecting with
 #
 
+export DB_HOST=$DB_HOST
+export DB_PORT=$DB_PORT
+export DB_USER=$DB_USER
+
 source /opt/cpm/bin/setenv.sh
 
 #

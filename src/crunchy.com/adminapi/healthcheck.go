@@ -56,11 +56,23 @@ func GetHC1(w rest.ResponseWriter, r *rest.Request) {
 	glog.Infoln(query)
 
 	results, err = c.Query(query)
+	if err != nil {
+		glog.Errorln(err.Error())
+		w.WriteJson(&results)
+		//rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if len(results) == 0 {
+		glog.Infoln("GetHC1: no results yet")
+		w.WriteJson(&results)
+		return
+	}
 
 	var resultsLen = len(results[0].Points)
 	if resultsLen == 0 {
-		glog.Errorln("GetHC1: no results")
-		rest.Error(w, "no healthcheck results yet", http.StatusBadRequest)
+		glog.Infoln("GetHC1: no results yet 2")
+		w.WriteJson(&results)
 		return
 	}
 
@@ -75,9 +87,7 @@ func GetHC1(w rest.ResponseWriter, r *rest.Request) {
 
 	resultsLen = len(results[0].Points)
 	if resultsLen == 0 {
-		glog.Errorln("GetHC1 b: no results")
-		rest.Error(w, "b: no healthcheck results yet", http.StatusBadRequest)
-		return
+		glog.Infoln("GetHC1 b: no results")
 	}
 
 	w.WriteJson(&results)

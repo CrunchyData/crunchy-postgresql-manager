@@ -4,6 +4,6 @@
 
 	roleApp.controller('roleController', function($scope, $http) {
 		$scope.hithere = 'fromrolecontroller';
-		console.log('hi from roleController');
+		//console.log('hi from roleController');
 	});
 

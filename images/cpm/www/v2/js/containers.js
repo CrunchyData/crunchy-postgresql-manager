@@ -3,7 +3,7 @@ var cpmApp = angular.module('cpmApp.containers', ['ngRoute', 'ngCookies']);
 
 
 cpmApp.controller('containersController', function($scope, $rootScope, $cookies, $routeParams ) {
-    console.log('hi from containers controller');
+    //console.log('hi from containers controller');
     //var param1 = $routeParams.param1;
 
     $scope.message = 'containers page.';
@@ -33,7 +33,7 @@ cpmApp.run(function($rootScope) {
     });
     $rootScope.$on('createContainerEvent', function(event, args) {
         $rootScope.$broadcast('createContainerTarget', args);
-        console.log('broadcast of createContainerTarget');
+        //console.log('broadcast of createContainerTarget');
     });
 });
 
@@ -67,7 +67,7 @@ var StopContainerModalInstanceCtrl = function($rootScope, $scope, $http, $modalI
 
     $scope.value = value;
     $scope.isLoading = false;
-    console.log('in stop container modal stopping ' + value);
+    //console.log('in stop container modal stopping ' + value);
     $scope.results = [];
 
     $scope.ok = function() {
@@ -105,7 +105,7 @@ var StartContainerModalInstanceCtrl = function($rootScope, $scope,
 
     $scope.value = value;
     $scope.isLoading = false;
-    console.log('in start container modal stopping ' + value);
+    //console.log('in start container modal stopping ' + value);
     $scope.results = [];
 
     $scope.ok = function() {
@@ -114,7 +114,7 @@ var StartContainerModalInstanceCtrl = function($rootScope, $scope,
         $scope.isLoading = true;
         var token = $cookieStore.get('cpm_token');
         if (token === void 0) {
-            console.log('cookie was undefined');
+            //console.log('cookie was undefined');
             alert('login required');
             return;
         }
@@ -150,7 +150,7 @@ var CreateContainerModalInstanceCtrl = function($rootScope, $scope, $http, $moda
 
     var token = $cookieStore.get('cpm_token');
     if (token === void 0) {
-        console.log('cookie was undefined');
+        //console.log('cookie was undefined');
         alert('login required');
         return;
     }
@@ -159,7 +159,7 @@ var CreateContainerModalInstanceCtrl = function($rootScope, $scope, $http, $moda
     $http.get($cookieStore.get('AdminURL') + '/servers/' + token).
     success(function(data, status, headers, config) {
         $scope.servers = data;
-        console.log('got servers len=' + data.length);
+        //console.log('got servers len=' + data.length);
         $scope.myServer = $scope.servers[0];
     }).error(function(data, status, headers, config) {
         console.log('error in fetch of servers');
@@ -171,30 +171,30 @@ var CreateContainerModalInstanceCtrl = function($rootScope, $scope, $http, $moda
 
     $scope.ok = function() {
 
-        console.log('in CreateContainerModalInstanceCtrl');
-        console.log('    with Name =' + this.Name);
-        console.log('    with Image =' + this.Image);
-        console.log('    with Image =' + this.Profile);
-        console.log('    with standalone flag =' + this.standalone);
-        console.log('    with server =' + this.myServer.ID);
+        //console.log('in CreateContainerModalInstanceCtrl');
+        //console.log('    with Name =' + this.Name);
+        //console.log('    with Image =' + this.Image);
+        //console.log('    with Image =' + this.Profile);
+        //console.log('    with standalone flag =' + this.standalone);
+        //console.log('    with server =' + this.myServer.ID);
 
         $scope.isLoading = true;
         //$rootScope.$emit('LoadingEvent', { message: "" });
         //
         var token = $cookieStore.get('cpm_token');
         if (token === void 0) {
-            console.log('cookie was undefined');
+            //console.log('cookie was undefined');
             alert('login required');
             return;
         }
 
         $http.get($cookieStore.get('AdminURL') + '/provision/' + this.Profile + '.' + this.Image + '.' + this.myServer.ID + '.' + this.Name + "." + this.standalone + "." + token).success(function(data, status, headers, config) {
             $scope.results = data;
-            console.log('success in provision');
+            //console.log('success in provision');
             $rootScope.$emit('createContainerEvent', {
                 message: "hi"
             });
-            console.log('after emit in provision');
+            //console.log('after emit in provision');
             //$rootScope.$emit('DoneLoadingEvent', { message: "" });
             $scope.isLoading = false;
             $modalInstance.close();
@@ -217,18 +217,18 @@ var DeleteContainerModalInstanceCtrl = function($rootScope, $scope, $http, $moda
     $scope.alerts = [];
 
     $scope.ok = function() {
-        console.log('in DeleteContainerModalInstanceCtrl with value ' + value);
+        //console.log('in DeleteContainerModalInstanceCtrl with value ' + value);
         $scope.isLoading = true;
         var token = $cookieStore.get('cpm_token');
         if (token === void 0) {
-            console.log('cookie was undefined');
+            //console.log('cookie was undefined');
             alert('login required');
             return;
         }
 
         $http.get($cookieStore.get('AdminURL') + '/deletenode/' + $scope.value.ID + "." + token).success(function(data, status, headers, config) {
             $scope.results = data;
-            console.log('success in delete container modal');
+            //console.log('success in delete container modal');
             $scope.isLoading = false;
             $rootScope.$emit('deleteContainerEvent', {
                 message: "hi"
@@ -260,7 +260,7 @@ cpmApp.controller('GetAllContainersController', function($rootScope, $scope, $ht
     };
 
     $scope.selectTab2 = function(setTab) {
-        console.log('setting tab to ' + setTab.ID);
+        //console.log('setting tab to ' + setTab.ID);
         $scope.tab = setTab.ID;
         $scope.activeClass = setTab.ID;
         $scope.currentContainer = setTab;
@@ -270,11 +270,11 @@ cpmApp.controller('GetAllContainersController', function($rootScope, $scope, $ht
     }
 
     function postit() {
-        console.log('in GetAllContainers postit');
+        //console.log('in GetAllContainers postit');
 
         var token = $cookieStore.get('cpm_token');
         if (token === void 0) {
-            console.log('cookie was undefined');
+            //console.log('cookie was undefined');
             alert('login required');
             return;
         }
@@ -290,19 +290,19 @@ cpmApp.controller('GetAllContainersController', function($rootScope, $scope, $ht
 
     var init = function() {
 
-        console.log('GetAllContainers init called');
+        //console.log('GetAllContainers init called');
         var token = $cookieStore.get('cpm_token');
         if (token === void 0) {
-            console.log('cookie was undefined');
+            //console.log('cookie was undefined');
             alert('login required');
             return;
         }
         $http.get($cookieStore.get('AdminURL') + '/nodes/' + token).
         success(function(data, status, headers, config) {
             $scope.results = data;
-            console.log('containers has ' + $scope.results.length);
+            //console.log('containers has ' + $scope.results.length);
             if ($scope.results.length > 0) {
-                console.log('first container is ' + $scope.results[0].Name);
+                //console.log('first container is ' + $scope.results[0].Name);
                 $rootScope.$emit('setContainer', {
                     message: $scope.results[0]
                 });
@@ -315,22 +315,22 @@ cpmApp.controller('GetAllContainersController', function($rootScope, $scope, $ht
 	    }
         }).
         error(function(data, status, headers, config) {
-            console.log('error:GetAllContainers:init');
+            //console.log('error:GetAllContainers:init');
         });
     };
 
     $rootScope.$on('updateContainerPageTarget', function(event, args) {
-        console.log('here in GetAllContainersCtrl target ' + args.message);
+        //console.log('here in GetAllContainersCtrl target ' + args.message);
         $scope.message = args.message;
         $scope.entryID = $scope.message.ID;
         postit();
     });
     $rootScope.$on('createContainerTarget', function(event, args) {
-        console.log('GetAllController createContainerTarget recv ' + args.message);
+        //console.log('GetAllController createContainerTarget recv ' + args.message);
         init();
     });
     $rootScope.$on('deleteContainerTarget', function(event, args) {
-        console.log('GetAllController deleteContainerTarget received ');
+        //console.log('GetAllController deleteContainerTarget received ');
         init();
     });
     if ($cookieStore.get('AdminURL')) {
@@ -354,7 +354,7 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
 
     $scope.handleStart = function() {
 	    $scope.status.isopen=false;
-        console.log('starting db on ' + $scope.currentContainer.Name);
+        //console.log('starting db on ' + $scope.currentContainer.Name);
         var modalInstance = $modal.open({
             templateUrl: 'pages/containerstart.html',
             controller: StartContainerModalInstanceCtrl,
@@ -368,7 +368,7 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
     };
     $scope.handleStop = function() {
 	    $scope.status.isopen=false;
-        console.log('stopping db on ' + $scope.currentContainer.Name);
+        //console.log('stopping db on ' + $scope.currentContainer.Name);
         var modalInstance = $modal.open({
             templateUrl: 'pages/containerstop.html',
             controller: StopContainerModalInstanceCtrl,
@@ -383,15 +383,15 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
 
     $scope.handleBackupClick = function() {
 	    $scope.status.isopen=false;
-        console.log('hi from handleBackupClick id=' + $scope.currentContainer.ID);
+        //console.log('hi from handleBackupClick id=' + $scope.currentContainer.ID);
         var popupWindow = window.open('pages/backups.html');
-        console.log('in app.js setting child container=' + $scope.currentContainer.ID);
+        //console.log('in app.js setting child container=' + $scope.currentContainer.ID);
         popupWindow.containerid = $scope.currentContainer.ID;
     };
 
     $scope.handleOfflineClick = function(msg) {
 	    $scope.status.isopen=false;
-        console.log('user wants ' + msg.Name + ' to go offline');
+        //console.log('user wants ' + msg.Name + ' to go offline');
         var modalInstance = $modal.open({
             templateUrl: 'pages/stopcontainermodal.html',
             controller: StopContainerModalInstanceCtrl,
@@ -405,7 +405,7 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
 
     $scope.handleMinusClick = function() {
 	    $scope.status.isopen=false;
-        console.log('hi from handleMinusClick id=' + $scope.currentContainer.ID);
+        //console.log('hi from handleMinusClick id=' + $scope.currentContainer.ID);
         var modalInstance = $modal.open({
             templateUrl: 'pages/deletecontainermodal.html',
             controller: DeleteContainerModalInstanceCtrl,
@@ -419,16 +419,16 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
 
     $scope.handleMonitorClick = function() {
 	    $scope.status.isopen=false;
-        console.log('hi from handleMonitorClick id=' + $scope.currentContainer.ID);
+        //console.log('hi from handleMonitorClick id=' + $scope.currentContainer.ID);
         var popupWindow = window.open('pages/containermonitor.html');
-        console.log('in app.js setting child container=' + $scope.currentContainer.ID);
+        //console.log('in app.js setting child container=' + $scope.currentContainer.ID);
         popupWindow.containerid = $scope.currentContainer.ID;
         popupWindow.slidervalue = $scope.slidervalue;
     };
 
     $scope.handlePlusClick = function() {
 	    $scope.status.isopen=false;
-        console.log('hi from handlePlusClick');
+        //console.log('hi from handlePlusClick');
         var modalInstance = $modal.open({
             templateUrl: 'pages/createcontainermodal.html',
             controller: CreateContainerModalInstanceCtrl
@@ -442,14 +442,14 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
 
     function postit(container) {
         $scope.currentContainer = container;
-        console.log('in GetContainer postit with containerid=' + container.ID);
+        //console.log('in GetContainer postit with containerid=' + container.ID);
         var token = $cookieStore.get('cpm_token');
         $http.get($cookieStore.get('AdminURL') + '/node/' + container.ID + "." + token).
         success(function(data, status, headers, config) {
             $scope.results = data;
-            console.log('here is ServerID=' + $scope.results.ServerID);
-            console.log('here is ClusterID=' + $scope.results.ClusterID);
-            console.log('here is Status=' + $scope.results.Status);
+            //console.log('here is ServerID=' + $scope.results.ServerID);
+            //console.log('here is ClusterID=' + $scope.results.ClusterID);
+            //console.log('here is Status=' + $scope.results.Status);
 	    if ($scope.results.Status == 'RUNNING') {
 		$scope.isRunning = true;
 	    } else {
@@ -462,12 +462,12 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
 	    }
 
             if ($scope.results.ClusterID == -1) {
-                console.log('setting myCluster to unassigne value');
+                //console.log('setting myCluster to unassigne value');
                 $scope.myCluster.Name = 'unassigned';
             } else {
 
                 if (token === void 0) {
-                    console.log('cookie was undefined');
+                    //console.log('cookie was undefined');
                     alert('login required');
                     return;
                 }
@@ -479,7 +479,7 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
             }
 
             if (token === void 0) {
-                console.log('cookie was undefined');
+                //console.log('cookie was undefined');
                 alert('login required');
                 return;
             }
@@ -500,18 +500,18 @@ cpmApp.controller('GetContainerController', function($scope, $http, $rootScope, 
     }
 
     $rootScope.$on('setContainerTarget', function(event, args) {
-        console.log('GetContainerController setContainerTarget ' + args.message.ID);
+        //console.log('GetContainerController setContainerTarget ' + args.message.ID);
         postit(args.message);
     });
     $rootScope.$on('noContainerTarget', function(event, args) {
-        console.log('GetContainerController noContainerTarget received');
+        //console.log('GetContainerController noContainerTarget received');
             $scope.results = [];
 		$scope.myCluster = [];
 		$scope.myServer = [];
     });
 
     $rootScope.$on('updateContainerPageTarget', function(event, args) {
-        console.log('here in GetContain ' + args.message.ID);
+        //console.log('here in GetContain ' + args.message.ID);
         postit(args.message);
     });
 

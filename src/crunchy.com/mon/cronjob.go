@@ -95,7 +95,8 @@ func RunMonJob(args *MonRequest) error {
 
 	var databaseConn *sql.DB
 	var id = "postgres"
-	var psw = "postgres"
+	var psw = ""
+	var database = "postgres"
 	y := 0
 	for y = range nodes {
 		//get connection to database
@@ -104,9 +105,10 @@ func RunMonJob(args *MonRequest) error {
 		if nodes[y].Role == "pgpool" {
 			id = "cpmtest"
 			psw = "cpmtest"
+			database = "cpmtest"
 		}
 
-		databaseConn, err = util.GetMonitoringConnection(nodes[y].Name+"."+domain, id, "5432", psw)
+		databaseConn, err = util.GetMonitoringConnection(nodes[y].Name+"."+domain, id, "5432", database, psw)
 		if err != nil {
 			glog.Errorln("error in getting connection to " + nodes[y].Name)
 		} else {

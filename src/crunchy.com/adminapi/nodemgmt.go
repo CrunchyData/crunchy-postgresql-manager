@@ -490,7 +490,7 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 
 func GetPGStatus2(hostname string) (string, error) {
 
-	dbConn, err := util.GetMonitoringConnection(hostname, "postgres", "5432", "postgres")
+	dbConn, err := util.GetMonitoringConnection(hostname, "postgres", "5432", "postgres", "")
 	defer dbConn.Close()
 	var value string
 

@@ -93,7 +93,7 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbConn, err := util.GetMonitoringConnection(node.Name, "postgres", "5432", "postgres")
+	dbConn, err := util.GetMonitoringConnection(node.Name, "postgres", "5432", "postgres", "")
 	defer dbConn.Close()
 
 	settings := make([]PostgresSetting, 0)
@@ -211,7 +211,7 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbConn, err := util.GetMonitoringConnection(node.Name, "postgres", "5432", "postgres")
+	dbConn, err := util.GetMonitoringConnection(node.Name, "postgres", "5432", "postgres", "")
 	defer dbConn.Close()
 
 	info := Bgwriter{}
@@ -263,7 +263,7 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbConn, err := util.GetMonitoringConnection(node.Name, "postgres", "5432", "postgres")
+	dbConn, err := util.GetMonitoringConnection(node.Name, "postgres", "5432", "postgres", "")
 	defer dbConn.Close()
 
 	stats := make([]Statdatabase, 0)
@@ -343,7 +343,7 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbConn, err := util.GetMonitoringConnection(node.Name, "postgres", "5432", "postgres")
+	dbConn, err := util.GetMonitoringConnection(node.Name, "postgres", "5432", "postgres", "")
 	defer dbConn.Close()
 
 	stats := make([]Statrepl, 0)
