@@ -29,6 +29,24 @@
       }
     },
     {
+      "id": "cpm-mon-api",
+      "kind": "Service",
+      "apiVersion": "v1beta1",
+      "port": 8086,
+      "selector": {
+        "name": "cpm-mon-api"
+      }
+    },
+    {
+      "id": "cpm-mon-ui",
+      "kind": "Service",
+      "apiVersion": "v1beta1",
+      "port": 8083,
+      "selector": {
+        "name": "cpm-mon-ui"
+      }
+    },
+    {
       "id": "cpm-mon",
       "kind": "Pod",
       "apiVersion": "v1beta1",
@@ -67,10 +85,10 @@
                  ],
 
             "env": [
- 		{ "name": "DOMAIN", "value": "example.com" },
+ 		{ "name": "DOMAIN", "value": "default.local" },
                	{ "name": "DB_PORT", "value": "5432" },
                	{ "name": "DB_USER", "value": "postgres" },
-               	{ "name": "DB_HOST", "value": "cpm-admin.crunchy.lab" }
+               	{ "name": "DB_HOST", "value": "cpm-admin-db.default.local" }
             ],
             "ports": [{
               "containerPort": 13000

@@ -34,10 +34,15 @@ func GetHC1(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var domain string
+	var hostname = "cpm-mon"
 	domain, err = admindb.GetDomain()
 
+	if kubeEnv {
+		hostname = hostname + "-api"
+	}
+
 	c, err := client.NewClient(&client.ClientConfig{
-		Host:     "cpm-mon." + domain + ":8086",
+		Host:     hostname + "." + domain + ":8086",
 		Username: "root",
 		Password: "root",
 		Database: "cpm",
