@@ -34,7 +34,7 @@
       "apiVersion": "v1beta1",
       "port": 8086,
       "selector": {
-        "name": "cpm-mon-api"
+        "name": "cpm-mon"
       }
     },
     {
@@ -43,7 +43,7 @@
       "apiVersion": "v1beta1",
       "port": 8083,
       "selector": {
-        "name": "cpm-mon-ui"
+        "name": "cpm-mon"
       }
     },
     {
