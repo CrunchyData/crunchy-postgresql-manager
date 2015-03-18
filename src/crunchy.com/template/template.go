@@ -41,6 +41,7 @@ var outputFile *os.File
 
 type KubePodParams struct {
 	ID     string
+	PODID  string
 	CPU    string
 	MEM    string
 	IMAGE  string

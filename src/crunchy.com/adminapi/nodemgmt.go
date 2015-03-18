@@ -95,12 +95,18 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 
 	if currentStatus != "CONTAINER NOT FOUND" {
 		//ping the db on that node to get current status
-		currentStatus, err = GetPGStatus2(results.Name + "." + domain)
+		var pinghost = results.Name
+		if kubeEnv {
+			pinghost = results.Name + "-db"
+		}
+		glog.Infoln("pinging db on " + pinghost + "." + domain)
+		currentStatus, err = GetPGStatus2(pinghost + "." + domain)
 		if err != nil {
 			glog.Errorln("GetNode:" + err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+		glog.Infoln("pinging db finished")
 	}
 
 	node := ClusterNode{results.ID, results.ClusterID, results.ServerID,
@@ -482,7 +488,7 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 
 func GetPGStatus2(hostname string) (string, error) {
 
-	dbConn, err := util.GetMonitoringConnection(hostname, "postgres", "5432", "postgres", "")
+	dbConn, err := util.GetMonitoringConnection(hostname, "cpmtest", "5432", "cpmtest", "cpmtest")
 	defer dbConn.Close()
 	var value string
 

@@ -40,6 +40,7 @@ func TestCreate(w rest.ResponseWriter, r *rest.Request) {
 
 	podInfo := template.KubePodParams{
 		"testnode",
+		"testnode",
 		"0", "0",
 		"crunchydata/cpm-node",
 		"/opt/cpm/data/pgsql/testnode", "13000"}

@@ -185,6 +185,7 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 
 		podInfo := template.KubePodParams{
 			params.ContainerName,
+			params.ContainerName,
 			params.CPU, params.MEM,
 			params.Image,
 			params.PGDataPath, "13000"}
@@ -195,6 +196,10 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 			glog.Errorln("Provision:" + err.Error())
 			return err
 		}
+		//we have to wait here since the Kube sometimes
+		//is not that fast in setting up the service
+		//for a pod..choosing 15 seconds to wait
+		time.Sleep(15000 * time.Millisecond)
 	}
 
 	dbnode := admindb.DBClusterNode{}
