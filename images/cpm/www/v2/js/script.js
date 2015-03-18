@@ -140,9 +140,10 @@ function convertUTCDateToLocalDate(date) {
 		date.setSeconds(data[0].points[0][2]);
 		//$scope.hcts = date.toISOString();
 		$scope.hcts = convertUTCDateToLocalDate(date).toUTCString();
+		console.log('hcts ' + $scope.hcts);
 		//overlay for tooltip hover	
 		for (i = 0; i < $scope.hc.length; i++) {
-			$scope.hc[i][2] = 'database down';
+			$scope.hc[i][2] = 'database ' + $scope.hc[i][5];
 			$scope.hc[i][4] = 'Database -' + $scope.hc[i][3];
 		}
 			

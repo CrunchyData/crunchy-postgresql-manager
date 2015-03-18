@@ -203,6 +203,18 @@ func hc1(scheduleTS int64, nodeName string, databaseConn *sql.DB, c *client.Clie
 			glog.Errorln("hc1 error writing to influxdb " + err.Error())
 		}
 
+	} else {
+		//hc1 - database up condition
+		series := &client.Series{
+			Name:    "hc1",
+			Columns: []string{"seconds", "service", "servicetype", "status"},
+			Points: [][]interface{}{
+				{scheduleTS, nodeName, "db", "up"},
+			},
+		}
+		if err = c.WriteSeries([]*client.Series{series}); err != nil {
+			glog.Errorln("hc1 error writing to influxdb " + err.Error())
+		}
 	}
 
 }
