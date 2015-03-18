@@ -26,7 +26,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 )
 
 type MyPod struct {
@@ -38,12 +37,6 @@ type MyPod struct {
 func TestCreate(w rest.ResponseWriter, r *rest.Request) {
 
 	glog.Infoln("here in Test Create")
-
-	kubeURL := os.Getenv("KUBE_URL")
-	if kubeURL == "" {
-		glog.Errorln("TestCreate: KUBE_URL not set")
-		rest.Error(w, "KUBE_URL not set", http.StatusBadRequest)
-	}
 
 	podInfo := template.KubePodParams{
 		"testnode",
@@ -66,12 +59,6 @@ func TestCreate(w rest.ResponseWriter, r *rest.Request) {
 func TestDelete(w rest.ResponseWriter, r *rest.Request) {
 
 	glog.Infoln("here in Test Delete")
-	kubeURL := os.Getenv("KUBE_URL")
-	if kubeURL == "" {
-		glog.Errorln("TestDelete: KUBE_URL not set")
-		rest.Error(w, "KUBE_URL not set", http.StatusBadRequest)
-		return
-	}
 	err := DeletePod(kubeURL, "testnode")
 	if err != nil {
 		glog.Infoln(err.Error())
@@ -122,7 +109,7 @@ func DeletePod(kubeURL string, ID string) error {
 	transport := &http.Transport{TLSClientConfig: tlsConfig}
 	client := &http.Client{Transport: transport}
 
-	// DELETE
+	// DELETE pod
 	var url = kubeURL + "/api/v1beta1/pods/" + ID
 	glog.Infoln("url is " + url)
 	request, err2 := http.NewRequest("DELETE", url, nil)
@@ -140,6 +127,54 @@ func DeletePod(kubeURL string, ID string) error {
 
 	// Dump response
 	data, err2 := ioutil.ReadAll(resp.Body)
+	if err2 != nil {
+		glog.Errorln(err2.Error())
+		return err2
+	}
+	glog.Infoln(string(data))
+
+	// DELETE service 1 (port 13000)
+	url = kubeURL + "/api/v1beta1/services/" + ID
+	glog.Infoln("url is " + url)
+	request, err2 = http.NewRequest("DELETE", url, nil)
+	if err2 != nil {
+		glog.Errorln(err2.Error())
+		return err2
+	}
+
+	resp, err = client.Do(request)
+	if err != nil {
+		glog.Errorln(err.Error())
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Dump response
+	data, err2 = ioutil.ReadAll(resp.Body)
+	if err2 != nil {
+		glog.Errorln(err2.Error())
+		return err2
+	}
+	glog.Infoln(string(data))
+
+	// DELETE service 2 (port 5432)
+	url = kubeURL + "/api/v1beta1/services/" + ID + "-db"
+	glog.Infoln("url is " + url)
+	request, err2 = http.NewRequest("DELETE", url, nil)
+	if err2 != nil {
+		glog.Errorln(err2.Error())
+		return err2
+	}
+
+	resp, err = client.Do(request)
+	if err != nil {
+		glog.Errorln(err.Error())
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Dump response
+	data, err2 = ioutil.ReadAll(resp.Body)
 	if err2 != nil {
 		glog.Errorln(err2.Error())
 		return err2

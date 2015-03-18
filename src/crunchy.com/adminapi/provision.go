@@ -25,7 +25,6 @@ import (
 	"github.com/golang/glog"
 	"net/http"
 	"net/rpc"
-	"os"
 	"strconv"
 	"time"
 )
@@ -101,13 +100,6 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool) error {
 	glog.Infoln("PROFILE: provisionImpl starts 1")
 
-	kubeEnv := false
-	kube := os.Getenv("KUBE_URL")
-	glog.Infoln("KUBE_URL=[" + kube + "]")
-	if kube != "" {
-		glog.Infoln("KUBE_URL value set, assume Kube environment")
-		kubeEnv = true
-	}
 	var errorStr string
 	//make sure the container name is not already taken
 	_, err2 := admindb.GetDBNodeByName(params.ContainerName)
@@ -185,7 +177,7 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 		//delete the kube pod with this name
 		//we only log an error, this is ok because
 		//we can get a 'not found' as an error
-		err = DeletePod(kube, params.ContainerName)
+		err = DeletePod(kubeURL, params.ContainerName)
 		glog.Infoln("after delete pod")
 		if err != nil {
 			glog.Infoln("Provision:" + err.Error())
@@ -197,7 +189,7 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 			params.Image,
 			params.PGDataPath, "13000"}
 		glog.Infoln("before create pod")
-		err = CreatePod(kube, podInfo)
+		err = CreatePod(kubeURL, podInfo)
 		glog.Infoln("after create pod")
 		if err != nil {
 			glog.Errorln("Provision:" + err.Error())

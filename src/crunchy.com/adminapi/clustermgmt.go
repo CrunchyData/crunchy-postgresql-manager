@@ -513,10 +513,21 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		//outside of us, so we let it pass that we can't remove
 		//it
 		//err = removeContainer(server.IPAddress, containers[i].Name)
-		output, err = cpmagent.DockerRemoveContainer(containers[i].Name,
-			server.IPAddress)
-		if err != nil {
-			glog.Errorln("DeleteCluster: error when trying to remove container" + err.Error())
+		if kubeEnv {
+			//delete the kube pod with this name
+			err = DeletePod(kubeURL, containers[i].Name)
+			if err != nil {
+				glog.Errorln("DeleteCluster:" + err.Error())
+				rest.Error(w, "error in deleting pod", http.StatusBadRequest)
+				return
+			}
+
+		} else {
+			output, err = cpmagent.DockerRemoveContainer(containers[i].Name,
+				server.IPAddress)
+			if err != nil {
+				glog.Errorln("DeleteCluster: error when trying to remove container" + err.Error())
+			}
 		}
 
 		//send the server a deletevolume command

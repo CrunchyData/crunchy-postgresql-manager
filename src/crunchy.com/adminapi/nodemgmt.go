@@ -25,7 +25,6 @@ import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/golang/glog"
 	"net/http"
-	"os"
 )
 
 const CONTAINER_NOT_FOUND = "CONTAINER NOT FOUND"
@@ -295,19 +294,12 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	//it is possible that someone can remove a container
 	//outside of us, so we let it pass that we can't remove
 	//it
-	kubeEnv := false
-	kube := os.Getenv("KUBE_URL")
-	glog.Infoln("KUBE_URL=[" + kube + "]")
-	if kube != "" {
-		glog.Infoln("KUBE_URL value set, assume Kube environment")
-		kubeEnv = true
-	}
 
 	var output string
 
 	if kubeEnv {
 		//delete the kube pod with this name
-		err = DeletePod(kube, dbNode.Name)
+		err = DeletePod(kubeURL, dbNode.Name)
 		if err != nil {
 			glog.Errorln("DeleteNode:" + err.Error())
 			rest.Error(w, "error in deleting pod", http.StatusBadRequest)
