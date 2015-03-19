@@ -105,13 +105,22 @@ func Postgresql(mode string, port string, clusterType string) (string, error) {
 	return buff.String(), nil
 }
 
-func Hba(mode string, hostname string, port string, clusterid string, domainname string) (string, error) {
+func Hba(kubeEnv bool, mode string, hostname string, port string, clusterid string, domainname string) (string, error) {
 
 	var hbaInfo HBAParameters
-	hbaInfo.PG_HOST_IP = hostname + "." + domainname
-	hbaInfo.BACKUP_HOST = hostname + "-backup." + domainname
-	hbaInfo.MONITOR_HOST = "cpm-mon." + domainname
-	hbaInfo.ADMIN_HOST = "cpm-admin." + domainname
+
+	if kubeEnv {
+		hbaInfo.PG_HOST_IP = hostname + "-db" + "." + domainname
+		hbaInfo.BACKUP_HOST = hostname + "-db" + "-backup." + domainname
+		hbaInfo.MONITOR_HOST = "cpm-mon" + "-db" + "." + domainname
+		hbaInfo.ADMIN_HOST = "cpm-admin" + "-db" + "." + domainname
+	} else {
+		hbaInfo.PG_HOST_IP = hostname + "." + domainname
+		hbaInfo.BACKUP_HOST = hostname + "-backup." + domainname
+		hbaInfo.MONITOR_HOST = "cpm-mon." + domainname
+		hbaInfo.ADMIN_HOST = "cpm-admin." + domainname
+	}
+
 	servers, err := admindb.GetAllDBServers()
 	if err != nil {
 		glog.Errorln("Hba:" + err.Error())
@@ -144,12 +153,16 @@ func Hba(mode string, hostname string, port string, clusterid string, domainname
 	}
 
 	if mode == "standby" || mode == "master" {
-		_, pgpoolNode, standbyList, err := getMasterValues(clusterid, domainname)
+		_, pgpoolNode, standbyList, err := getMasterValues(kubeEnv, clusterid, domainname)
 		if err != nil {
 			return "", err
 		}
 
-		hbaInfo.PGPOOL_HOST = pgpoolNode.Name + "." + domainname
+		if kubeEnv {
+			hbaInfo.PGPOOL_HOST = pgpoolNode.Name + "-db" + "." + domainname
+		} else {
+			hbaInfo.PGPOOL_HOST = pgpoolNode.Name + "." + domainname
+		}
 		hbaInfo.STANDBY_LIST = standbyList
 	}
 
@@ -175,7 +188,7 @@ func Hba(mode string, hostname string, port string, clusterid string, domainname
 //
 // getMasterValues returns a master node, pgpool node, and list of standby nodes
 //
-func getMasterValues(clusterID string, domainname string) (admindb.DBClusterNode, admindb.DBClusterNode, []string, error) {
+func getMasterValues(kubeEnv bool, clusterID string, domainname string) (admindb.DBClusterNode, admindb.DBClusterNode, []string, error) {
 	master := admindb.DBClusterNode{}
 	pgpool := admindb.DBClusterNode{}
 	//we pass in a list of containers in this cluster
@@ -197,13 +210,21 @@ func getMasterValues(clusterID string, domainname string) (admindb.DBClusterNode
 		if nodes[i].Role == "master" {
 			master = nodes[i]
 			masterFound = true
-			nodeslice[nodecount] = nodes[i].Name + "." + domainname
+			if kubeEnv {
+				nodeslice[nodecount] = nodes[i].Name + "-db" + "." + domainname
+			} else {
+				nodeslice[nodecount] = nodes[i].Name + "." + domainname
+			}
 			nodecount++
 		} else if nodes[i].Role == "pgpool" {
 			pgpool = nodes[i]
 			pgpoolFound = true
 		} else if nodes[i].Role == "standby" {
-			nodeslice[nodecount] = nodes[i].Name + "." + domainname
+			if kubeEnv {
+				nodeslice[nodecount] = nodes[i].Name + "-db" + "." + domainname
+			} else {
+				nodeslice[nodecount] = nodes[i].Name + "." + domainname
+			}
 			nodecount++
 		}
 		i++

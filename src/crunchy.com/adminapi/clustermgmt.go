@@ -130,7 +130,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 	}
 
 	//configure master pg_hba.conf file
-	data, err = template.Hba("master", master.Name, "5432", cluster.ID, domainname.Value)
+	data, err = template.Hba(kubeEnv, "master", master.Name, "5432", cluster.ID, domainname.Value)
 	if err != nil {
 		glog.Errorln("configureCluster:" + err.Error())
 		return err
@@ -166,8 +166,12 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 	//sleep loop until the master's PG can respond
 	var found = false
 	var currentStatus string
+	var masterhost = master.Name
+	if kubeEnv {
+		masterhost = master.Name + "-db"
+	}
 	for i := 0; i < 20; i++ {
-		currentStatus, err = GetPGStatus2(master.Name)
+		currentStatus, err = GetPGStatus2(masterhost)
 		if currentStatus == "RUNNING" {
 			glog.Infoln("master is running...continuing")
 			found = true
@@ -203,14 +207,14 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 			}
 
 			//create base backup from master
-			commandoutput, err = cpmagent.Command1(CPMBIN+"basebackup.sh", master.Name+"."+domainname.Value, standbynodes[i].Name)
+			commandoutput, err = cpmagent.Command1(CPMBIN+"basebackup.sh", masterhost+"."+domainname.Value, standbynodes[i].Name)
 			if err != nil {
 				glog.Errorln("configureCluster:" + err.Error())
 				return err
 			}
 			glog.Infoln("configureCluster:basebackup output was" + commandoutput)
 
-			data, err = template.Recovery(master.Name, "5432", "postgres")
+			data, err = template.Recovery(masterhost, "5432", "postgres")
 			if err != nil {
 				glog.Errorln("configureCluster:" + err.Error())
 				return err
@@ -240,7 +244,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 			glog.Infoln("configureCluster:standby postgresql.conf copied remotely")
 
 			//configure standby pg_hba.conf file
-			data, err = template.Hba("standby", standbynodes[i].Name, "5432", cluster.ID, domainname.Value)
+			data, err = template.Hba(kubeEnv, "standby", standbynodes[i].Name, "5432", cluster.ID, domainname.Value)
 			if err != nil {
 				glog.Errorln("configureCluster:" + err.Error())
 				return err
@@ -717,7 +721,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 				glog.Infoln("AdminFailover: standby postgresql.conf copied remotely")
 
 				//configure standby pg_hba.conf file
-				data, err = template.Hba("standby", clusterNodes[i].Name, "5432", dbNode.ClusterID, domainname.Value)
+				data, err = template.Hba(kubeEnv, "standby", clusterNodes[i].Name, "5432", dbNode.ClusterID, domainname.Value)
 				if err != nil {
 					glog.Errorln("AdminFailover:" + err.Error())
 					rest.Error(w, err.Error(), http.StatusBadRequest)

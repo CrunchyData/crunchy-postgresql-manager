@@ -59,8 +59,11 @@ func MonitorContainerLoadtest(w rest.ResponseWriter, r *rest.Request) {
 
 	var output string
 	var port = "5432"
-
-	output, err = cpmagent.AgentCommandConfigureNode(CPMBIN+"loadtest", node.Name,
+	var host = node.Name
+	if kubeEnv {
+		host = node.Name + "-db"
+	}
+	output, err = cpmagent.AgentCommandConfigureNode(CPMBIN+"loadtest", host,
 		port, Writes, "", "", "", "", server.IPAddress)
 	if err != nil {
 		glog.Errorln("MonitorContainerGetInfo:" + err.Error())
@@ -93,7 +96,11 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbConn, err := util.GetMonitoringConnection(node.Name, "postgres", "5432", "postgres", "")
+	var host = node.Name
+	if kubeEnv {
+		host = node.Name + "-db"
+	}
+	dbConn, err := util.GetMonitoringConnection(host, "cpmtest", "5432", "cpmtest", "cpmtest")
 	defer dbConn.Close()
 
 	settings := make([]PostgresSetting, 0)
@@ -211,7 +218,11 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbConn, err := util.GetMonitoringConnection(node.Name, "postgres", "5432", "postgres", "")
+	var host = node.Name
+	if kubeEnv {
+		host = node.Name + "-db"
+	}
+	dbConn, err := util.GetMonitoringConnection(host, "cpmtest", "5432", "cpmtest", "cpmtest")
 	defer dbConn.Close()
 
 	info := Bgwriter{}
@@ -263,7 +274,11 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbConn, err := util.GetMonitoringConnection(node.Name, "postgres", "5432", "postgres", "")
+	var host = node.Name
+	if kubeEnv {
+		host = node.Name + "-db"
+	}
+	dbConn, err := util.GetMonitoringConnection(host, "cpmtest", "5432", "cpmtest", "cpmtest")
 	defer dbConn.Close()
 
 	stats := make([]Statdatabase, 0)
@@ -343,7 +358,11 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbConn, err := util.GetMonitoringConnection(node.Name, "postgres", "5432", "postgres", "")
+	var host = node.Name
+	if kubeEnv {
+		host = node.Name + "-db"
+	}
+	dbConn, err := util.GetMonitoringConnection(host, "cpmtest", "5432", "cpmtest", "cpmtest")
 	defer dbConn.Close()
 
 	stats := make([]Statrepl, 0)
@@ -435,8 +454,13 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 	var password = "cpmtest"
 	var database = "cpmtest"
 
+	var host = node.Name
+	if kubeEnv {
+		host = node.Name + "-db"
+	}
+
 	cmd := exec.Command(CPMBIN+"loadtest",
-		node.Name,
+		host,
 		port,
 		user,
 		password,

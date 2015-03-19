@@ -274,7 +274,7 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 			return err
 		}
 		//create pg_hba.conf
-		data, err = template.Hba(mode, params.ContainerName, port, "", domainname.Value)
+		data, err = template.Hba(kubeEnv, mode, params.ContainerName, port, "", domainname.Value)
 		if err != nil {
 			glog.Errorln("Provision:" + err.Error())
 			return err
