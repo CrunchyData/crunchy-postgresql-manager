@@ -23,6 +23,7 @@
       "id": "cpm-mon",
       "kind": "Service",
       "apiVersion": "v1beta1",
+      "containerPort": 13000,
       "port": 13000,
       "selector": {
         "name": "cpm-mon"
@@ -32,6 +33,7 @@
       "id": "cpm-mon-api",
       "kind": "Service",
       "apiVersion": "v1beta1",
+      "containerPort": 8086,
       "port": 8086,
       "selector": {
         "name": "cpm-mon"
@@ -41,6 +43,7 @@
       "id": "cpm-mon-ui",
       "kind": "Service",
       "apiVersion": "v1beta1",
+      "containerPort": 8083,
       "port": 8083,
       "selector": {
         "name": "cpm-mon"
@@ -91,7 +94,9 @@
                	{ "name": "DB_HOST", "value": "cpm-admin-db.default.local" }
             ],
             "ports": [{
-              "containerPort": 13000
+              "containerPort": 13000,
+              "containerPort": 8083,
+              "containerPort": 8086
             }]
           }]
         }

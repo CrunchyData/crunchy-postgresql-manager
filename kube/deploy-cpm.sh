@@ -3,22 +3,23 @@
 #
 # deploy cpm
 #
-osc process -n cpm-project -f cpm-template.json   | osc create -n cpm-project -f -
-
+osc process -n default -f cpm-template.json   | osc create -n default -f -
 
 #
 # deploy cpm-admin
 #
-osc process -n cpm-project -f cpm-admin-template.json   | osc create -n cpm-project -f -
+osc process -n default -f cpm-admin-template.json   | osc create -n default -f -
 
+sleep 10
 
 #
 # deploy cpm-backup
 #
-osc process -n cpm-project -f cpm-backup-template.json   | osc create -n cpm-project -f -
+osc process -n default -f cpm-backup-template.json   | osc create -n default -f -
 
+sleep 10
 
 #
 # deploy cpm-mon
 #
-osc process -n cpm-project -f cpm-mon-template.json   | osc create -n cpm-project -f -
+osc process -n default -f cpm-mon-template.json   | osc create -n default -f -

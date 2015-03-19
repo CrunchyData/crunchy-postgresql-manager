@@ -948,6 +948,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
 		return
 	}
+
 	glog.Infoln("AUTO CLUSTER PROFILE master container created")
 	var node admindb.DBClusterNode
 	//update node with cluster iD

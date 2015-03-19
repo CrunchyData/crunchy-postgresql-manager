@@ -23,6 +23,7 @@
       "id": "cpm",
       "kind": "Service",
       "apiVersion": "v1beta1",
+      "containerPort": 13000,
       "port": 13000,
       "selector": {
         "name": "cpm"

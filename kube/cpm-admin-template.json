@@ -23,6 +23,7 @@
       "id": "cpm-admin",
       "kind": "Service",
       "apiVersion": "v1beta1",
+      "containerPort": 13000,
       "port": 13000,
       "selector": {
         "name": "cpm-admin"
@@ -32,6 +33,7 @@
       "id": "cpm-admin-db",
       "kind": "Service",
       "apiVersion": "v1beta1",
+      "containerPort": 5432,
       "port": 5432,
       "selector": {
         "name": "cpm-admin"
@@ -103,7 +105,8 @@
                	{ "name": "DB_HOST", "value": "127.0.0.1" }
             ],
             "ports": [{
-              "containerPort": 13000
+              "containerPort": 13000,
+              "containerPort": 5432
             }]
           }]
         }

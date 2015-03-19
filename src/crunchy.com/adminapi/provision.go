@@ -358,7 +358,7 @@ func PGCommand(pgcommand string, ipaddress string) (string, error) {
 func waitTillReady(container string) error {
 
 	var err error
-	for i := 0; i < 20; i++ {
+	for i := 0; i < 40; i++ {
 		err = RemoteWritefile("/tmp/waitTest", "waitTillReady was here", container)
 		if err != nil {
 			glog.Errorln("waitTillReady:waited for cpmagent on " + container)
