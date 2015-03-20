@@ -18,6 +18,7 @@ package main
 import (
 	"crunchy.com/admindb"
 	"crunchy.com/cpmagent"
+	"crunchy.com/kubeclient"
 	"crunchy.com/template"
 	"database/sql"
 	"errors"
@@ -177,21 +178,59 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 		//delete the kube pod with this name
 		//we only log an error, this is ok because
 		//we can get a 'not found' as an error
-		err = DeletePod(kubeURL, params.ContainerName)
+		err = kubeclient.DeletePod(kubeURL, params.ContainerName)
 		glog.Infoln("after delete pod")
 		if err != nil {
 			glog.Infoln("Provision:" + err.Error())
 		}
 
+		err = kubeclient.DeleteService(kubeURL, params.ContainerName)
+		if err != nil {
+			glog.Infoln("Provision:" + err.Error())
+		}
+
+		err = kubeclient.DeleteService(kubeURL, params.ContainerName+"-db")
+		if err != nil {
+			glog.Infoln("Provision:" + err.Error())
+		}
+
 		podInfo := template.KubePodParams{
-			params.ContainerName,
-			params.ContainerName,
-			params.CPU, params.MEM,
-			params.Image,
-			params.PGDataPath, "13000"}
-		glog.Infoln("before create pod")
-		err = CreatePod(kubeURL, podInfo)
-		glog.Infoln("after create pod")
+			ID:                   params.ContainerName,
+			PODID:                params.ContainerName,
+			CPU:                  params.CPU,
+			MEM:                  params.MEM,
+			IMAGE:                params.Image,
+			VOLUME:               params.PGDataPath,
+			PORT:                 "13000",
+			BACKUP_NAME:          "",
+			BACKUP_SERVERNAME:    "",
+			BACKUP_SERVERIP:      "",
+			BACKUP_SCHEDULEID:    "",
+			BACKUP_PROFILENAME:   "",
+			BACKUP_CONTAINERNAME: "",
+			BACKUP_PATH:          "",
+			BACKUP_HOST:          "",
+			BACKUP_PORT:          "",
+			BACKUP_USER:          "",
+			BACKUP_SERVER_URL:    "",
+		}
+		err = kubeclient.CreatePod(kubeURL, podInfo)
+		if err != nil {
+			glog.Errorln("Provision:" + err.Error())
+			return err
+		}
+
+		//create the service to the admin port 13000
+		err = kubeclient.CreateService(kubeURL, podInfo)
+		if err != nil {
+			glog.Errorln("Provision:" + err.Error())
+			return err
+		}
+
+		//create the service to the PG port 5432
+		podInfo.PORT = "5432"
+		podInfo.ID = podInfo.ID + "-db"
+		err = kubeclient.CreateService(kubeURL, podInfo)
 		if err != nil {
 			glog.Errorln("Provision:" + err.Error())
 			return err

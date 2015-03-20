@@ -18,6 +18,7 @@ package main
 import (
 	"crunchy.com/admindb"
 	"crunchy.com/cpmagent"
+	"crunchy.com/kubeclient"
 	"crunchy.com/template"
 	"errors"
 	"github.com/ant0ine/go-json-rest/rest"
@@ -519,7 +520,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		//err = removeContainer(server.IPAddress, containers[i].Name)
 		if kubeEnv {
 			//delete the kube pod with this name
-			err = DeletePod(kubeURL, containers[i].Name)
+			err = kubeclient.DeletePod(kubeURL, containers[i].Name)
 			if err != nil {
 				glog.Errorln("DeleteCluster:" + err.Error())
 				rest.Error(w, "error in deleting pod", http.StatusBadRequest)

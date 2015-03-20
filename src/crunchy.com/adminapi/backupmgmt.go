@@ -105,7 +105,11 @@ func BackupNow(w rest.ResponseWriter, r *rest.Request) {
 	request := backup.BackupRequest{}
 	request.ScheduleID = postMsg.ScheduleID
 	request.ServerID = server.ID
-	request.ContainerName = schedule.ContainerName
+	if kubeEnv {
+		request.ContainerName = schedule.ContainerName + "-db"
+	} else {
+		request.ContainerName = schedule.ContainerName
+	}
 	request.ServerName = server.Name
 	request.ServerIP = server.IPAddress
 	request.ProfileName = postMsg.ProfileName

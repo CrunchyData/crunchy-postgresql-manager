@@ -16,9 +16,9 @@
 package main
 
 import (
-	//	"bytes"
 	"crunchy.com/admindb"
 	"crunchy.com/cpmagent"
+	"crunchy.com/kubeclient"
 	"crunchy.com/util"
 	"database/sql"
 	"fmt"
@@ -75,8 +75,8 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	if kubeEnv {
-		var podInfo MyPod
-		podInfo, err = GetPod(kubeURL, results.Name)
+		var podInfo kubeclient.MyPod
+		podInfo, err = kubeclient.GetPod(kubeURL, results.Name)
 		if err != nil {
 			currentStatus = CONTAINER_NOT_FOUND
 		}
@@ -305,7 +305,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 
 	if kubeEnv {
 		//delete the kube pod with this name
-		err = DeletePod(kubeURL, dbNode.Name)
+		err = kubeclient.DeletePod(kubeURL, dbNode.Name)
 		if err != nil {
 			glog.Errorln("DeleteNode:" + err.Error())
 			rest.Error(w, "error in deleting pod", http.StatusBadRequest)

@@ -1,0 +1,58 @@
+    {
+      "id": "{{.ID}}",
+      "kind": "Pod",
+      "apiVersion": "v1beta1",
+      "desiredState": {
+        "manifest": {
+          "version": "v1beta1",
+          "id": "{{.ID}}",
+          "volumes": [
+          	{
+               	"name": "pgdata",
+               	"source":
+               		{
+                       	"hostDir":
+                       		{
+                               	"path": "{{.VOLUME}}"
+                               	}
+			}
+
+		}
+          ],
+          "containers": [{
+            "name": "{{.ID}}",
+            "cpu": {{.CPU}},
+            "memory": 0,
+            "image": "{{.IMAGE}}",
+        	"volumeMounts": [
+                                    {
+                                        "name": "pgdata",
+                                        "mountPath": "/pgdata",
+                                        "readOnly": false
+                                    }
+                 ],
+
+            "env": [
+                { "name": "BACKUP_NAME", "value": "{{.BACKUP_NAME}}" },
+                { "name": "BACKUP_SERVERNAME", "value": "{{.BACKUP_SERVERNAME}}" },
+                { "name": "BACKUP_SERVERIP", "value": "{{.BACKUP_SERVERIP}}" },
+                { "name": "BACKUP_SCHEDULEID", "value": "{{.BACKUP_SCHEDULEID}}" },
+                { "name": "BACKUP_PROFILENAME", "value": "{{.BACKUP_PROFILENAME}}" },
+                { "name": "BACKUP_CONTAINERNAME", "value": "{{.BACKUP_CONTAINERNAME}}" },
+                { "name": "BACKUP_PATH", "value": "{{.BACKUP_PATH}}" },
+                { "name": "BACKUP_HOST", "value": "{{.BACKUP_HOST}}" },
+                { "name": "BACKUP_PORT", "value": "{{.BACKUP_PORT}}" },
+                { "name": "BACKUP_USER", "value": "{{.BACKUP_USER}}" },
+                { "name": "BACKUP_SERVER_URL", "value": "{{.BACKUP_SERVER_URL}}" }
+            ],
+            "ports": [{
+              "containerPort": 5432,
+              "containerPort": 13000
+            }]
+          }]
+        }
+      },
+      "labels": {
+        "name": "{{.ID}}"
+      }
+    }

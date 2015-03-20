@@ -3,6 +3,7 @@ export GOPATH=$(HOME)/crunchy-postgresql-manager
 build:
 		go install crunchy.com/util
 		go install crunchy.com/admindb
+		go install crunchy.com/kubeclient
 		go install crunchy.com/sec
 		go install crunchy.com/adminapi
 		go install crunchy.com/cpmagent

@@ -40,13 +40,24 @@ var pgUserFlag = flag.String("pguserid", "", "pg user ID")
 var outputFile *os.File
 
 type KubePodParams struct {
-	ID     string
-	PODID  string
-	CPU    string
-	MEM    string
-	IMAGE  string
-	VOLUME string
-	PORT   string
+	ID                   string
+	PODID                string
+	CPU                  string
+	MEM                  string
+	IMAGE                string
+	VOLUME               string
+	PORT                 string
+	BACKUP_NAME          string
+	BACKUP_SERVERNAME    string
+	BACKUP_SERVERIP      string
+	BACKUP_SCHEDULEID    string
+	BACKUP_PROFILENAME   string
+	BACKUP_CONTAINERNAME string
+	BACKUP_PATH          string
+	BACKUP_HOST          string
+	BACKUP_PORT          string
+	BACKUP_USER          string
+	BACKUP_SERVER_URL    string
 }
 
 type HBAParameters struct {

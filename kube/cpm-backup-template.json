@@ -38,6 +38,12 @@
           "version": "v1beta1",
           "id": "cpm-backup",
           "volumes": [
+		{
+		"name":"kubekeys",
+		"source":
+			{ "hostDir":{ "path":"/opt/cpm/kubekeys" }
+		}
+		},
  		{
                	"name":"cpmlogs",
                	"source":
@@ -50,6 +56,11 @@
             "image": "crunchydata/cpm-backup",
         	"volumeMounts": [
 				{
+                                    "mountPath":"/kubekeys",
+                                    "name":"kubekeys",
+                                    "readOnly":false
+                                },
+				{
                                     "mountPath":"/cpmlogs",
                                     "name":"cpmlogs",
                                     "readOnly":false
@@ -57,6 +68,7 @@
                  ],
 
             "env": [
+	       	{ "name": "KUBE_URL", "value": "https://192.168.0.108:8443" },
  		{ "name": "DOMAIN", "value": "default.local" },
                	{ "name": "DB_PORT", "value": "5432" },
                	{ "name": "DB_USER", "value": "postgres" },

@@ -18,6 +18,8 @@ package backup
 import (
 	"crunchy.com/admindb"
 	"crunchy.com/cpmagent"
+	"crunchy.com/kubeclient"
+	"crunchy.com/template"
 	"fmt"
 	"github.com/golang/glog"
 	"time"
@@ -32,10 +34,11 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	glog.Infoln("with serverip=" + args.ServerIP)
 	glog.Infoln("with containername=" + args.ContainerName)
 	glog.Infoln("with profilename=" + args.ProfileName)
+	glog.Flush()
 
 	var params cpmagent.DockerRunArgs
 	params = cpmagent.DockerRunArgs{}
-	params.Image = "cpm-backup-job"
+	params.Image = "crunchydata/cpm-backup-job"
 	params.ServerID = args.ServerID
 	backupcontainername := args.ContainerName + "-backup"
 	params.ContainerName = backupcontainername
@@ -45,6 +48,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	server, err := admindb.GetDBServer(params.ServerID)
 	if err != nil {
 		glog.Errorln("Provision:" + err.Error())
+		glog.Flush()
 		return err
 	}
 
@@ -62,6 +66,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	setting, err = admindb.GetDBSetting("DOMAIN-NAME")
 	if err != nil {
 		glog.Errorln("Provision:" + err.Error())
+		glog.Flush()
 		return err
 	}
 	var domain = setting.Value
@@ -78,6 +83,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	setting, err = admindb.GetDBSetting("PG-PORT")
 	if err != nil {
 		glog.Errorln("Provision:" + err.Error())
+		glog.Flush()
 		return err
 	}
 	params.EnvVars["BACKUP_PORT"] = setting.Value
@@ -90,10 +96,42 @@ func ProvisionBackupJob(args *BackupRequest) error {
 		params.PGDataPath,
 		server.IPAddress)
 	glog.Infoln(responseStr)
-	//run the container
-	kubeEnv := false
+	glog.Flush()
 
-	if !kubeEnv {
+	//run the container
+	if kubeEnv {
+		//create a pod template to run the cpm-backup-job
+		//create the pod
+		err = kubeclient.DeletePod(kubeURL, backupcontainername)
+		glog.Flush()
+		var podInfo = template.KubePodParams{
+			ID:                   backupcontainername,
+			PODID:                "",
+			CPU:                  "0",
+			MEM:                  "0",
+			IMAGE:                params.Image,
+			VOLUME:               params.EnvVars["BACKUP_PATH"],
+			PORT:                 "5432",
+			BACKUP_NAME:          params.EnvVars["BACKUP_NAME"],
+			BACKUP_SERVERNAME:    params.EnvVars["BACKUP_SERVERNAME"],
+			BACKUP_SERVERIP:      params.EnvVars["BACKUP_SERVERIP"],
+			BACKUP_SCHEDULEID:    params.EnvVars["BACKUP_SCHEDULEID"],
+			BACKUP_PROFILENAME:   params.EnvVars["BACKUP_PROFILENAME"],
+			BACKUP_CONTAINERNAME: params.EnvVars["BACKUP_CONTAINERNAME"],
+			BACKUP_PATH:          params.EnvVars["BACKUP_PATH"],
+			BACKUP_HOST:          params.EnvVars["BACKUP_HOST"],
+			BACKUP_PORT:          params.EnvVars["BACKUP_PORT"],
+			BACKUP_USER:          params.EnvVars["BACKUP_USER"],
+			BACKUP_SERVER_URL:    params.EnvVars["BACKUP_SERVER_URL"],
+		}
+
+		err = kubeclient.CreatePod(kubeURL, podInfo)
+		if err != nil {
+			glog.Errorln(err.Error())
+			glog.Flush()
+			return err
+		}
+	} else {
 		var output string
 		params.CommandPath = CPMBIN + "docker-run-backup.sh"
 
@@ -101,6 +139,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 
 		if err != nil {
 			glog.Errorln("Provision: " + output)
+			glog.Flush()
 			return err
 		}
 		glog.Infoln("docker-run-backup.sh output=" + output)

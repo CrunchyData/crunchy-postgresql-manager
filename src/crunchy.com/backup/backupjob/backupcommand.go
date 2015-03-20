@@ -150,6 +150,8 @@ func backupfunc(str string) {
 	err := cmd.Run()
 	if err != nil {
 		io.WriteString(file, "backupfunc:"+err.Error()+"\n")
+		io.WriteString(file, "backupfunc cmd stdout :"+out.String()+"\n")
+		io.WriteString(file, "backupfunc cmd stderr :"+stderr.String()+"\n")
 		return
 	}
 

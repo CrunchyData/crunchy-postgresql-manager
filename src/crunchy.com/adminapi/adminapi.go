@@ -163,8 +163,6 @@ func main() {
 		&rest.Route{"GET", "/mon/container/pg2/:Name.:Interval.:Token", GetPG2},
 		&rest.Route{"GET", "/mon/hc1/:Token", GetHC1},
 		&rest.Route{"GET", "/version", GetVersion},
-		&rest.Route{"GET", "/testcreate/:Token", TestCreate},
-		&rest.Route{"GET", "/testdelete/:Token", TestDelete},
 	)
 	if err != nil {
 		log.Fatal(err)

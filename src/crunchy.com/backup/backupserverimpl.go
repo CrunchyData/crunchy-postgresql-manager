@@ -18,6 +18,7 @@ package backup
 import (
 	"github.com/golang/glog"
 	"github.com/robfig/cron"
+	"os"
 )
 
 type Command struct {
@@ -75,6 +76,19 @@ type BackupSchedule struct {
 var CRONInstance *cron.Cron
 
 var CPMBIN = "/opt/cpm/bin/"
+
+var kubeEnv = false
+var kubeURL = ""
+
+func init() {
+
+	kubeURL = os.Getenv("KUBE_URL")
+	glog.Infoln("KUBE_URL=[" + kubeURL + "]")
+	if kubeURL != "" {
+		glog.Infoln("KUBE_URL value set, assume Kube environment")
+		kubeEnv = true
+	}
+}
 
 //called by backup jobs as they execute
 func (t *Command) AddStatus(status *BackupStatus, reply *Command) error {
