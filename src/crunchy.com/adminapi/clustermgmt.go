@@ -526,6 +526,20 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 				rest.Error(w, "error in deleting pod", http.StatusBadRequest)
 				return
 			}
+			//delete the kube service with this name 13000
+			err = kubeclient.DeleteService(kubeURL, containers[i].Name)
+			if err != nil {
+				glog.Errorln("DeleteCluster:" + err.Error())
+				rest.Error(w, "error in deleting service 1", http.StatusBadRequest)
+				return
+			}
+			//delete the kube service with this name 5432
+			err = kubeclient.DeleteService(kubeURL, containers[i].Name+"-db")
+			if err != nil {
+				glog.Errorln("DeleteCluster:" + err.Error())
+				rest.Error(w, "error in deleting service 1", http.StatusBadRequest)
+				return
+			}
 
 		} else {
 			output, err = cpmagent.DockerRemoveContainer(containers[i].Name,
@@ -931,11 +945,11 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//create master container
-	docker := new(cpmagent.DockerRunArgs)
-	docker.Image = "cpm-node"
-	docker.ContainerName = params.Name + "-master"
-	docker.ServerID = masterServer.ID
-	docker.Standalone = "false"
+	dockermaster := cpmagent.DockerRunArgs{}
+	dockermaster.Image = "crunchydata/cpm-node"
+	dockermaster.ContainerName = params.Name + "-master"
+	dockermaster.ServerID = masterServer.ID
+	dockermaster.Standalone = "false"
 	if err != nil {
 		glog.Errorln("AutoCluster: error-create master node " + err.Error())
 		rest.Error(w, "AutoCluster error"+err.Error(), http.StatusBadRequest)
@@ -943,7 +957,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//	provision the master
-	err2 = provisionImpl(docker, profile.MasterProfile, false)
+	err2 = provisionImpl(&dockermaster, profile.MasterProfile, false)
 	if err2 != nil {
 		glog.Errorln("AutoCluster: error-provision master " + err2.Error())
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -953,7 +967,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	glog.Infoln("AUTO CLUSTER PROFILE master container created")
 	var node admindb.DBClusterNode
 	//update node with cluster iD
-	node, err2 = admindb.GetDBNodeByName(docker.ContainerName)
+	node, err2 = admindb.GetDBNodeByName(dockermaster.ContainerName)
 	if err2 != nil {
 		glog.Errorln("AutoCluster: error-get node by name " + err2.Error())
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -972,12 +986,21 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	//create standby containers
 	var count int
 	count, err2 = strconv.Atoi(profile.Count)
+	if err2 != nil {
+		glog.Errorln(err2.Error())
+		rest.Error(w, err2.Error(), http.StatusBadRequest)
+		return
+	}
+
+	dockerstandby := make([]cpmagent.DockerRunArgs, count)
 	for i := 0; i < count; i++ {
 		glog.Infoln("working on standby ....")
 		//	loop - provision standby
-		docker.ServerID = chosenServers[i].ID
-		docker.ContainerName = params.Name + "-standby-" + strconv.Itoa(i)
-		err2 = provisionImpl(docker, profile.StandbyProfile, true)
+		dockerstandby[i].ServerID = chosenServers[i].ID
+		dockerstandby[i].Image = "crunchydata/cpm-node"
+		dockerstandby[i].ContainerName = params.Name + "-standby-" + strconv.Itoa(i)
+		dockerstandby[i].Standalone = "false"
+		err2 = provisionImpl(&dockerstandby[i], profile.StandbyProfile, true)
 		if err2 != nil {
 			glog.Errorln("AutoCluster: error-provision master " + err2.Error())
 			rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -985,7 +1008,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		}
 
 		//update node with cluster iD
-		node, err2 = admindb.GetDBNodeByName(docker.ContainerName)
+		node, err2 = admindb.GetDBNodeByName(dockerstandby[i].ContainerName)
 		if err2 != nil {
 			glog.Errorln("AutoCluster: error-get node by name " + err2.Error())
 			rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -1004,10 +1027,13 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	glog.Infoln("AUTO CLUSTER PROFILE standbys created")
 	//create pgpool container
 	//	provision
-	docker.ContainerName = params.Name + "-pgpool"
-	docker.Image = "cpm-pgpool"
-	docker.ServerID = chosenServers[count].ID
-	err2 = provisionImpl(docker, profile.StandbyProfile, true)
+	dockerpgpool := cpmagent.DockerRunArgs{}
+	dockerpgpool.ContainerName = params.Name + "-pgpool"
+	dockerpgpool.Image = "crunchydata/cpm-pgpool"
+	dockerpgpool.ServerID = chosenServers[count].ID
+	dockerpgpool.Standalone = "false"
+
+	err2 = provisionImpl(&dockerpgpool, profile.StandbyProfile, true)
 	if err2 != nil {
 		glog.Errorln("AutoCluster: error-provision pgpool " + err2.Error())
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -1015,7 +1041,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 	glog.Infoln("AUTO CLUSTER PROFILE pgpool created")
 	//update node with cluster ID
-	node, err2 = admindb.GetDBNodeByName(docker.ContainerName)
+	node, err2 = admindb.GetDBNodeByName(dockerpgpool.ContainerName)
 	if err2 != nil {
 		glog.Errorln("AutoCluster: error-get pgpool node by name " + err2.Error())
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -1027,6 +1053,23 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	err2 = admindb.UpdateDBNode(node)
 	if err2 != nil {
 		glog.Errorln("AutoCluster: error-update pgpool node " + err2.Error())
+		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//init the master DB
+	//	provision the master
+	err2 = provisionImplInit(&dockermaster, profile.MasterProfile, false)
+	if err2 != nil {
+		glog.Errorln("AutoCluster: error-provisionInit master " + err2.Error())
+		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//make sure every node is ready
+	err2 = waitTillAllReady(dockermaster, dockerpgpool, dockerstandby)
+	if err2 != nil {
+		glog.Errorln("cluster members not responding in time")
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
 		return
 	}
@@ -1143,4 +1186,26 @@ func roundRobin(profile ClusterProfiles) (admindb.DBServer, []admindb.DBServer, 
 		glog.Infoln("round-robin: other servers " + chosen[x].Name + " class=" + chosen[x].ServerClass)
 	}
 	return masterServer, chosen, nil
+}
+
+func waitTillAllReady(dockermaster cpmagent.DockerRunArgs, dockerpgpool cpmagent.DockerRunArgs, dockerstandby []cpmagent.DockerRunArgs) error {
+	err := waitTillReady(dockermaster.ContainerName)
+	if err != nil {
+		glog.Errorln("time out waiting for " + dockermaster.ContainerName)
+		return err
+	}
+	err = waitTillReady(dockerpgpool.ContainerName)
+	if err != nil {
+		glog.Errorln("time out waiting for " + dockerpgpool.ContainerName)
+		return err
+	}
+	for x := 0; x < len(dockerstandby); x++ {
+		err = waitTillReady(dockerstandby[x].ContainerName)
+		if err != nil {
+			glog.Errorln("time out waiting for " + dockerstandby[x].ContainerName)
+			return err
+		}
+	}
+	return nil
+
 }

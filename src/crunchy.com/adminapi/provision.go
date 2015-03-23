@@ -91,6 +91,12 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	err = provisionImplInit(params, PROFILE, false)
+	if err != nil {
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}
 	status.Status = "OK"
@@ -267,13 +273,21 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 		return nil
 	}
 
+	return nil
+
+}
+
+func provisionImplInit(params *cpmagent.DockerRunArgs, PROFILE string, standby bool) error {
 	//go get the domain name from the settings
 	var domainname admindb.DBSetting
+	var err error
+
 	domainname, err = admindb.GetDBSetting("DOMAIN-NAME")
 	if err != nil {
 		glog.Errorln("Provision:DOMAIN-NAME setting error " + err.Error())
 		return err
 	}
+
 	fqdn := params.ContainerName + "." + domainname.Value
 
 	//we are depending on a DNS entry being created shortly after
@@ -292,6 +306,8 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 		//initdb on the new node
 
 		glog.Infoln("PROFILE running initdb on the node")
+		var output string
+
 		output, err = PGCommand(CPMBIN+"initdb.sh", fqdn)
 		if err != nil {
 			glog.Errorln("Provision:" + err.Error())

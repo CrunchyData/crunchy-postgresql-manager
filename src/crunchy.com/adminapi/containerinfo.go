@@ -368,7 +368,7 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 	stats := make([]Statrepl, 0)
 	var rows *sql.Rows
 
-	rows, err = dbConn.Query("SELECT pid , usesysid , usename , application_name , client_addr , client_hostname , client_port , to_char(backend_start, 'YYYY-MM-DD HH24:MI-SS') as backend_start , state , sent_location , write_location , flush_location , replay_location , sync_priority , sync_state from pg_stat_replication")
+	rows, err = dbConn.Query("SELECT pid , usesysid , usename , application_name , client_addr , coalesce(client_hostname, ' ') , client_port , to_char(backend_start, 'YYYY-MM-DD HH24:MI-SS') as backend_start , state , sent_location , write_location , flush_location , replay_location , sync_priority , sync_state from pg_stat_replication")
 	if err != nil {
 		glog.Errorln("ContainerStatrepl:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)

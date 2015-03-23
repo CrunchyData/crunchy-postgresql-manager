@@ -1,11 +1,12 @@
 FROM cpm-base:latest
 MAINTAINER crunchy
 
-
 VOLUME ["/monitordata"]
 
 # open up the monitor server port
 EXPOSE 13000
+EXPOSE 8083
+EXPOSE 8086
 
 USER root
 

@@ -30,12 +30,17 @@ export DB_USER=$DB_USER
 
 source /opt/cpm/bin/setenv.sh
 
+sleep 4
+
 #
 # start influx
 #
-/usr/bin/influxdb -stdout=true -pidfile /tmp/influxdb.pid -config /opt/cpm/conf/config.toml > /cpmlogs/crunchy-mon-influx.log &
+INPID=/tmp/influxdb.pid
+/bin/rm -f $INPID
 
-sleep 2
+/usr/bin/influxdb -stdout=true -pidfile $INPID -config /opt/cpm/conf/config.toml > /cpmlogs/crunchy-mon-influx.log 2> /cpmlogs/crunchy-mon-influx.stderr &
+
+sleep 7
 
 monserver -log_dir=/cpmlogs  -logtostderr=false  &
 
