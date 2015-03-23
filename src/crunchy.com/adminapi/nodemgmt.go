@@ -311,6 +311,20 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 			rest.Error(w, "error in deleting pod", http.StatusBadRequest)
 			return
 		}
+		//delete the kube service with this name
+		err = kubeclient.DeleteService(kubeURL, dbNode.Name)
+		if err != nil {
+			glog.Errorln("DeleteNode:" + err.Error())
+			rest.Error(w, "error in deleting service 1", http.StatusBadRequest)
+			return
+		}
+		//delete the kube service with this name 5432
+		err = kubeclient.DeleteService(kubeURL, dbNode.Name+"-db")
+		if err != nil {
+			glog.Errorln("DeleteNode:" + err.Error())
+			rest.Error(w, "error in deleting service 2", http.StatusBadRequest)
+			return
+		}
 	} else {
 		output, err = cpmagent.DockerRemoveContainer(dbNode.Name, server.IPAddress)
 		if err != nil {
