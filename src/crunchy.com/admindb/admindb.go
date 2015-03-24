@@ -16,6 +16,7 @@
 package admindb
 
 import (
+	"crunchy.com/mylog"
 	"database/sql"
 	"fmt"
 	"github.com/golang/glog"
@@ -73,6 +74,11 @@ type DBPGStats struct {
 
 var dbConn *sql.DB
 
+var logger mylog.MyLogger
+
+func SetLogger(log mylog.MyLogger) {
+	logger = log
+}
 func SetConnection(conn *sql.DB) {
 	//glog.Infoln("admindb:SetConnection: called to open dbConn")
 	dbConn = conn

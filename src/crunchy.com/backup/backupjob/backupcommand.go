@@ -18,8 +18,9 @@ package main
 import (
 	"bytes"
 	"crunchy.com/backup"
-	"github.com/golang/glog"
+	//"github.com/golang/glog"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -47,7 +48,8 @@ func init() {
 	var err error
 	file, err = os.Create(filename)
 	if err != nil {
-		glog.Errorln(err.Error())
+		//glog.Errorln(err.Error())
+		log.Println(err.Error())
 	}
 }
 
@@ -55,7 +57,7 @@ func main() {
 
 	_, err := io.WriteString(file, "backupcommand running....\n")
 	if err != nil {
-		glog.Errorln(err.Error())
+		log.Println(err.Error())
 	}
 
 	defer closeLog()
@@ -95,7 +97,7 @@ func closeLog() {
 
 	err := cmd.Run()
 	if err != nil {
-		glog.Errorln(err.Error())
+		log.Println(err.Error())
 		io.WriteString(file, err.Error())
 	}
 }

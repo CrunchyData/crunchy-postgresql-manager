@@ -16,8 +16,9 @@
 package backup
 
 import (
-	"github.com/golang/glog"
+	//"github.com/golang/glog"
 	"github.com/robfig/cron"
+	"log"
 	"os"
 )
 
@@ -83,21 +84,22 @@ var kubeURL = ""
 func init() {
 
 	kubeURL = os.Getenv("KUBE_URL")
-	glog.Infoln("KUBE_URL=[" + kubeURL + "]")
 	if kubeURL != "" {
-		glog.Infoln("KUBE_URL value set, assume Kube environment")
+		log.Println("KUBE_URL value set, assume Kube environment")
 		kubeEnv = true
+	} else {
+		log.Println("KUBE_URL=[" + kubeURL + "]")
 	}
 }
 
 //called by backup jobs as they execute
 func (t *Command) AddStatus(status *BackupStatus, reply *Command) error {
 
-	glog.Infoln("AddStatus called")
+	logger.Info.Println("AddStatus called")
 
 	id, err := DBAddStatus(*status)
 	if err != nil {
-		glog.Errorln("AddStatus error " + err.Error())
+		logger.Error.Println("AddStatus error " + err.Error())
 	}
 	reply.Output = id
 	return err
@@ -106,11 +108,11 @@ func (t *Command) AddStatus(status *BackupStatus, reply *Command) error {
 //called by backup jobs as they execute
 func (t *Command) UpdateStatus(status *BackupStatus, reply *Command) error {
 
-	glog.Infoln("UpdateStatus called")
+	logger.Info.Println("UpdateStatus called")
 
 	err := DBUpdateStatus(*status)
 	if err != nil {
-		glog.Errorln("UpdateStatus error " + err.Error())
+		logger.Error.Println("UpdateStatus error " + err.Error())
 	}
 	return err
 }
@@ -118,23 +120,23 @@ func (t *Command) UpdateStatus(status *BackupStatus, reply *Command) error {
 //called by admin do perform an adhoc backup job
 func (t *Command) BackupNow(args *BackupRequest, reply *Command) error {
 
-	glog.Infoln("BackupNow.impl called")
+	logger.Info.Println("BackupNow.impl called")
 	err := ProvisionBackupJob(args)
 	if err != nil {
-		glog.Errorln("BackupNow.impl error:" + err.Error())
+		logger.Error.Println("BackupNow.impl error:" + err.Error())
 	}
-	glog.Infoln("BackupNow.impl completed")
+	logger.Info.Println("BackupNow.impl completed")
 	return err
 }
 
 //called by admin to cause a reload of the cron jobs
 func (t *Command) Reload(schedule *BackupSchedule, reply *Command) error {
 
-	glog.Infoln("Reload called")
+	logger.Info.Println("Reload called")
 
 	err := LoadSchedules()
 	if err != nil {
-		glog.Errorln("Reload error " + err.Error())
+		logger.Error.Println("Reload error " + err.Error())
 	}
 
 	return err
@@ -143,15 +145,15 @@ func (t *Command) Reload(schedule *BackupSchedule, reply *Command) error {
 func LoadSchedules() error {
 
 	var err error
-	glog.Infoln("LoadSchedules called")
+	logger.Info.Println("LoadSchedules called")
 
 	schedules, err := DBGetSchedules()
 	if err != nil {
-		glog.Errorln("LoadSchedules error " + err.Error())
+		logger.Error.Println("LoadSchedules error " + err.Error())
 	}
 
 	if CRONInstance != nil {
-		glog.Infoln("stopping current cron instance...")
+		logger.Info.Println("stopping current cron instance...")
 		CRONInstance.Stop()
 	}
 
@@ -159,15 +161,15 @@ func LoadSchedules() error {
 	CRONInstance = nil
 
 	//create a new cron
-	glog.Infoln("creating cron instance...")
+	logger.Info.Println("creating cron instance...")
 	CRONInstance = cron.New()
 
 	var cronexp string
 	for i := 0; i < len(schedules); i++ {
 		cronexp = getCron(schedules[i])
-		glog.Infoln("would have loaded schedule..." + cronexp)
+		logger.Info.Println("would have loaded schedule..." + cronexp)
 		if schedules[i].Enabled == "YES" {
-			glog.Infoln("schedule " + schedules[i].ID + " was enabled so adding it")
+			logger.Info.Println("schedule " + schedules[i].ID + " was enabled so adding it")
 			x := DefaultJob{}
 			x.request = BackupRequest{}
 			x.request.ScheduleID = schedules[i].ID
@@ -179,12 +181,12 @@ func LoadSchedules() error {
 
 			CRONInstance.AddJob(cronexp, x)
 		} else {
-			glog.Infoln("schedule " + schedules[i].ID + " NOT enabled so dropping it")
+			logger.Info.Println("schedule " + schedules[i].ID + " NOT enabled so dropping it")
 		}
 
 	}
 
-	glog.Infoln("starting new CRONInstance")
+	logger.Info.Println("starting new CRONInstance")
 	CRONInstance.Start()
 
 	return err
