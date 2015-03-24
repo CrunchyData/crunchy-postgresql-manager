@@ -22,7 +22,7 @@ set -e
 
 # set the istall directory
 export VERSION=0.9.1
-export WORKDIR=$HOME/cpm
+export WORKDIR=$HOME/crunchy-postgresql-manager
 export TMPDIR=/tmp/opt/cpm
 export ARCHIVE=/tmp/cpm.$VERSION-linux-amd64.tar.gz
 
