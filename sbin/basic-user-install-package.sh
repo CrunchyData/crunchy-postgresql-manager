@@ -21,7 +21,7 @@
 set -e
 
 # set the istall directory
-export VERSION=0.9.0
+export VERSION=0.9.1
 export WORKDIR=$HOME/cpm
 export TMPDIR=/tmp/opt/cpm
 export ARCHIVE=/tmp/cpm.$VERSION-linux-amd64.tar.gz
