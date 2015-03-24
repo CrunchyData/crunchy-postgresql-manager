@@ -23,6 +23,13 @@ install.
 The user install allows you to get CPM up and running quickly by
 downloading pre-built binaries and Docker images.
 
+The user installation archive can be downloaded from:
+
+https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.1-linux-amd64.tar.gz
+
+See docs/user-install.md for details on the user installation 
+requirements.
+
 For performing a user install, see the docs/user-install.md 
 documentation.
 
