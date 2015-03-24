@@ -44,7 +44,7 @@ create table node (
 	clusterid int,
 	serverid int references server (id) on delete cascade,
 	noderole varchar(10) not null,
-	image varchar(20) not null,
+	image varchar(30) not null,
 	createdt timestamp not null,
 	constraint valid_node_roles check (
 		noderole in ('standby', 'master', 'unassigned', 'standalone', 'pgpool')
