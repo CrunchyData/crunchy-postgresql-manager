@@ -19,11 +19,11 @@ import (
 	"bytes"
 	"crunchy.com/admindb"
 	"crunchy.com/cpmagent"
+	"crunchy.com/logit"
 	"crunchy.com/util"
 	"database/sql"
 	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
-	"github.com/golang/glog"
 	_ "github.com/lib/pq"
 	"net/http"
 	"os/exec"
@@ -45,14 +45,14 @@ func MonitorContainerLoadtest(w rest.ResponseWriter, r *rest.Request) {
 
 	node, err := admindb.GetDBNode(ID)
 	if err != nil {
-		glog.Errorln("MonitorContainerGetInfo:" + err.Error())
+		logit.Error.Println("MonitorContainerGetInfo:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	server, err2 := admindb.GetDBServer(node.ServerID)
 	if err2 != nil {
-		glog.Errorln("MonitorContainerGetInfo:" + err2.Error())
+		logit.Error.Println("MonitorContainerGetInfo:" + err2.Error())
 		rest.Error(w, err2.Error(), http.StatusBadRequest)
 		return
 	}
@@ -66,7 +66,7 @@ func MonitorContainerLoadtest(w rest.ResponseWriter, r *rest.Request) {
 	output, err = cpmagent.AgentCommandConfigureNode(CPMBIN+"loadtest", host,
 		port, Writes, "", "", "", "", server.IPAddress)
 	if err != nil {
-		glog.Errorln("MonitorContainerGetInfo:" + err.Error())
+		logit.Error.Println("MonitorContainerGetInfo:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -78,7 +78,7 @@ func MonitorContainerLoadtest(w rest.ResponseWriter, r *rest.Request) {
 func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		glog.Errorln("MonitorContainerSettings: authorize error " + err.Error())
+		logit.Error.Println("MonitorContainerSettings: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -91,7 +91,7 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 
 	node, err := admindb.GetDBNode(ID)
 	if err != nil {
-		glog.Errorln("MonitorContainerGetInfo:" + err.Error())
+		logit.Error.Println("MonitorContainerGetInfo:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -108,7 +108,7 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 
 	rows, err = dbConn.Query("select name, current_setting(name), source from pg_settings where source not in ('default','override')")
 	if err != nil {
-		glog.Errorln("MonitorContainerSettings:" + err.Error())
+		logit.Error.Println("MonitorContainerSettings:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -120,14 +120,14 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 			&setting.CurrentSetting,
 			&setting.Source,
 		); err != nil {
-			glog.Errorln("MonitorContainerSettings:" + err.Error())
+			logit.Error.Println("MonitorContainerSettings:" + err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		settings = append(settings, setting)
 	}
 	if err = rows.Err(); err != nil {
-		glog.Errorln("MonitorContainerSettings:" + err.Error())
+		logit.Error.Println("MonitorContainerSettings:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -141,7 +141,7 @@ func MonitorContainerControldata(w rest.ResponseWriter, r *rest.Request) {
 	var output string
 	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		glog.Errorln("MonitorContainerControldata: authorize error " + err.Error())
+		logit.Error.Println("MonitorContainerControldata: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -154,7 +154,7 @@ func MonitorContainerControldata(w rest.ResponseWriter, r *rest.Request) {
 
 	node, err := admindb.GetDBNode(ID)
 	if err != nil {
-		glog.Errorln("MonitorContainerControldata:" + err.Error())
+		logit.Error.Println("MonitorContainerControldata:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -164,11 +164,11 @@ func MonitorContainerControldata(w rest.ResponseWriter, r *rest.Request) {
 	//send the container a pg_controldata command
 	output, err = cpmagent.AgentCommand(PGBIN+"pg_controldata", "/pgdata", node.Name)
 	if err != nil {
-		glog.Errorln("MonitorContainerControldata:" + err.Error())
+		logit.Error.Println("MonitorContainerControldata:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	glog.Infoln(output)
+	logit.Info.Println(output)
 
 	lines := strings.Split(output, "\n")
 	//fmt.Println(len(lines))
@@ -200,7 +200,7 @@ type Bgwriter struct {
 func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		glog.Errorln("ContainerBgwriter: authorize error " + err.Error())
+		logit.Error.Println("ContainerBgwriter: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -213,7 +213,7 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 
 	node, err := admindb.GetDBNode(ID)
 	if err != nil {
-		glog.Errorln("ContainerBgwriter:" + err.Error())
+		logit.Error.Println("ContainerBgwriter:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -229,11 +229,11 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 	err = dbConn.QueryRow("SELECT to_char(now(), 'mm/dd/yy HH12:MI:SS') now, to_char(block_size::numeric * buffers_alloc / (1024 * 1024 * seconds), 'FM999999999999D9999') AS alloc_mbps, to_char(block_size::numeric * buffers_checkpoint / (1024 * 1024 * seconds), 'FM999999999999D9999') AS checkpoint_mbps, to_char(block_size::numeric * buffers_clean / (1024 * 1024 * seconds), 'FM999999999999D9999') AS clean_mbps, to_char(block_size::numeric * buffers_backend/ (1024 * 1024 * seconds), 'FM999999999999D9999') AS backend_mbps, to_char(block_size::numeric * (buffers_checkpoint + buffers_clean + buffers_backend) / (1024 * 1024 * seconds), 'FM999999999999D9999') AS write_mbps FROM ( SELECT now() AS sample,now() - stats_reset AS uptime,EXTRACT(EPOCH FROM now()) - extract(EPOCH FROM stats_reset) AS seconds, b.*,p.setting::integer AS block_size FROM pg_stat_bgwriter b,pg_settings p WHERE p.name='block_size') bgw").Scan(&info.Now, &info.AllocMbps, &info.CheckpointMbps, &info.CleanMbps, &info.BackendMbps, &info.WriteMbps)
 	switch {
 	case err == sql.ErrNoRows:
-		glog.Errorln("ContainerBgwriter:" + err.Error())
+		logit.Error.Println("ContainerBgwriter:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	case err != nil:
-		glog.Errorln("ContainerBgwriter:" + err.Error())
+		logit.Error.Println("ContainerBgwriter:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -256,7 +256,7 @@ type Statdatabase struct {
 func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		glog.Errorln("ContainerStatdatabase: authorize error " + err.Error())
+		logit.Error.Println("ContainerStatdatabase: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -269,7 +269,7 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 
 	node, err := admindb.GetDBNode(ID)
 	if err != nil {
-		glog.Errorln("ContainerStatdatabase:" + err.Error())
+		logit.Error.Println("ContainerStatdatabase:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -286,7 +286,7 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 
 	rows, err = dbConn.Query("SELECT datname, blks_read::text, tup_returned::text, tup_fetched::text, tup_inserted::text, tup_updated::text, tup_deleted::text, coalesce(to_char(stats_reset, 'YYYY-MM-DD HH24:MI:SS'), ' ') as stats_reset from pg_stat_database")
 	if err != nil {
-		glog.Errorln("ContainerStatdatabase:" + err.Error())
+		logit.Error.Println("ContainerStatdatabase:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -303,14 +303,14 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 			&stat.TupDeleted,
 			&stat.StatsReset,
 		); err != nil {
-			glog.Errorln("ContainerStatdatabase:" + err.Error())
+			logit.Error.Println("ContainerStatdatabase:" + err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		stats = append(stats, stat)
 	}
 	if err = rows.Err(); err != nil {
-		glog.Errorln("ContainerStatdatabase:" + err.Error())
+		logit.Error.Println("ContainerStatdatabase:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -340,7 +340,7 @@ type Statrepl struct {
 func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		glog.Errorln("ContainerStatrepl: authorize error " + err.Error())
+		logit.Error.Println("ContainerStatrepl: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -353,7 +353,7 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 
 	node, err := admindb.GetDBNode(ID)
 	if err != nil {
-		glog.Errorln("ContainerStatrepl:" + err.Error())
+		logit.Error.Println("ContainerStatrepl:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -370,7 +370,7 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 
 	rows, err = dbConn.Query("SELECT pid , usesysid , usename , application_name , client_addr , coalesce(client_hostname, ' ') , client_port , to_char(backend_start, 'YYYY-MM-DD HH24:MI-SS') as backend_start , state , sent_location , write_location , flush_location , replay_location , sync_priority , sync_state from pg_stat_replication")
 	if err != nil {
-		glog.Errorln("ContainerStatrepl:" + err.Error())
+		logit.Error.Println("ContainerStatrepl:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -394,14 +394,14 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 			&stat.SyncPriority,
 			&stat.SyncState,
 		); err != nil {
-			glog.Errorln("ContainerStatrepl:" + err.Error())
+			logit.Error.Println("ContainerStatrepl:" + err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		stats = append(stats, stat)
 	}
 	if err = rows.Err(); err != nil {
-		glog.Errorln("ContainerStatrepl:" + err.Error())
+		logit.Error.Println("ContainerStatrepl:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -415,7 +415,7 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		glog.Errorln("ContainerLoadTest: authorize error " + err.Error())
+		logit.Error.Println("ContainerLoadTest: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -436,7 +436,7 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 
 	node, err := admindb.GetDBNode(ID)
 	if err != nil {
-		glog.Errorln("ContainerLoadTest:" + err.Error())
+		logit.Error.Println("ContainerLoadTest:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -468,7 +468,7 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 		Writes)
 
 	for i := 0; i < len(cmd.Args); i++ {
-		glog.Infoln("ContainerLoadTest:" + cmd.Args[i])
+		logit.Info.Println("ContainerLoadTest:" + cmd.Args[i])
 	}
 
 	var out bytes.Buffer
@@ -477,13 +477,12 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 	cmd.Stderr = &stderr
 	err = cmd.Run()
 	if err != nil {
-		glog.Errorln("ContainerLoadTest:" + err.Error())
-		glog.Flush()
+		logit.Error.Println("ContainerLoadTest:" + err.Error())
 		errorString := fmt.Sprintf("%s\n%s\n%s\n", err.Error(), out.String(), stderr.String())
 		rest.Error(w, errorString, http.StatusBadRequest)
 		return
 	}
-	glog.Infoln("ContainerLoadTest: command output was " + out.String())
+	logit.Info.Println("ContainerLoadTest: command output was " + out.String())
 
 	//w.(http.ResponseWriter).Write([]byte(output))
 	w.(http.ResponseWriter).Write([]byte(out.String()))

@@ -17,8 +17,8 @@ package main
 
 import (
 	"crunchy.com/cpmagent"
+	"crunchy.com/logit"
 	"flag"
-	"github.com/golang/glog"
 	"log"
 	"net/rpc"
 )
@@ -33,7 +33,7 @@ func main() {
 	metricFlag := flag.String("m", "none", "metric to execute")
 	flag.Parse()
 
-	glog.Infoln("main: connecting to " + *hostFlag)
+	logit.Info.Println("main: connecting to " + *hostFlag)
 	if *metricFlag == "none" {
 		log.Fatal("no metric specified on command line -m")
 	}
@@ -48,17 +48,17 @@ func main() {
 
 	var command cpmagent.Command
 
-	glog.Infoln("main: executing metric: " + *metricFlag)
+	logit.Info.Println("main: executing metric: " + *metricFlag)
 
 	args := &cpmagent.Args{}
 	args.A = *metricFlag
 	err = client.Call("Command.Get", args, &command)
 	if err != nil {
-		glog.Errorln("main:Get error:" + err.Error())
+		logit.Error.Println("main:Get error:" + err.Error())
 	} else {
-		glog.Infoln("main: output ......")
-		glog.Infoln("main:" + command.Output)
-		glog.Infoln("main: ")
+		logit.Info.Println("main: output ......")
+		logit.Info.Println("main:" + command.Output)
+		logit.Info.Println("main: ")
 	}
 
 }

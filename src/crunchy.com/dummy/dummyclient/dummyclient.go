@@ -17,8 +17,8 @@ package main
 
 import (
 	"crunchy.com/dummy"
+	"crunchy.com/logit"
 	"flag"
-	"github.com/golang/glog"
 	"log"
 	"net/rpc"
 )
@@ -33,7 +33,7 @@ func main() {
 	metricFlag := flag.String("m", "none", "metric to execute")
 	flag.Parse()
 
-	glog.Infoln("connecting to " + *hostFlag)
+	logit.Info.Println("connecting to " + *hostFlag)
 	if *metricFlag == "none" {
 		log.Fatal("no metric specified on command line -m")
 	}
@@ -48,17 +48,17 @@ func main() {
 
 	var command dummy.Command
 
-	glog.Infoln("executing metric: " + *metricFlag)
+	logit.Info.Println("executing metric: " + *metricFlag)
 
 	args := &dummy.Args{}
 	args.A = *metricFlag
 	err = client.Call("Command.Get", args, &command)
 	if err != nil {
-		glog.Errorln("Get error:" + err.Error())
+		logit.Error.Println("Get error:" + err.Error())
 	} else {
-		glog.Infoln(" output ......")
-		glog.Infoln(command.Output)
-		glog.Infoln(" ")
+		logit.Info.Println(" output ......")
+		logit.Info.Println(command.Output)
+		logit.Info.Println(" ")
 	}
 
 }

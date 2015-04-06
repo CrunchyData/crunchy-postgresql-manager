@@ -16,9 +16,9 @@
 package main
 
 import (
+	"crunchy.com/logit"
 	"flag"
 	dockerapi "github.com/fsouza/go-dockerclient"
-	"github.com/golang/glog"
 	"strings"
 	"time"
 )
@@ -36,34 +36,32 @@ func init() {
 
 func main() {
 
-	glog.Infoln("dockerapi started...")
+	logit.Info.Println("dockerapi started...")
 	time.Sleep(time.Millisecond * 5000)
-	glog.Infoln("action: " + ACTION)
-	glog.Infoln("containers: " + CONTAINERS)
+	logit.Info.Println("action: " + ACTION)
+	logit.Info.Println("containers: " + CONTAINERS)
 	var containers = strings.Split(CONTAINERS, ",")
 	var docker *dockerapi.Client
 	var err error
 	docker, err = dockerapi.NewClient(DOCKER_HOST)
 	if err != nil {
-		glog.Errorln(err.Error())
+		logit.Error.Println(err.Error())
 	}
 	err = docker.Ping()
-	glog.Flush()
 
 	for i := range containers {
-		glog.Infoln(ACTION + " issued for " + containers[i])
+		logit.Info.Println(ACTION + " issued for " + containers[i])
 		switch ACTION {
 		case "stop":
 			err = docker.StopContainer(containers[i], 5)
 		case "start":
 			err = docker.StartContainer(containers[i], nil)
 		default:
-			glog.Infoln(ACTION + " unsupported action")
+			logit.Info.Println(ACTION + " unsupported action")
 		}
 		if err != nil {
-			glog.Errorln(err.Error())
+			logit.Error.Println(err.Error())
 		}
 		time.Sleep(time.Millisecond * 2000)
 	}
-	glog.Flush()
 }

@@ -19,11 +19,11 @@ import (
 	"crunchy.com/admindb"
 	"crunchy.com/cpmagent"
 	"crunchy.com/kubeclient"
+	"crunchy.com/logit"
 	"crunchy.com/template"
 	"database/sql"
 	"errors"
 	"github.com/ant0ine/go-json-rest/rest"
-	"github.com/golang/glog"
 	"net/http"
 	"net/rpc"
 	"strconv"
@@ -35,7 +35,7 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-container")
 	if err != nil {
-		glog.Errorln("Provision: validate token error " + err.Error())
+		logit.Error.Println("Provision: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -50,40 +50,40 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 	errorStr := ""
 
 	if PROFILE == "" {
-		glog.Errorln("Provision error profile required")
+		logit.Error.Println("Provision error profile required")
 		errorStr = "Profile required"
 		rest.Error(w, errorStr, http.StatusBadRequest)
 		return
 	}
 	if params.ServerID == "" {
-		glog.Errorln("Provision error serverid required")
+		logit.Error.Println("Provision error serverid required")
 		errorStr = "ServerID required"
 		rest.Error(w, errorStr, http.StatusBadRequest)
 		return
 	}
 	if params.ContainerName == "" {
-		glog.Errorln("Provision error containername required")
+		logit.Error.Println("Provision error containername required")
 		errorStr = "ContainerName required"
 		rest.Error(w, errorStr, http.StatusBadRequest)
 		return
 	}
 	if params.Image == "" {
-		glog.Errorln("Provision error image required")
+		logit.Error.Println("Provision error image required")
 		errorStr = "Image required"
 		rest.Error(w, errorStr, http.StatusBadRequest)
 		return
 	}
 	if params.Standalone == "" {
-		glog.Errorln("Provision error standalone flag required")
+		logit.Error.Println("Provision error standalone flag required")
 		errorStr = "Standalone required"
 		rest.Error(w, errorStr, http.StatusBadRequest)
 		return
 	}
-	glog.Infoln("params.Image=" + params.Image)
-	glog.Infoln("params.Profile=" + PROFILE)
-	glog.Infoln("params.ServerID=" + params.ServerID)
-	glog.Infoln("params.ContainerName=" + params.ContainerName)
-	glog.Infoln("params.Standalone=" + params.Standalone)
+	logit.Info.Println("params.Image=" + params.Image)
+	logit.Info.Println("params.Profile=" + PROFILE)
+	logit.Info.Println("params.ServerID=" + params.ServerID)
+	logit.Info.Println("params.ContainerName=" + params.ContainerName)
+	logit.Info.Println("params.Standalone=" + params.Standalone)
 
 	err = provisionImpl(params, PROFILE, false)
 	if err != nil {
@@ -105,7 +105,7 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool) error {
-	glog.Infoln("PROFILE: provisionImpl starts 1")
+	logit.Info.Println("PROFILE: provisionImpl starts 1")
 
 	var errorStr string
 	//make sure the container name is not already taken
@@ -116,18 +116,18 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 		}
 	} else {
 		errorStr = "container name" + params.ContainerName + " already used can't provision"
-		glog.Errorln("Provision error" + errorStr)
+		logit.Error.Println("Provision error" + errorStr)
 		return errors.New(errorStr)
 	}
 
 	//go get the IPAddress
 	server, err := admindb.GetDBServer(params.ServerID)
 	if err != nil {
-		glog.Errorln("Provision:" + err.Error())
+		logit.Error.Println("Provision:" + err.Error())
 		return err
 	}
 
-	glog.Infoln("provisioning on server " + server.IPAddress)
+	logit.Info.Println("provisioning on server " + server.IPAddress)
 
 	//for database nodes, on the target server, we need to allocate
 	//a disk volume for the /pgdata container volume to work with
@@ -138,24 +138,24 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 
 	params.PGDataPath = server.PGDataPath + "/" + params.ContainerName
 
-	glog.Infoln("PROFILE provisionImpl 2 about to provision volume")
+	logit.Info.Println("PROFILE provisionImpl 2 about to provision volume")
 	if params.Image != "cpm-pgpool" {
 		responseStr, err = cpmagent.AgentCommand(CPMBIN+"provisionvolume.sh",
 			params.PGDataPath,
 			server.IPAddress)
 		if err != nil {
-			glog.Errorln("Provision: problem in provisionvolume call" + err.Error())
+			logit.Error.Println("Provision: problem in provisionvolume call" + err.Error())
 			return err
 		}
-		glog.Infoln("Provision: provisionvolume call response=" + responseStr)
+		logit.Info.Println("Provision: provisionvolume call response=" + responseStr)
 	}
-	glog.Infoln("PROFILE provisionImpl 3 provision volume completed")
+	logit.Info.Println("PROFILE provisionImpl 3 provision volume completed")
 
 	//run docker run to create the container
 
 	params.CPU, params.MEM, err = getDockerResourceSettings(PROFILE)
 	if err != nil {
-		glog.Errorln("Provision: problem in getting profiles call" + err.Error())
+		logit.Error.Println("Provision: problem in getting profiles call" + err.Error())
 		return err
 	}
 
@@ -163,41 +163,41 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 
 	if !kubeEnv {
 		//remove any existing docker containers with this name
-		glog.Infoln("PROFILE provisionImpl remove old container start")
+		logit.Info.Println("PROFILE provisionImpl remove old container start")
 		responseStr, err = cpmagent.DockerRemoveContainer(params.ContainerName,
 			server.IPAddress)
 		if err != nil {
-			glog.Errorln("Provision:" + err.Error())
+			logit.Error.Println("Provision:" + err.Error())
 			return err
 		}
-		glog.Infoln("PROFILE provisionImpl remove old container end")
+		logit.Info.Println("PROFILE provisionImpl remove old container end")
 		params.CommandPath = CPMBIN + "docker-run.sh"
 		output, err = cpmagent.AgentDockerRun(*params, server.IPAddress)
 
 		if err != nil {
-			glog.Errorln("Provision: " + output)
+			logit.Error.Println("Provision: " + output)
 			return err
 		}
-		glog.Infoln("docker-run.sh output=" + output)
-		glog.Infoln("PROFILE provisionImpl end of docker-run")
+		logit.Info.Println("docker-run.sh output=" + output)
+		logit.Info.Println("PROFILE provisionImpl end of docker-run")
 	} else {
 		//delete the kube pod with this name
 		//we only log an error, this is ok because
 		//we can get a 'not found' as an error
 		err = kubeclient.DeletePod(kubeURL, params.ContainerName)
-		glog.Infoln("after delete pod")
+		logit.Info.Println("after delete pod")
 		if err != nil {
-			glog.Infoln("Provision:" + err.Error())
+			logit.Info.Println("Provision:" + err.Error())
 		}
 
 		err = kubeclient.DeleteService(kubeURL, params.ContainerName)
 		if err != nil {
-			glog.Infoln("Provision:" + err.Error())
+			logit.Info.Println("Provision:" + err.Error())
 		}
 
 		err = kubeclient.DeleteService(kubeURL, params.ContainerName+"-db")
 		if err != nil {
-			glog.Infoln("Provision:" + err.Error())
+			logit.Info.Println("Provision:" + err.Error())
 		}
 
 		podInfo := template.KubePodParams{
@@ -222,14 +222,14 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 		}
 		err = kubeclient.CreatePod(kubeURL, podInfo)
 		if err != nil {
-			glog.Errorln("Provision:" + err.Error())
+			logit.Error.Println("Provision:" + err.Error())
 			return err
 		}
 
 		//create the service to the admin port 13000
 		err = kubeclient.CreateService(kubeURL, podInfo)
 		if err != nil {
-			glog.Errorln("Provision:" + err.Error())
+			logit.Error.Println("Provision:" + err.Error())
 			return err
 		}
 
@@ -238,7 +238,7 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 		podInfo.ID = podInfo.ID + "-db"
 		err = kubeclient.CreateService(kubeURL, podInfo)
 		if err != nil {
-			glog.Errorln("Provision:" + err.Error())
+			logit.Error.Println("Provision:" + err.Error())
 			return err
 		}
 		//we have to wait here since the Kube sometimes
@@ -264,7 +264,7 @@ func provisionImpl(params *cpmagent.DockerRunArgs, PROFILE string, standby bool)
 	strid, err = admindb.InsertDBNode(dbnode)
 	newid := strconv.Itoa(strid)
 	if err != nil {
-		glog.Errorln("Provision:" + err.Error())
+		logit.Error.Println("Provision:" + err.Error())
 		return err
 	}
 	dbnode.ID = newid
@@ -284,7 +284,7 @@ func provisionImplInit(params *cpmagent.DockerRunArgs, PROFILE string, standby b
 
 	domainname, err = admindb.GetDBSetting("DOMAIN-NAME")
 	if err != nil {
-		glog.Errorln("Provision:DOMAIN-NAME setting error " + err.Error())
+		logit.Error.Println("Provision:DOMAIN-NAME setting error " + err.Error())
 		return err
 	}
 
@@ -293,28 +293,28 @@ func provisionImplInit(params *cpmagent.DockerRunArgs, PROFILE string, standby b
 	//we are depending on a DNS entry being created shortly after
 	//creating the node either in Docker or Kube!
 	//you might need to wait here until you can reach the new node's agent
-	glog.Infoln("PROFILE waiting till DNS ready")
+	logit.Info.Println("PROFILE waiting till DNS ready")
 	err = waitTillReady(fqdn)
 	if err != nil {
-		glog.Errorln("Provision:" + err.Error())
+		logit.Error.Println("Provision:" + err.Error())
 		return err
 	}
 
 	if standby {
-		glog.Infoln("standby node being created, will not initdb")
+		logit.Info.Println("standby node being created, will not initdb")
 	} else {
 		//initdb on the new node
 
-		glog.Infoln("PROFILE running initdb on the node")
+		logit.Info.Println("PROFILE running initdb on the node")
 		var output string
 
 		output, err = PGCommand(CPMBIN+"initdb.sh", fqdn)
 		if err != nil {
-			glog.Errorln("Provision:" + err.Error())
+			logit.Error.Println("Provision:" + err.Error())
 			return err
 		}
-		glog.Infoln("initdb output was" + output)
-		glog.Infoln("PROFILE initdb completed")
+		logit.Info.Println("initdb output was" + output)
+		logit.Info.Println("PROFILE initdb completed")
 		//create postgresql.conf
 		var data string
 		var mode = "standalone"
@@ -325,39 +325,39 @@ func provisionImplInit(params *cpmagent.DockerRunArgs, PROFILE string, standby b
 		//place postgresql.conf on new node
 		err = RemoteWritefile("/pgdata/postgresql.conf", data, fqdn)
 		if err != nil {
-			glog.Errorln("Provision:" + err.Error())
+			logit.Error.Println("Provision:" + err.Error())
 			return err
 		}
 		//create pg_hba.conf
 		data, err = template.Hba(kubeEnv, mode, params.ContainerName, port, "", domainname.Value)
 		if err != nil {
-			glog.Errorln("Provision:" + err.Error())
+			logit.Error.Println("Provision:" + err.Error())
 			return err
 		}
 		//place pg_hba.conf on new node
 		err = RemoteWritefile("/pgdata/pg_hba.conf", data, fqdn)
 		if err != nil {
-			glog.Errorln("Provision:" + err.Error())
+			logit.Error.Println("Provision:" + err.Error())
 			return err
 		}
-		glog.Infoln("PROFILE templates all built and copied to node")
+		logit.Info.Println("PROFILE templates all built and copied to node")
 		//start pg on new node
 		output, err = PGCommand(CPMBIN+"startpg.sh", fqdn)
 		if err != nil {
-			glog.Errorln("Provision:" + err.Error())
+			logit.Error.Println("Provision:" + err.Error())
 			return err
 		}
-		glog.Infoln("startpg output was" + output)
+		logit.Info.Println("startpg output was" + output)
 
 		//seed database with initial objects
 		output, err = PGCommand(CPMBIN+"seed.sh", fqdn)
 		if err != nil {
-			glog.Errorln("Provision:" + err.Error())
+			logit.Error.Println("Provision:" + err.Error())
 			return err
 		}
-		glog.Infoln("seed output was" + output)
+		logit.Info.Println("seed output was" + output)
 	}
-	glog.Infoln("PROFILE node provisioning completed")
+	logit.Info.Println("PROFILE node provisioning completed")
 
 	return nil
 }
@@ -365,11 +365,11 @@ func provisionImplInit(params *cpmagent.DockerRunArgs, PROFILE string, standby b
 func RemoteWritefile(path string, filecontents string, ipaddress string) error {
 	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
 	if err != nil {
-		glog.Errorln("RemoteWritefile: dialing:" + err.Error())
+		logit.Error.Println("RemoteWritefile: dialing:" + err.Error())
 		return err
 	}
 	if client == nil {
-		glog.Errorln("RemoteWritefile: dialing:" + err.Error())
+		logit.Error.Println("RemoteWritefile: dialing:" + err.Error())
 		return errors.New("client was null on rpc call to " + ipaddress)
 	}
 
@@ -380,21 +380,21 @@ func RemoteWritefile(path string, filecontents string, ipaddress string) error {
 	args.B = path
 	err = client.Call("Command.Writefile", args, &command)
 	if err != nil {
-		glog.Errorln("RemoteWritefile:  Command Writefile " + args.B + " error:" + err.Error())
+		logit.Error.Println("RemoteWritefile:  Command Writefile " + args.B + " error:" + err.Error())
 		return err
 	}
-	glog.Infoln("RemoteWritefile: Writefile output " + command.Output)
+	logit.Info.Println("RemoteWritefile: Writefile output " + command.Output)
 	return nil
 }
 
 func PGCommand(pgcommand string, ipaddress string) (string, error) {
 	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
 	if err != nil {
-		glog.Errorln("PGCommand: dialing:" + err.Error())
+		logit.Error.Println("PGCommand: dialing:" + err.Error())
 		return "", err
 	}
 	if client == nil {
-		glog.Errorln("PGCommand: dialing:" + err.Error())
+		logit.Error.Println("PGCommand: dialing:" + err.Error())
 		return "", errors.New("client was null on pgcommand rpc to " + ipaddress)
 	}
 
@@ -404,7 +404,7 @@ func PGCommand(pgcommand string, ipaddress string) (string, error) {
 	args.A = pgcommand
 	err = client.Call("Command.PGCommand", args, &command)
 	if err != nil {
-		glog.Errorln("PGCommand:  Command PGCommand " + args.A + " error:" + err.Error())
+		logit.Error.Println("PGCommand:  Command PGCommand " + args.A + " error:" + err.Error())
 		return "", err
 	}
 	return command.Output, nil
@@ -416,14 +416,14 @@ func waitTillReady(container string) error {
 	for i := 0; i < 40; i++ {
 		err = RemoteWritefile("/tmp/waitTest", "waitTillReady was here", container)
 		if err != nil {
-			glog.Errorln("waitTillReady:waited for cpmagent on " + container)
+			logit.Error.Println("waitTillReady:waited for cpmagent on " + container)
 			time.Sleep(2000 * time.Millisecond)
 		} else {
-			glog.Infoln("waitTillReady:connected to cpmagent on " + container)
+			logit.Info.Println("waitTillReady:connected to cpmagent on " + container)
 			return nil
 		}
 	}
-	glog.Infoln("waitTillReady: could not connect to cpmagent on " + container)
+	logit.Info.Println("waitTillReady: could not connect to cpmagent on " + container)
 	return errors.New("could not connect to cpmagent on " + container)
 
 }

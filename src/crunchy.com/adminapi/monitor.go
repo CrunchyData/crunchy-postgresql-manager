@@ -17,10 +17,10 @@ package main
 
 import (
 	"crunchy.com/admindb"
+	"crunchy.com/logit"
 	"crunchy.com/util"
 	"database/sql"
 	"github.com/ant0ine/go-json-rest/rest"
-	"github.com/golang/glog"
 	"github.com/influxdb/influxdb/client"
 	_ "github.com/lib/pq"
 	"net/http"
@@ -40,28 +40,28 @@ func GetServerMetrics(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		glog.Errorln("GetServerMetrics: validate token error " + err.Error())
+		logit.Error.Println("GetServerMetrics: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	serverID := r.PathParam("ServerID")
 	if serverID == "" {
-		glog.Errorln("GetServerMetrics: error serverID required")
+		logit.Error.Println("GetServerMetrics: error serverID required")
 		rest.Error(w, "serverID required", http.StatusBadRequest)
 		return
 	}
 
 	interval := r.PathParam("Interval")
 	if interval == "" {
-		glog.Errorln("GetServerMetrics: error Interval required")
+		logit.Error.Println("GetServerMetrics: error Interval required")
 		rest.Error(w, "Interval required", http.StatusBadRequest)
 		return
 	}
 
 	metric := r.PathParam("Metric")
 	if interval == "" {
-		glog.Errorln("GetServerMetrics: error Metric required")
+		logit.Error.Println("GetServerMetrics: error Metric required")
 		rest.Error(w, "Metric required", http.StatusBadRequest)
 		return
 	}
@@ -69,7 +69,7 @@ func GetServerMetrics(w rest.ResponseWriter, r *rest.Request) {
 	server := admindb.DBServer{}
 	server, err = admindb.GetDBServer(serverID)
 	if err != nil {
-		glog.Errorln("GetServerCPUMetrics: " + err.Error())
+		logit.Error.Println("GetServerCPUMetrics: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -77,7 +77,7 @@ func GetServerMetrics(w rest.ResponseWriter, r *rest.Request) {
 	var domain string
 	domain, err = admindb.GetDomain()
 	if err != nil {
-		glog.Errorln("GetServerCPUMetrics: " + err.Error())
+		logit.Error.Println("GetServerCPUMetrics: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -94,7 +94,7 @@ func GetServerMetrics(w rest.ResponseWriter, r *rest.Request) {
 	})
 
 	if err != nil {
-		glog.Errorln("GetServerCPUMetrics: " + err.Error())
+		logit.Error.Println("GetServerCPUMetrics: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -102,18 +102,18 @@ func GetServerMetrics(w rest.ResponseWriter, r *rest.Request) {
 	var results []*client.Series
 
 	var query = "select value, server from " + metric + " where server = '" + server.Name + "' and time > now() - " + interval + " order asc limit 1000"
-	glog.Infoln(query)
+	logit.Info.Println(query)
 
 	results, err = c.Query(query)
 	if err != nil {
-		glog.Errorln("GetServerCPUMetrics: " + err.Error())
+		logit.Error.Println("GetServerCPUMetrics: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if len(results) > 0 {
-		glog.Infof("results len = %d\n", len(results[0].Points))
-		glog.Infof("results x=%f y=%f\n", results[0].Points[0][0], results[0].Points[0][3])
+		logit.Info.Printf("results len = %d\n", len(results[0].Points))
+		logit.Info.Printf("results x=%f y=%f\n", results[0].Points[0][0], results[0].Points[0][3])
 	}
 	w.WriteJson(&results)
 
@@ -124,21 +124,21 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		glog.Errorln("GetPG2: validate token error " + err.Error())
+		logit.Error.Println("GetPG2: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	Name := r.PathParam("Name")
 	if Name == "" {
-		glog.Errorln("GetPG2: error Name required")
+		logit.Error.Println("GetPG2: error Name required")
 		rest.Error(w, "Name required", http.StatusBadRequest)
 		return
 	}
 
 	interval := r.PathParam("Interval")
 	if interval == "" {
-		glog.Errorln("GetPG2: error Interval required")
+		logit.Error.Println("GetPG2: error Interval required")
 		rest.Error(w, "Interval required", http.StatusBadRequest)
 		return
 	}
@@ -160,7 +160,7 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 	})
 
 	if err != nil {
-		glog.Errorln("GetPG2: " + err.Error())
+		logit.Error.Println("GetPG2: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -173,12 +173,12 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 	var databases []string
 	databases, err = GetAllDatabases(databaseConn)
 	if err != nil {
-		glog.Errorln("GetPG2: " + err.Error())
+		logit.Error.Println("GetPG2: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	glog.Infof("databases len = %d\n", len(databases))
+	logit.Info.Printf("databases len = %d\n", len(databases))
 
 	bigresults := make([]PG2Data, 0)
 	var results []*client.Series
@@ -188,7 +188,7 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 		var query = "select value, database from pg2 where database = '" + databases[y] + "' and container = '" + Name + "' and time > now() - " + interval + " order asc limit 1000"
 		pgdata := PG2Data{}
 
-		glog.Infoln(query)
+		logit.Info.Println(query)
 
 		results, err = c.Query(query)
 
@@ -198,8 +198,8 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 		pgdata.Name = databases[y]
 
 		if len(results) > 0 {
-			glog.Infof("results len = %d\n", len(results[0].Points))
-			glog.Infof("results x=%f y=%f\n", results[0].Points[0][0], results[0].Points[0][3])
+			logit.Info.Printf("results len = %d\n", len(results[0].Points))
+			logit.Info.Printf("results x=%f y=%f\n", results[0].Points[0][0], results[0].Points[0][3])
 			i := 0
 			for i = range results[0].Points {
 				pt := MyPoint{}
@@ -209,7 +209,7 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 				points = append(points, pt)
 			}
 		} else {
-			glog.Infof("results len = 0 for database %s\n", databases[y])
+			logit.Info.Printf("results len = 0 for database %s\n", databases[y])
 		}
 		pgdata.Data = points
 		bigresults = append(bigresults, pgdata)
@@ -217,11 +217,11 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	if len(bigresults) == 0 {
-		glog.Errorln("GetPG2: no data found")
+		logit.Error.Println("GetPG2: no data found")
 		rest.Error(w, "GetPG2:  no data found", http.StatusBadRequest)
 		return
 	} else {
-		glog.Infof("bigresults len = %d\n", len(bigresults))
+		logit.Info.Printf("bigresults len = %d\n", len(bigresults))
 	}
 
 	w.WriteJson(&bigresults)
@@ -229,7 +229,7 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func GetAllDatabases(conn *sql.DB) ([]string, error) {
-	glog.Infoln("GetAllDatabases: called")
+	logit.Info.Println("GetAllDatabases: called")
 	m := make([]string, 0)
 
 	var rows *sql.Rows

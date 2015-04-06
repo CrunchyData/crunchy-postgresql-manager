@@ -2,7 +2,7 @@ export GOPATH=$(HOME)/crunchy-postgresql-manager
 
 build:
 		go install crunchy.com/util
-		go install crunchy.com/mylog
+		go install crunchy.com/logit
 		go install crunchy.com/admindb
 		go install crunchy.com/kubeclient
 		go install crunchy.com/sec

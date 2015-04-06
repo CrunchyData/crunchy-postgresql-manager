@@ -16,8 +16,8 @@
 package mon
 
 import (
+	"crunchy.com/logit"
 	"errors"
-	"github.com/golang/glog"
 	"net/rpc"
 )
 
@@ -25,14 +25,14 @@ import (
 //in the future
 func PlaceholderClient(ipaddress string, status string) error {
 
-	glog.Infoln("Placeholder called")
+	logit.Info.Println("Placeholder called")
 	client, err := rpc.DialHTTP("tcp", ipaddress)
 	if err != nil {
-		glog.Errorln("Placeholder: dialing:" + err.Error())
+		logit.Error.Println("Placeholder: dialing:" + err.Error())
 		return err
 	}
 	if client == nil {
-		glog.Errorln("Placeholder: client was nil")
+		logit.Error.Println("Placeholder: client was nil")
 		return errors.New("client was nil from rpc dial")
 	}
 
@@ -40,10 +40,10 @@ func PlaceholderClient(ipaddress string, status string) error {
 
 	err = client.Call("Command.Placeholder", &status, &command)
 	if err != nil {
-		glog.Errorln("Placeholder: error " + err.Error())
+		logit.Error.Println("Placeholder: error " + err.Error())
 		return err
 	}
-	glog.Infoln("status=" + status)
+	logit.Info.Println("status=" + status)
 
 	return nil
 }

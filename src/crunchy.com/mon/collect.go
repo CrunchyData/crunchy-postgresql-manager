@@ -17,9 +17,9 @@ package mon
 
 import (
 	"crunchy.com/cpmagent"
+	"crunchy.com/logit"
 	"database/sql"
 	"fmt"
-	"github.com/golang/glog"
 	"github.com/myinfluxdb/client"
 	"strconv"
 	"strings"
@@ -39,19 +39,19 @@ func collectServerMetrics(metricName string, server string) (DBMetric, error) {
 	var values DBMetric
 	var err error
 
-	glog.Infoln("collecting metric " + metricName + " for server " + server)
+	logit.Info.Println("collecting metric " + metricName + " for server " + server)
 	switch metricName {
 	case "cpu":
-		glog.Infoln("cpu collecting ")
+		logit.Info.Println("cpu collecting ")
 		values, err = cpu(server)
 	case "mem":
-		glog.Infoln("mem collecting ")
+		logit.Info.Println("mem collecting ")
 		values, err = mem(server)
 	default:
-		glog.Infoln(metricName + " not implemented yet ")
+		logit.Info.Println(metricName + " not implemented yet ")
 	}
 	if err != nil {
-		glog.Errorln("error in collecting " + metricName + " " + err.Error())
+		logit.Error.Println("error in collecting " + metricName + " " + err.Error())
 		return values, err
 	}
 
@@ -62,18 +62,18 @@ func collectContainerMetrics(metricName string, databaseConn *sql.DB) ([]DBMetri
 	var values []DBMetric
 	var err error
 
-	glog.Infoln("collecting metric..." + metricName)
+	logit.Info.Println("collecting metric..." + metricName)
 	switch metricName {
 	case "pg1":
 		values, err = pg1(databaseConn)
 	case "pg2":
 		values, err = pg2(databaseConn)
 	default:
-		glog.Infoln(metricName + " not implemented yet ")
+		logit.Info.Println(metricName + " not implemented yet ")
 	}
 
 	if err != nil {
-		glog.Errorln("error in collecting " + metricName + " " + err.Error())
+		logit.Error.Println("error in collecting " + metricName + " " + err.Error())
 		return values, err
 	}
 
@@ -91,7 +91,7 @@ func pg1(databaseConn *sql.DB) ([]DBMetric, error) {
 
 	err = databaseConn.QueryRow(fmt.Sprintf("select trunc(random() * 10 + 1) from  generate_series(1,1)")).Scan(&intValue)
 	if err != nil {
-		glog.Errorln("pg1:error:" + err.Error())
+		logit.Error.Println("pg1:error:" + err.Error())
 		return values, err
 	}
 	values[0].Value = float64(intValue)
@@ -127,7 +127,7 @@ func pg2(databaseConn *sql.DB) ([]DBMetric, error) {
 		values = append(values, m)
 	}
 	if err = rows.Err(); err != nil {
-		glog.Errorln("pg2:error:" + err.Error())
+		logit.Error.Println("pg2:error:" + err.Error())
 		return nil, err
 	}
 
@@ -145,7 +145,7 @@ func cpu(server string) (DBMetric, error) {
 
 	output, err = cpmagent.AgentCommand(CPMBIN+"monitor-load", "", server)
 	if err != nil {
-		glog.Errorln("cpu metric error:" + err.Error())
+		logit.Error.Println("cpu metric error:" + err.Error())
 		return values, err
 	}
 
@@ -153,7 +153,7 @@ func cpu(server string) (DBMetric, error) {
 
 	values.Value, err = strconv.ParseFloat(output, 64)
 	if err != nil {
-		glog.Errorln("parseFloat error in cpu metric " + err.Error())
+		logit.Error.Println("parseFloat error in cpu metric " + err.Error())
 	}
 
 	return values, err
@@ -170,7 +170,7 @@ func mem(server string) (DBMetric, error) {
 
 	output, err = cpmagent.AgentCommand(CPMBIN+"monitor-mem", "", server)
 	if err != nil {
-		glog.Errorln("mem metric error:" + err.Error())
+		logit.Error.Println("mem metric error:" + err.Error())
 		return values, err
 	}
 
@@ -178,7 +178,7 @@ func mem(server string) (DBMetric, error) {
 
 	values.Value, err = strconv.ParseFloat(output, 64)
 	if err != nil {
-		glog.Errorln("parseFloat error in mem metric " + err.Error())
+		logit.Error.Println("parseFloat error in mem metric " + err.Error())
 	}
 
 	return values, err
@@ -190,7 +190,7 @@ func hc1(scheduleTS int64, nodeName string, databaseConn *sql.DB, c *client.Clie
 
 	err = databaseConn.QueryRow(fmt.Sprintf("select now()::text")).Scan(&strValue)
 	if err != nil {
-		glog.Errorln(err.Error())
+		logit.Error.Println(err.Error())
 		//hc1 - database down condition
 		series := &client.Series{
 			Name:    "hc1",
@@ -200,7 +200,7 @@ func hc1(scheduleTS int64, nodeName string, databaseConn *sql.DB, c *client.Clie
 			},
 		}
 		if err = c.WriteSeries([]*client.Series{series}); err != nil {
-			glog.Errorln("hc1 error writing to influxdb " + err.Error())
+			logit.Error.Println("hc1 error writing to influxdb " + err.Error())
 		}
 
 	} else {
@@ -213,7 +213,7 @@ func hc1(scheduleTS int64, nodeName string, databaseConn *sql.DB, c *client.Clie
 			},
 		}
 		if err = c.WriteSeries([]*client.Series{series}); err != nil {
-			glog.Errorln("hc1 error writing to influxdb " + err.Error())
+			logit.Error.Println("hc1 error writing to influxdb " + err.Error())
 		}
 	}
 

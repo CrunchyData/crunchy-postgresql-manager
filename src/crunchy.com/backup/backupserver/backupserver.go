@@ -18,32 +18,18 @@ package main
 import (
 	"crunchy.com/admindb"
 	"crunchy.com/backup"
-	"crunchy.com/mylog"
+	"crunchy.com/logit"
 	"crunchy.com/util"
 	"database/sql"
-	"flag"
-	"log"
-	//"github.com/golang/glog"
 	"net"
 	"net/http"
 	"net/rpc"
 	"time"
 )
 
-var logger mylog.MyLogger
-
-var LOGPATH = flag.String("logpath", "backupserver.log", "log directory to write to")
-
 func main() {
-	flag.Parse()
 
-	log.Println("logging to " + *LOGPATH)
-
-	logger = mylog.Init(*LOGPATH)
-	backup.SetLogger(logger)
-	admindb.SetLogger(logger)
-
-	logger.Info.Println("sleeping during startup to give DNS a chance")
+	logit.Info.Println("sleeping during startup to give DNS a chance")
 	time.Sleep(time.Millisecond * 7000)
 
 	found := false
@@ -52,11 +38,11 @@ func main() {
 	for i := 0; i < 10; i++ {
 		dbConn, err = util.GetConnection("clusteradmin")
 		if err != nil {
-			logger.Error.Println(err.Error())
-			logger.Error.Println("could not get initial database connection, will retry in 5 seconds")
+			logit.Error.Println(err.Error())
+			logit.Error.Println("could not get initial database connection, will retry in 5 seconds")
 			time.Sleep(time.Millisecond * 5000)
 		} else {
-			logger.Info.Println("got db connection")
+			logit.Info.Println("got db connection")
 			found = true
 			break
 		}
@@ -71,18 +57,18 @@ func main() {
 
 	backup.LoadSchedules()
 
-	logger.Info.Println("starting\n")
+	logit.Info.Println("starting\n")
 	command := new(backup.Command)
 	rpc.Register(command)
-	logger.Info.Println("Command registered\n")
+	logit.Info.Println("Command registered\n")
 	rpc.HandleHTTP()
 	l, e := net.Listen("tcp", ":13000")
-	logger.Info.Println("listening\n")
+	logit.Info.Println("listening\n")
 	if e != nil {
-		logger.Error.Println(e.Error())
+		logit.Error.Println(e.Error())
 		panic("could not listen on rpc socker")
 	}
-	logger.Info.Println("about to serve\n")
+	logit.Info.Println("about to serve\n")
 	http.Serve(l, nil)
-	logger.Info.Println("after serve\n")
+	logit.Info.Println("after serve\n")
 }

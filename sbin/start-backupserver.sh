@@ -29,9 +29,4 @@ env > /tmp/envvars.out
 
 source /opt/cpm/bin/setenv.sh
 
-backupserver -logpath=/cpmlogs/backupserver.log -log_dir=/cpmlogs -logtostderr=false &
-
-#
-# block with the dummy server, allows for hot swapping the backupserver# when needed
-
-dummyserver > /tmp/dummy.log 
+backupserver  > /cpmlogs/backupserver.log

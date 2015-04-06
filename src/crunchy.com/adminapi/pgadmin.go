@@ -18,8 +18,8 @@ package main
 import (
 	"crunchy.com/admindb"
 	"crunchy.com/cpmagent"
+	"crunchy.com/logit"
 	"github.com/ant0ine/go-json-rest/rest"
-	"github.com/golang/glog"
 	"net/http"
 	"time"
 )
@@ -27,21 +27,21 @@ import (
 func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-cluster")
 	if err != nil {
-		glog.Errorln("AdminStartpg: authorize error " + err.Error())
+		logit.Error.Println("AdminStartpg: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	ID := r.PathParam("ID")
 	if ID == "" {
-		glog.Errorln("AdminStartpg: error node ID required")
+		logit.Error.Println("AdminStartpg: error node ID required")
 		rest.Error(w, "node ID required", http.StatusBadRequest)
 		return
 	}
 
 	dbNode, err := admindb.GetDBNode(ID)
 	if err != nil {
-		glog.Errorln("AdminStartpg: " + err.Error())
+		logit.Error.Println("AdminStartpg: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -49,11 +49,11 @@ func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 	var output string
 	output, err = cpmagent.AgentCommand(CPMBIN+"startpg.sh", "", dbNode.Name)
 	if err != nil {
-		glog.Errorln("AdminStartpg:" + err.Error())
+		logit.Error.Println("AdminStartpg:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	glog.Infoln("AdminStartpg:" + output)
+	logit.Info.Println("AdminStartpg:" + output)
 
 	//give the UI a chance to see the start
 	time.Sleep(3000 * time.Millisecond)
@@ -68,35 +68,35 @@ func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-cluster")
 	if err != nil {
-		glog.Errorln("AdminStoppg: authorize error " + err.Error())
+		logit.Error.Println("AdminStoppg: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	glog.Infoln("AdminStoppg:called")
+	logit.Info.Println("AdminStoppg:called")
 	ID := r.PathParam("ID")
 	if ID == "" {
-		glog.Errorln("AdminStoppg:ID not found error")
+		logit.Error.Println("AdminStoppg:ID not found error")
 		rest.Error(w, "node ID required", http.StatusBadRequest)
 		return
 	}
 
 	dbNode, err := admindb.GetDBNode(ID)
 	if err != nil {
-		glog.Errorln("AdminStartpg: " + err.Error())
+		logit.Error.Println("AdminStartpg: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	glog.Infoln("AdminStoppg: in stop with dbnode")
+	logit.Info.Println("AdminStoppg: in stop with dbnode")
 
 	var output string
 	output, err = cpmagent.AgentCommand(CPMBIN+"stoppg.sh", "", dbNode.Name)
 	if err != nil {
-		glog.Errorln("AdminStoppg:" + err.Error())
+		logit.Error.Println("AdminStoppg:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	glog.Infoln("AdminStoppg:" + output)
+	logit.Info.Println("AdminStoppg:" + output)
 
 	//give the UI a chance to see the stop
 	time.Sleep(3000 * time.Millisecond)

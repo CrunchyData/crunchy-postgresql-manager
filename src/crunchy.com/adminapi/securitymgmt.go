@@ -16,9 +16,9 @@
 package main
 
 import (
+	"crunchy.com/logit"
 	"crunchy.com/sec"
 	"github.com/ant0ine/go-json-rest/rest"
-	"github.com/golang/glog"
 	"net/http"
 )
 
@@ -42,34 +42,34 @@ func Login(w rest.ResponseWriter, r *rest.Request) {
 	ID := r.PathParam("ID")
 	PSW := r.PathParam("PSW")
 	if ID == "" || PSW == "" {
-		glog.Errorln("Login: ID or PSW not supplied")
+		logit.Error.Println("Login: ID or PSW not supplied")
 		rest.Error(w, "ID or PSW not supplied", http.StatusBadRequest)
 	}
 
-	glog.Infoln("Login: called")
+	logit.Info.Println("Login: called")
 	tokenContents, err := secimpl.Login(ID, PSW)
 	if err != nil {
-		glog.Errorln("Login: error secimpl call" + err.Error())
+		logit.Error.Println("Login: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	//w.WriteHeader(http.StatusOK)
 	token := LoginToken{tokenContents}
-	glog.Infoln("sending back token " + token.Contents)
+	logit.Info.Println("sending back token " + token.Contents)
 	w.WriteJson(&token)
 }
 
 func Logout(w rest.ResponseWriter, r *rest.Request) {
 	token := r.PathParam("Token")
 	if token == "" {
-		glog.Errorln("Logout: Token not supplied")
+		logit.Error.Println("Logout: Token not supplied")
 		rest.Error(w, "Token not supplied", http.StatusBadRequest)
 	}
 
 	err := secimpl.Logout(token)
 	if err != nil {
-		glog.Errorln("Logout: error secimpl call" + err.Error())
+		logit.Error.Println("Logout: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -81,25 +81,25 @@ func Logout(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func UpdateUser(w rest.ResponseWriter, r *rest.Request) {
-	glog.Infoln("UpdateUser: in UpdateUser")
+	logit.Info.Println("UpdateUser: in UpdateUser")
 	user := sec.User{}
 	err := r.DecodeJsonPayload(&user)
 	if err != nil {
-		glog.Errorln("UpdateUser: error in decode" + err.Error())
+		logit.Error.Println("UpdateUser: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = secimpl.Authorize(user.Token, "perm-user")
 	if err != nil {
-		glog.Errorln("UpdateUser: authorize error " + err.Error())
+		logit.Error.Println("UpdateUser: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	err = secimpl.UpdateUser(user)
 	if err != nil {
-		glog.Errorln("UpdateUser: error secimpl call" + err.Error())
+		logit.Error.Println("UpdateUser: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -111,25 +111,25 @@ func UpdateUser(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func AddUser(w rest.ResponseWriter, r *rest.Request) {
-	glog.Infoln("AddUser: in AddUser")
+	logit.Info.Println("AddUser: in AddUser")
 	user := sec.User{}
 	err := r.DecodeJsonPayload(&user)
 	if err != nil {
-		glog.Errorln("AddUser: error in decode" + err.Error())
+		logit.Error.Println("AddUser: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = secimpl.Authorize(user.Token, "perm-user")
 	if err != nil {
-		glog.Errorln("UpdateUser: authorize error " + err.Error())
+		logit.Error.Println("UpdateUser: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	err = secimpl.AddUser(user)
 	if err != nil {
-		glog.Errorln("AddUser: error secimpl call" + err.Error())
+		logit.Error.Println("AddUser: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -143,14 +143,14 @@ func AddUser(w rest.ResponseWriter, r *rest.Request) {
 func GetUser(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		glog.Errorln("GetUser: validate token error " + err.Error())
+		logit.Error.Println("GetUser: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	ID := r.PathParam("ID")
 	if ID == "" {
-		glog.Errorln("GetUser: error User ID required")
+		logit.Error.Println("GetUser: error User ID required")
 		rest.Error(w, "User ID required", http.StatusBadRequest)
 		return
 	}
@@ -164,20 +164,20 @@ func GetUser(w rest.ResponseWriter, r *rest.Request) {
 func GetAllUsers(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		glog.Errorln("GetAllUsers: validate token error " + err.Error())
+		logit.Error.Println("GetAllUsers: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	usersList, err := secimpl.GetAllUsers()
 	if err != nil {
-		glog.Errorln("GetAllUsers: error " + err.Error())
+		logit.Error.Println("GetAllUsers: error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	for i := range usersList {
-		glog.Infoln("GetAllUsers: secimpl.GetAllUsers userName=" + usersList[i].Name)
+		logit.Info.Println("GetAllUsers: secimpl.GetAllUsers userName=" + usersList[i].Name)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -188,20 +188,20 @@ func DeleteUser(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-user")
 	if err != nil {
-		glog.Errorln("DeleteUser: authorize error " + err.Error())
+		logit.Error.Println("DeleteUser: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	ID := r.PathParam("ID")
 	if ID == "" {
-		glog.Errorln("DeleteUser: error ID required")
+		logit.Error.Println("DeleteUser: error ID required")
 		rest.Error(w, "ID required", http.StatusBadRequest)
 		return
 	}
 	err = secimpl.DeleteUser(ID)
 	if err != nil {
-		glog.Errorln("DeleteUser: error secimpl call" + err.Error())
+		logit.Error.Println("DeleteUser: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -213,25 +213,25 @@ func DeleteUser(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func UpdateRole(w rest.ResponseWriter, r *rest.Request) {
-	glog.Infoln("UpdateRole: in UpdateRole")
+	logit.Info.Println("UpdateRole: in UpdateRole")
 	role := sec.Role{}
 	err := r.DecodeJsonPayload(&role)
 	if err != nil {
-		glog.Errorln("UpdateRole: error in decode" + err.Error())
+		logit.Error.Println("UpdateRole: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = secimpl.Authorize(role.Token, "perm-user")
 	if err != nil {
-		glog.Errorln("GetAllRoles: authorize error " + err.Error())
+		logit.Error.Println("GetAllRoles: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	err = secimpl.UpdateRole(role)
 	if err != nil {
-		glog.Errorln("UpdateRole: error secimpl call" + err.Error())
+		logit.Error.Println("UpdateRole: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -243,25 +243,25 @@ func UpdateRole(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func AddRole(w rest.ResponseWriter, r *rest.Request) {
-	glog.Infoln("AddRole: in AddRole")
+	logit.Info.Println("AddRole: in AddRole")
 	role := sec.Role{}
 	err := r.DecodeJsonPayload(&role)
 	if err != nil {
-		glog.Errorln("AddRole: error in decode" + err.Error())
+		logit.Error.Println("AddRole: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = secimpl.Authorize(role.Token, "perm-user")
 	if err != nil {
-		glog.Errorln("GetAllRoles: authorize error " + err.Error())
+		logit.Error.Println("GetAllRoles: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	err = secimpl.AddRole(role)
 	if err != nil {
-		glog.Errorln("AddRole: error secimpl call" + err.Error())
+		logit.Error.Println("AddRole: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -276,20 +276,20 @@ func DeleteRole(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-user")
 	if err != nil {
-		glog.Errorln("GetAllRoles: validate token error " + err.Error())
+		logit.Error.Println("GetAllRoles: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	if r.PathParam("ID") == "" {
-		glog.Errorln("DeleteRole: error ID required")
+		logit.Error.Println("DeleteRole: error ID required")
 		rest.Error(w, "ID required", http.StatusBadRequest)
 		return
 	}
 
 	err = secimpl.DeleteRole(r.PathParam("ID"))
 	if err != nil {
-		glog.Errorln("DeleteRole: error secimpl call" + err.Error())
+		logit.Error.Println("DeleteRole: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -304,14 +304,14 @@ func GetAllRoles(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		glog.Errorln("GetAllRoles: validate token error " + err.Error())
+		logit.Error.Println("GetAllRoles: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 	var roles []sec.Role
 	roles, err = secimpl.GetAllRoles()
 	if err != nil {
-		glog.Errorln("GetAllRoles: error secimpl call" + err.Error())
+		logit.Error.Println("GetAllRoles: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -324,14 +324,14 @@ func GetRole(w rest.ResponseWriter, r *rest.Request) {
 	var err error
 	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		glog.Errorln("GetRole: validate token error " + err.Error())
+		logit.Error.Println("GetRole: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	Name := r.PathParam("Name")
 	if Name == "" {
-		glog.Errorln("GetRole: error Name required")
+		logit.Error.Println("GetRole: error Name required")
 		rest.Error(w, "Name required", http.StatusBadRequest)
 		return
 	}
@@ -339,7 +339,7 @@ func GetRole(w rest.ResponseWriter, r *rest.Request) {
 	var role sec.Role
 	role, err = secimpl.GetRole(Name)
 	if err != nil {
-		glog.Errorln("GetRole: error secimpl call" + err.Error())
+		logit.Error.Println("GetRole: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -348,18 +348,18 @@ func GetRole(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func ChangePassword(w rest.ResponseWriter, r *rest.Request) {
-	glog.Infoln("ChangePassword: in ChangePassword")
+	logit.Info.Println("ChangePassword: in ChangePassword")
 	changePass := ChgPassword{}
 	err := r.DecodeJsonPayload(&changePass)
 	if err != nil {
-		glog.Errorln("ChangePassword: error in decode" + err.Error())
+		logit.Error.Println("ChangePassword: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = secimpl.Authorize(changePass.Token, "perm-read")
 	if err != nil {
-		glog.Errorln("ChangePassword: authorize error " + err.Error())
+		logit.Error.Println("ChangePassword: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -367,7 +367,7 @@ func ChangePassword(w rest.ResponseWriter, r *rest.Request) {
 	var sameUser bool
 	sameUser, err = secimpl.CompareUserToToken(changePass.Username, changePass.Token)
 	if err != nil {
-		glog.Errorln("ChangePassword: compare UserToToken error " + err.Error())
+		logit.Error.Println("ChangePassword: compare UserToToken error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -377,7 +377,7 @@ func ChangePassword(w rest.ResponseWriter, r *rest.Request) {
 	if !sameUser {
 		err = secimpl.Authorize(changePass.Token, "perm-user")
 		if err != nil {
-			glog.Errorln("ChangePassword: authorize error " + err.Error())
+			logit.Error.Println("ChangePassword: authorize error " + err.Error())
 			rest.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
@@ -385,7 +385,7 @@ func ChangePassword(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.ChangePassword(changePass.Username, changePass.Password)
 	if err != nil {
-		glog.Errorln("ChangePassword: error secimpl call" + err.Error())
+		logit.Error.Println("ChangePassword: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

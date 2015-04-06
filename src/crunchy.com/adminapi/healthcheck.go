@@ -17,8 +17,8 @@ package main
 
 import (
 	"crunchy.com/admindb"
+	"crunchy.com/logit"
 	"github.com/ant0ine/go-json-rest/rest"
-	"github.com/golang/glog"
 	"github.com/influxdb/influxdb/client"
 	"net/http"
 	"strconv"
@@ -28,7 +28,7 @@ func GetHC1(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		glog.Errorln("GetHC1: validate token error " + err.Error())
+		logit.Error.Println("GetHC1: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -49,7 +49,7 @@ func GetHC1(w rest.ResponseWriter, r *rest.Request) {
 	})
 
 	if err != nil {
-		glog.Errorln("GetHC1: " + err.Error())
+		logit.Error.Println("GetHC1: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -58,41 +58,41 @@ func GetHC1(w rest.ResponseWriter, r *rest.Request) {
 
 	//get the latest HC1 record and it's seconds value
 	var query = "select seconds, service, servicetype, status from hc1 limit 1"
-	glog.Infoln(query)
+	logit.Info.Println(query)
 
 	results, err = c.Query(query)
 	if err != nil {
-		glog.Errorln(err.Error())
+		logit.Error.Println(err.Error())
 		w.WriteJson(&results)
 		//rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if len(results) == 0 {
-		glog.Infoln("GetHC1: no results yet")
+		logit.Info.Println("GetHC1: no results yet")
 		w.WriteJson(&results)
 		return
 	}
 
 	var resultsLen = len(results[0].Points)
 	if resultsLen == 0 {
-		glog.Infoln("GetHC1: no results yet 2")
+		logit.Info.Println("GetHC1: no results yet 2")
 		w.WriteJson(&results)
 		return
 	}
 
-	glog.Infof("results len = %d\n", resultsLen)
+	logit.Info.Printf("results len = %d\n", resultsLen)
 	var seconds = results[0].Points[0][2].(float64)
-	glog.Infof("results seconds=%f\n", seconds)
+	logit.Info.Printf("results seconds=%f\n", seconds)
 
 	query = "select seconds, service, servicetype, status from hc1 where seconds = " + strconv.FormatFloat(seconds, 'f', 2, 64)
-	glog.Infoln(query)
+	logit.Info.Println(query)
 
 	results, err = c.Query(query)
 
 	resultsLen = len(results[0].Points)
 	if resultsLen == 0 {
-		glog.Infoln("GetHC1 b: no results")
+		logit.Info.Println("GetHC1 b: no results")
 	}
 
 	w.WriteJson(&results)

@@ -16,11 +16,11 @@
 package main
 
 import (
+	"crunchy.com/logit"
 	"crunchy.com/mon"
 	"crunchy.com/util"
 	"database/sql"
 	"flag"
-	"github.com/golang/glog"
 	"net"
 	"net/http"
 	"net/rpc"
@@ -30,7 +30,7 @@ import (
 func main() {
 	flag.Parse()
 
-	glog.Infoln("sleeping during startup to give DNS a chance")
+	logit.Info.Println("sleeping during startup to give DNS a chance")
 	time.Sleep(time.Millisecond * 7000)
 
 	//verify cpm db exists in influxdb
@@ -42,19 +42,18 @@ func main() {
 	for i := 0; i < 10; i++ {
 		dbConn, err = util.GetConnection("clusteradmin")
 		if err != nil {
-			glog.Errorln(err.Error())
-			glog.Errorln("could not get initial database connection, will retry in 5 seconds")
+			logit.Error.Println(err.Error())
+			logit.Error.Println("could not get initial database connection, will retry in 5 seconds")
 			time.Sleep(time.Millisecond * 5000)
 		} else {
-			glog.Infoln("got db connection")
+			logit.Info.Println("got db connection")
 			found = true
 			break
 		}
 	}
 
 	if !found {
-		glog.Errorln("could not connect to clusteradmin db")
-		glog.Flush()
+		logit.Error.Println("could not connect to clusteradmin db")
 		panic("could not connect to clusteradmin db")
 	}
 
@@ -64,21 +63,20 @@ func main() {
 
 	dbConn.Close()
 
-	glog.Infoln("starting\n")
+	logit.Info.Println("starting\n")
 	command := new(mon.Command)
 	rpc.Register(command)
-	glog.Infoln("Command registered\n")
+	logit.Info.Println("Command registered\n")
 	rpc.HandleHTTP()
 	l, e := net.Listen("tcp", ":13000")
-	glog.Infoln("listening\n")
+	logit.Info.Println("listening\n")
 	if e != nil {
-		glog.Errorln(e.Error())
-		glog.Flush()
+		logit.Error.Println(e.Error())
 		panic("could not listen on rpc socker")
 	}
-	glog.Infoln("about to serve\n")
+	logit.Info.Println("about to serve\n")
 	http.Serve(l, nil)
-	glog.Infoln("after serve\n")
+	logit.Info.Println("after serve\n")
 }
 
 func bootstrapInflux() {

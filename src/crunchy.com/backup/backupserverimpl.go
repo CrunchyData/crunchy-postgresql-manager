@@ -16,9 +16,8 @@
 package backup
 
 import (
-	//"github.com/golang/glog"
+	"crunchy.com/logit"
 	"github.com/robfig/cron"
-	"log"
 	"os"
 )
 
@@ -85,21 +84,21 @@ func init() {
 
 	kubeURL = os.Getenv("KUBE_URL")
 	if kubeURL != "" {
-		log.Println("KUBE_URL value set, assume Kube environment")
+		logit.Info.Println("KUBE_URL value set, assume Kube environment")
 		kubeEnv = true
 	} else {
-		log.Println("KUBE_URL=[" + kubeURL + "]")
+		logit.Info.Println("KUBE_URL=[" + kubeURL + "]")
 	}
 }
 
 //called by backup jobs as they execute
 func (t *Command) AddStatus(status *BackupStatus, reply *Command) error {
 
-	logger.Info.Println("AddStatus called")
+	logit.Info.Println("AddStatus called")
 
 	id, err := DBAddStatus(*status)
 	if err != nil {
-		logger.Error.Println("AddStatus error " + err.Error())
+		logit.Error.Println("AddStatus error " + err.Error())
 	}
 	reply.Output = id
 	return err
@@ -108,11 +107,11 @@ func (t *Command) AddStatus(status *BackupStatus, reply *Command) error {
 //called by backup jobs as they execute
 func (t *Command) UpdateStatus(status *BackupStatus, reply *Command) error {
 
-	logger.Info.Println("UpdateStatus called")
+	logit.Info.Println("UpdateStatus called")
 
 	err := DBUpdateStatus(*status)
 	if err != nil {
-		logger.Error.Println("UpdateStatus error " + err.Error())
+		logit.Error.Println("UpdateStatus error " + err.Error())
 	}
 	return err
 }
@@ -120,23 +119,23 @@ func (t *Command) UpdateStatus(status *BackupStatus, reply *Command) error {
 //called by admin do perform an adhoc backup job
 func (t *Command) BackupNow(args *BackupRequest, reply *Command) error {
 
-	logger.Info.Println("BackupNow.impl called")
+	logit.Info.Println("BackupNow.impl called")
 	err := ProvisionBackupJob(args)
 	if err != nil {
-		logger.Error.Println("BackupNow.impl error:" + err.Error())
+		logit.Error.Println("BackupNow.impl error:" + err.Error())
 	}
-	logger.Info.Println("BackupNow.impl completed")
+	logit.Info.Println("BackupNow.impl completed")
 	return err
 }
 
 //called by admin to cause a reload of the cron jobs
 func (t *Command) Reload(schedule *BackupSchedule, reply *Command) error {
 
-	logger.Info.Println("Reload called")
+	logit.Info.Println("Reload called")
 
 	err := LoadSchedules()
 	if err != nil {
-		logger.Error.Println("Reload error " + err.Error())
+		logit.Error.Println("Reload error " + err.Error())
 	}
 
 	return err
@@ -145,15 +144,15 @@ func (t *Command) Reload(schedule *BackupSchedule, reply *Command) error {
 func LoadSchedules() error {
 
 	var err error
-	logger.Info.Println("LoadSchedules called")
+	logit.Info.Println("LoadSchedules called")
 
 	schedules, err := DBGetSchedules()
 	if err != nil {
-		logger.Error.Println("LoadSchedules error " + err.Error())
+		logit.Error.Println("LoadSchedules error " + err.Error())
 	}
 
 	if CRONInstance != nil {
-		logger.Info.Println("stopping current cron instance...")
+		logit.Info.Println("stopping current cron instance...")
 		CRONInstance.Stop()
 	}
 
@@ -161,15 +160,15 @@ func LoadSchedules() error {
 	CRONInstance = nil
 
 	//create a new cron
-	logger.Info.Println("creating cron instance...")
+	logit.Info.Println("creating cron instance...")
 	CRONInstance = cron.New()
 
 	var cronexp string
 	for i := 0; i < len(schedules); i++ {
 		cronexp = getCron(schedules[i])
-		logger.Info.Println("would have loaded schedule..." + cronexp)
+		logit.Info.Println("would have loaded schedule..." + cronexp)
 		if schedules[i].Enabled == "YES" {
-			logger.Info.Println("schedule " + schedules[i].ID + " was enabled so adding it")
+			logit.Info.Println("schedule " + schedules[i].ID + " was enabled so adding it")
 			x := DefaultJob{}
 			x.request = BackupRequest{}
 			x.request.ScheduleID = schedules[i].ID
@@ -181,12 +180,12 @@ func LoadSchedules() error {
 
 			CRONInstance.AddJob(cronexp, x)
 		} else {
-			logger.Info.Println("schedule " + schedules[i].ID + " NOT enabled so dropping it")
+			logit.Info.Println("schedule " + schedules[i].ID + " NOT enabled so dropping it")
 		}
 
 	}
 
-	logger.Info.Println("starting new CRONInstance")
+	logit.Info.Println("starting new CRONInstance")
 	CRONInstance.Start()
 
 	return err

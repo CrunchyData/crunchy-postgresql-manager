@@ -18,7 +18,7 @@ package main
 import (
 	"bytes"
 	"crunchy.com/backup"
-	//"github.com/golang/glog"
+	"crunchy.com/logit"
 	"io"
 	"log"
 	"os"
@@ -48,8 +48,7 @@ func init() {
 	var err error
 	file, err = os.Create(filename)
 	if err != nil {
-		//glog.Errorln(err.Error())
-		log.Println(err.Error())
+		logit.Error.Println(err.Error())
 	}
 }
 

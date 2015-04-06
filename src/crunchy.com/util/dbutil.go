@@ -16,8 +16,8 @@
 package util
 
 import (
+	"crunchy.com/logit"
 	"database/sql"
-	"github.com/golang/glog"
 	"os"
 )
 
@@ -29,25 +29,24 @@ func GetConnection(database string) (*sql.DB, error) {
 	dbPassword = os.Getenv("DB_PASSWORD")
 
 	if dbHost == "" || dbUser == "" || dbPort == "" {
-		glog.Errorln("DB_HOST [" + dbHost + "]")
-		glog.Errorln("DB_USER [" + dbUser + "]")
-		glog.Errorln("DB_PORT [" + dbPort + "]")
-		glog.Errorln("error in getting required env vars")
-		glog.Flush()
+		logit.Error.Println("DB_HOST [" + dbHost + "]")
+		logit.Error.Println("DB_USER [" + dbUser + "]")
+		logit.Error.Println("DB_PORT [" + dbPort + "]")
+		logit.Error.Println("error in getting required env vars")
 		panic("could not get required env vars")
 	}
 
 	var dbConn *sql.DB
 	var err error
 	if dbPassword != "" {
-		glog.Infoln("connecting to database " + database + " host=" + dbHost + " user=" + dbUser + " port=" + dbPort + " password=" + dbPassword)
+		logit.Info.Println("connecting to database " + database + " host=" + dbHost + " user=" + dbUser + " port=" + dbPort + " password=" + dbPassword)
 		dbConn, err = sql.Open("postgres", "sslmode=disable user="+dbUser+" host="+dbHost+" port="+dbPort+" dbname="+database+" password="+dbPassword)
 	} else {
-		glog.Infoln("connecting to database " + database + " host=" + dbHost + " user=" + dbUser + " port=" + dbPort)
+		logit.Info.Println("connecting to database " + database + " host=" + dbHost + " user=" + dbUser + " port=" + dbPort)
 		dbConn, err = sql.Open("postgres", "sslmode=disable user="+dbUser+" host="+dbHost+" port="+dbPort+" dbname="+database)
 	}
 	if err != nil {
-		glog.Errorln(err.Error())
+		logit.Error.Println(err.Error())
 	}
 	return dbConn, err
 }
@@ -59,14 +58,14 @@ func GetMonitoringConnection(dbHost string, dbUser string, dbPort string, databa
 	var err error
 
 	if dbPassword == "" {
-		glog.Infoln("open db with dbHost=[" + dbHost + "] dbUser=[" + dbUser + "] dbPort=[" + dbPort + "] database=[" + database + "]")
+		logit.Info.Println("open db with dbHost=[" + dbHost + "] dbUser=[" + dbUser + "] dbPort=[" + dbPort + "] database=[" + database + "]")
 		dbConn, err = sql.Open("postgres", "sslmode=disable user="+dbUser+" host="+dbHost+" port="+dbPort+" dbname="+database)
 	} else {
-		glog.Infoln("open db with dbHost=[" + dbHost + "] dbUser=[" + dbUser + "] dbPort=[" + dbPort + "] database=[" + database + "] password=[" + dbPassword + "]")
+		logit.Info.Println("open db with dbHost=[" + dbHost + "] dbUser=[" + dbUser + "] dbPort=[" + dbPort + "] database=[" + database + "] password=[" + dbPassword + "]")
 		dbConn, err = sql.Open("postgres", "sslmode=disable user="+dbUser+" host="+dbHost+" port="+dbPort+" dbname="+database+" password="+dbPassword)
 	}
 	if err != nil {
-		glog.Errorln("error in getting connection :" + err.Error())
+		logit.Error.Println("error in getting connection :" + err.Error())
 	}
 	return dbConn, err
 }

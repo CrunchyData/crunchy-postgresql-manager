@@ -25,9 +25,7 @@ source /opt/cpm/bin/setenv.sh
 /opt/cpm/bin/start-pg-wrapper-admin.sh &
 export KUBE_URL=$KUBE_URL
 
-# log output will go to /tmp into files created by glog
-# named similar to adminapi.7869c0a96e4c.postgres.log.INFO.20150204-192844.2313
-/opt/cpm/bin/adminapi -log_dir=/cpmlogs -logtostderr=false &
+/opt/cpm/bin/adminapi > /cpmlogs/adminapi.log
 
-/opt/cpm/bin/dummyserver > /tmp/dummyserver.log 
+#/opt/cpm/bin/dummyserver > /tmp/dummyserver.log 
 

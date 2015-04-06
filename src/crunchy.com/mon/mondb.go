@@ -16,9 +16,9 @@
 package mon
 
 import (
+	"crunchy.com/logit"
 	"database/sql"
 	"fmt"
-	"github.com/golang/glog"
 	_ "github.com/lib/pq"
 )
 
@@ -36,12 +36,12 @@ type MonMetric struct {
 var dbConn *sql.DB
 
 func SetConnection(conn *sql.DB) {
-	glog.Infoln("mondb:SetConnection: called to open dbConn")
+	logit.Info.Println("mondb:SetConnection: called to open dbConn")
 	dbConn = conn
 }
 
 func DBGetSchedules() ([]MonSchedule, error) {
-	glog.Infoln("DBGetSchedules called")
+	logit.Info.Println("DBGetSchedules called")
 	var rows *sql.Rows
 	var err error
 
@@ -69,7 +69,7 @@ func DBGetSchedules() ([]MonSchedule, error) {
 }
 
 func DBGetMetrics() ([]MonMetric, error) {
-	glog.Infoln("DBGetMetrics called")
+	logit.Info.Println("DBGetMetrics called")
 	var rows *sql.Rows
 	var err error
 

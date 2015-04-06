@@ -16,22 +16,22 @@
 package backup
 
 import (
+	"crunchy.com/logit"
 	"errors"
-	//"github.com/golang/glog"
 	"net/rpc"
 )
 
 //called by backup jobs as they execute
 func AddStatusClient(ipaddress string, status BackupStatus) (string, error) {
 
-	logger.Info.Println("AddStatus called")
+	logit.Info.Println("AddStatus called")
 	client, err := rpc.DialHTTP("tcp", ipaddress)
 	if err != nil {
-		logger.Error.Println("AddStatus: dialing:" + err.Error())
+		logit.Error.Println("AddStatus: dialing:" + err.Error())
 		return "", err
 	}
 	if client == nil {
-		logger.Error.Println("AddStatus: client was nil")
+		logit.Error.Println("AddStatus: client was nil")
 		return "", errors.New("client was nil from rpc dial")
 	}
 
@@ -39,10 +39,10 @@ func AddStatusClient(ipaddress string, status BackupStatus) (string, error) {
 
 	err = client.Call("Command.AddStatus", &status, &command)
 	if err != nil {
-		logger.Error.Println("AddStatus: error " + err.Error())
+		logit.Error.Println("AddStatus: error " + err.Error())
 		return "", err
 	}
-	logger.Info.Println("status.ID=" + status.ID)
+	logit.Info.Println("status.ID=" + status.ID)
 
 	return command.Output, nil
 }
@@ -50,14 +50,14 @@ func AddStatusClient(ipaddress string, status BackupStatus) (string, error) {
 //called by backup jobs as they execute
 func UpdateStatusClient(ipaddress string, status BackupStatus) (string, error) {
 
-	logger.Info.Println("UpdateStatus called")
+	logit.Info.Println("UpdateStatus called")
 	client, err := rpc.DialHTTP("tcp", ipaddress)
 	if err != nil {
-		logger.Error.Println("UpdateStatus: dialing:" + err.Error())
+		logit.Error.Println("UpdateStatus: dialing:" + err.Error())
 		return "", err
 	}
 	if client == nil {
-		logger.Error.Println("UpdateStatus: client was nil")
+		logit.Error.Println("UpdateStatus: client was nil")
 		return "", errors.New("client was nil from rpc dial")
 	}
 
@@ -65,7 +65,7 @@ func UpdateStatusClient(ipaddress string, status BackupStatus) (string, error) {
 
 	err = client.Call("Command.UpdateStatus", &status, &command)
 	if err != nil {
-		logger.Error.Println("UpdateStatus: error " + err.Error())
+		logit.Error.Println("UpdateStatus: error " + err.Error())
 		return "", err
 	}
 
@@ -75,14 +75,14 @@ func UpdateStatusClient(ipaddress string, status BackupStatus) (string, error) {
 //called by admin do perform an adhoc backup job
 func BackupNowClient(ipaddress string, request BackupRequest) (string, error) {
 
-	logger.Info.Println("BackupNow called ip=" + ipaddress)
+	logit.Info.Println("BackupNow called ip=" + ipaddress)
 	client, err := rpc.DialHTTP("tcp", ipaddress)
 	if err != nil {
-		logger.Error.Println("BackupNow: dialing:" + err.Error())
+		logit.Error.Println("BackupNow: dialing:" + err.Error())
 		return "", err
 	}
 	if client == nil {
-		logger.Error.Println("BackupNow: client was nil")
+		logit.Error.Println("BackupNow: client was nil")
 		return "", errors.New("client was nil from rpc dial")
 	}
 
@@ -90,7 +90,7 @@ func BackupNowClient(ipaddress string, request BackupRequest) (string, error) {
 
 	err = client.Call("Command.BackupNow", &request, &command)
 	if err != nil {
-		logger.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println("BackupNow: error " + err.Error())
 		return "", err
 	}
 
@@ -100,14 +100,14 @@ func BackupNowClient(ipaddress string, request BackupRequest) (string, error) {
 //called by admin to add to reload schedules in the backup server
 func ReloadClient(ipaddress string, sched BackupSchedule) (string, error) {
 
-	logger.Info.Println("ReloadClient called")
+	logit.Info.Println("ReloadClient called")
 	client, err := rpc.DialHTTP("tcp", ipaddress)
 	if err != nil {
-		logger.Error.Println("ReloadClient: dialing:" + err.Error())
+		logit.Error.Println("ReloadClient: dialing:" + err.Error())
 		return "", err
 	}
 	if client == nil {
-		logger.Error.Println("ReloadClient: client was nil")
+		logit.Error.Println("ReloadClient: client was nil")
 		return "", errors.New("client was nil from rpc dial")
 	}
 
@@ -115,7 +115,7 @@ func ReloadClient(ipaddress string, sched BackupSchedule) (string, error) {
 
 	err = client.Call("Command.Reload", &sched, &command)
 	if err != nil {
-		logger.Error.Println("ReloadError: error " + err.Error())
+		logit.Error.Println("ReloadError: error " + err.Error())
 		return "", err
 	}
 

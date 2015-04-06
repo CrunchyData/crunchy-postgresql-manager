@@ -18,12 +18,12 @@ package main
 import (
 	"crunchy.com/admindb"
 	"crunchy.com/backup"
+	"crunchy.com/logit"
 	"crunchy.com/util"
 	"database/sql"
 	"flag"
 	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
-	"github.com/golang/glog"
 	"log"
 	"net/http"
 	"os"
@@ -38,9 +38,9 @@ func init() {
 	flag.Parse()
 
 	kubeURL = os.Getenv("KUBE_URL")
-	glog.Infoln("KUBE_URL=[" + kubeURL + "]")
+	logit.Info.Println("KUBE_URL=[" + kubeURL + "]")
 	if kubeURL != "" {
-		glog.Infoln("KUBE_URL value set, assume Kube environment")
+		logit.Info.Println("KUBE_URL value set, assume Kube environment")
 		kubeEnv = true
 	}
 
@@ -53,11 +53,6 @@ var CPMBIN = CPMDIR + "bin/"
 func main() {
 
 	fmt.Println("at top of adminapi main")
-	//flag.Parse()
-	//glog.Flush()
-
-	//glog.Info("called flag.Parse\n")
-	//glog.Flush()
 
 	var dbConn *sql.DB
 	found := false
@@ -66,11 +61,11 @@ func main() {
 	for i := 0; i < 10; i++ {
 		dbConn, err = util.GetConnection("clusteradmin")
 		if err != nil {
-			glog.Errorln(err.Error())
-			glog.Errorln("could not get initial database connection, will retry in 5 seconds")
+			logit.Error.Println(err.Error())
+			logit.Error.Println("could not get initial database connection, will retry in 5 seconds")
 			time.Sleep(time.Millisecond * 5000)
 		} else {
-			//glog.Infoln("got db connection")
+			//logit.Info.Println("got db connection")
 			found = true
 			break
 		}
@@ -283,7 +278,7 @@ type PostgresControldata struct {
 func Kube(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		glog.Errorln("Kube: validate token error " + err.Error())
+		logit.Error.Println("Kube: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}

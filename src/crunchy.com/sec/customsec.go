@@ -16,7 +16,7 @@
 package sec
 
 import (
-	"github.com/golang/glog"
+	"crunchy.com/logit"
 )
 
 //this is a place holder for any future security implementations
@@ -26,66 +26,66 @@ type CustomSec struct {
 }
 
 func (d CustomSec) Login(id string, psw string) (string, error) {
-	glog.Infoln("CustomSec.Login")
+	logit.Info.Println("CustomSec.Login")
 	return "", nil
 }
 
 func (d CustomSec) Logout(id string) error {
-	glog.Infoln("CustomSec.Logout")
+	logit.Info.Println("CustomSec.Logout")
 	return nil
 }
 
 func (d CustomSec) UpdateUser(user User) error {
-	glog.Infoln("CustomSec.UpdateUser")
+	logit.Info.Println("CustomSec.UpdateUser")
 	return nil
 }
 
 func (d CustomSec) AddUser(user User) error {
-	glog.Infoln("CustomSec.AddUser")
+	logit.Info.Println("CustomSec.AddUser")
 	return nil
 }
 
 func (d CustomSec) GetUser(id string) (User, error) {
 	user := User{Name: "myname", Password: "mypass"}
-	glog.Infoln("CustomSec.GetUser id=" + id)
+	logit.Info.Println("CustomSec.GetUser id=" + id)
 	return user, nil
 }
 
 func (d CustomSec) GetAllUsers() ([]User, error) {
 	user := User{Name: "myname", Password: "mypass"}
 	users := []User{user}
-	glog.Infoln("CustomSec.GetAllUsers")
+	logit.Info.Println("CustomSec.GetAllUsers")
 	return users, nil
 }
 
 func (d CustomSec) DeleteUser(id string) error {
-	glog.Infoln("CustomSec.DeleteUser id=" + id)
+	logit.Info.Println("CustomSec.DeleteUser id=" + id)
 	return nil
 }
 
 func (d CustomSec) UpdateRole(role Role) error {
-	glog.Infoln("CustomSec.UpdateRole")
+	logit.Info.Println("CustomSec.UpdateRole")
 	return nil
 }
 
 func (d CustomSec) AddRole(role Role) error {
-	glog.Infoln("CustomSec.AddRole")
+	logit.Info.Println("CustomSec.AddRole")
 	return nil
 }
 
 func (d CustomSec) DeleteRole(name string) error {
-	glog.Infoln("CustomSec.DeleteRole name=" + name)
+	logit.Info.Println("CustomSec.DeleteRole name=" + name)
 	return nil
 }
 
 func (d CustomSec) GetAllRoles() ([]Role, error) {
-	glog.Infoln("CustomSec.GetAllRoles")
+	logit.Info.Println("CustomSec.GetAllRoles")
 	roles := []Role{}
 	return roles, nil
 }
 
 func (d CustomSec) GetRole(name string) (Role, error) {
-	glog.Infoln("CustomSec.GetRole Name=" + name)
+	logit.Info.Println("CustomSec.GetRole Name=" + name)
 	permissions := make(map[string]string)
 	permissions["perm1"] = "perm1 desc"
 	permissions["perm2"] = "perm2 desc"

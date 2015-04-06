@@ -16,9 +16,9 @@
 package sec
 
 import (
+	"crunchy.com/logit"
 	"database/sql"
 	"fmt"
-	"github.com/golang/glog"
 	_ "github.com/lib/pq"
 	"log"
 )
@@ -33,7 +33,7 @@ var db = "clusteradmin"
 var dbConn *sql.DB
 
 func init() {
-	//glog.Infoln("secdb:init: called to open dbConn")
+	//logit.Info.Println("secdb:init: called to open dbConn")
 	var err error
 	dbConn, err = sql.Open("postgres", "sslmode=disable user="+pguser+" host="+pghost+" port="+pgport+" dbname="+db)
 	if err != nil {
@@ -43,7 +43,7 @@ func init() {
 
 func DBGetUser(Name string) (User, error) {
 	user := User{}
-	//glog.Infoln("secdb:GetUser: called name=" + Name)
+	//logit.Info.Println("secdb:GetUser: called name=" + Name)
 	var rows *sql.Rows
 
 	roles, err := DBGetRoles()
@@ -59,10 +59,10 @@ func DBGetUser(Name string) (User, error) {
 	err = dbConn.QueryRow(fmt.Sprintf("select password, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from secuser where name='%s'", Name)).Scan(&user.Password, &user.UpdateDate)
 	switch {
 	case err == sql.ErrNoRows:
-		glog.Errorln("DBGetUser:no user with that name")
+		logit.Error.Println("DBGetUser:no user with that name")
 		return user, err
 	case err != nil:
-		glog.Errorln("DBGetuser:Get User:" + err.Error())
+		logit.Error.Println("DBGetuser:Get User:" + err.Error())
 		return user, err
 	default:
 	}
@@ -88,14 +88,14 @@ func DBGetUser(Name string) (User, error) {
 		role = user.Roles[roleName]
 		role.Selected = true
 		user.Roles[roleName] = role
-		//glog.Infoln("setting role " + roleName + " to true for User " + Name)
+		//logit.Info.Println("setting role " + roleName + " to true for User " + Name)
 	}
 	if err = rows.Err(); err != nil {
 		return user, err
 	}
 
 	if rolesfound == false {
-		glog.Errorln("no roles found for user " + Name)
+		logit.Error.Println("no roles found for user " + Name)
 	}
 
 	return user, nil
@@ -104,7 +104,7 @@ func DBGetUser(Name string) (User, error) {
 func DBGetRole(Name string) (Role, error) {
 	role := Role{}
 	role.Selected = false
-	//glog.Infoln("secdb:GetRole: called")
+	//logit.Info.Println("secdb:GetRole: called")
 	var rows *sql.Rows
 	var err error
 
@@ -113,7 +113,7 @@ func DBGetRole(Name string) (Role, error) {
 	var perms []Permission
 	perms, err = DBGetPermissions()
 	if err != nil {
-		glog.Errorln("error in DBGetRole:GetPermissions")
+		logit.Error.Println("error in DBGetRole:GetPermissions")
 		return role, err
 	}
 	role.Permissions = make(map[string]Permission)
@@ -150,7 +150,7 @@ func DBGetRole(Name string) (Role, error) {
 		perm.Selected = true
 		perm.Description = permDescription
 		role.Permissions[permName] = perm
-		//glog.Infoln("setting perm " + permName + " to true for role " + roleName)
+		//logit.Info.Println("setting perm " + permName + " to true for role " + roleName)
 	}
 	if err = rows.Err(); err != nil {
 		return role, err
@@ -160,7 +160,7 @@ func DBGetRole(Name string) (Role, error) {
 
 func DBGetPermissions() ([]Permission, error) {
 	slice := []Permission{}
-	//glog.Infoln("secdb:GetPermissions: called")
+	//logit.Info.Println("secdb:GetPermissions: called")
 	var rows *sql.Rows
 	var err error
 
@@ -191,16 +191,16 @@ func DBGetPermissions() ([]Permission, error) {
 
 func DBDeleteRole(name string) error {
 	queryStr := fmt.Sprintf("delete from secrole where name='%s' returning name", name)
-	//glog.Infoln("secdb:DeleteRole:" + queryStr)
+	//logit.Info.Println("secdb:DeleteRole:" + queryStr)
 
 	var theName string
 	err := dbConn.QueryRow(queryStr).Scan(&theName)
 	switch {
 	case err != nil:
-		glog.Errorln(err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	default:
-		glog.Infoln("secdb:DeleteRole:role " + name + " deleted ")
+		logit.Info.Println("secdb:DeleteRole:role " + name + " deleted ")
 	}
 
 	return nil
@@ -208,34 +208,34 @@ func DBDeleteRole(name string) error {
 
 func DBDeleteUser(name string) error {
 	queryStr := fmt.Sprintf("delete from secuser where name='%s' returning name", name)
-	glog.Infoln("secdb:DeleteUser:" + queryStr)
+	logit.Info.Println("secdb:DeleteUser:" + queryStr)
 
 	var theName string
 	err := dbConn.QueryRow(queryStr).Scan(&theName)
 	switch {
 	case err != nil:
-		glog.Errorln(err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	default:
-		glog.Infoln("secdb:DeleteUser:User " + name + " deleted ")
+		logit.Info.Println("secdb:DeleteUser:User " + name + " deleted ")
 	}
 
 	return nil
 }
 
 func DBAddRole(role Role) error {
-	glog.Infoln("secdb:AddRole:called")
+	logit.Info.Println("secdb:AddRole:called")
 	queryStr := fmt.Sprintf("insert into secrole( name, updatedt) values ( '%s', now()) returning name", role.Name)
 
-	glog.Infoln("secdb:AddRole:" + queryStr)
+	logit.Info.Println("secdb:AddRole:" + queryStr)
 	var theName string
 	err := dbConn.QueryRow(queryStr).Scan(&theName)
 	switch {
 	case err != nil:
-		glog.Errorln("secdb:AddRole:" + err.Error())
+		logit.Error.Println("secdb:AddRole:" + err.Error())
 		return err
 	default:
-		glog.Infoln("secdb:AddRole: role inserted " + role.Name)
+		logit.Info.Println("secdb:AddRole: role inserted " + role.Name)
 	}
 
 	for k, v := range role.Permissions {
@@ -251,54 +251,54 @@ func DBAddRole(role Role) error {
 }
 
 func DBAddUserRole(user string, role string) error {
-	glog.Infoln("secdb:AddUserRole:called")
+	logit.Info.Println("secdb:AddUserRole:called")
 	queryStr := fmt.Sprintf("insert into secuserrole ( username, role) values ( '%s', '%s') returning username", user, role)
 
-	glog.Infoln("secdb:AddUserRole:" + queryStr)
+	logit.Info.Println("secdb:AddUserRole:" + queryStr)
 	var theUser string
 	err := dbConn.QueryRow(queryStr).Scan(&theUser)
 	switch {
 	case err != nil:
-		glog.Errorln("secdb:AddUserRole:" + err.Error())
+		logit.Error.Println("secdb:AddUserRole:" + err.Error())
 		return err
 	default:
-		glog.Infoln("secdb:AddUserRole: inserted user=" + user + " role=" + role)
+		logit.Info.Println("secdb:AddUserRole: inserted user=" + user + " role=" + role)
 	}
 
 	return nil
 }
 
 func DBAddRolePerm(role string, perm string) error {
-	glog.Infoln("secdb:AddRolePerm:called")
+	logit.Info.Println("secdb:AddRolePerm:called")
 	queryStr := fmt.Sprintf("insert into secroleperm ( role, perm) values ( '%s', '%s') returning role", role, perm)
 
-	glog.Infoln("secdb:AddRolePerm:" + queryStr)
+	logit.Info.Println("secdb:AddRolePerm:" + queryStr)
 	var theRole string
 	err := dbConn.QueryRow(queryStr).Scan(&theRole)
 	switch {
 	case err != nil:
-		glog.Errorln("secdb:AddRolePerm:" + err.Error())
+		logit.Error.Println("secdb:AddRolePerm:" + err.Error())
 		return err
 	default:
-		glog.Infoln("secdb:AddRolePerm: inserted role=" + role + " perm=" + perm)
+		logit.Info.Println("secdb:AddRolePerm: inserted role=" + role + " perm=" + perm)
 	}
 
 	return nil
 }
 
 func DBAddUser(user User) error {
-	glog.Infoln("secdb:AddUser:called")
+	logit.Info.Println("secdb:AddUser:called")
 	queryStr := fmt.Sprintf("insert into secuser ( name, password, updatedt) values ( '%s', '%s', now()) returning name", user.Name, user.Password)
 
-	glog.Infoln("secdb:AddUser:" + queryStr)
+	logit.Info.Println("secdb:AddUser:" + queryStr)
 	var theName string
 	err := dbConn.QueryRow(queryStr).Scan(&theName)
 	switch {
 	case err != nil:
-		glog.Errorln("secdb:AddUser:" + err.Error())
+		logit.Error.Println("secdb:AddUser:" + err.Error())
 		return err
 	default:
-		glog.Infoln("secdb:AddUser: inserted " + user.Name)
+		logit.Info.Println("secdb:AddUser: inserted " + user.Name)
 	}
 	for k, v := range user.Roles {
 		if v.Selected {
@@ -313,7 +313,7 @@ func DBAddUser(user User) error {
 }
 
 func DBUpdateRole(role Role) error {
-	glog.Infoln("secdb:UpdateRole:called")
+	logit.Info.Println("secdb:UpdateRole:called")
 	err := DBDeleteRole(role.Name)
 	if err != nil {
 		return err
@@ -328,7 +328,7 @@ func DBUpdateRole(role Role) error {
 }
 
 func DBUpdateUser(user User) error {
-	glog.Infoln("secdb:DBUpdateUser:called")
+	logit.Info.Println("secdb:DBUpdateUser:called")
 
 	err := DBDeleteUser(user.Name)
 	if err != nil {
@@ -344,7 +344,7 @@ func DBUpdateUser(user User) error {
 
 func DBGetAllUsers() ([]User, error) {
 	userList := []User{}
-	//glog.Infoln("secdb:DBGetAllUser: called")
+	//logit.Info.Println("secdb:DBGetAllUser: called")
 	var rows *sql.Rows
 	var err error
 
@@ -365,7 +365,7 @@ func DBGetAllUsers() ([]User, error) {
 			return userList, err
 		}
 		if err != nil {
-			glog.Errorln("error in GetUser" + err.Error())
+			logit.Error.Println("error in GetUser" + err.Error())
 			return userList, err
 		}
 		userList = append(userList, user)
@@ -376,10 +376,10 @@ func DBGetAllUsers() ([]User, error) {
 
 	var user User
 	for i := range userList {
-		glog.Infoln("fetching user info for " + userList[i].Name)
+		logit.Info.Println("fetching user info for " + userList[i].Name)
 		user, err = DBGetUser(userList[i].Name)
 		if err != nil {
-			glog.Errorln("error" + err.Error())
+			logit.Error.Println("error" + err.Error())
 			return userList, err
 		}
 
@@ -392,7 +392,7 @@ func DBGetAllUsers() ([]User, error) {
 
 func DBGetRoles() ([]Role, error) {
 	slice := []Role{}
-	//glog.Infoln("secdb:GetRoles: called")
+	//logit.Info.Println("secdb:GetRoles: called")
 	var rows *sql.Rows
 	var err error
 
@@ -401,7 +401,7 @@ func DBGetRoles() ([]Role, error) {
 	rows, err = dbConn.Query(queryStr)
 
 	if err != nil {
-		glog.Errorln("error in GetRoles:" + err.Error())
+		logit.Error.Println("error in GetRoles:" + err.Error())
 		return slice, err
 	}
 	defer rows.Close()
@@ -421,10 +421,10 @@ func DBGetRoles() ([]Role, error) {
 
 	var role Role
 	for i := range slice {
-		//glog.Infoln("fetching role info for " + slice[i].Name)
+		//logit.Info.Println("fetching role info for " + slice[i].Name)
 		role, err = DBGetRole(slice[i].Name)
 		if err != nil {
-			glog.Errorln("error" + err.Error())
+			logit.Error.Println("error" + err.Error())
 			return slice, err
 		}
 
@@ -435,31 +435,31 @@ func DBGetRoles() ([]Role, error) {
 }
 
 func LogUser(user User) {
-	glog.Infoln("***user***")
-	glog.Infoln("user.Name=" + user.Name + " user.Password=" + user.Password)
+	logit.Info.Println("***user***")
+	logit.Info.Println("user.Name=" + user.Name + " user.Password=" + user.Password)
 	for k, v := range user.Roles {
-		glog.Infoln("***role***")
-		glog.Infoln("role=" + k + " Selected=" + fmt.Sprintf("%t", v.Selected))
+		logit.Info.Println("***role***")
+		logit.Info.Println("role=" + k + " Selected=" + fmt.Sprintf("%t", v.Selected))
 		for i, j := range v.Permissions {
-			glog.Infoln("perm=" + i + " desc=" + j.Description + " selected=" + fmt.Sprintf("%t", j.Selected))
+			logit.Info.Println("perm=" + i + " desc=" + j.Description + " selected=" + fmt.Sprintf("%t", j.Selected))
 		}
-		glog.Infoln("******")
+		logit.Info.Println("******")
 	}
-	glog.Infoln("******")
+	logit.Info.Println("******")
 
 }
 func LogPermissions(perms map[string]Permission) {
-	glog.Infoln("***log of permissions***")
+	logit.Info.Println("***log of permissions***")
 	for i, j := range perms {
-		glog.Infoln("perm=" + i + " desc=" + j.Description + " selected=" + fmt.Sprintf("%t", j.Selected))
+		logit.Info.Println("perm=" + i + " desc=" + j.Description + " selected=" + fmt.Sprintf("%t", j.Selected))
 	}
-	glog.Infoln("******")
+	logit.Info.Println("******")
 
 }
 
 func DBGetSession(token string) (Session, error) {
 	session := Session{}
-	//glog.Infoln("secdb:GetSession: called token=" + token)
+	//logit.Info.Println("secdb:GetSession: called token=" + token)
 
 	queryStr := fmt.Sprintf("select token, name, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS')  from secsession where token = '%s'", token)
 
@@ -470,38 +470,38 @@ func DBGetSession(token string) (Session, error) {
 
 	switch {
 	case err == sql.ErrNoRows:
-		glog.Errorln("secdb:DBGetSession:no token matched")
+		logit.Error.Println("secdb:DBGetSession:no token matched")
 		return session, err
 	case err != nil:
-		glog.Errorln("secdb:DBGetSession:" + err.Error())
+		logit.Error.Println("secdb:DBGetSession:" + err.Error())
 		return session, err
 	default:
-		//glog.Infoln("secdb:DBGetSession: token returned is " + session.Token)
+		//logit.Info.Println("secdb:DBGetSession: token returned is " + session.Token)
 	}
 
 	return session, nil
 }
 
 func DBAddSession(uuid string, id string) error {
-	//glog.Infoln("secdb:DBAddSession:called")
+	//logit.Info.Println("secdb:DBAddSession:called")
 	queryStr := fmt.Sprintf("insert into secsession ( token, name, updatedt) values ( '%s', '%s', now()) returning token", uuid, id)
 
-	//glog.Infoln("secdb:DBAddSession:" + queryStr)
+	//logit.Info.Println("secdb:DBAddSession:" + queryStr)
 	var theToken string
 	err := dbConn.QueryRow(queryStr).Scan(&theToken)
 	switch {
 	case err != nil:
-		glog.Errorln("secdb:DBAddSession:" + err.Error())
+		logit.Error.Println("secdb:DBAddSession:" + err.Error())
 		return err
 	default:
-		glog.Infoln("secdb:AddSession: Session inserted " + theToken)
+		logit.Info.Println("secdb:AddSession: Session inserted " + theToken)
 	}
 
 	return nil
 }
 
 func DBDeleteSession(uuid string) error {
-	glog.Infoln("secdb:DBDeleteSession:called")
+	logit.Info.Println("secdb:DBDeleteSession:called")
 
 	//if the uuid is not there, return
 	_, err := DBGetSession(uuid)
@@ -510,33 +510,33 @@ func DBDeleteSession(uuid string) error {
 	}
 
 	queryStr := fmt.Sprintf("delete from secsession where token='%s' returning token", uuid)
-	glog.Infoln("secdb:DeleteSession:" + queryStr)
+	logit.Info.Println("secdb:DeleteSession:" + queryStr)
 
 	var theToken string
 	err = dbConn.QueryRow(queryStr).Scan(&theToken)
 	switch {
 	case err != nil:
-		glog.Errorln(err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	default:
-		glog.Infoln("secdb:DeleteSession " + uuid + " deleted ")
+		logit.Info.Println("secdb:DeleteSession " + uuid + " deleted ")
 	}
 
 	return nil
 }
 
 func DBUpdatePassword(username string, password string) error {
-	glog.Infoln("UpdatePassword:called")
+	logit.Info.Println("UpdatePassword:called")
 	queryStr := fmt.Sprintf("update secuser set ( password, updatedt) = ('%s', now()) where name = '%s' returning name", password, username)
 
-	glog.Infoln("UpdatePassword: str=[" + queryStr + "]")
+	logit.Info.Println("UpdatePassword: str=[" + queryStr + "]")
 	var theName string
 	err := dbConn.QueryRow(queryStr).Scan(&theName)
 	switch {
 	case err != nil:
 		return err
 	default:
-		glog.Infoln("UpdatePassword:updated " + username)
+		logit.Info.Println("UpdatePassword:updated " + username)
 	}
 	return nil
 }

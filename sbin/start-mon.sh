@@ -42,9 +42,9 @@ INPID=/tmp/influxdb.pid
 
 sleep 7
 
-monserver -log_dir=/cpmlogs  -logtostderr=false  &
+monserver > /cpmlogs/monserver.log
 
 #
 # block with the dummy server, allows for hot swapping the backupserver# when needed
 
-dummyserver > /tmp/dummy.log 
+#dummyserver > /tmp/dummy.log 

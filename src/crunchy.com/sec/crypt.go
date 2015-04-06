@@ -16,11 +16,11 @@
 package sec
 
 import (
+	"crunchy.com/logit"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/hex"
 	"fmt"
-	"github.com/golang/glog"
 )
 
 //stuff used by the crypto routines
@@ -36,7 +36,7 @@ func EncryptPassword(inputPassword string) (string, error) {
 
 	encryptedRaw, err = basicencrypt(stuff)
 	if err != nil {
-		glog.Errorln(err.Error())
+		logit.Error.Println(err.Error())
 		return "", err
 	}
 
@@ -58,13 +58,13 @@ func DecryptPassword(encodedHexPassword string) (string, error) {
 
 	encryptedPassword, err = hex.DecodeString(encodedHexPassword)
 	if err != nil {
-		glog.Errorln(err.Error())
+		logit.Error.Println(err.Error())
 		return "", err
 	}
 
 	unencryptedPassword, err = basicdecrypt(encryptedPassword)
 	if err != nil {
-		glog.Errorln(err.Error())
+		logit.Error.Println(err.Error())
 		return "", err
 	}
 	return unencryptedPassword, nil
@@ -89,7 +89,7 @@ func basicencrypt(input []byte) ([]byte, error) {
 	encrypted := make([]byte, len(input))
 	encrypter.XORKeyStream(encrypted, input)
 	//var stroutput = string(encrypted[:])
-	//glog.Infoln("encrypted value " + stroutput)
+	//logit.Info.Println("encrypted value " + stroutput)
 
 	return encrypted, nil
 }
@@ -112,6 +112,6 @@ func basicdecrypt(input []byte) (string, error) {
 	decrypter.XORKeyStream(decrypted, input)
 
 	var stroutput = string(decrypted[:])
-	//glog.Infoln("decrypted value " + stroutput)
+	//logit.Info.Println("decrypted value " + stroutput)
 	return stroutput, nil
 }

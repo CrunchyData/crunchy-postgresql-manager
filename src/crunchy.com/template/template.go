@@ -18,9 +18,9 @@ package template
 import (
 	"bytes"
 	"crunchy.com/admindb"
+	"crunchy.com/logit"
 	"errors"
 	"flag"
-	"github.com/golang/glog"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -134,7 +134,7 @@ func Hba(kubeEnv bool, mode string, hostname string, port string, clusterid stri
 
 	servers, err := admindb.GetAllDBServers()
 	if err != nil {
-		glog.Errorln("Hba:" + err.Error())
+		logit.Error.Println("Hba:" + err.Error())
 		return "", err
 	}
 
@@ -142,7 +142,7 @@ func Hba(kubeEnv bool, mode string, hostname string, port string, clusterid stri
 	var allservers = ""
 	var allbridges = ""
 	for i = range servers {
-		glog.Infoln("Hba:" + servers[i].IPAddress)
+		logit.Info.Println("Hba:" + servers[i].IPAddress)
 		if allservers == "" {
 			allservers = servers[i].IPAddress
 			allbridges = servers[i].DockerBridgeIP
@@ -151,7 +151,7 @@ func Hba(kubeEnv bool, mode string, hostname string, port string, clusterid stri
 			allbridges = allbridges + ":" + servers[i].DockerBridgeIP
 		}
 	}
-	glog.Infoln("Hba:processing serverlist=" + allservers)
+	logit.Info.Println("Hba:processing serverlist=" + allservers)
 	hbaInfo.SERVER_IP_LIST = strings.Split(allservers, ":")
 	hbaInfo.BRIDGE_IP_LIST = strings.Split(allbridges, ":")
 
@@ -191,7 +191,7 @@ func Hba(kubeEnv bool, mode string, hostname string, port string, clusterid stri
 	logInfo(hbaInfo)
 
 	err = tmpl.Execute(buff, hbaInfo)
-	glog.Infoln("Hba:" + buff.String())
+	logit.Info.Println("Hba:" + buff.String())
 
 	return buff.String(), nil
 }
@@ -253,23 +253,23 @@ func getMasterValues(kubeEnv bool, clusterID string, domainname string) (admindb
 	return master, pgpool, nodelist, nil
 }
 func logInfo(info HBAParameters) {
-	glog.Infoln("HBA Parameters are:")
-	glog.Infoln("PG_HOST_IP=" + info.PG_HOST_IP)
-	glog.Infoln("USER=" + info.USER)
+	logit.Info.Println("HBA Parameters are:")
+	logit.Info.Println("PG_HOST_IP=" + info.PG_HOST_IP)
+	logit.Info.Println("USER=" + info.USER)
 	i := 0
 	for i = range info.USER_IP_LIST {
-		glog.Infoln("USER_IP_LIST[" + strconv.Itoa(i) + "]=" + info.USER_IP_LIST[i])
+		logit.Info.Println("USER_IP_LIST[" + strconv.Itoa(i) + "]=" + info.USER_IP_LIST[i])
 		i++
 	}
-	glog.Infoln("PGPOOL_HOST=" + info.PGPOOL_HOST)
+	logit.Info.Println("PGPOOL_HOST=" + info.PGPOOL_HOST)
 	i = 0
 	for i = range info.STANDBY_LIST {
-		glog.Infoln("STANDBY_LIST[" + strconv.Itoa(i) + "]=" + info.STANDBY_LIST[i])
+		logit.Info.Println("STANDBY_LIST[" + strconv.Itoa(i) + "]=" + info.STANDBY_LIST[i])
 		i++
 	}
 	i = 0
 	for i = range info.BRIDGE_IP_LIST {
-		glog.Infoln("BRIDGE_IP_LIST[" + strconv.Itoa(i) + "]=" + info.BRIDGE_IP_LIST[i])
+		logit.Info.Println("BRIDGE_IP_LIST[" + strconv.Itoa(i) + "]=" + info.BRIDGE_IP_LIST[i])
 		i++
 	}
 }
@@ -320,7 +320,7 @@ func Poolhba() (string, error) {
 	buff := bytes.NewBufferString("")
 
 	err = tmpl.Execute(buff, info)
-	glog.Infoln("Poolhba:" + buff.String())
+	logit.Info.Println("Poolhba:" + buff.String())
 
 	return buff.String(), nil
 }
@@ -347,7 +347,7 @@ func Poolpasswd() (string, error) {
 	buff := bytes.NewBufferString("")
 
 	err = tmpl.Execute(buff, info)
-	glog.Infoln("Poolpasswd:" + buff.String())
+	logit.Info.Println("Poolpasswd:" + buff.String())
 
 	return buff.String(), nil
 }
@@ -374,7 +374,7 @@ func Poolconf(poolnames []string) (string, error) {
 	buff := bytes.NewBufferString("")
 
 	err = tmpl.Execute(buff, poolParams)
-	glog.Infoln("Poolconf:" + buff.String())
+	logit.Info.Println("Poolconf:" + buff.String())
 
 	return buff.String(), nil
 }
