@@ -259,7 +259,7 @@ func (d DefaultSec) Authorize(token string, action string) error {
 	}
 
 	//authorize all read-only actions
-	logit.Info.Println("Authorize:  action=[" + action + "]")
+	//logit.Info.Println("Authorize:  action=[" + action + "]")
 	if action == "perm-read" {
 		return nil
 	}
