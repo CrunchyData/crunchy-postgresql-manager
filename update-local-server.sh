@@ -23,7 +23,6 @@ ssh root@$server "systemctl stop cpmagent.service"
 
 
 scp ./bin/* ./sbin/* \
-	./sql/loadtest.sql  \
 	root@$server:/opt/cpm/bin/
 
 ssh root@$server "systemctl start cpmagent.service"

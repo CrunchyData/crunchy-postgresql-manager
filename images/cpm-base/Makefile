@@ -11,7 +11,6 @@ endif
 		mkdir bin
 		cp ../../config/.bash_profile conf/
 		cp ../../sql/node-setup.sql bin/setup.sql
-		cp ../../sql/loadtestfunc.sql bin/
 		cp ../../sbin/* bin/
 		cp ../../config/postgresql.service bin/
 	        docker build -t cpm-base .

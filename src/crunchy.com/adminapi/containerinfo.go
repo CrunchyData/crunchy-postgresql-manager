@@ -16,7 +16,6 @@
 package main
 
 import (
-	"bytes"
 	"crunchy.com/admindb"
 	"crunchy.com/cpmagent"
 	"crunchy.com/logit"
@@ -26,10 +25,12 @@ import (
 	"github.com/ant0ine/go-json-rest/rest"
 	_ "github.com/lib/pq"
 	"net/http"
-	"os/exec"
+	"strconv"
 	"strings"
+	"time"
 )
 
+/*
 func MonitorContainerLoadtest(w rest.ResponseWriter, r *rest.Request) {
 	ID := r.PathParam("ID")
 	Writes := r.PathParam("Writes")
@@ -74,6 +75,7 @@ func MonitorContainerLoadtest(w rest.ResponseWriter, r *rest.Request) {
 	w.(http.ResponseWriter).Write([]byte(output))
 	w.WriteHeader(http.StatusOK)
 }
+*/
 
 func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
@@ -319,6 +321,12 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&stats)
 }
 
+type Loadtestresults struct {
+	Operation string
+	Count     int
+	Results   string
+}
+
 type Statrepl struct {
 	Pid            string
 	Usesysid       string
@@ -433,6 +441,13 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, "Writes required", http.StatusBadRequest)
 		return
 	}
+	var writes int
+	writes, err = strconv.Atoi(Writes)
+	if err != nil {
+		logit.Error.Println("ContainerLoadTest:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	node, err := admindb.GetDBNode(ID)
 	if err != nil {
@@ -441,50 +456,111 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	//$1 - host node.Name
-	//$2 - port "5432"
-	//$3 - user "cpmtest"
-	//$4 - password "cpmtest"
-	//$5 - database "cpmtest"
-	//$6 - insert count - only valid for loadtest Metric
-
-	//hardcoded for now, TODO pull from metadata
-	var port = "5432"
-	var user = "cpmtest"
-	var password = "cpmtest"
-	var database = "cpmtest"
-
 	var host = node.Name
 	if kubeEnv {
 		host = node.Name + "-db"
 	}
 
-	cmd := exec.Command(CPMBIN+"loadtest",
-		host,
-		port,
-		user,
-		password,
-		database,
-		Writes)
-
-	for i := 0; i < len(cmd.Args); i++ {
-		logit.Info.Println("ContainerLoadTest:" + cmd.Args[i])
-	}
-
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-	err = cmd.Run()
-	if err != nil {
-		logit.Error.Println("ContainerLoadTest:" + err.Error())
-		errorString := fmt.Sprintf("%s\n%s\n%s\n", err.Error(), out.String(), stderr.String())
-		rest.Error(w, errorString, http.StatusBadRequest)
+	results, err2 := loadtest(host, writes)
+	if err2 != nil {
+		logit.Error.Println("ContainerLoadTest:" + err2.Error())
+		rest.Error(w, err2.Error(), http.StatusBadRequest)
 		return
 	}
-	logit.Info.Println("ContainerLoadTest: command output was " + out.String())
 
-	//w.(http.ResponseWriter).Write([]byte(output))
-	w.(http.ResponseWriter).Write([]byte(out.String()))
 	w.WriteHeader(http.StatusOK)
+	w.WriteJson(&results)
+}
+
+func loadtest(host string, writes int) ([]Loadtestresults, error) {
+	var err error
+	var name string
+	var query string
+	var id int
+	var i int
+	var dbConn *sql.DB
+	var database = "cpmtest"
+	var user = "cpmtest"
+	var pass = "cpmtest"
+	var port = "5432"
+	var results = make([]Loadtestresults, 4)
+
+	//get db connection
+	dbConn, err = util.GetMonitoringConnection(host, user, port, database, pass)
+	if err != nil {
+		logit.Error.Println("loadtest connection error:" + err.Error())
+		return results, err
+	}
+	defer dbConn.Close()
+
+	start := time.Now()
+
+	//inserts
+	results[0].Operation = "inserts"
+	results[0].Count = writes
+	for i = 0; i < writes; i++ {
+		query = fmt.Sprintf("insert into loadtest ( id, name ) values ( %d, 'this is a row for load test') returning id ", i)
+		err = dbConn.QueryRow(query).Scan(&id)
+		switch {
+		case err != nil:
+			logit.Error.Println("loadtest insert error:" + err.Error())
+			return results, err
+		}
+	}
+
+	results[0].Results = time.Since(start).String()
+
+	start = time.Now()
+
+	//selects
+	results[1].Operation = "selects"
+	results[1].Count = writes
+	for i = 0; i < writes; i++ {
+		err = dbConn.QueryRow(fmt.Sprintf("select name from loadtest where id=%d", i)).Scan(&name)
+		switch {
+		case err == sql.ErrNoRows:
+			logit.Error.Println("no row with that id")
+			return results, err
+		case err != nil:
+			logit.Error.Println(err.Error())
+			return results, err
+		}
+	}
+
+	results[1].Results = time.Since(start).String()
+
+	start = time.Now()
+
+	//updates
+	results[2].Operation = "updates"
+	results[2].Count = writes
+	for i = 0; i < writes; i++ {
+		query = fmt.Sprintf("update loadtest set ( name ) = ('howdy' ) where id = %d returning id", i)
+		err = dbConn.QueryRow(query).Scan(&id)
+		switch {
+		case err != nil:
+			return results, err
+		}
+	}
+
+	results[2].Results = time.Since(start).String()
+
+	start = time.Now()
+
+	//deletes
+	results[3].Operation = "deletes"
+	results[3].Count = writes
+	for i = 0; i < writes; i++ {
+		query = fmt.Sprintf("delete from loadtest where id=%d returning id", i)
+		err := dbConn.QueryRow(query).Scan(&id)
+		switch {
+		case err != nil:
+			return results, err
+		}
+
+	}
+
+	results[3].Results = time.Since(start).String()
+
+	return results, nil
 }
