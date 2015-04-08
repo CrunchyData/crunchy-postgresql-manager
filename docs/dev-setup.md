@@ -1,6 +1,47 @@
 Developer Setup
 =================
 
+Development Environment
+=======================
+Here are the steps required to set up a CPM development environment...
+
+
+### Setup Go Project Structure ###
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+mkdir -p devproject/src devproject/bin devproject/pkg
+
+export GOPATH=~/devproject
+export GOBIN=$GOPATH/bin
+export PATH=$GOBIN:$PATH
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Download and Install godep ###
+~~~~~~~~~~~~~~~~~~~~~~~~
+cd devproject
+go get github.com/tools/godep
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Download CPM Source ###
+~~~~~~~~~~~~~~~~~~~~~~~~
+go get github.com/jmccormick2001/crunchy-postgresql-manager
+cd src/github.com/jmccormick2001/crunchy-postgresql-manager
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Download and Restore All Dependencies ###
+~~~~~~~~~~~~~~~~~~~~~~~~
+godep restore
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Compile CPM ###
+~~~~~~~~~~~~~~~~~~~~~~~~
+make build
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Build CPM Docker Images ###
+~~~~~~~~~~~~~~~~~~~~~~~~
+make buildimages
+~~~~~~~~~~~~~~~~~~~~~~~~
+
 Typical Development Environment
 -------------------------------
 CentOS 7 and RHEL 7 are supported currently, others might work, especially
@@ -36,35 +77,6 @@ The DNS installation will enable and configure the Docker service
 to specify the DNS server as the primary DNS nameserver.  This
 DNS server will also be your primary nameserver in your /etc/resolv.conf
 configuration.
-
-Developer Installation vs User Installation
---------------------------------------------
-
-There is a developer installation which is meant for people
-wanting to modify or work with the CPM source code.  There is
-also a user installation that has the binaries and Docker images
-all ready to pull down and execute.  In this document we will
-discuss the developer installation.  See User-Install.md for
-details on the user installation.
-
-
-
-Run Install.sh
------------------
-The first step of course is to clone the CPM project from
-github.  In the root directory is a file named install.sh.
-Running install.sh is the first step you would take.  This
-script does the following:
-* adds your userid to the docker group
-* sets your GOPATH to the CPM directory
-* creates the /opt/cpm target directory
-* runs 'make'
-* make compiles the golang source code
-* make performs the Docker builds for the CPM containers
-* copies the binaries and scripts to the target locations on the local server
-* sets up the local postgres data directory
-* enables in systemd the cpmagent service
-
 
 Running CPM
 --------------

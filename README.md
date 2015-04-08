@@ -11,6 +11,8 @@ CPM also allows you to monitor and administer PostgreSQL
 databases.  Currently CPM only works with databases that have
 been provisioned by CPM.
 
+![CPM Web UI](./docs/cpm.png)
+
 A user guide is available at:
 https://s3.amazonaws.com/crunchydata/cpm-user-guide.pdf
 
@@ -35,6 +37,8 @@ documentation.
 
 The developer install is more difficult but allows you to build, 
 configure, and develop new CPM functionality to suit your needs.
+
+The developer install and setup is documented in docs/dev-install.md
 
 Pre-requisite Installation
 ============
