@@ -14,8 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-INSTALLDIR=$HOME/crunchy-postgresql-manager
-
+INSTALLDIR=`pwd`
 
 echo "setting up log dir..."
 LOGDIR=/opt/cpm/logs
