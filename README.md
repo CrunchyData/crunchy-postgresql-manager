@@ -1,4 +1,4 @@
-Crunchy Postgresql Manager (Beta v0.9.1)
+Crunchy Postgresql Manager (Beta v0.9.2)
 ==========================
 
 Crunchy Postgresql Manager (CPM) is a Docker-based solution which
@@ -26,31 +26,31 @@ The user install allows you to get CPM up and running quickly by
 downloading pre-built binaries and Docker images.
 
 The user installation archive can be downloaded from:
-
-https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.1-linux-amd64.tar.gz
+[https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.2-linux-amd64.tar.gz](https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.2-linux-amd64.tar.gz)
 
 See docs/user-install.md for details on the user installation 
 requirements.
 
-For performing a user install, see the docs/user-install.md 
+For performing a user install, see the [docs/user-install.md](docs/user-install.md)
 documentation.
 
 The developer install is more difficult but allows you to build, 
 configure, and develop new CPM functionality to suit your needs.
 
-The developer install and setup is documented in docs/dev-install.md
+The developer install and setup is documented in [docs/dev-install.md](docs/dev-install.md)
 
 Pre-requisite Installation
 ============
 
-Install the skybridge or dnsbridge program before installing this one.
+Install the skybridge or dnsbridge program before installing CPM.
 
 skybridge is the preferred DNS bridge solution and is found
-at the following location: https://github.com/CrunchyData/skybridge
+at the following location: 
+[https://github.com/CrunchyData/skybridge](https://github.com/CrunchyData/skybridge)
 
 dnsbridge is a similar solution to skybridge except that it
 supports the BIND DNS server.  dnsbridge information can be found
-at: https://github.com/CrunchyData/dnsbridge
+at: [https://github.com/CrunchyData/dnsbridge](https://github.com/CrunchyData/dnsbridge)
 
 
 

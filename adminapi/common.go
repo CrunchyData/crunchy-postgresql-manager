@@ -159,5 +159,5 @@ func Kube(w rest.ResponseWriter, r *rest.Request) {
 
 func GetVersion(w rest.ResponseWriter, r *rest.Request) {
 
-	w.(http.ResponseWriter).Write([]byte("0.9.1"))
+	w.(http.ResponseWriter).Write([]byte("0.9.2"))
 }
