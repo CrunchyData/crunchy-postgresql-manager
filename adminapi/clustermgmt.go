@@ -946,7 +946,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	//create master container
 	dockermaster := cpmagent.DockerRunArgs{}
-	dockermaster.Image = "crunchydata/cpm-node"
+	dockermaster.Image = "cpm-node"
 	dockermaster.ContainerName = params.Name + "-master"
 	dockermaster.ServerID = masterServer.ID
 	dockermaster.Standalone = "false"
@@ -997,7 +997,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		logit.Info.Println("working on standby ....")
 		//	loop - provision standby
 		dockerstandby[i].ServerID = chosenServers[i].ID
-		dockerstandby[i].Image = "crunchydata/cpm-node"
+		dockerstandby[i].Image = "cpm-node"
 		dockerstandby[i].ContainerName = params.Name + "-standby-" + strconv.Itoa(i)
 		dockerstandby[i].Standalone = "false"
 		err2 = provisionImpl(&dockerstandby[i], profile.StandbyProfile, true)
@@ -1029,7 +1029,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	//	provision
 	dockerpgpool := cpmagent.DockerRunArgs{}
 	dockerpgpool.ContainerName = params.Name + "-pgpool"
-	dockerpgpool.Image = "crunchydata/cpm-pgpool"
+	dockerpgpool.Image = "cpm-pgpool"
 	dockerpgpool.ServerID = chosenServers[count].ID
 	dockerpgpool.Standalone = "false"
 

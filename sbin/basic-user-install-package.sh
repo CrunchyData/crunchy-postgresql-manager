@@ -21,8 +21,8 @@
 set -e
 
 # set the istall directory
-export VERSION=0.9.1
-export WORKDIR=$HOME/crunchy-postgresql-manager
+export VERSION=0.9.2
+export WORKDIR=$GOPATH/src/github.com/crunchydata/crunchy-postgresql-manager
 export TMPDIR=/tmp/opt/cpm
 export ARCHIVE=/tmp/cpm.$VERSION-linux-amd64.tar.gz
 
@@ -32,7 +32,7 @@ createArchive () {
 	mkdir -p $TMPDIR/bin
 
 	cp $WORKDIR/sbin/* $TMPDIR/bin
-	cp $WORKDIR/bin/* $TMPDIR/bin
+	cp $GOPATH/bin/* $TMPDIR/bin
 	cp $WORKDIR/sbin/basic-user-install.sh $TMPDIR
 	cp $WORKDIR/sbin/bu-*.sh $TMPDIR
 
@@ -115,5 +115,36 @@ pushImages () {
 #	docker save crunchydata/cpm-dashboard > /tmp/cpm-dashboard.tar
 }
 
-createArchive
-pushImages
+saveImages () {
+
+	echo "saving cpm image"
+	docker save crunchydata/cpm > /tmp/cpm.tar
+
+	echo "saving cpm-pgpool image"
+	docker save crunchydata/cpm-pgpool > /tmp/cpm-pgpool.tar
+
+	echo "saving cpm-admin image"
+	docker save crunchydata/cpm-admin > /tmp/cpm-admin.tar
+
+	echo "saving cpm-base image"
+	docker save crunchydata/cpm-base > /tmp/cpm-base.tar
+
+	echo "saving cpm-mon image"
+	docker save crunchydata/cpm-mon > /tmp/cpm-mon.tar
+
+	echo "saving cpm-backup image"
+	docker save crunchydata/cpm-backup > /tmp/cpm-backup.tar
+
+	echo "saving cpm-backup-job image"
+	docker save crunchydata/cpm-backup-job > /tmp/cpm-backup-job.tar
+
+	echo "saving cpm-node image"
+	docker save crunchydata/cpm-node > /tmp/cpm-node.tar
+
+	echo "saving cpm-dashboard image"
+	docker save crunchydata/cpm-dashboard > /tmp/cpm-dashboard.tar
+}
+
+#createArchive
+saveImages
+#pushImages
