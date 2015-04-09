@@ -16,7 +16,7 @@ env > /tmp/envvars.out
 
 source /opt/cpm/bin/setenv.sh
 
-backupjob
+backupcommand
 
 #
 # next line, is used only for development, block with the dummy server
