@@ -3,7 +3,7 @@ User Install
 
 Typical Development Environment
 -------------------------------
-CentOS 7 and RHEL 7 are supported currently, others might work, especially
+CentOS 7.1 and RHEL 7.1 are supported currently, others might work, especially
 Fedora or other RHEL variants but you might see differences in
 installation.
 
@@ -12,8 +12,8 @@ Obtain the Media
 Download the binary install archives for skybridge and CPM
 from the following:
 ~~~~~~~~~~~~~~~~~
-https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.1-linux-amd64.tar.gz
-https://s3.amazonaws.com/crunchydata/cpm/skybridge.1.0.0-linux-amd64.tar.gz
+https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.2-linux-amd64.tar.gz
+https://s3.amazonaws.com/crunchydata/cpm/skybridge.1.0.1-linux-amd64.tar.gz
 ~~~~~~~~~~~~~~~~~
 
 Install
@@ -23,12 +23,12 @@ Here is an example of how to perform the installation:
 ~~~~~~~~~~~~~~~~~
 mkdir skybridge-install
 cd skybridge-install
-tar xvzf ../skybridge.1.0.0-linux-amd64.tar.gz
+tar xvzf ../skybridge.1.0.1-linux-amd64.tar.gz
 ./install.sh
 
 mkdir cpm-install
 cd cpm-install
-tar xvzf ../cpm.0.9.1-linux-amd64.tar.gz
+tar xvzf ../cpm.0.9.2-linux-amd64.tar.gz
 
 ./basic-user-install.sh
 ~~~~~~~~~~~~~~~~~

@@ -1,4 +1,4 @@
-FROM centos:centos7
+FROM docker.io/centos:centos7
 MAINTAINER crunchy
 
 # Install postgresql deps

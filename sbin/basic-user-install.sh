@@ -33,10 +33,10 @@ export LOGDIR=$INSTALLDIR/logs
 sudo mkdir -p $LOGDIR
 
 # prompt for static IP to use
-echo "enter static ip to use...(e.g. 192.168.56.103)"
+echo "enter static ip to use for this host... "
 read STATICIP
 # prompt for domain name to use
-echo "enter domain name to use...(e.g crunchy.lab) "
+echo "enter domain name to use... "
 read DOMAIN
 
 #Check if current user is member to the wheel group
@@ -52,14 +52,12 @@ fi
 set +e
 
 # install deps
-sudo yum -y install docker-io
+sudo yum -y install docker
 sudo rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
 sudo rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
 sudo yum install -y postgresql94 postgresql94-contrib postgresql94-server libxslt unzip openssh-clients hostname bind-utils net-tools sysstat
 
 set -e
-# make sure the user is in the docker group
-sudo usermod -a -G docker $USER
 
 # make sure docker is started and enabled
 sudo systemctl enable docker.service
@@ -85,15 +83,15 @@ sed -i "s/crunchy.lab/$DOMAIN/g" ./bu-init-cpm.sh
 
 # pull down CPM Docker images from dockerhub
 echo "pulling down cpm docker images...."
-docker pull crunchydata/cpm:latest
-docker pull crunchydata/cpm-pgpool:latest
-docker pull crunchydata/cpm-admin:latest
-docker pull crunchydata/cpm-base:latest
-docker pull crunchydata/cpm-mon:latest
-docker pull crunchydata/cpm-backup:latest
-docker pull crunchydata/cpm-backup-job:latest
-docker pull crunchydata/cpm-node:latest
-docker pull crunchydata/cpm-dashboard:latest
+sudo docker pull crunchydata/cpm:latest
+sudo docker pull crunchydata/cpm-pgpool:latest
+sudo docker pull crunchydata/cpm-admin:latest
+sudo docker pull crunchydata/cpm-base:latest
+sudo docker pull crunchydata/cpm-mon:latest
+sudo docker pull crunchydata/cpm-backup:latest
+sudo docker pull crunchydata/cpm-backup-job:latest
+sudo docker pull crunchydata/cpm-node:latest
+sudo docker pull crunchydata/cpm-dashboard:latest
 
 # generate keys for cpm and cpm-admin
 echo "generating keys for cpm and cpm-admin containers..."

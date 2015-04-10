@@ -17,32 +17,36 @@
 #
 # script to copy docker server related files to destination
 #
-adminserver=espresso.crunchy.lab
-remoteservers=(jeff1.crunchy.lab espresso.crunchy.lab)
+GOPATH=/home/jeffmc/dev2
+CPMPATH=$GOPATH/src/github.com/crunchydata/crunchy-postgresql-manager
+adminserver=localhost
+remoteservers=(localhost)
 
 for i in "${remoteservers[@]}"
 do
 	echo $i
 	ssh root@$i "mkdir -p /opt/cpm/bin"
-	scp ./bin/*  \
-	./sbin/*  \
-	./sql/*  \
+	scp $GOPATH/bin/*  \
+	$CPMPATH/sbin/*  \
+	$CPMPATH/sql/*  \
 	root@$i:/opt/cpm/bin/
-	scp  ./config/cpm.sh  root@$i:/etc/profile.d/cpm.sh
-	scp  ./config/cpmagent.service  \
+#	scp  ../config/cpm.sh  root@$i:/etc/profile.d/cpm.sh
+	scp  $CPMPATH/config/cpmagent.service  \
 	 root@$i:/usr/lib/systemd/system
- 	ssh root@$i "systemctl enable docker.service"
+# 	ssh root@$i "systemctl enable docker.service"
         ssh root@$i "systemctl enable cpmagent.service"
 done
 
 # copy all required admin files to the admin server
 
 ssh root@$adminserver "mkdir -p /opt/cpm/bin"
-scp ./bin/* \
-./sbin/* \
+scp $GOPATH/bin/* \
+$CPMPATH/sbin/* \
 root@$adminserver:/opt/cpm/bin
 
-scp ./config/cpmagent.service root@$adminserver:/usr/lib/systemd/system
+scp $CPMPATH/sbin/cert.pem root@$adminserver:/opt/cpm/keys
+scp $CPMPATH/sbin/key root@$adminserver:/opt/cpm/keys
+scp $CPMPATH/config/cpmagent.service root@$adminserver:/usr/lib/systemd/system
 
 ssh root@$adminserver "systemctl enable cpmagent.service"
 

@@ -37,7 +37,7 @@ documentation.
 The developer install is more difficult but allows you to build, 
 configure, and develop new CPM functionality to suit your needs.
 
-The developer install and setup is documented in [docs/dev-install.md](docs/dev-install.md)
+The developer install and setup is documented in [docs/dev-setup.md](docs/dev-setup.md)
 
 Pre-requisite Installation
 ============

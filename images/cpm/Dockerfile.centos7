@@ -1,4 +1,4 @@
-FROM centos:centos7
+FROM docker.io/centos:centos7
 MAINTAINER crunchy
 
 RUN rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm

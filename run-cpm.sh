@@ -14,25 +14,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Make sure only root can run our script
+if [[ $EUID -ne 0 ]]; then
+	   echo "This script must be run as root" 1>&2
+	      exit 1
+fi
+
 INSTALLDIR=`pwd`
 
 echo "setting up log dir..."
 LOGDIR=/opt/cpm/logs
-sudo mkdir -p $LOGDIR
-sudo chmod -R 777 $LOGDIR
-sudo chcon -Rt svirt_sandbox_file_t $LOGDIR
+mkdir -p $LOGDIR
+chmod -R 777 $LOGDIR
+chcon -Rt svirt_sandbox_file_t $LOGDIR
 
 echo "setting up keys dir..."
 KEYSDIR=/opt/cpm/keys
-sudo chcon -Rt svirt_sandbox_file_t $KEYSDIR
+chcon -Rt svirt_sandbox_file_t $KEYSDIR
 
 echo "deleting all old log files...."
-sudo rm -rf $LOGDIR/*
+rm -rf $LOGDIR/*
 
 echo "restarting cpm container..."
 docker stop cpm
 docker rm cpm
-sudo chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v2
+chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v2
 docker run --name=cpm -d \
 	-v $LOGDIR:/cpmlogs \
 	-v $KEYSDIR:/cpmkeys \
@@ -43,9 +49,9 @@ sleep 2
 docker stop cpm-admin
 docker rm cpm-admin
 DBDIR=/opt/cpm/data/pgsql/cpm-admin
-sudo mkdir -p $DBDIR
-sudo chown postgres:postgres $DBDIR
-sudo chcon -Rt svirt_sandbox_file_t $DBDIR
+mkdir -p $DBDIR
+chown postgres:postgres $DBDIR
+chcon -Rt svirt_sandbox_file_t $DBDIR
 docker run -e DB_HOST=127.0.0.1 \
 	-e DOMAIN=crunchy.lab \
 	-e DB_PORT=5432 -e DB_USER=postgres \
@@ -68,8 +74,8 @@ sleep 2
 docker stop cpm-mon
 docker rm cpm-mon
 INFLUXDIR=/opt/cpm/data/influxdb
-sudo mkdir -p $INFLUXDIR
-sudo chcon -Rt svirt_sandbox_file_t $INFLUXDIR
+mkdir -p $INFLUXDIR
+chcon -Rt svirt_sandbox_file_t $INFLUXDIR
 docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	--hostname="cpm-mon" \
 	-e DB_PORT=5432 -e DB_USER=postgres \
