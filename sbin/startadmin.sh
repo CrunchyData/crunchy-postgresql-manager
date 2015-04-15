@@ -20,12 +20,12 @@
 export THISDOMAIN=$DOMAIN
 env > /tmp/envvars.out
 
-source /opt/cpm/bin/setenv.sh
+source /var/cpm/bin/setenv.sh
 
-/opt/cpm/bin/start-pg-wrapper-admin.sh &
+start-pg-wrapper-admin.sh &
 export KUBE_URL=$KUBE_URL
 
-/opt/cpm/bin/adminapi > /cpmlogs/adminapi.log
+adminapi > /cpmlogs/adminapi.log
 
-#/opt/cpm/bin/dummyserver > /tmp/dummyserver.log 
+#dummyserver > /tmp/dummyserver.log 
 

@@ -3,7 +3,8 @@ Developer Setup
 
 Development Environment
 =======================
-Here are the steps required to set up a CPM development environment...
+Here are the steps required to set up a CPM development environment, CPM is 
+built using Centos 7.1  and Docker 1.5
 
 
 ### Setup Go Project Structure ###
@@ -23,8 +24,8 @@ go get github.com/tools/godep
 
 ### Download CPM Source ###
 ~~~~~~~~~~~~~~~~~~~~~~~~
-go get github.com/jmccormick2001/crunchy-postgresql-manager
-cd src/github.com/jmccormick2001/crunchy-postgresql-manager
+go get github.com/crunchydata/crunchy-postgresql-manager
+cd src/github.com/crunchydata/crunchy-postgresql-manager
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Download and Restore All Dependencies ###
@@ -42,11 +43,17 @@ make build
 make buildimages
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Typical Development Environment
--------------------------------
-CentOS 7 and RHEL 7 are supported currently, others might work, especially
-Fedora or other RHEL variants but you might see differences in
-installation.
+Start CPM Server Agent
+----------------------
+After you have successfully compiled CPM and built the CPM Docker images,
+on each server that is to run CPM, you will need to start a CPM Server
+Agent, this is started using systemd.  CPM server files are copied to
+each server by the sbin/dev-setup.sh script.  Modify this script
+if you are going to configure multiple CPM hosts.  The script is currently
+setup for a single CPM host installation.
+~~~~~~~~~~~~~~~~~~~~~~~~
+./sbin/dev-setup.sh
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Network Configuration
 ------------------------------

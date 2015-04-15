@@ -23,13 +23,13 @@ fi
 INSTALLDIR=`pwd`
 
 echo "setting up log dir..."
-LOGDIR=/opt/cpm/logs
+LOGDIR=/var/cpm/logs
 mkdir -p $LOGDIR
 chmod -R 777 $LOGDIR
 chcon -Rt svirt_sandbox_file_t $LOGDIR
 
 echo "setting up keys dir..."
-KEYSDIR=/opt/cpm/keys
+KEYSDIR=/var/cpm/keys
 chcon -Rt svirt_sandbox_file_t $KEYSDIR
 
 echo "deleting all old log files...."
@@ -48,12 +48,13 @@ echo "restarting cpm-admin container..."
 sleep 2
 docker stop cpm-admin
 docker rm cpm-admin
-DBDIR=/opt/cpm/data/pgsql/cpm-admin
+DBDIR=/var/cpm/data/pgsql/cpm-admin
 mkdir -p $DBDIR
 chown postgres:postgres $DBDIR
 chcon -Rt svirt_sandbox_file_t $DBDIR
 docker run -e DB_HOST=127.0.0.1 \
 	-e DOMAIN=crunchy.lab \
+	-e CPMBASE=/var/cpm \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cpm-admin -d  \
 	-v $KEYSDIR:/cpmkeys \
@@ -66,6 +67,7 @@ docker stop cpm-backup
 docker rm cpm-backup
 docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-v $LOGDIR:/cpmlogs \
+	-e CPMBASE=/var/cpm \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cpm-backup -d crunchydata/cpm-backup:latest
 
@@ -73,11 +75,12 @@ echo "restarting cpm-mon container..."
 sleep 2
 docker stop cpm-mon
 docker rm cpm-mon
-INFLUXDIR=/opt/cpm/data/influxdb
+INFLUXDIR=/var/cpm/data/influxdb
 mkdir -p $INFLUXDIR
 chcon -Rt svirt_sandbox_file_t $INFLUXDIR
 docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	--hostname="cpm-mon" \
+	-e CPMBASE=/var/cpm \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	-v $LOGDIR:/cpmlogs \
 	-v $INFLUXDIR:/monitordata \

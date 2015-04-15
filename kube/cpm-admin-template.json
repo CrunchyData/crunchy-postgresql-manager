@@ -51,25 +51,25 @@
  		{
                	"name":"kubekeys",
                	"source":
-			{ "hostDir":{ "path":"/opt/cpm/kubekeys" }
+			{ "hostDir":{ "path":"/var/cpm/kubekeys" }
                	}
                 },
  		{
                	"name":"cpmlogs",
                	"source":
-			{ "hostDir":{ "path":"/opt/cpm/logs" }
+			{ "hostDir":{ "path":"/var/cpm/logs" }
                	}
                 },
                	{
                	"name":"cpmkeys",
                	"source":
-			{ "hostDir":{ "path":"/opt/cpm/keys" }
+			{ "hostDir":{ "path":"/var/cpm/keys" }
                	}
                	},
           	{
                	"name": "pgdata",
                	"source":
-               		{ "hostDir": { "path": "/opt/cpm/data/pgsql/cpm-admin" } }
+               		{ "hostDir": { "path": "/var/cpm/data/pgsql/cpm-admin" } }
 
 		}
           ],

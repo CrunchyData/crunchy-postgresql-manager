@@ -9,7 +9,6 @@ endif
 	rm -rf bin
 	mkdir bin
 	cp ../../sbin/*  ./bin
-	cp ../../../../../../bin/cpmagentserver  ./bin
-	cp ../../config/cpmagent.service  ./bin
-	docker build -t cpm-pgpool .
-	docker tag cpm-pgpool:latest crunchydata/cpm-pgpool
+	cp ../../../../../../bin/cpmnodeagent  ./bin
+	sudo docker build -t cpm-pgpool .
+	sudo docker tag -f cpm-pgpool:latest crunchydata/cpm-pgpool

@@ -75,8 +75,6 @@ type BackupSchedule struct {
 //global cron instance that gets started, stopped, restarted
 var CRONInstance *cron.Cron
 
-var CPMBIN = "/opt/cpm/bin/"
-
 var kubeEnv = false
 var kubeURL = ""
 

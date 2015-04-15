@@ -14,11 +14,11 @@
 
 env > /tmp/envvars.out
 
-source /opt/cpm/bin/setenv.sh
+source /var/cpm/bin/setenv.sh
 
 backupcommand
 
 #
 # next line, is used only for development, block with the dummy server
 
-#/opt/cpm/bin/dummyserver > /tmp/dummy.log 
+#dummyserver > /tmp/dummy.log 

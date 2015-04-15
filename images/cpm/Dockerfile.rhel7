@@ -17,12 +17,12 @@ EXPOSE 13000
 
 # set up cpm directory
 #
-RUN mkdir -p /opt/cpm/bin 
-RUN mkdir -p /opt/cpm/conf 
-ADD bin /opt/cpm/bin
-ADD conf /opt/cpm/conf
-RUN chown -R daemon:daemon /opt/cpm
+RUN mkdir -p /var/cpm/bin 
+RUN mkdir -p /var/cpm/conf 
+ADD bin /var/cpm/bin
+ADD conf /var/cpm/conf
+RUN chown -R daemon:daemon /var/cpm
 
 USER daemon
 
-CMD ["/opt/cpm/bin/startnginx.sh"]
+CMD ["/var/cpm/bin/startnginx.sh"]

@@ -19,10 +19,12 @@ import (
 	"errors"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmagent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmnodeagent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmserveragent"
 	"github.com/crunchydata/crunchy-postgresql-manager/kubeclient"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/template"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 	"strconv"
 	"strings"
@@ -150,14 +152,14 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 
 	//restart postgres after the config file changes
 	var commandoutput string
-	commandoutput, err = PGCommand(CPMBIN+"stoppg.sh", master.Name)
+	commandoutput, err = PGCommand("stoppg.sh", master.Name)
 	if err != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
 		return err
 	}
 	logit.Info.Println("configureCluster: master stoppg output was" + commandoutput)
 
-	commandoutput, err = PGCommand(CPMBIN+"startpg.sh", master.Name)
+	commandoutput, err = PGCommand("startpg.sh", master.Name)
 	if err != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
 		return err
@@ -199,7 +201,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 
 			//stop standby
 			if !autocluster {
-				commandoutput, err = PGCommand(CPMBIN+"stoppg.sh", standbynodes[i].Name)
+				commandoutput, err = PGCommand("stoppg.sh", standbynodes[i].Name)
 				if err != nil {
 					logit.Error.Println("configureCluster:" + err.Error())
 					return err
@@ -208,7 +210,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 			}
 
 			//create base backup from master
-			commandoutput, err = cpmagent.Command1(CPMBIN+"basebackup.sh", masterhost+"."+domainname.Value, standbynodes[i].Name)
+			commandoutput, err = cpmnodeagent.Command2("basebackup.sh", masterhost+"."+domainname.Value, standbynodes[i].Name)
 			if err != nil {
 				logit.Error.Println("configureCluster:" + err.Error())
 				return err
@@ -263,7 +265,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 
 			//start standby
 
-			commandoutput, err = PGCommand(CPMBIN+"startpgonstandby.sh", standbynodes[i].Name)
+			commandoutput, err = PGCommand("startpgonstandby.sh", standbynodes[i].Name)
 			if err != nil {
 				logit.Error.Println("configureCluster:" + err.Error())
 				return err
@@ -303,7 +305,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 	logit.Info.Println("configureCluster:pgpool pgpool.conf generated")
 
 	//write pgpool.conf to remote pool node
-	err = RemoteWritefile(CPMBIN+"pgpool.conf", data, pgpoolNode.Name)
+	err = RemoteWritefile(util.GetBase()+"/bin/"+"pgpool.conf", data, pgpoolNode.Name)
 	if err != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
 		return err
@@ -320,7 +322,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 	logit.Info.Println("configureCluster:pgpool pool_passwd generated")
 
 	//write pgpool.conf to remote pool node
-	err = RemoteWritefile(CPMBIN+"pool_passwd", data, pgpoolNode.Name)
+	err = RemoteWritefile(util.GetBase()+"/bin/"+"pool_passwd", data, pgpoolNode.Name)
 	if err != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
 		return err
@@ -337,7 +339,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 	logit.Info.Println("configureCluster:pgpool pool_hba generated")
 
 	//write pgpool.conf to remote pool node
-	err = RemoteWritefile(CPMBIN+"pool_hba.conf", data, pgpoolNode.Name)
+	err = RemoteWritefile(util.GetBase()+"/bin/"+"pool_hba.conf", data, pgpoolNode.Name)
 	if err != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
 		return err
@@ -345,7 +347,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 	logit.Info.Println("configureCluster:pgpool pool_hba copied remotely")
 
 	//start pgpool
-	commandoutput, err = PGCommand(CPMBIN+"startpgpool.sh", pgpoolNode.Name)
+	commandoutput, err = PGCommand("startpgpool.sh", pgpoolNode.Name)
 	if err != nil {
 		logit.Error.Println("configureCluster: " + err.Error())
 		return err
@@ -542,7 +544,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 			}
 
 		} else {
-			output, err = cpmagent.DockerRemoveContainer(containers[i].Name,
+			output, err = cpmserveragent.DockerRemoveContainer(containers[i].Name,
 				server.IPAddress)
 			if err != nil {
 				logit.Error.Println("DeleteCluster: error when trying to remove container" + err.Error())
@@ -550,7 +552,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		}
 
 		//send the server a deletevolume command
-		output, err = cpmagent.AgentCommand(CPMBIN+"deletevolume", server.PGDataPath+"/"+containers[i].Name, server.IPAddress)
+		output, err = cpmserveragent.AgentCommand("deletevolume", server.PGDataPath+"/"+containers[i].Name, server.IPAddress)
 		logit.Info.Println("DeleteCluster:" + output)
 
 		i++
@@ -608,7 +610,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	output, err = cpmagent.AgentCommand(CPMBIN+"fail-over.sh", dbNode.Name, dbNode.Name)
+	output, err = cpmnodeagent.AgentCommand("fail-over.sh", dbNode.Name, dbNode.Name)
 	if err != nil {
 		logit.Error.Println("AdminFailover: fail-over error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -645,7 +647,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	//stop pg on the old master
 	//params.IPAddress1 = oldMaster.IPAddress
 
-	output, err = cpmagent.AgentCommand(CPMBIN+"stoppg.sh", oldMaster.Name, oldMaster.Name)
+	output, err = cpmnodeagent.AgentCommand("stoppg.sh", oldMaster.Name, oldMaster.Name)
 	if err != nil {
 		logit.Error.Println("AdminFailover: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -674,7 +676,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 				logit.Info.Println("AdminFailover: fail-over is reconfiguring standby  " + clusterNodes[i].Name)
 				//stop standby
 				var commandoutput string
-				commandoutput, err = PGCommand(CPMBIN+"stoppg.sh", clusterNodes[i].Name)
+				commandoutput, err = PGCommand("stoppg.sh", clusterNodes[i].Name)
 				if err != nil {
 					logit.Error.Println("AdminFailover:" + err.Error())
 					rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -689,7 +691,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 					rest.Error(w, err.Error(), http.StatusBadRequest)
 				}
 				//create base backup from master
-				commandoutput, err = cpmagent.Command1(CPMBIN+"basebackup.sh", dbNode.Name+"."+domainname.Value, clusterNodes[i].Name)
+				commandoutput, err = cpmnodeagent.Command2("basebackup.sh", dbNode.Name+"."+domainname.Value, clusterNodes[i].Name)
 				if err != nil {
 					logit.Error.Println("AdminFailover:" + err.Error())
 					rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -756,7 +758,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 
 				//start standby
 
-				commandoutput, err = PGCommand(CPMBIN+"startpgonstandby.sh", clusterNodes[i].Name)
+				commandoutput, err = PGCommand("startpgonstandby.sh", clusterNodes[i].Name)
 				if err != nil {
 					logit.Error.Println("AdminFailover:" + err.Error())
 					rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -945,7 +947,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//create master container
-	dockermaster := cpmagent.DockerRunArgs{}
+	dockermaster := cpmserveragent.DockerRunArgs{}
 	dockermaster.Image = "cpm-node"
 	dockermaster.ContainerName = params.Name + "-master"
 	dockermaster.ServerID = masterServer.ID
@@ -992,7 +994,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dockerstandby := make([]cpmagent.DockerRunArgs, count)
+	dockerstandby := make([]cpmserveragent.DockerRunArgs, count)
 	for i := 0; i < count; i++ {
 		logit.Info.Println("working on standby ....")
 		//	loop - provision standby
@@ -1027,7 +1029,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("AUTO CLUSTER PROFILE standbys created")
 	//create pgpool container
 	//	provision
-	dockerpgpool := cpmagent.DockerRunArgs{}
+	dockerpgpool := cpmserveragent.DockerRunArgs{}
 	dockerpgpool.ContainerName = params.Name + "-pgpool"
 	dockerpgpool.Image = "cpm-pgpool"
 	dockerpgpool.ServerID = chosenServers[count].ID
@@ -1188,7 +1190,7 @@ func roundRobin(profile ClusterProfiles) (admindb.DBServer, []admindb.DBServer, 
 	return masterServer, chosen, nil
 }
 
-func waitTillAllReady(dockermaster cpmagent.DockerRunArgs, dockerpgpool cpmagent.DockerRunArgs, dockerstandby []cpmagent.DockerRunArgs) error {
+func waitTillAllReady(dockermaster cpmserveragent.DockerRunArgs, dockerpgpool cpmserveragent.DockerRunArgs, dockerstandby []cpmserveragent.DockerRunArgs) error {
 	err := waitTillReady(dockermaster.ContainerName)
 	if err != nil {
 		logit.Error.Println("time out waiting for " + dockermaster.ContainerName)

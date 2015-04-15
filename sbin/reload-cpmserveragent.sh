@@ -14,10 +14,10 @@
 # limitations under the License.
 
 #
-# start up the cpm agent
+# start up the cpm server agent
 #
 
 
-killall cpmagentserver
+killall cpmserveragent
 sleep 2
-/opt/cpm/bin/start-cpmagent.sh
+/var/cpm/bin/start-cpmserveragent.sh

@@ -23,7 +23,7 @@ ssh root@$server "systemctl stop cpmagent.service"
 
 
 scp ./bin/* ./sbin/* \
-	root@$server:/opt/cpm/bin/
+	root@$server:/var/cpm/bin/
 
 ssh root@$server "systemctl start cpmagent.service"
 

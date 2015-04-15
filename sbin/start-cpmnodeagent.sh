@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # Copyright 2015 Crunchy Data Solutions, Inc.
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +14,10 @@
 # limitations under the License.
 
 #
+# start up the cpm node agent
 #
 
-source /opt/cpm/bin/setenv.sh
+source /var/cpm/bin/setenv.sh
 
-cpmagentserver > /tmp/cpmagent.log 2> /tmp/cpmagent.err
-
+cpmnodeagent 
+#dummyserver

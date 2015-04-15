@@ -18,7 +18,7 @@ package adminapi
 import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmagent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmserveragent"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"net/http"
 	"strconv"
@@ -131,7 +131,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var output string
-	output, err = cpmagent.AgentCommand(CPMBIN+Metric, "", server.IPAddress)
+	output, err = cpmserveragent.AgentCommand(Metric, "", server.IPAddress)
 	if err != nil {
 		logit.Error.Println("MonitorServerGetInfo:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)

@@ -41,13 +41,13 @@
 		{
 		"name":"kubekeys",
 		"source":
-			{ "hostDir":{ "path":"/opt/cpm/kubekeys" }
+			{ "hostDir":{ "path":"/var/cpm/kubekeys" }
 		}
 		},
  		{
                	"name":"cpmlogs",
                	"source":
-			{ "hostDir":{ "path":"/opt/cpm/logs" }
+			{ "hostDir":{ "path":"/var/cpm/logs" }
                	}
                 }
           ],

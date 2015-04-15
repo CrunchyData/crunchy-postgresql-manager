@@ -28,7 +28,7 @@ export DB_HOST=$DB_HOST
 export DB_PORT=$DB_PORT
 export DB_USER=$DB_USER
 
-source /opt/cpm/bin/setenv.sh
+source /var/cpm/bin/setenv.sh
 
 sleep 4
 
@@ -38,7 +38,7 @@ sleep 4
 INPID=/tmp/influxdb.pid
 /bin/rm -f $INPID
 
-/usr/bin/influxdb -stdout=true -pidfile $INPID -config /opt/cpm/conf/config.toml > /cpmlogs/crunchy-mon-influx.log 2> /cpmlogs/crunchy-mon-influx.stderr &
+/usr/bin/influxdb -stdout=true -pidfile $INPID -config /var/cpm/conf/config.toml > /cpmlogs/crunchy-mon-influx.log 2> /cpmlogs/crunchy-mon-influx.stderr &
 
 sleep 7
 

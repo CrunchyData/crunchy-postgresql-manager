@@ -40,7 +40,7 @@ var backupUser string
 var backupAgentURL string
 var StatusID = ""
 var filename = "/tmp/backupjob.log"
-var CPMBIN = "/opt/cpm/bin/"
+var CPMBIN = "/var/cpm/bin/"
 var file *os.File
 
 func init() {

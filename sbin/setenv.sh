@@ -14,10 +14,11 @@
 # limitations under the License.
 
 export PGROOT=/usr/pgsql-9.4
+export CPMBASE=/var/cpm
 export PGDATA=/pgdata
 export PG_LOG=/tmp/pg.log
 export CLUSTER_LOG=/tmp/cluster-admin.log
-export PATH=/opt/cpm/bin:$PGROOT/bin:$PATH
+export PATH=$CPMBASE/bin:$PGROOT/bin:$PATH
 export LD_LIBRARY_PATH=$PGROOT/lib
 
 hostip() {

@@ -20,4 +20,4 @@
 # to outside of the container
 #
 
-psql -U postgres postgres < /opt/cpm/bin/setup.sql
+psql -U postgres postgres < /var/cpm/bin/setup.sql

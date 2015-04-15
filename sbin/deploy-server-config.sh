@@ -25,11 +25,11 @@ remoteservers=(localhost)
 for i in "${remoteservers[@]}"
 do
 	echo $i
-	ssh root@$i "mkdir -p /opt/cpm/bin"
+	ssh root@$i "mkdir -p /var/cpm/bin"
 	scp $GOPATH/bin/*  \
 	$CPMPATH/sbin/*  \
 	$CPMPATH/sql/*  \
-	root@$i:/opt/cpm/bin/
+	root@$i:/var/cpm/bin/
 #	scp  ../config/cpm.sh  root@$i:/etc/profile.d/cpm.sh
 	scp  $CPMPATH/config/cpmagent.service  \
 	 root@$i:/usr/lib/systemd/system
@@ -39,13 +39,13 @@ done
 
 # copy all required admin files to the admin server
 
-ssh root@$adminserver "mkdir -p /opt/cpm/bin"
+ssh root@$adminserver "mkdir -p /var/cpm/bin"
 scp $GOPATH/bin/* \
 $CPMPATH/sbin/* \
-root@$adminserver:/opt/cpm/bin
+root@$adminserver:/var/cpm/bin
 
-scp $CPMPATH/sbin/cert.pem root@$adminserver:/opt/cpm/keys
-scp $CPMPATH/sbin/key root@$adminserver:/opt/cpm/keys
+scp $CPMPATH/sbin/cert.pem root@$adminserver:/var/cpm/keys
+scp $CPMPATH/sbin/key root@$adminserver:/var/cpm/keys
 scp $CPMPATH/config/cpmagent.service root@$adminserver:/usr/lib/systemd/system
 
 ssh root@$adminserver "systemctl enable cpmagent.service"

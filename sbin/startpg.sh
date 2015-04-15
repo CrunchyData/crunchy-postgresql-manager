@@ -14,5 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-source /opt/cpm/bin/setenv.sh
+source /var/cpm/bin/setenv.sh
+
 pg_ctl -w -D /pgdata start 2> /tmp/startpg.err > /tmp/startpg.log

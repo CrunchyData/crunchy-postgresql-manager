@@ -13,6 +13,6 @@ endif
 		cp ../../sql/node-setup.sql bin/setup.sql
 		cp ../../sbin/* bin/
 		cp ../../config/postgresql.service bin/
-	        docker build -t cpm-base .
-		docker tag cpm-base:latest crunchydata/cpm-base
+	        sudo docker build -t cpm-base .
+		sudo docker tag -f cpm-base:latest crunchydata/cpm-base
 

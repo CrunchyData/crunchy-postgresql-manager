@@ -14,4 +14,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-df -BG | tail -n +2 | awk '{print $1","$2","$3","$4","$5","$6}' | awk -f /opt/cpm/bin/df.awk
+df -BG | tail -n +2 | awk '{print $1","$2","$3","$4","$5","$6}' | awk -f /var/cpm/bin/df.awk

@@ -4,22 +4,22 @@ MAINTAINER crunchy
 RUN rpm -Uvh http://nginx.org/packages/rhel/7/noarch/RPMS/nginx-release-rhel-7-0.el7.ngx.noarch.rpm
 RUN yum install -y tar procps-ng nginx which hostname wget && yum clean all -y
 
-# set up opt/cpm directory
+# set up var/cpm directory
 #
-RUN mkdir -p /opt/cpm/conf
-RUN mkdir -p /opt/cpm/bin
-ADD conf /opt/cpm/conf
-ADD bin /opt/cpm/bin
+RUN mkdir -p /var/cpm/conf
+RUN mkdir -p /var/cpm/bin
+ADD conf /var/cpm/conf
+ADD bin /var/cpm/bin
 
-WORKDIR /opt/cpm
+WORKDIR /var/cpm
 
 RUN wget http://grafanarel.s3.amazonaws.com/grafana-1.9.1.tar.gz
 RUN gunzip grafana-1.9.1.tar.gz
 RUN tar -xf grafana-1.9.1.tar
-ADD conf/config.js /opt/cpm/grafana-1.9.1/
+ADD conf/config.js /var/cpm/grafana-1.9.1/
 
-RUN chown -R daemon:daemon /opt/cpm
+RUN chown -R daemon:daemon /var/cpm
 
 USER daemon
 
-CMD ["/opt/cpm/bin/startnginx.sh"]
+CMD ["/var/cpm/bin/startnginx.sh"]

@@ -4,11 +4,11 @@ MAINTAINER crunchy
 # open up the backupserver port
 EXPOSE 13000
 
-ADD bin /opt/cpm/bin
-ADD conf /opt/cpm/conf
+ADD bin /var/cpm/bin
+ADD conf /var/cpm/conf
 
 VOLUME ["/kubekeys"]
 
 USER root
 
-CMD ["/opt/cpm/bin/start-backupserver.sh"]
+CMD ["/var/cpm/bin/start-backupserver.sh"]

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-INSTALLDIR=/opt/cpm
+INSTALLDIR=/var/cpm
 
 DOMAIN=example.com
 
@@ -25,7 +25,7 @@ sudo chmod -R 777 $LOGDIR
 sudo chcon -Rt svirt_sandbox_file_t $LOGDIR
 
 echo "setting up keys dir..."
-KEYSDIR=/opt/cpm/keys
+KEYSDIR=/var/cpm/keys
 sudo chcon -Rt svirt_sandbox_file_t $KEYSDIR
 
 echo "deleting all old log files...."

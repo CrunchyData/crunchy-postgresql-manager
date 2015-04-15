@@ -14,11 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+source /var/cpm/bin/setenv.sh
+
 sleep 3
-/opt/cpm/bin/initdb.sh > /tmp/initdb.log 2> /tmp/initdb.err
+initdb.sh > /tmp/initdb.log 2> /tmp/initdb.err
 echo "host all all 0.0.0.0/0 md5" >> /pgdata/pg_hba.conf
 echo "listen_addresses='*'" >> /pgdata/postgresql.conf
-/opt/cpm/bin/startpg.sh > /tmp/startpg.log
+startpg.sh > /tmp/startpg.log
 sleep 3
-/opt/cpm/bin/seed.sh > /tmp/seed.log
-/opt/cpm/bin/start-cpmagentserver.sh 
+seed.sh > /tmp/seed.log
+start-cpmagentserver.sh 

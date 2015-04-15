@@ -21,15 +21,13 @@ import (
 	"flag"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
 	"text/template"
 )
-
-var CPMDIR = "/opt/cpm/"
-var CPMCONF = CPMDIR + "conf/"
 
 var templateTypeFlag = flag.String("t", "", "the template type, can be 'hba','postgresql', or 'recovery'")
 var pgpooluseriplistFlag = flag.String("pgpooluseriplist", "", "list of pgpool Users and IP addresses")
@@ -96,7 +94,7 @@ func Postgresql(mode string, port string, clusterType string) (string, error) {
 	var path string
 	switch mode {
 	case "standalone", "master", "standby":
-		path = CPMCONF + mode + "/postgresql.conf.template"
+		path = util.GetBase() + "/conf/" + mode + "/postgresql.conf.template"
 	default:
 		return "", errors.New("invalid mode in processPostgresql of " + mode)
 	}
@@ -158,7 +156,7 @@ func Hba(kubeEnv bool, mode string, hostname string, port string, clusterid stri
 	var path string
 	switch mode {
 	case "standalone", "master", "standby":
-		path = CPMCONF + mode + "/pg_hba.conf.template"
+		path = util.GetBase() + "/conf/" + mode + "/pg_hba.conf.template"
 	default:
 		return "", errors.New("invalid mode in processHba of " + mode)
 	}
@@ -281,7 +279,7 @@ func Recovery(masterhost string, port string, masteruser string) (string, error)
 	info.PG_HOST_IP = masterhost
 
 	var path string
-	path = CPMCONF + "standby/recovery.conf.template"
+	path = util.GetBase() + "/conf/" + "standby/recovery.conf.template"
 
 	contents, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -306,7 +304,7 @@ func Poolhba() (string, error) {
 
 	var info RecoveryParameters
 
-	var path = CPMCONF + "pgpool/pool_hba.conf.template"
+	var path = util.GetBase() + "/conf/" + "pgpool/pool_hba.conf.template"
 
 	contents, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -333,7 +331,7 @@ func Poolpasswd() (string, error) {
 
 	var info RecoveryParameters
 
-	var path = CPMCONF + "pgpool/pool_passwd.template"
+	var path = util.GetBase() + "/conf/" + "pgpool/pool_passwd.template"
 
 	contents, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -360,7 +358,7 @@ func Poolconf(poolnames []string) (string, error) {
 
 	var poolParams PGPoolParameters
 	poolParams.HOST_LIST = poolnames
-	var path = CPMCONF + "pgpool/pgpool.conf.template"
+	var path = util.GetBase() + "/conf/" + "pgpool/pgpool.conf.template"
 
 	contents, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -382,7 +380,7 @@ func Poolconf(poolnames []string) (string, error) {
 func KubeNodePod(info KubePodParams) ([]byte, error) {
 
 	var path string
-	path = CPMCONF + "kube.node.pod.template"
+	path = util.GetBase() + "/conf/" + "kube.node.pod.template"
 
 	contents, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -402,7 +400,7 @@ func KubeNodePod(info KubePodParams) ([]byte, error) {
 func KubeNodeService(info KubePodParams) ([]byte, error) {
 
 	var path string
-	path = CPMCONF + "kube.node.service.template"
+	path = util.GetBase() + "/conf/" + "kube.node.service.template"
 
 	contents, err := ioutil.ReadFile(path)
 	if err != nil {

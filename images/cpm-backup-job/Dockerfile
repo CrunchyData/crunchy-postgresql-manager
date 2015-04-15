@@ -1,8 +1,8 @@
 FROM cpm-base:latest
 MAINTAINER crunchy
 
-ADD bin /opt/cpm/bin
+ADD bin /var/cpm/bin
 
 USER postgres
 
-CMD ["/opt/cpm/bin/start-backupjob.sh"]
+CMD ["/var/cpm/bin/start-backupjob.sh"]

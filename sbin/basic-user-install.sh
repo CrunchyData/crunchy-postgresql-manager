@@ -23,7 +23,7 @@
 set -e
 
 # set the istall directory
-export INSTALLDIR=/opt/cpm
+export INSTALLDIR=/var/cpm
 
 sudo mkdir -p $INSTALLDIR/bin
 sudo mkdir -p $INSTALLDIR/config
@@ -63,7 +63,7 @@ set -e
 sudo systemctl enable docker.service
 sudo systemctl start docker.service
 
-# move the CPM media to the /opt/cpm installation directory
+# move the CPM media to the /var/cpm installation directory
 sudo mv `pwd`/bin/* $INSTALLDIR/bin
 sudo mv `pwd`/config/* $INSTALLDIR/config
 sudo mv `pwd`/www/* $INSTALLDIR/www

@@ -27,6 +27,6 @@
 
 env > /tmp/envvars.out
 
-source /opt/cpm/bin/setenv.sh
+source /var/cpm/bin/setenv.sh
 
 backupserver  > /cpmlogs/backupserver.log

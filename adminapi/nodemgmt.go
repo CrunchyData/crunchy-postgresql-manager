@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmagent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmserveragent"
 	"github.com/crunchydata/crunchy-postgresql-manager/kubeclient"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
@@ -85,7 +85,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 			currentStatus = CONTAINER_NOT_FOUND
 		}
 	} else {
-		_, err = cpmagent.DockerInspect2Command(results.Name, server.IPAddress)
+		_, err = cpmserveragent.DockerInspect2Command(results.Name, server.IPAddress)
 		if err != nil {
 			logit.Error.Println("GetNode: " + err.Error())
 			currentStatus = CONTAINER_NOT_FOUND
@@ -114,40 +114,6 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 
 	w.WriteJson(node)
 }
-
-/*
-func GetPGStatus(hostname string) (string, error) {
-	var currentStatus = "UNKNOWN"
-	var err error
-
-	cmd := exec.Command(CPMBIN+"pgstatus",
-		hostname,
-		"5432",
-		"cpmtest",
-		"cpmtest",
-		"cpmtest")
-
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-	err = cmd.Run()
-	if err != nil {
-		logit.Error.Println("GetNode:" + err.Error())
-		return "", err
-	}
-	logit.Info.Println("GetPGStatus: command output was " + out.String())
-
-	logit.Info.Println("GetPGStatus: output from ping was [" + out.String() + "]")
-	currentStatus = "OFFLINE"
-
-	if out.String() == "up" {
-		currentStatus = "RUNNING"
-	}
-
-	return currentStatus, err
-}
-*/
 
 func GetAllNodes(w rest.ResponseWriter, r *rest.Request) {
 
@@ -326,14 +292,14 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 			return
 		}
 	} else {
-		output, err = cpmagent.DockerRemoveContainer(dbNode.Name, server.IPAddress)
+		output, err = cpmserveragent.DockerRemoveContainer(dbNode.Name, server.IPAddress)
 		if err != nil {
 			logit.Error.Println("DeleteNode: error when trying to remove container " + err.Error())
 		}
 	}
 
 	//send the server a deletevolume command
-	output, err = cpmagent.AgentCommand(CPMBIN+"deletevolume", server.PGDataPath+"/"+dbNode.Name, server.IPAddress)
+	output, err = cpmserveragent.AgentCommand("deletevolume", server.PGDataPath+"/"+dbNode.Name, server.IPAddress)
 	logit.Info.Println(output)
 
 	//we should not have to delete the DNS entries because
@@ -378,7 +344,7 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var output cpmagent.InspectOutput
+	var output cpmserveragent.InspectOutput
 	var e error
 	nodes := make([]ClusterNode, len(results))
 	i := 0
@@ -392,7 +358,7 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].CreateDate = results[i].CreateDate
 		nodes[i].Status = "down"
 
-		output, e = cpmagent.DockerInspect2Command(results[i].Name, server.IPAddress)
+		output, e = cpmserveragent.DockerInspect2Command(results[i].Name, server.IPAddress)
 		logit.Info.Println("GetAllNodesForServer:" + results[i].Name + " " + output.IPAddress + " " + output.RunningState)
 		if e != nil {
 			logit.Error.Println("GetAllNodesForServer:" + e.Error())
@@ -441,7 +407,7 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var output string
-	output, err = cpmagent.DockerStartContainer(node.Name,
+	output, err = cpmserveragent.DockerStartContainer(node.Name,
 		server.IPAddress)
 	if err != nil {
 		logit.Error.Println("AdminStartNode: error when trying to start container " + err.Error())
@@ -486,7 +452,7 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var output string
-	output, err = cpmagent.DockerStopContainer(node.Name,
+	output, err = cpmserveragent.DockerStopContainer(node.Name,
 		server.IPAddress)
 	if err != nil {
 		logit.Error.Println("AdminStopNode error when trying to stop container " + err.Error())

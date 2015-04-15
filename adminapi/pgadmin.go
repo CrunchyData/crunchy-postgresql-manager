@@ -18,7 +18,7 @@ package adminapi
 import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmagent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmnodeagent"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"net/http"
 	"time"
@@ -47,7 +47,7 @@ func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var output string
-	output, err = cpmagent.AgentCommand(CPMBIN+"startpg.sh", "", dbNode.Name)
+	output, err = cpmnodeagent.AgentCommand("startpg.sh", "", dbNode.Name)
 	if err != nil {
 		logit.Error.Println("AdminStartpg:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -90,7 +90,7 @@ func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("AdminStoppg: in stop with dbnode")
 
 	var output string
-	output, err = cpmagent.AgentCommand(CPMBIN+"stoppg.sh", "", dbNode.Name)
+	output, err = cpmnodeagent.AgentCommand("stoppg.sh", "", dbNode.Name)
 	if err != nil {
 		logit.Error.Println("AdminStoppg:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)

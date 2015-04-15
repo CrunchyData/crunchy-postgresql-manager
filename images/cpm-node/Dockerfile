@@ -4,9 +4,9 @@ MAINTAINER crunchy
 # open up the cpmagent port
 EXPOSE 13000
 
-ADD bin /opt/cpm/bin
-ADD conf /opt/cpm/conf
+ADD bin /var/cpm/bin
+ADD conf /var/cpm/conf
 
 USER postgres
 
-CMD ["/opt/cpm/bin/start-cpmagentserver.sh"]
+CMD ["/var/cpm/bin/start-cpmnodeagent.sh"]

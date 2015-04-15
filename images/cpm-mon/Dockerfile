@@ -10,12 +10,12 @@ EXPOSE 8086
 
 USER root
 
-ADD bin /opt/cpm/bin
-ADD conf /opt/cpm/conf
+ADD bin /var/cpm/bin
+ADD conf /var/cpm/conf
 
 # get influxdb
 RUN rpm -Uvh http://s3.amazonaws.com/influxdb/influxdb-latest-1.x86_64.rpm
 
 RUN chown -R root:root /monitordata
 
-CMD ["/opt/cpm/bin/start-mon.sh"]
+CMD ["/var/cpm/bin/start-mon.sh"]

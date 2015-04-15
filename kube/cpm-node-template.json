@@ -40,13 +40,13 @@
  		{
                 "name":"cpmlogs",
                 "source":
-                        { "hostDir":{ "path":"/opt/cpm/logs" }
+                        { "hostDir":{ "path":"/var/cpm/logs" }
                 }
                 },
           	{
                	"name": "pgdata",
                	"source":
-               		{ "hostDir": { "path": "/opt/cpm/data/pgsql/dude" }
+               		{ "hostDir": { "path": "/var/cpm/data/pgsql/dude" }
 			}
 
 		}

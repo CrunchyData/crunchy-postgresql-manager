@@ -20,7 +20,7 @@
 # clean up any previous PG lock files
 rm /tmp/.s.PGSQL.*
 
-source /opt/cpm/bin/setenv.sh
+source /var/cpm/bin/setenv.sh
 
 chgrp postgres $CLUSTER_LOG
 chmod g+w $CLUSTER_LOG

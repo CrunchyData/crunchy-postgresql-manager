@@ -6,6 +6,6 @@ ifeq ($(OSFLAVOR),centos7)
 else
 	cp Dockerfile.rhel7 Dockerfile
 endif
-	        docker build -t cpm-dashboard .
-		docker tag cpm-dashboard:latest crunchydata/cpm-dashboard
+	        sudo docker build -t cpm-dashboard .
+		sudo docker tag -f cpm-dashboard:latest crunchydata/cpm-dashboard
 

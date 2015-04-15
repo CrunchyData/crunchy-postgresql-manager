@@ -73,7 +73,7 @@ To manually start the CPM containers, run this script:
 
 systemd unit files for CPM are found in:
 ~~~~~~~~~~~~~~~~~
-/opt/cpm/config/cpm.service
+/var/cpm/config/cpm.service
 ~~~~~~~~~~~~~~~~~
 
 Initial Login
@@ -85,7 +85,7 @@ page enter 'cpm' for the userid, 'cpm' for the password, and
 Refer to the CPM User Guide for details on how to use the application, but
 generally you would first create a Server.  Your current host is
 what you would define as your CPM Server.  Use the Docker Bridge value
-of 172.17.42.1, and the PG Data Path is /opt/cpm/data/pgsql.
+of 172.17.42.1, and the PG Data Path is /var/cpm/data/pgsql.
 
 After that, you can create a PG container and PG clusters.
 

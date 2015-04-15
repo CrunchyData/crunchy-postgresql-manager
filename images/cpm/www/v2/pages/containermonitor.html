@@ -73,9 +73,13 @@
     <div>
      <a href="#">pg_stat_database</a><br>
      <a href="#bgwriter">bgwriter</a><br>
+     <div ng-show="container.Role == 'master'">
      <a href="#repl">pg_stat_replication</a><br>
+     </div>
      <a href="#settings">pg_settings</a><br>
+     <div ng-show="container.Role != 'pgpool'">
      <a href="#controldata">pg_controldata</a><br>
+     </div>
    </div>
  </accordion-group>
  <accordion-group is-open="accessstatus.open">
@@ -83,7 +87,9 @@
  Load Test<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': accessstatus.open, 'glyphicon-chevron-right': !accessstatus.open}"></i>
 </accordion-heading>
 <div>
- <a href="#loadtest">Simple</a><br>
+ 	<div ng-show="container.Role != 'standby'">
+ 	<a href="#loadtest">Simple</a><br>
+ 	</div>
 </div>
 </accordion-group>
  <accordion-group is-open="monitorstatus.open">
@@ -91,7 +97,9 @@
  Monitor<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': accessstatus.open, 'glyphicon-chevron-right': !accessstatus.open}"></i>
 </accordion-heading>
 <div>
- <a href="#monitor1">Database Size</a><br>
+ 	<div ng-show="container.Role != 'pgpool'">
+ 		<a href="#monitor1">Database Size</a><br>
+ 	</div>
 </div>
 </accordion-group>
 </accordion>

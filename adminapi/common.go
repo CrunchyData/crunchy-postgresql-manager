@@ -25,10 +25,6 @@ import (
 var KubeEnv = false
 var KubeURL = ""
 
-var CPMDIR = "/opt/cpm/"
-var PGBIN = "/usr/pgsql-9.4/bin/"
-var CPMBIN = CPMDIR + "bin/"
-
 type MonitorServerParam struct {
 	ServerID string
 	Metric   string
@@ -159,5 +155,5 @@ func Kube(w rest.ResponseWriter, r *rest.Request) {
 
 func GetVersion(w rest.ResponseWriter, r *rest.Request) {
 
-	w.(http.ResponseWriter).Write([]byte("0.9.2"))
+	w.(http.ResponseWriter).Write([]byte("0.9.3"))
 }

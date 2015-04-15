@@ -13,15 +13,15 @@
  limitations under the License.
 */
 
-package cpmagent
+package cpmserveragent
 
 import (
 	"bytes"
 	"errors"
 	"fmt"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	dockerapi "github.com/fsouza/go-dockerclient"
-	"io/ioutil"
 	"net/rpc"
 	"os/exec"
 	"strings"
@@ -84,30 +84,6 @@ func (t *Command) Get(args *Args, reply *Command) error {
 	} else {
 		cmd = exec.Command(args.A, args.B)
 	}
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-
-	err := cmd.Run()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		errorString := fmt.Sprintf("%s\n%s\n%s\n", err.Error(), out.String(), stderr.String())
-		return errors.New(errorString)
-	}
-	logit.Info.Println("command output was " + out.String())
-	reply.Output = out.String()
-
-	return nil
-}
-
-func (t *Command) ConfigureNode(args *Args, reply *Command) error {
-
-	logit.Info.Println("on server, Command ConfigureMaster called CommandPath=" + args.CommandPath + " A=" + args.A + " B=" + args.B + " C=" + args.C + " D=" + args.D + " cpm=" + args.CPU + " mem=" + args.MEM + " E=" + args.E)
-
-	var cmd *exec.Cmd
-
-	cmd = exec.Command(args.CommandPath, args.A, args.B, args.C, args.D, args.CPU, args.MEM, args.E)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
@@ -215,80 +191,6 @@ func (t *Command) DockerRemoveCommand(args *Args, reply *Command) error {
 		logit.Info.Println("container removed ")
 	}
 
-	reply.Output = "success"
-
-	return nil
-}
-
-//
-// Initdb is run on the node during provisioning
-//
-func (t *Command) PGCommand(args *Args, reply *Command) error {
-
-	logit.Info.Println(args.A)
-
-	var cmd *exec.Cmd
-
-	cmd = exec.Command(args.A, "su - postgres -c 'initdb -D /pgdata'")
-
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-
-	err := cmd.Run()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		errorString := fmt.Sprintf("%s\n%s\n%s\n", err.Error(), out.String(), stderr.String())
-		return errors.New(errorString)
-	}
-	logit.Info.Println(args.A + " command output was " + out.String())
-	reply.Output = out.String()
-	reply.Output = "success"
-
-	return nil
-}
-
-//
-// Writefile is run on the node during provisioning
-// args.A contains the file contents
-// args.B contains the path to write the contents to
-//
-func (t *Command) Writefile(args *Args, reply *Command) error {
-	d1 := []byte(args.A)
-	err := ioutil.WriteFile(args.B, d1, 0644)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return err
-	}
-
-	return nil
-}
-
-//
-// generic command with 1 parameter
-//
-func (t *Command) Command1(args *Args, reply *Command) error {
-
-	logit.Info.Println(args.A + " " + args.B)
-
-	var cmd *exec.Cmd
-
-	cmd = exec.Command(args.A, args.B)
-
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-
-	err := cmd.Run()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		errorString := fmt.Sprintf("%s\n%s\n%s\n", err.Error(), out.String(), stderr.String())
-		return errors.New(errorString)
-	}
-	logit.Info.Println(args.A + " " + args.B + " command output was " + out.String())
-	reply.Output = out.String()
 	reply.Output = "success"
 
 	return nil
@@ -473,6 +375,12 @@ func (t *Command) DockerRun(args *DockerRunArgs, reply *Command) error {
 	return nil
 }
 
+//used by backup to provision backup directories
+//used by adminapi clustermgmt to delete a disk volume
+//used by adminapi nodemgmt to delete a disk volume
+//used by adminapi provision to provision a disk volume
+//used by adminapi server to get server metrics
+//used by monserver to collect cpu and mem stats
 func AgentCommand(arga string, argb string, ipaddress string) (string, error) {
 	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
 	if err != nil {
@@ -486,7 +394,7 @@ func AgentCommand(arga string, argb string, ipaddress string) (string, error) {
 	var command Command
 
 	args := &Args{}
-	args.A = arga
+	args.A = util.GetBase() + "/bin/" + arga
 	args.B = argb
 	err = client.Call("Command.Get", args, &command)
 	if err != nil {
@@ -496,6 +404,8 @@ func AgentCommand(arga string, argb string, ipaddress string) (string, error) {
 	return command.Output, nil
 }
 
+//used by cpm-backup to create backup jobs
+//used by adminapi provision to provision container
 func AgentDockerRun(args DockerRunArgs, ipaddress string) (string, error) {
 	logit.Info.Println("server.go:AgentDockerRun:cpu=" + args.CPU + " mem=" + args.MEM)
 	if args.EnvVars != nil {
@@ -546,6 +456,7 @@ func DockerInspectCommand(arga string, ipaddress string) (string, error) {
 	return command.Output, nil
 }
 
+//used by adminap nodemgmt
 func DockerInspect2Command(arga string, ipaddress string) (InspectOutput, error) {
 	var command InspectCommandOutput
 	var output InspectOutput
@@ -573,6 +484,9 @@ func DockerInspect2Command(arga string, ipaddress string) (InspectOutput, error)
 	return output, nil
 }
 
+//used by adminapi clustermgmt to remove a container
+//used by adminapi nodemtm to remove a container
+//used by adminapi provision to remove a container
 func DockerRemoveContainer(arga string, ipaddress string) (string, error) {
 	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
 	if err != nil {
@@ -596,36 +510,7 @@ func DockerRemoveContainer(arga string, ipaddress string) (string, error) {
 	return command.Output, nil
 }
 
-func AgentCommandConfigureNode(commandpath string, arga string, argb string, argc string, argd string, arge string, cpu string, mem string, ipaddress string) (string, error) {
-	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
-	if err != nil {
-		logit.Error.Println("AgentCommandConfigureNode dialing:" + err.Error())
-		return "", err
-	}
-	if client == nil {
-		logit.Error.Println("AgentCommandConfigureNode dialing: client was nil")
-		return "", errors.New("client was nil")
-	}
-
-	var command Command
-
-	args := &Args{}
-	args.CommandPath = commandpath
-	args.A = arga
-	args.B = argb
-	args.C = argc
-	args.D = argd
-	args.CPU = cpu
-	args.MEM = mem
-	args.E = arge
-	err = client.Call("Command.ConfigureNode", args, &command)
-	if err != nil {
-		logit.Error.Println("AgentCommandConfigureNode error:" + err.Error())
-		return "", err
-	}
-	return command.Output, nil
-}
-
+//used by adminapi nodemgmt
 func DockerStartContainer(containerName string, ipaddress string) (string, error) {
 	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
 	if err != nil {
@@ -649,6 +534,7 @@ func DockerStartContainer(containerName string, ipaddress string) (string, error
 	return command.Output, nil
 }
 
+//used by adminapi nodemgmt
 func DockerStopContainer(containerName string, ipaddress string) (string, error) {
 
 	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
@@ -668,30 +554,6 @@ func DockerStopContainer(containerName string, ipaddress string) (string, error)
 	err = client.Call("Command.DockerStopCommand", args, &command)
 	if err != nil {
 		logit.Info.Println("DockerStopContainer containerName error:" + err.Error())
-		return "", err
-	}
-	return command.Output, nil
-}
-
-func Command1(pgcommand string, parameter string, ipaddress string) (string, error) {
-	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
-	if err != nil {
-		logit.Error.Println("Command1: dialing:" + err.Error())
-		return "", err
-	}
-	if client == nil {
-		logit.Error.Println("Command1: client was nil")
-		return "", errors.New("client was nil from rpc dial")
-	}
-
-	var command Command
-
-	args := &Args{}
-	args.A = pgcommand
-	args.B = parameter
-	err = client.Call("Command.Command1", args, &command)
-	if err != nil {
-		logit.Error.Println("Command1: " + args.A + " " + args.B + " error:" + err.Error())
 		return "", err
 	}
 	return command.Output, nil

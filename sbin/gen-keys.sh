@@ -15,7 +15,7 @@
 # limitations under the License.
 
 
-KEYSDIR=/opt/cpm/keys
+KEYSDIR=/var/cpm/keys
 sudo mkdir -p $KEYSDIR
 sudo chown -R postgres:postgres $KEYSDIR
 #

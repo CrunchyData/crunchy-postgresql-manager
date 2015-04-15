@@ -17,7 +17,7 @@
 # stop pgpool
 #
 
-source /opt/cpm/bin/setenv.sh
+source /var/cpm/bin/setenv.sh
 
 echo "stopping pgpool agent" >> $CLUSTER_LOG
 PID=`ps -C pgpool -o pid=`

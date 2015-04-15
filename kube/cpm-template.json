@@ -40,15 +40,15 @@
           "volumes": [
           	{
                	"name": "www",
-               	"source": { "hostDir": { "path": "/opt/cpm/www/v2" } }
+               	"source": { "hostDir": { "path": "/var/cpm/www/v2" } }
 		},
           	{
                	"name": "cpmlogs",
-               	"source": { "hostDir": { "path": "/opt/cpm/logs" } }
+               	"source": { "hostDir": { "path": "/var/cpm/logs" } }
 		},
           	{
                	"name": "cpmkeys",
-               	"source": { "hostDir": { "path": "/opt/cpm/keys" } }
+               	"source": { "hostDir": { "path": "/var/cpm/keys" } }
 		}
           ],
           "containers": [{

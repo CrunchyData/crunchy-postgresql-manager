@@ -9,10 +9,10 @@ RUN yum install -y procps-ng postgresql94 postgresql94-contrib postgresql94-serv
 
 # set up cpm directory
 #
-RUN mkdir -p /opt/cpm/bin
-RUN mkdir -p /opt/cpm/conf
+RUN mkdir -p /var/cpm/bin
+RUN mkdir -p /var/cpm/conf
 
-RUN chown -R postgres:postgres /opt/cpm
+RUN chown -R postgres:postgres /var/cpm
 
 # set environment vars
 ENV PGROOT /usr/pgsql-9.4
@@ -31,8 +31,8 @@ RUN chown -R postgres:postgres /cpmlogs
 # open up the postgres port
 EXPOSE 5432
 
-ADD bin /opt/cpm/bin
-ADD conf /opt/cpm/conf
+ADD bin /var/cpm/bin
+ADD conf /var/cpm/conf
 
 USER postgres
 

@@ -7,7 +7,7 @@ Type=forking
 TimeoutSec=120
 User=postgres
 Group=postgres
-Environment="PATH=/opt/cpm/bin:/usr/pgsql-9.4/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"
+Environment="PATH=/var/cpm/bin:/usr/pgsql-9.4/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"
 SyslogIdentifier=postgresql
 
 ExecStart=/usr/pgsql-9.4/bin/pg_ctl -w -D /pgdata start

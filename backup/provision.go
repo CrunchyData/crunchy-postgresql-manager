@@ -18,7 +18,7 @@ package backup
 import (
 	"fmt"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmagent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmserveragent"
 	"github.com/crunchydata/crunchy-postgresql-manager/kubeclient"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/template"
@@ -35,8 +35,8 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	logit.Info.Println("with containername=" + args.ContainerName)
 	logit.Info.Println("with profilename=" + args.ProfileName)
 
-	var params cpmagent.DockerRunArgs
-	params = cpmagent.DockerRunArgs{}
+	var params cpmserveragent.DockerRunArgs
+	params = cpmserveragent.DockerRunArgs{}
 	params.Image = "crunchydata/cpm-backup-job"
 	params.ServerID = args.ServerID
 	backupcontainername := args.ContainerName + "-backup"
@@ -88,7 +88,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 
 	//provision the volume
 	var responseStr string
-	responseStr, err = cpmagent.AgentCommand(CPMBIN+"provisionvolume.sh",
+	responseStr, err = cpmserveragent.AgentCommand("provisionvolume.sh",
 		params.PGDataPath,
 		server.IPAddress)
 	logit.Info.Println(responseStr)
@@ -126,9 +126,9 @@ func ProvisionBackupJob(args *BackupRequest) error {
 		}
 	} else {
 		var output string
-		params.CommandPath = CPMBIN + "docker-run-backup.sh"
+		params.CommandPath = "docker-run-backup.sh"
 
-		output, err = cpmagent.AgentDockerRun(params, server.IPAddress)
+		output, err = cpmserveragent.AgentDockerRun(params, server.IPAddress)
 
 		if err != nil {
 			logit.Error.Println("Provision: " + output)

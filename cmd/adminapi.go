@@ -44,8 +44,7 @@ func init() {
 
 }
 
-var PGBIN = "/usr/pgsql-9.4/bin/"
-var CPMDIR = "/opt/cpm/"
+var CPMDIR = "/var/cpm/"
 var CPMBIN = CPMDIR + "bin/"
 
 func main() {

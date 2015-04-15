@@ -1,26 +1,29 @@
 
 gendeps:
 		godep save \
-		github.com/jmccormick2001/crunchy-postgresql-manager/util \
-		github.com/jmccormick2001/crunchy-postgresql-manager/logit \
-		github.com/jmccormick2001/crunchy-postgresql-manager/adminapi \
-		github.com/jmccormick2001/crunchy-postgresql-manager/backup \
-		github.com/jmccormick2001/crunchy-postgresql-manager/cpmagent \
-		github.com/jmccormick2001/crunchy-postgresql-manager/dummy \
-		github.com/jmccormick2001/crunchy-postgresql-manager/kubeclient \
-		github.com/jmccormick2001/crunchy-postgresql-manager/myinfluxdb/client \
-		github.com/jmccormick2001/crunchy-postgresql-manager/mon \
-		github.com/jmccormick2001/crunchy-postgresql-manager/sec \
-		github.com/jmccormick2001/crunchy-postgresql-manager/template \
-		github.com/jmccormick2001/crunchy-postgresql-manager/admindb 
+		github.com/crunchydata/crunchy-postgresql-manager/util \
+		github.com/crunchydata/crunchy-postgresql-manager/logit \
+		github.com/crunchydata/crunchy-postgresql-manager/adminapi \
+		github.com/crunchydata/crunchy-postgresql-manager/backup \
+		github.com/crunchydata/crunchy-postgresql-manager/cpmnodeagent \
+		github.com/crunchydata/crunchy-postgresql-manager/cpmserveragent \
+		github.com/crunchydata/crunchy-postgresql-manager/dummy \
+		github.com/crunchydata/crunchy-postgresql-manager/kubeclient \
+		github.com/crunchydata/crunchy-postgresql-manager/myinfluxdb/client \
+		github.com/crunchydata/crunchy-postgresql-manager/mon \
+		github.com/crunchydata/crunchy-postgresql-manager/sec \
+		github.com/crunchydata/crunchy-postgresql-manager/template \
+		github.com/crunchydata/crunchy-postgresql-manager/admindb 
 
 build:
-		godep go install cmd/adminapi.go
+		godep go install cmd/cpmnodeagent.go
+		godep go install cmd/cpmserveragent.go
 		godep go install cmd/backupcommand.go
 		godep go install cmd/backupserver.go
-		godep go install cmd/cpmagentserver.go
 		godep go install cmd/monserver.go
 		godep go install cmd/dummyserver.go
+		godep go install cmd/dockerapi.go
+		godep go install cmd/adminapi.go
 
 buildimages:
 		cd images/cpm-dashboard && make

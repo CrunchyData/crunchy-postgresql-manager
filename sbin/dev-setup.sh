@@ -24,51 +24,31 @@
 # program before this one.
 #
 
-# Exit installation on any unexpected error
-set -e
-
-# add the docker group to this user's account so they can run docker cmds
-sudo usermod -a -G docker $USER
-
 # install deps
-export INSTALLDIR=$(pwd)
 
-RUN rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
+sudo rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
 
 sudo yum install -y postgresql94 postgresql94-contrib postgresql94-server
 
-# set the gopath
-source $INSTALLDIR/setpath.sh
+export DEVROOT=/home/jeffmc/dev2
+export DEVBASE=$DEVROOT/src/github.com/crunchydata/crunchy-postgresql-manager
+export CPMBASE=/var/cpm
 
-make
-
-export TARGET=/opt/cpm
-
-sudo mkdir -p $TARGET/bin
-sudo mkdir -p $TARGET/config
-sudo mkdir -p $TARGET/data
-sudo mkdir -p $TARGET/logs
-sudo mkdir -p $TARGET/keys
+sudo mkdir -p $CPMBASE/bin
+sudo mkdir -p $CPMBASE/config
+sudo mkdir -p $CPMBASE/data
+sudo mkdir -p $CPMBASE/logs
+sudo mkdir -p $CPMBASE/keys
 
 server=$(hostname)
 
-scp bin/* sql/loadtest.sql  \
-	root@$server:$TARGET/bin
+scp $DEVROOT/bin/cpmserveragent root@$server:$CPMBASE/bin
+scp $DEVBASE/sbin/cert.pem $DEVBASE/sbin/key.pem root@$server:$CPMBASE/keys
 
-scp sbin/*  \
-	root@$server:$TARGET/bin
+scp $DEVBASE/sbin/* root@$server:$CPMBASE/bin
 
-sudo scp config/cpmagent.service  \
-	root@$server:/usr/lib/systemd/system
+scp $DEVBASE/config/cpmserveragent.service  root@$server:/usr/lib/systemd/system
 
-ssh root@$server "systemctl enable cpmagent.service"
-ssh root@$server "systemctl start cpmagent.service"
+ssh root@$server "systemctl enable cpmserveragent.service"
+ssh root@$server "systemctl start cpmserveragent.service"
 
-DBPATH=/opt/cpm/data/cpm-admin
-sudo mkdir $DBPATH
-sudo chown postgres:postgres $DBPATH
-sudo chown postgres:postgres $TARGET/keys
-sudo chcon -Rt svirt_sandbox_file_t  $DBPATH
-sudo chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v2
-
-sbin/gen-keys.sh

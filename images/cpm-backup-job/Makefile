@@ -6,6 +6,6 @@ build:
 		cp ../../sbin/cpm.sh ./bin
 		cp ../../../../../../bin/backupcommand ./bin
 		cp ../../../../../../bin/dummyserver ./bin
-	        docker build -t cpm-backup-job .
-		docker tag cpm-backup-job:latest crunchydata/cpm-backup-job
+	        sudo docker build -t cpm-backup-job .
+		sudo docker tag -f cpm-backup-job:latest crunchydata/cpm-backup-job
 

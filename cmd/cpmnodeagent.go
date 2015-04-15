@@ -15,8 +15,9 @@
 package main
 
 import (
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmagent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmnodeagent"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net"
 	"net/http"
 	"net/rpc"
@@ -25,7 +26,9 @@ import (
 func main() {
 
 	logit.Info.Println("starting\n")
-	command := new(cpmagent.Command)
+	//get location of CPM bin
+	logit.Info.Println("CPMBASE set to " + util.GetBase())
+	command := new(cpmnodeagent.Command)
 	rpc.Register(command)
 	logit.Info.Println("Command registered\n")
 	rpc.HandleHTTP()

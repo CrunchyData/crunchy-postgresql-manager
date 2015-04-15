@@ -18,15 +18,13 @@ package mon
 import (
 	"database/sql"
 	"fmt"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmagent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmserveragent"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/myinfluxdb/client"
 	"strconv"
 	"strings"
 	"time"
 )
-
-var CPMBIN = "/opt/cpm/bin/"
 
 type DBMetric struct {
 	MetricType string
@@ -143,7 +141,7 @@ func cpu(server string) (DBMetric, error) {
 	values.MetricType = "cpu"
 	var output string
 
-	output, err = cpmagent.AgentCommand(CPMBIN+"monitor-load", "", server)
+	output, err = cpmserveragent.AgentCommand("monitor-load", "", server)
 	if err != nil {
 		logit.Error.Println("cpu metric error:" + err.Error())
 		return values, err
@@ -168,7 +166,7 @@ func mem(server string) (DBMetric, error) {
 	values.MetricType = "mem"
 	var output string
 
-	output, err = cpmagent.AgentCommand(CPMBIN+"monitor-mem", "", server)
+	output, err = cpmserveragent.AgentCommand("monitor-mem", "", server)
 	if err != nil {
 		logit.Error.Println("mem metric error:" + err.Error())
 		return values, err

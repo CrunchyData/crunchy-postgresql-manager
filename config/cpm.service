@@ -10,11 +10,11 @@ TimeoutStartSec=0
 TimeoutStopSec=0
 RemainAfterExit=yes
 
-Environment="PATH=/opt/cpm/bin:/usr/pgsql-9.4/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"
+Environment="PATH=/var/cpm/bin:/usr/pgsql-9.4/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"
 SyslogIdentifier=cpm
 
-ExecStart=/opt/cpm/bin/systemd-start-cpm.sh
-ExecStop=/opt/cpm/bin/systemd-stop-cpm.sh
+ExecStart=/var/cpm/bin/systemd-start-cpm.sh
+ExecStop=/var/cpm/bin/systemd-stop-cpm.sh
 
 [Install]
 WantedBy=multi-user.target

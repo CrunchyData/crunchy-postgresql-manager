@@ -17,6 +17,6 @@
 # report pg status to cluster
 #
 
-source /opt/cpm/bin/setenv.sh
+source /var/cpm/bin/setenv.sh
 
 echo report pg stats >> $CLUSTER_LOG

@@ -6,5 +6,5 @@ ifeq ($(OSFLAVOR),centos7)
 else
 	cp Dockerfile.rhel7 Dockerfile
 endif
-	        docker build -t cpm .
-		docker tag cpm:latest crunchydata/cpm
+	        sudo docker build -t cpm .
+		sudo docker tag -f cpm:latest crunchydata/cpm

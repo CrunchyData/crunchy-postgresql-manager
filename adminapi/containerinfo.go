@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmagent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmnodeagent"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	_ "github.com/lib/pq"
@@ -117,7 +117,7 @@ func MonitorContainerControldata(w rest.ResponseWriter, r *rest.Request) {
 	settings := make([]PostgresControldata, 0)
 
 	//send the container a pg_controldata command
-	output, err = cpmagent.AgentCommand(PGBIN+"pg_controldata", "/pgdata", node.Name)
+	output, err = cpmnodeagent.PostgresCommand("pg_controldata", "/pgdata", node.Name)
 	if err != nil {
 		logit.Error.Println("MonitorContainerControldata:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)

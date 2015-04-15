@@ -17,7 +17,7 @@
 # wraps docker command
 #
 
-source /opt/cpm/bin/setenv.sh
+source /var/cpm/bin/setenv.sh
 
 echo $1 " is docker run pgdatapath " >> $CLUSTER_LOG
 echo $2 " is docker run container name " >> $CLUSTER_LOG

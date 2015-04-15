@@ -13,5 +13,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-/opt/cpm/bin/dockerapi -a start -c "cpm,cpm-mon,cpm-admin,cpm-backup" -log_dir=/opt/cpm/logs -logtostderr=false
+/var/cpm/bin/dockerapi -a start -c "cpm,cpm-mon,cpm-admin,cpm-backup" -log_dir=/var/cpm/logs -logtostderr=false
 

@@ -22,9 +22,9 @@
 #
 rm /tmp/.s.PGSQL*
 
-source /opt/cpm/bin/setenv.sh
+source /var/cpm/bin/setenv.sh
 
-HBA=/opt/cpm/conf/admin/pg_hba.conf
+HBA=/var/cpm/conf/admin/pg_hba.conf
 #
 # the initial start of postgres will create the clusteradmin database
 #
@@ -37,15 +37,15 @@ if [ ! -f /pgdata/postgresql.conf ]; then
         sed "s/crunchy.lab/$THISDOMAIN/g" /tmp/pg_hba.conf > /pgdata/pg_hba.conf
         cat /pgdata/pg_hba.conf >> /tmp/start-db.log
 
-        sed -i "s/crunchy.lab/$THISDOMAIN/g" /opt/cpm/bin/setup.sql
+        sed -i "s/crunchy.lab/$THISDOMAIN/g" /var/cpm/bin/setup.sql
 
-        cp /opt/cpm/conf/admin/postgresql.conf /pgdata/
+        cp /var/cpm/conf/admin/postgresql.conf /pgdata/
         echo "starting db" >> /tmp/start-db.log
 
         pg_ctl -D /pgdata start
         sleep 3
         echo "building clusteradmin db" >> /tmp/start-db.log
-        psql -U postgres < /opt/cpm/bin/setup.sql
+        psql -U postgres < /var/cpm/bin/setup.sql
         exit
 fi
 

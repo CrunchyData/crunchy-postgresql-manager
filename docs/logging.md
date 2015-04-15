@@ -8,7 +8,7 @@ To trigger the use of glog, your main() functions need
 to call flag.Parse if you want to process any glog
 command line
 
-The CPM services log into the /opt/cpm/logs directory on
+The CPM services log into the /var/cpm/logs directory on
 your docker host.
 
 This directory is initially created by the run-cpm.sh script.
@@ -30,7 +30,7 @@ Each container mounts
 ````````````
 
 Each startup script for the services now writes to /cpmlogs which gets
-mapped by Docker to /opt/cpm/logs on the Docker host.
+mapped by Docker to /var/cpm/logs on the Docker host.
 
 Within a container startup script, you will pass the following
 glog flags to direct log output to the mounted volume:
