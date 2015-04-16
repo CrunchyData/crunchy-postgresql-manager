@@ -42,7 +42,7 @@ docker run --name=cpm -d \
 
 echo "restarting cpm-admin container..."
 sleep 2
-DBDIR=$INSTALLDIR/data/cpm-admin
+DBDIR=$INSTALLDIR/data/pgsql/cpm-admin
 sudo mkdir -p $DBDIR
 sudo chown postgres:postgres $DBDIR
 sudo chcon -Rt svirt_sandbox_file_t $DBDIR
