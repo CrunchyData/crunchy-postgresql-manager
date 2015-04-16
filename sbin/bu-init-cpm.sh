@@ -16,7 +16,10 @@
 
 INSTALLDIR=/var/cpm
 
-DOMAIN=example.com
+echo "enter domain to use..."
+read DOMAIN
+echo "enter static ip to use..."
+read THISIP
 
 echo "setting up log dir..."
 LOGDIR=$INSTALLDIR/logs
@@ -35,6 +38,7 @@ echo "restarting cpm container..."
 sudo chcon -Rt svirt_sandbox_file_t $INSTALLDIR/www/v2
 docker rm cpm
 docker run --name=cpm -d \
+	-p $THISIP:8080:13000 \
 	-v $LOGDIR:/cpmlogs \
 	-v $KEYSDIR:/cpmkeys \
 	-v $INSTALLDIR/www/v2:/www \
@@ -48,6 +52,7 @@ sudo chown postgres:postgres $DBDIR
 sudo chcon -Rt svirt_sandbox_file_t $DBDIR
 docker rm cpm-admin
 docker run -e DB_HOST=127.0.0.1 \
+	-p $THISIP:8081:13000 \
 	-e DOMAIN=$DOMAIN \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cpm-admin -d -v $LOGDIR:/cpmlogs -v $DBDIR:/pgdata \
@@ -70,6 +75,7 @@ sudo mkdir -p $INFLUXDIR
 sudo chcon -Rt svirt_sandbox_file_t $INFLUXDIR
 docker rm cpm-mon
 docker run -e DB_HOST=cpm-admin.$DOMAIN \
+	-p $THISIP:8083:8083 \
 	--hostname="cpm-mon" \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	-v $LOGDIR:/cpmlogs \
