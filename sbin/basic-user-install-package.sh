@@ -118,33 +118,33 @@ pushImages () {
 saveImages () {
 
 	echo "saving cpm image"
-	docker save crunchydata/cpm > /tmp/cpm.tar
+	sudo docker save crunchydata/cpm > /tmp/cpm.tar
 
 	echo "saving cpm-pgpool image"
-	docker save crunchydata/cpm-pgpool > /tmp/cpm-pgpool.tar
+	sudo docker save crunchydata/cpm-pgpool > /tmp/cpm-pgpool.tar
 
 	echo "saving cpm-admin image"
-	docker save crunchydata/cpm-admin > /tmp/cpm-admin.tar
+	sudo docker save crunchydata/cpm-admin > /tmp/cpm-admin.tar
 
 	echo "saving cpm-base image"
-	docker save crunchydata/cpm-base > /tmp/cpm-base.tar
+	sudo docker save crunchydata/cpm-base > /tmp/cpm-base.tar
 
 	echo "saving cpm-mon image"
-	docker save crunchydata/cpm-mon > /tmp/cpm-mon.tar
+	sudo docker save crunchydata/cpm-mon > /tmp/cpm-mon.tar
 
 	echo "saving cpm-backup image"
-	docker save crunchydata/cpm-backup > /tmp/cpm-backup.tar
+	sudo docker save crunchydata/cpm-backup > /tmp/cpm-backup.tar
 
 	echo "saving cpm-backup-job image"
-	docker save crunchydata/cpm-backup-job > /tmp/cpm-backup-job.tar
+	sudo docker save crunchydata/cpm-backup-job > /tmp/cpm-backup-job.tar
 
 	echo "saving cpm-node image"
-	docker save crunchydata/cpm-node > /tmp/cpm-node.tar
+	sudo docker save crunchydata/cpm-node > /tmp/cpm-node.tar
 
 	echo "saving cpm-dashboard image"
-	docker save crunchydata/cpm-dashboard > /tmp/cpm-dashboard.tar
+	sudo docker save crunchydata/cpm-dashboard > /tmp/cpm-dashboard.tar
 }
 
-createArchive
-#saveImages
-#pushImages
+#createArchive
+saveImages
+pushImages
