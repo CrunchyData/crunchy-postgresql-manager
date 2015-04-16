@@ -72,11 +72,11 @@ echo "SECURITY WARNING- turning off and disabling your firewall!"
 sudo systemctl stop firewalld.service
 sudo systemctl disable firewalld.service
 
-# start up local cpmagent
-echo "starting cpmagent...."
-sudo cp $INSTALLDIR/config/cpmagent.service /usr/lib/systemd/system
-sudo systemctl enable cpmagent.service
-sudo systemctl start cpmagent.service
+# start up local cpmserveragent
+echo "starting cpmserveragent...."
+sudo cp $INSTALLDIR/config/cpmserveragent.service /etc/systemd/system
+sudo systemctl enable cpmserveragent.service
+sudo systemctl start cpmserveragent.service
 
 
 sed -i "s/crunchy.lab/$DOMAIN/g" ./bu-init-cpm.sh
