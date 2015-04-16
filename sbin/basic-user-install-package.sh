@@ -21,7 +21,7 @@
 set -e
 
 # set the istall directory
-export VERSION=0.9.2
+export VERSION=0.9.3
 export WORKDIR=$GOPATH/src/github.com/crunchydata/crunchy-postgresql-manager
 export TMPDIR=/tmp/var/cpm
 export ARCHIVE=/tmp/cpm.$VERSION-linux-amd64.tar.gz
@@ -147,4 +147,4 @@ saveImages () {
 
 createArchive
 #saveImages
-pushImages
+#pushImages
