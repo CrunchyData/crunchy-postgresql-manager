@@ -26,6 +26,9 @@ import (
 func main() {
 
 	logit.Info.Println("starting\n")
+
+	//see if we can run startpg.sh
+
 	//get location of CPM bin
 	logit.Info.Println("CPMBASE set to " + util.GetBase())
 	command := new(cpmnodeagent.Command)
