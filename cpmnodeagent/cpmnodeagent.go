@@ -20,7 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
-	"github.com/crunchydata/crunchy-postgresql-manager/util"
+	//"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"io/ioutil"
 	"net/rpc"
 	"os/exec"
@@ -145,7 +145,8 @@ func AgentCommand(arga string, argb string, ipaddress string) (string, error) {
 	var command Command
 
 	args := &Args{}
-	args.A = util.GetBase() + "/" + arga
+	//args.A = util.GetBase() + "/" + arga
+	args.A = arga
 	args.B = argb
 	err = client.Call("Command.Get", args, &command)
 	if err != nil {

@@ -47,7 +47,11 @@ func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var output string
-	output, err = cpmnodeagent.AgentCommand("startpg.sh", "", dbNode.Name)
+	var cmd = "startpg.sh"
+	if dbNode.Role == "pgpool" {
+		cmd = "startpgpool.sh"
+	}
+	output, err = cpmnodeagent.AgentCommand(cmd, "", dbNode.Name)
 	if err != nil {
 		logit.Error.Println("AdminStartpg:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -90,7 +94,11 @@ func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("AdminStoppg: in stop with dbnode")
 
 	var output string
-	output, err = cpmnodeagent.AgentCommand("stoppg.sh", "", dbNode.Name)
+	var cmd = "stoppg.sh"
+	if dbNode.Role == "pgpool" {
+		cmd = "stop-pgpool.sh"
+	}
+	output, err = cpmnodeagent.AgentCommand(cmd, "", dbNode.Name)
 	if err != nil {
 		logit.Error.Println("AdminStoppg:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)

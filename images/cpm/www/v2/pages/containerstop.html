@@ -1,9 +1,10 @@
 <div class="modal-header">
-	<h1>Stop Database</h1>
+	<h1 ng-if="$parent.value.Role != 'pgpool'">Stop Database</h1>
+	<h1 ng-if="$parent.value.Role == 'pgpool'">Stop pgpool</h1>
 </div>
 
 <div class="modal-body">
-	Confirm that you want to stop database {{$parent.value.Name}}!
+	Confirm that you want to stop {{$parent.value.Name}}!
 </div>
 
 <div id="veil" ng-show="$parent.isLoading"><i class="fa fa-circle-o-notch fa-spin fa-3x"></i></div>
