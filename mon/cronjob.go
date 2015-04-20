@@ -20,6 +20,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/myinfluxdb/client"
+	"github.com/crunchydata/crunchy-postgresql-manager/sec"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"strconv"
 	"time"
@@ -48,6 +49,13 @@ func RunMonJob(args *MonRequest) error {
 	})
 	if err != nil {
 		logit.Error.Println("error in connection to fluxdb " + err.Error())
+		return err
+	}
+
+	var pgport admindb.DBSetting
+	pgport, err = admindb.GetDBSetting("PG-PORT")
+	if err != nil {
+		logit.Error.Println("RunMonJob: setting error " + err.Error())
 		return err
 	}
 
@@ -103,12 +111,23 @@ func RunMonJob(args *MonRequest) error {
 		logit.Info.Println("collecting for node " + nodes[y].Name)
 
 		if nodes[y].Role == "pgpool" {
+			//fetch cpmtest user credentials
+			var nodeuser admindb.DBNodeUser
+			var password string
+			nodeuser, err = admindb.GetNodeUser(nodes[y].Name, "cpmtest")
+			if err != nil {
+				logit.Error.Println(err.Error())
+			}
+
+			password, err = sec.DecryptPassword(nodeuser.Passwd)
+			logit.Info.Println("cpmtest password is " + password)
+
 			id = "cpmtest"
-			psw = "cpmtest"
+			psw = password
 			database = "cpmtest"
 		}
 
-		databaseConn, err = util.GetMonitoringConnection(nodes[y].Name+"."+domain, id, "5432", database, psw)
+		databaseConn, err = util.GetMonitoringConnection(nodes[y].Name+"."+domain, id, pgport.Value, database, psw)
 		if err != nil {
 			logit.Error.Println("error in getting connection to " + nodes[y].Name)
 		} else {

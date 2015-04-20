@@ -30,6 +30,9 @@ import (
 	"time"
 )
 
+var CPMTEST_DB = "cpmtest"
+var CPMTEST_USER = "cpmtest"
+
 func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
@@ -55,7 +58,23 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 	if KubeEnv {
 		host = node.Name + "-db"
 	}
-	dbConn, err := util.GetMonitoringConnection(host, "cpmtest", "5432", "cpmtest", "cpmtest")
+
+	//fetch cpmtest user credentials
+	var nodeuser admindb.DBNodeUser
+	nodeuser, err = admindb.GetNodeUser(node.Name, CPMTEST_USER)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	logit.Info.Println("cpmtest password is " + nodeuser.Passwd)
+
+	//get port
+	var pgport admindb.DBSetting
+	pgport, err = admindb.GetDBSetting("PG-PORT")
+
+	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
 	defer dbConn.Close()
 
 	settings := make([]PostgresSetting, 0)
@@ -177,7 +196,22 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 	if KubeEnv {
 		host = node.Name + "-db"
 	}
-	dbConn, err := util.GetMonitoringConnection(host, "cpmtest", "5432", "cpmtest", "cpmtest")
+
+	//get password
+	var nodeuser admindb.DBNodeUser
+	nodeuser, err = admindb.GetNodeUser(node.Name, CPMTEST_USER)
+	if err != nil {
+		logit.Error.Println("ContainerBgwriter:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//get port
+	var pgport admindb.DBSetting
+	pgport, err = admindb.GetDBSetting("PG-PORT")
+
+	var dbConn *sql.DB
+	dbConn, err = util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
 	defer dbConn.Close()
 
 	info := Bgwriter{}
@@ -233,7 +267,21 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 	if KubeEnv {
 		host = node.Name + "-db"
 	}
-	dbConn, err := util.GetMonitoringConnection(host, "cpmtest", "5432", "cpmtest", "cpmtest")
+
+	//get password
+	var nodeuser admindb.DBNodeUser
+	nodeuser, err = admindb.GetNodeUser(node.Name, CPMTEST_USER)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//get port
+	var pgport admindb.DBSetting
+	pgport, err = admindb.GetDBSetting("PG-PORT")
+
+	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
 	defer dbConn.Close()
 
 	stats := make([]Statdatabase, 0)
@@ -323,7 +371,21 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 	if KubeEnv {
 		host = node.Name + "-db"
 	}
-	dbConn, err := util.GetMonitoringConnection(host, "cpmtest", "5432", "cpmtest", "cpmtest")
+
+	//fetch cpmtest user credentials
+	var nodeuser admindb.DBNodeUser
+	nodeuser, err = admindb.GetNodeUser(node.Name, CPMTEST_USER)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//get port
+	var pgport admindb.DBSetting
+	pgport, err = admindb.GetDBSetting("PG-PORT")
+
+	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
 	defer dbConn.Close()
 
 	stats := make([]Statrepl, 0)
@@ -414,7 +476,7 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 		host = node.Name + "-db"
 	}
 
-	results, err2 := loadtest(host, writes)
+	results, err2 := loadtest(node.Name, host, writes)
 	if err2 != nil {
 		logit.Error.Println("ContainerLoadTest:" + err2.Error())
 		rest.Error(w, err2.Error(), http.StatusBadRequest)
@@ -425,21 +487,29 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&results)
 }
 
-func loadtest(host string, writes int) ([]Loadtestresults, error) {
+func loadtest(nodename string, host string, writes int) ([]Loadtestresults, error) {
 	var err error
 	var name string
 	var query string
 	var id int
 	var i int
 	var dbConn *sql.DB
-	var database = "cpmtest"
-	var user = "cpmtest"
-	var pass = "cpmtest"
-	var port = "5432"
 	var results = make([]Loadtestresults, 4)
 
+	//get port
+	var pgport admindb.DBSetting
+	pgport, err = admindb.GetDBSetting("PG-PORT")
+
+	//fetch cpmtest user credentials
+	var nodeuser admindb.DBNodeUser
+	nodeuser, err = admindb.GetNodeUser(nodename, CPMTEST_USER)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return results, err
+	}
+
 	//get db connection
-	dbConn, err = util.GetMonitoringConnection(host, user, port, database, pass)
+	dbConn, err = util.GetMonitoringConnection(host, CPMTEST_USER, pgport.Value, CPMTEST_DB, nodeuser.Passwd)
 	if err != nil {
 		logit.Error.Println("loadtest connection error:" + err.Error())
 		return results, err

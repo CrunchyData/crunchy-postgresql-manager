@@ -159,6 +159,12 @@ func provisionImpl(params *cpmserveragent.DockerRunArgs, PROFILE string, standby
 		logit.Error.Println("Provision: problem in getting profiles call" + err.Error())
 		return err
 	}
+	var pgport admindb.DBSetting
+	pgport, err = admindb.GetDBSetting("PG-PORT")
+	if err != nil {
+		logit.Error.Println("Provision:PG-PORT setting error " + err.Error())
+		return err
+	}
 
 	var output string
 
@@ -234,8 +240,8 @@ func provisionImpl(params *cpmserveragent.DockerRunArgs, PROFILE string, standby
 			return err
 		}
 
-		//create the service to the PG port 5432
-		podInfo.PORT = "5432"
+		//create the service to the PG port
+		podInfo.PORT = pgport.Value
 		podInfo.ID = podInfo.ID + "-db"
 		err = kubeclient.CreateService(KubeURL, podInfo)
 		if err != nil {
@@ -270,22 +276,69 @@ func provisionImpl(params *cpmserveragent.DockerRunArgs, PROFILE string, standby
 	}
 	dbnode.ID = newid
 
-	if params.Image == "cpm-pgpool" {
-		return nil
+	//register default db users on the new node
+	err = createDBUsers(dbnode)
+
+	return err
+
+}
+
+func createDBUsers(dbnode admindb.DBClusterNode) error {
+	var err error
+	var password admindb.DBSetting
+	//cpmtest and pgpool users are created by the node-setup.sql script
+	//here, we just register them when we create a new node
+
+	//get the cpmtest password
+	password, err = admindb.GetDBSetting("CPMTESTPSW")
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
+	//register cpmtest user
+	var user = admindb.DBNodeUser{}
+	user.Containername = dbnode.Name
+	user.Usename = "cpmtest"
+	user.Passwd = password.Value
+	_, err = admindb.DBAddNodeUser(user)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
 	}
 
-	return nil
+	//get the pgpool password
+	password, err = admindb.GetDBSetting("PGPOOLPSW")
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
+	user.Containername = dbnode.Name
+	user.Usename = "pgpool"
+	user.Passwd = password.Value
+	//register pgpool user
+	_, err = admindb.DBAddNodeUser(user)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
 
+	return err
 }
 
 func provisionImplInit(params *cpmserveragent.DockerRunArgs, PROFILE string, standby bool) error {
 	//go get the domain name from the settings
 	var domainname admindb.DBSetting
+	var pgport admindb.DBSetting
 	var err error
 
 	domainname, err = admindb.GetDBSetting("DOMAIN-NAME")
 	if err != nil {
 		logit.Error.Println("Provision:DOMAIN-NAME setting error " + err.Error())
+		return err
+	}
+	pgport, err = admindb.GetDBSetting("PG-PORT")
+	if err != nil {
+		logit.Error.Println("Provision:PG-PORT setting error " + err.Error())
 		return err
 	}
 
@@ -319,9 +372,8 @@ func provisionImplInit(params *cpmserveragent.DockerRunArgs, PROFILE string, sta
 		//create postgresql.conf
 		var data string
 		var mode = "standalone"
-		var port = "5432"
 
-		data, err = template.Postgresql(mode, port, "")
+		data, err = template.Postgresql(mode, pgport.Value, "")
 
 		//place postgresql.conf on new node
 		err = RemoteWritefile("/pgdata/postgresql.conf", data, fqdn)
@@ -330,7 +382,7 @@ func provisionImplInit(params *cpmserveragent.DockerRunArgs, PROFILE string, sta
 			return err
 		}
 		//create pg_hba.conf
-		data, err = template.Hba(KubeEnv, mode, params.ContainerName, port, "", domainname.Value)
+		data, err = template.Hba(KubeEnv, mode, params.ContainerName, pgport.Value, "", domainname.Value)
 		if err != nil {
 			logit.Error.Println("Provision:" + err.Error())
 			return err

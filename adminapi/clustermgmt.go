@@ -99,14 +99,21 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 		return err
 	}
 
+	var pgport admindb.DBSetting
+	pgport, err = admindb.GetDBSetting("PG-PORT")
+	if err != nil {
+		logit.Error.Println("configureCluster:" + err.Error())
+		return err
+	}
+
 	logit.Info.Println("configureCluster:GetDBNodeMaster")
 
 	//configure master postgresql.conf file
 	var data string
 	if cluster.ClusterType == "synchronous" {
-		data, err = template.Postgresql("master", "5432", "*")
+		data, err = template.Postgresql("master", pgport.Value, "*")
 	} else {
-		data, err = template.Postgresql("master", "5432", "")
+		data, err = template.Postgresql("master", pgport.Value, "")
 	}
 	if err != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
@@ -133,7 +140,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 	}
 
 	//configure master pg_hba.conf file
-	data, err = template.Hba(KubeEnv, "master", master.Name, "5432", cluster.ID, domainname.Value)
+	data, err = template.Hba(KubeEnv, "master", master.Name, pgport.Value, cluster.ID, domainname.Value)
 	if err != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
 		return err
@@ -174,7 +181,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 		masterhost = master.Name + "-db"
 	}
 	for i := 0; i < 20; i++ {
-		currentStatus, err = GetPGStatus2(masterhost)
+		currentStatus, err = GetPGStatus2(master.Name, masterhost)
 		if currentStatus == "RUNNING" {
 			logit.Info.Println("master is running...continuing")
 			found = true
@@ -217,7 +224,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 			}
 			logit.Info.Println("configureCluster:basebackup output was" + commandoutput)
 
-			data, err = template.Recovery(masterhost, "5432", "postgres")
+			data, err = template.Recovery(masterhost, pgport.Value, "postgres")
 			if err != nil {
 				logit.Error.Println("configureCluster:" + err.Error())
 				return err
@@ -232,7 +239,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 			}
 			logit.Info.Println("configureCluster:standby recovery.conf copied remotely")
 
-			data, err = template.Postgresql("standby", "5432", "")
+			data, err = template.Postgresql("standby", pgport.Value, "")
 			if err != nil {
 				logit.Error.Println("configureCluster:" + err.Error())
 				return err
@@ -247,7 +254,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 			logit.Info.Println("configureCluster:standby postgresql.conf copied remotely")
 
 			//configure standby pg_hba.conf file
-			data, err = template.Hba(KubeEnv, "standby", standbynodes[i].Name, "5432", cluster.ID, domainname.Value)
+			data, err = template.Hba(KubeEnv, "standby", standbynodes[i].Name, pgport.Value, cluster.ID, domainname.Value)
 			if err != nil {
 				logit.Error.Println("configureCluster:" + err.Error())
 				return err
@@ -535,7 +542,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 				rest.Error(w, "error in deleting service 1", http.StatusBadRequest)
 				return
 			}
-			//delete the kube service with this name 5432
+			//delete the kube service with this name
 			err = kubeclient.DeleteService(KubeURL, containers[i].Name+"-db")
 			if err != nil {
 				logit.Error.Println("DeleteCluster:" + err.Error())
@@ -658,6 +665,15 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	if err != nil {
 		logit.Error.Println("AdminFailover:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var pgport admindb.DBSetting
+	pgport, err = admindb.GetDBSetting("PG-PORT")
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	i := 0
@@ -700,7 +716,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 				logit.Info.Println("AdminFailover: fail-over basebackup output was" + commandoutput)
 
 				var data string
-				data, err = template.Recovery(dbNode.Name, "5432", "postgres")
+				data, err = template.Recovery(dbNode.Name, pgport.Value, "postgres")
 				if err != nil {
 					logit.Error.Println("AdminFailover:" + err.Error())
 					rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -718,9 +734,9 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 				logit.Info.Println("AdminFailover: fail-over standby recovery.conf copied remotely")
 
 				if cluster.ClusterType == "synchronous" {
-					data, err = template.Postgresql("standby", "5432", "*")
+					data, err = template.Postgresql("standby", pgport.Value, "*")
 				} else {
-					data, err = template.Postgresql("standby", "5432", "")
+					data, err = template.Postgresql("standby", pgport.Value, "")
 				}
 				if err != nil {
 					logit.Error.Println("AdminFailover: " + err.Error())
@@ -738,7 +754,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 				logit.Info.Println("AdminFailover: standby postgresql.conf copied remotely")
 
 				//configure standby pg_hba.conf file
-				data, err = template.Hba(KubeEnv, "standby", clusterNodes[i].Name, "5432", dbNode.ClusterID, domainname.Value)
+				data, err = template.Hba(KubeEnv, "standby", clusterNodes[i].Name, pgport.Value, dbNode.ClusterID, domainname.Value)
 				if err != nil {
 					logit.Error.Println("AdminFailover:" + err.Error())
 					rest.Error(w, err.Error(), http.StatusBadRequest)

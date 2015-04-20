@@ -105,7 +105,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 			MEM:                  "0",
 			IMAGE:                params.Image,
 			VOLUME:               params.EnvVars["BACKUP_PATH"],
-			PORT:                 "5432",
+			PORT:                 params.EnvVars["BACKUP_PORT"],
 			BACKUP_NAME:          params.EnvVars["BACKUP_NAME"],
 			BACKUP_SERVERNAME:    params.EnvVars["BACKUP_SERVERNAME"],
 			BACKUP_SERVERIP:      params.EnvVars["BACKUP_SERVERIP"],

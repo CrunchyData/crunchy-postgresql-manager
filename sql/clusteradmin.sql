@@ -208,3 +208,14 @@ insert into monmetric values ('pg1', 'database', 's1');
 insert into monmetric values ('pg2', 'database', 's1');
 insert into monmetric values ('hc1', 'healthck', 's1');
 
+create table nodeuser (
+	id serial primary key,
+	containername varchar(20) references node (name) on delete cascade not null,
+	usename varchar(30) not null,
+	passwd varchar(30) not null,
+	updatedt timestamp not null,
+	unique (containername, usename)
+);
+
+insert into settings (name, value, updatedt) values ('CPMTESTPSW', 'cpmtest', now());
+insert into settings (name, value, updatedt) values ('PGPOOLPSW', 'pgpool', now());

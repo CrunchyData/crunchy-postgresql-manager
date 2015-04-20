@@ -134,6 +134,15 @@ type PostgresControldata struct {
 	Value string
 }
 
+type NodeUser struct {
+	ID            string
+	Containername string
+	Usename       string
+	Passwd        string
+	Updatedt      string
+	Token         string
+}
+
 func Kube(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {

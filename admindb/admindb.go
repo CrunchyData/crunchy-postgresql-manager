@@ -19,6 +19,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/sec"
 	_ "github.com/lib/pq"
 	"strconv"
 	"strings"
@@ -56,6 +57,14 @@ type DBClusterNode struct {
 	Role       string
 	Image      string
 	CreateDate string
+}
+
+type DBNodeUser struct {
+	ID            string
+	Containername string
+	Usename       string
+	Passwd        string
+	UpdateDate    string
 }
 
 type DBLinuxStats struct {
@@ -677,4 +686,105 @@ func GetDomain() (string, error) {
 	domain := strings.Trim(tmp.Value, ".")
 
 	return domain, nil
+}
+
+func DBAddNodeUser(s DBNodeUser) (int, error) {
+
+	//logit.Info.Println("DBAddNodeUser called")
+
+	//encrypt the password...passwords at rest are encrypted
+	encrypted, err := sec.EncryptPassword(s.Passwd)
+
+	queryStr := fmt.Sprintf("insert into nodeuser ( containername, usename, passwd, updatedt) values ( '%s', '%s', '%s',  now()) returning id",
+		s.Containername,
+		s.Usename,
+		encrypted)
+
+	logit.Info.Println("DBAddNodeUser:" + queryStr)
+	var theID int
+	err = dbConn.QueryRow(queryStr).Scan(
+		&theID)
+	if err != nil {
+		logit.Error.Println("error in DBAddNodeUser query " + err.Error())
+		return theID, err
+	}
+
+	switch {
+	case err != nil:
+		logit.Error.Println("DBAddNodeUser: error " + err.Error())
+		return theID, err
+	default:
+	}
+
+	return theID, nil
+}
+
+func DBDeleteNodeUser(id string) error {
+	queryStr := fmt.Sprintf("delete from nodeuser where id=%s returning id", id)
+	//logit.Info.Println("admindb:DeleteDBCluster:" + queryStr)
+
+	var nodeuserid int
+	err := dbConn.QueryRow(queryStr).Scan(&nodeuserid)
+	switch {
+	case err != nil:
+		return err
+	default:
+		logit.Info.Println("admindb:DBDeleteNodeUser: deleted " + id)
+	}
+	return nil
+}
+
+func GetAllUsersForNode(containerName string) ([]DBNodeUser, error) {
+	var rows *sql.Rows
+	var err error
+	queryStr := fmt.Sprintf("select id, usename, passwd, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from nodeuser where containername = '%s' order by usename", containerName)
+	logit.Info.Println("admindb:GetAllUsersForNode:" + queryStr)
+	rows, err = dbConn.Query(queryStr)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	users := make([]DBNodeUser, 0)
+	for rows.Next() {
+		user := DBNodeUser{}
+		user.Containername = containerName
+		if err = rows.Scan(&user.ID, &user.Usename, &user.Passwd, &user.UpdateDate); err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+func GetNodeUser(containername string, usename string) (DBNodeUser, error) {
+	var rows *sql.Rows
+	var user DBNodeUser
+	var err error
+	queryStr := fmt.Sprintf("select id, passwd, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from nodeuser where usename = '%s' and containername = '%s'", usename, containername)
+	logit.Info.Println("admindb:GetNodeUser:" + queryStr)
+	rows, err = dbConn.Query(queryStr)
+	if err != nil {
+		return user, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		user.Usename = usename
+		user.Containername = containername
+		if err = rows.Scan(&user.ID, &user.Passwd, &user.UpdateDate); err != nil {
+			return user, err
+		}
+	}
+	if err = rows.Err(); err != nil {
+		return user, err
+	}
+	var unencrypted string
+	unencrypted, err = sec.DecryptPassword(user.Passwd)
+	if err != nil {
+		return user, err
+	}
+	user.Passwd = unencrypted
+	return user, nil
 }

@@ -100,7 +100,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 			pinghost = results.Name + "-db"
 		}
 		logit.Info.Println("pinging db on " + pinghost + "." + domain)
-		currentStatus, err = GetPGStatus2(pinghost + "." + domain)
+		currentStatus, err = GetPGStatus2(results.Name, pinghost+"."+domain)
 		if err != nil {
 			logit.Error.Println("GetNode:" + err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -284,7 +284,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 			rest.Error(w, "error in deleting service 1", http.StatusBadRequest)
 			return
 		}
-		//delete the kube service with this name 5432
+		//delete the kube service with this name
 		err = kubeclient.DeleteService(KubeURL, dbNode.Name+"-db")
 		if err != nil {
 			logit.Error.Println("DeleteNode:" + err.Error())
@@ -466,9 +466,20 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
-func GetPGStatus2(hostname string) (string, error) {
+func GetPGStatus2(nodename string, hostname string) (string, error) {
+	//fetch cpmtest user credentials
+	nodeuser, err := admindb.GetNodeUser(nodename, "cpmtest")
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return "", err
+	}
 
-	dbConn, err := util.GetMonitoringConnection(hostname, "cpmtest", "5432", "cpmtest", "cpmtest")
+	logit.Info.Println("cpmtest password is " + nodeuser.Passwd)
+
+	var pgport admindb.DBSetting
+	pgport, err = admindb.GetDBSetting("PG-PORT")
+
+	dbConn, err := util.GetMonitoringConnection(hostname, "cpmtest", pgport.Value, "cpmtest", nodeuser.Passwd)
 	defer dbConn.Close()
 	var value string
 

@@ -1,19 +1,20 @@
 {
-	"ImportPath": "github.com/jmccormick2001/crunchy-postgresql-manager",
+	"ImportPath": "github.com/crunchydata/crunchy-postgresql-manager",
 	"GoVersion": "go1.3.3",
 	"Packages": [
-		"github.com/jmccormick2001/crunchy-postgresql-manager/util",
-		"github.com/jmccormick2001/crunchy-postgresql-manager/logit",
-		"github.com/jmccormick2001/crunchy-postgresql-manager/adminapi",
-		"github.com/jmccormick2001/crunchy-postgresql-manager/backup",
-		"github.com/jmccormick2001/crunchy-postgresql-manager/cpmagent",
-		"github.com/jmccormick2001/crunchy-postgresql-manager/dummy",
-		"github.com/jmccormick2001/crunchy-postgresql-manager/kubeclient",
-		"github.com/jmccormick2001/crunchy-postgresql-manager/myinfluxdb/client",
-		"github.com/jmccormick2001/crunchy-postgresql-manager/mon",
-		"github.com/jmccormick2001/crunchy-postgresql-manager/sec",
-		"github.com/jmccormick2001/crunchy-postgresql-manager/template",
-		"github.com/jmccormick2001/crunchy-postgresql-manager/admindb"
+		"github.com/crunchydata/crunchy-postgresql-manager/util",
+		"github.com/crunchydata/crunchy-postgresql-manager/logit",
+		"github.com/crunchydata/crunchy-postgresql-manager/adminapi",
+		"github.com/crunchydata/crunchy-postgresql-manager/backup",
+		"github.com/crunchydata/crunchy-postgresql-manager/cpmnodeagent",
+		"github.com/crunchydata/crunchy-postgresql-manager/cpmserveragent",
+		"github.com/crunchydata/crunchy-postgresql-manager/dummy",
+		"github.com/crunchydata/crunchy-postgresql-manager/kubeclient",
+		"github.com/crunchydata/crunchy-postgresql-manager/myinfluxdb/client",
+		"github.com/crunchydata/crunchy-postgresql-manager/mon",
+		"github.com/crunchydata/crunchy-postgresql-manager/sec",
+		"github.com/crunchydata/crunchy-postgresql-manager/template",
+		"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	],
 	"Deps": [
 		{

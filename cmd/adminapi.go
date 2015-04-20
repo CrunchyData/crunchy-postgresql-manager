@@ -155,6 +155,10 @@ func main() {
 		&rest.Route{"GET", "/mon/container/pg2/:Name.:Interval.:Token", adminapi.GetPG2},
 		&rest.Route{"GET", "/mon/hc1/:Token", adminapi.GetHC1},
 		&rest.Route{"GET", "/version", adminapi.GetVersion},
+		&rest.Route{"POST", "/dbuser/add/:Token", adminapi.AddNodeUser},
+		&rest.Route{"GET", "/dbuser/delete/:ID.:Token", adminapi.DeleteNodeUser},
+		&rest.Route{"GET", "/dbuser/get/:Containername.:Usename.:Token", adminapi.GetNodeUser},
+		&rest.Route{"GET", "/dbuser/getall/:Containername:Token", adminapi.GetAllUsersForNode},
 	)
 	if err != nil {
 		log.Fatal(err)

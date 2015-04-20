@@ -143,6 +143,14 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	var pgport admindb.DBSetting
+	pgport, err = admindb.GetDBSetting("PG-PORT")
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	//get domain name
 	var domain string
 	var hostname = "cpm-mon"
@@ -167,7 +175,7 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 
 	//get list of databases on node
 	var databaseConn *sql.DB
-	databaseConn, err = util.GetMonitoringConnection(Name+"."+domain, "postgres", "5432", "postgres", "")
+	databaseConn, err = util.GetMonitoringConnection(Name+"."+domain, "postgres", pgport.Value, "postgres", "")
 	defer databaseConn.Close()
 
 	var databases []string
