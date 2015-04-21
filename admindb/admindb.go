@@ -788,3 +788,20 @@ func GetNodeUser(containername string, usename string) (DBNodeUser, error) {
 	user.Passwd = unencrypted
 	return user, nil
 }
+
+func UpdateNodeUser(user DBNodeUser) error {
+	//logit.Info.Println("admindb:UpdateCluster:called")
+	queryStr := fmt.Sprintf("update nodeuser set ( passwd, updatedt) = ('%s', now()) where id = %s returning id", user.Passwd, user.ID)
+
+	logit.Info.Println("[" + queryStr + "]")
+	var userid int
+	err := dbConn.QueryRow(queryStr).Scan(&userid)
+	switch {
+	case err != nil:
+		return err
+	default:
+		logit.Info.Println("admindb:UpdateNodeUser:updated " + user.ID)
+	}
+	return nil
+
+}

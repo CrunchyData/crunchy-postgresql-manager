@@ -36,6 +36,8 @@ type PG2Data struct {
 	Name  string
 }
 
+var SUPERUSER = "postgres"
+
 func GetServerMetrics(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
@@ -175,7 +177,17 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 
 	//get list of databases on node
 	var databaseConn *sql.DB
-	databaseConn, err = util.GetMonitoringConnection(Name+"."+domain, "postgres", pgport.Value, "postgres", "")
+
+	//fetch cpmtest user credentials
+	var nodeuser admindb.DBNodeUser
+	nodeuser, err = admindb.GetNodeUser(Name, SUPERUSER)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	databaseConn, err = util.GetMonitoringConnection(Name+"."+domain, "postgres", pgport.Value, SUPERUSER, nodeuser.Passwd)
 	defer databaseConn.Close()
 
 	var databases []string

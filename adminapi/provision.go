@@ -283,9 +283,29 @@ func provisionImpl(params *cpmserveragent.DockerRunArgs, PROFILE string, standby
 
 }
 
+//currently we define default DB users (postgres, cpmtest, pgpool)
+//for all database containers
 func createDBUsers(dbnode admindb.DBClusterNode) error {
 	var err error
 	var password admindb.DBSetting
+
+	//get the postgres password
+	password, err = admindb.GetDBSetting("POSTGRESPSW")
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
+	//register postgres user
+	var user = admindb.DBNodeUser{}
+	user.Containername = dbnode.Name
+	user.Usename = "postgres"
+	user.Passwd = password.Value
+	_, err = admindb.DBAddNodeUser(user)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
+
 	//cpmtest and pgpool users are created by the node-setup.sql script
 	//here, we just register them when we create a new node
 
@@ -296,7 +316,6 @@ func createDBUsers(dbnode admindb.DBClusterNode) error {
 		return err
 	}
 	//register cpmtest user
-	var user = admindb.DBNodeUser{}
 	user.Containername = dbnode.Name
 	user.Usename = "cpmtest"
 	user.Passwd = password.Value

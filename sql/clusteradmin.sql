@@ -217,5 +217,6 @@ create table nodeuser (
 	unique (containername, usename)
 );
 
+insert into settings (name, value, updatedt) values ('POSTGRESPSW', '', now());
 insert into settings (name, value, updatedt) values ('CPMTESTPSW', 'cpmtest', now());
 insert into settings (name, value, updatedt) values ('PGPOOLPSW', 'pgpool', now());

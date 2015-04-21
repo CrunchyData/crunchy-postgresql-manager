@@ -30,6 +30,9 @@ type DefaultJob struct {
 	request MonRequest
 }
 
+const CPMTESTUSER = "cpmtest"
+const SUPERUSER = "postgres"
+
 //this is the func that implements the cron Job interface
 func (t DefaultJob) Run() {
 	logit.Info.Println("running Schedule:" + t.request.Schedule.Name)
@@ -102,19 +105,21 @@ func RunMonJob(args *MonRequest) error {
 	}
 
 	var databaseConn *sql.DB
-	var id = "postgres"
-	var psw = ""
-	var database = "postgres"
+	var id string
+	var psw string
+	var database string
+
 	y := 0
 	for y = range nodes {
 		//get connection to database
 		logit.Info.Println("collecting for node " + nodes[y].Name)
 
+		var nodeuser admindb.DBNodeUser
+		var password string
+
 		if nodes[y].Role == "pgpool" {
 			//fetch cpmtest user credentials
-			var nodeuser admindb.DBNodeUser
-			var password string
-			nodeuser, err = admindb.GetNodeUser(nodes[y].Name, "cpmtest")
+			nodeuser, err = admindb.GetNodeUser(nodes[y].Name, CPMTESTUSER)
 			if err != nil {
 				logit.Error.Println(err.Error())
 			}
@@ -122,9 +127,22 @@ func RunMonJob(args *MonRequest) error {
 			password, err = sec.DecryptPassword(nodeuser.Passwd)
 			logit.Info.Println("cpmtest password is " + password)
 
-			id = "cpmtest"
+			id = CPMTESTUSER
 			psw = password
 			database = "cpmtest"
+		} else {
+			//fetch postgres user credentials
+			nodeuser, err = admindb.GetNodeUser(nodes[y].Name, SUPERUSER)
+			if err != nil {
+				logit.Error.Println(err.Error())
+			}
+
+			password, err = sec.DecryptPassword(nodeuser.Passwd)
+			logit.Info.Println("postgres password is " + password)
+
+			id = SUPERUSER
+			psw = password
+			database = "postgres"
 		}
 
 		databaseConn, err = util.GetMonitoringConnection(nodes[y].Name+"."+domain, id, pgport.Value, database, psw)
