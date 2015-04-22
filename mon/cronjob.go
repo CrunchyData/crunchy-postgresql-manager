@@ -55,14 +55,7 @@ func RunMonJob(args *MonRequest) error {
 		return err
 	}
 
-	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting("PG-PORT")
-	if err != nil {
-		logit.Error.Println("RunMonJob: setting error " + err.Error())
-		return err
-	}
-
-	domain, servers, nodes, metrics, err := getData()
+	pgport, domain, servers, nodes, metrics, err := getData()
 	if err != nil {
 		logit.Error.Println("error: RunMonJob " + err.Error())
 		return err
@@ -145,7 +138,7 @@ func RunMonJob(args *MonRequest) error {
 			database = "postgres"
 		}
 
-		databaseConn, err = util.GetMonitoringConnection(nodes[y].Name+"."+domain, id, pgport.Value, database, psw)
+		databaseConn, err = util.GetMonitoringConnection(nodes[y].Name+"."+domain, id, pgport, database, psw)
 		if err != nil {
 			logit.Error.Println("error in getting connection to " + nodes[y].Name)
 		} else {
@@ -189,8 +182,9 @@ func RunMonJob(args *MonRequest) error {
 
 }
 
-func getData() (string, []admindb.Server, []admindb.Container, []MonMetric, error) {
+func getData() (string, string, []admindb.Server, []admindb.Container, []MonMetric, error) {
 	var domain string
+	var pgportValue string
 	var servers []admindb.Server
 	var nodes []admindb.Container
 	var metrics []MonMetric
@@ -200,7 +194,7 @@ func getData() (string, []admindb.Server, []admindb.Container, []MonMetric, erro
 	dbConn, err = util.GetConnection("clusteradmin")
 	if err != nil {
 		logit.Error.Println(err.Error())
-		return domain, servers, nodes, metrics, err
+		return pgportValue, domain, servers, nodes, metrics, err
 	}
 	defer dbConn.Close()
 
@@ -209,27 +203,35 @@ func getData() (string, []admindb.Server, []admindb.Container, []MonMetric, erro
 	domain, err = admindb.GetDomain()
 	if err != nil {
 		logit.Error.Println("error: getData " + err.Error())
-		return domain, servers, nodes, metrics, err
+		return pgportValue, domain, servers, nodes, metrics, err
 	}
 
 	servers, err = admindb.GetAllServers()
 	if err != nil {
 		logit.Error.Println(err.Error())
-		return domain, servers, nodes, metrics, err
+		return pgportValue, domain, servers, nodes, metrics, err
 	}
 	nodes, err = admindb.GetAllContainers()
 	if err != nil {
 		logit.Error.Println(err.Error())
-		return domain, servers, nodes, metrics, err
+		return pgportValue, domain, servers, nodes, metrics, err
 	}
+
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
+	if err != nil {
+		logit.Error.Println("error getData: setting error " + err.Error())
+		return pgportValue, domain, servers, nodes, metrics, err
+	}
+	pgportValue = pgport.Value
 
 	SetConnection(dbConn)
 	metrics, err = DBGetMetrics()
 	if err != nil {
 		logit.Error.Println(err.Error())
-		return domain, servers, nodes, metrics, err
+		return pgportValue, domain, servers, nodes, metrics, err
 	}
 
 	logit.Info.Println("got this many metrics " + strconv.Itoa(len(metrics)))
-	return domain, servers, nodes, metrics, err
+	return pgportValue, domain, servers, nodes, metrics, err
 }

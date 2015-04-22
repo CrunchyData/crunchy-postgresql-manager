@@ -18,6 +18,7 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/mon"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
@@ -58,6 +59,7 @@ func main() {
 	}
 
 	mon.SetConnection(dbConn)
+	admindb.SetConnection(dbConn)
 
 	mon.LoadSchedules()
 
