@@ -31,7 +31,7 @@ func GetAllSettings(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	results, err := admindb.GetAllDBSettings()
+	results, err := admindb.GetAllSettings()
 	if err != nil {
 		logit.Error.Println("GetAllSettings: error-" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -68,14 +68,14 @@ func SaveSettings(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("SaveSettings: PGPort=" + settings.PGPort)
 	logit.Info.Println("SaveSettings: DomainName=" + settings.DomainName)
 
-	dbsetting := admindb.DBSetting{"DOCKER-REGISTRY", settings.DockerRegistry, ""}
-	err2 := admindb.UpdateDBSetting(dbsetting)
-	dbsetting = admindb.DBSetting{"PG-PORT", settings.PGPort, ""}
-	err2 = admindb.UpdateDBSetting(dbsetting)
-	dbsetting = admindb.DBSetting{"DOMAIN-NAME", settings.DomainName, ""}
-	err2 = admindb.UpdateDBSetting(dbsetting)
+	dbsetting := admindb.Setting{"DOCKER-REGISTRY", settings.DockerRegistry, ""}
+	err2 := admindb.UpdateSetting(dbsetting)
+	dbsetting = admindb.Setting{"PG-PORT", settings.PGPort, ""}
+	err2 = admindb.UpdateSetting(dbsetting)
+	dbsetting = admindb.Setting{"DOMAIN-NAME", settings.DomainName, ""}
+	err2 = admindb.UpdateSetting(dbsetting)
 	if err2 != nil {
-		logit.Error.Println("SaveSettings: error in UpdateDBSetting " + err.Error())
+		logit.Error.Println("SaveSettings: error in UpdateSetting " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -107,18 +107,18 @@ func SaveProfiles(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("SaveProfiles: mediumCPU=" + profiles.MediumCPU + " mediumMEM=" + profiles.MediumMEM)
 	logit.Info.Println("SaveProfiles: largeCPU=" + profiles.LargeCPU + " largeMEM=" + profiles.LargeMEM)
 
-	dbsetting := admindb.DBSetting{"S-DOCKER-PROFILE-CPU", profiles.SmallCPU, ""}
-	err2 := admindb.UpdateDBSetting(dbsetting)
-	dbsetting = admindb.DBSetting{"S-DOCKER-PROFILE-MEM", profiles.SmallMEM, ""}
-	err2 = admindb.UpdateDBSetting(dbsetting)
-	dbsetting = admindb.DBSetting{"M-DOCKER-PROFILE-CPU", profiles.MediumCPU, ""}
-	err2 = admindb.UpdateDBSetting(dbsetting)
-	dbsetting = admindb.DBSetting{"M-DOCKER-PROFILE-MEM", profiles.MediumMEM, ""}
-	err2 = admindb.UpdateDBSetting(dbsetting)
-	dbsetting = admindb.DBSetting{"L-DOCKER-PROFILE-CPU", profiles.LargeCPU, ""}
-	err2 = admindb.UpdateDBSetting(dbsetting)
-	dbsetting = admindb.DBSetting{"L-DOCKER-PROFILE-MEM", profiles.LargeMEM, ""}
-	err2 = admindb.UpdateDBSetting(dbsetting)
+	dbsetting := admindb.Setting{"S-DOCKER-PROFILE-CPU", profiles.SmallCPU, ""}
+	err2 := admindb.UpdateSetting(dbsetting)
+	dbsetting = admindb.Setting{"S-DOCKER-PROFILE-MEM", profiles.SmallMEM, ""}
+	err2 = admindb.UpdateSetting(dbsetting)
+	dbsetting = admindb.Setting{"M-DOCKER-PROFILE-CPU", profiles.MediumCPU, ""}
+	err2 = admindb.UpdateSetting(dbsetting)
+	dbsetting = admindb.Setting{"M-DOCKER-PROFILE-MEM", profiles.MediumMEM, ""}
+	err2 = admindb.UpdateSetting(dbsetting)
+	dbsetting = admindb.Setting{"L-DOCKER-PROFILE-CPU", profiles.LargeCPU, ""}
+	err2 = admindb.UpdateSetting(dbsetting)
+	dbsetting = admindb.Setting{"L-DOCKER-PROFILE-MEM", profiles.LargeMEM, ""}
+	err2 = admindb.UpdateSetting(dbsetting)
 	if err2 != nil {
 		logit.Error.Println("SaveProfiles: sql error " + err2.Error())
 		rest.Error(w, err2.Error(), http.StatusBadRequest)
@@ -152,18 +152,18 @@ func SaveClusterProfiles(w rest.ResponseWriter, r *rest.Request) {
 
 	logit.Info.Println("SaveClusterProfiles: size=" + profiles.Size)
 
-	dbsetting := admindb.DBSetting{"CP-" + profiles.Size + "-COUNT", profiles.Count, ""}
-	err = admindb.UpdateDBSetting(dbsetting)
-	dbsetting = admindb.DBSetting{"CP-" + profiles.Size + "-ALGO", profiles.Algo, ""}
-	err = admindb.UpdateDBSetting(dbsetting)
-	dbsetting = admindb.DBSetting{"CP-" + profiles.Size + "-M-PROFILE", profiles.MasterProfile, ""}
-	err = admindb.UpdateDBSetting(dbsetting)
-	dbsetting = admindb.DBSetting{"CP-" + profiles.Size + "-S-PROFILE", profiles.StandbyProfile, ""}
-	err = admindb.UpdateDBSetting(dbsetting)
-	dbsetting = admindb.DBSetting{"CP-" + profiles.Size + "-M-SERVER", profiles.MasterServer, ""}
-	err = admindb.UpdateDBSetting(dbsetting)
-	dbsetting = admindb.DBSetting{"CP-" + profiles.Size + "-S-SERVER", profiles.StandbyServer, ""}
-	err = admindb.UpdateDBSetting(dbsetting)
+	dbsetting := admindb.Setting{"CP-" + profiles.Size + "-COUNT", profiles.Count, ""}
+	err = admindb.UpdateSetting(dbsetting)
+	dbsetting = admindb.Setting{"CP-" + profiles.Size + "-ALGO", profiles.Algo, ""}
+	err = admindb.UpdateSetting(dbsetting)
+	dbsetting = admindb.Setting{"CP-" + profiles.Size + "-M-PROFILE", profiles.MasterProfile, ""}
+	err = admindb.UpdateSetting(dbsetting)
+	dbsetting = admindb.Setting{"CP-" + profiles.Size + "-S-PROFILE", profiles.StandbyProfile, ""}
+	err = admindb.UpdateSetting(dbsetting)
+	dbsetting = admindb.Setting{"CP-" + profiles.Size + "-M-SERVER", profiles.MasterServer, ""}
+	err = admindb.UpdateSetting(dbsetting)
+	dbsetting = admindb.Setting{"CP-" + profiles.Size + "-S-SERVER", profiles.StandbyServer, ""}
+	err = admindb.UpdateSetting(dbsetting)
 
 	if err != nil {
 		logit.Error.Println("SaveClusterProfiles: sql error " + err.Error())
@@ -181,7 +181,7 @@ func SaveClusterProfiles(w rest.ResponseWriter, r *rest.Request) {
 func getClusterProfileInfo(sz string) (ClusterProfiles, error) {
 	prof := ClusterProfiles{}
 
-	results, err := admindb.GetAllDBSettingsMap()
+	results, err := admindb.GetAllSettingsMap()
 	if err != nil {
 		logit.Error.Println("GetAllSettings: error-" + err.Error())
 		return prof, err

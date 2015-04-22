@@ -68,8 +68,8 @@ func GetServerMetrics(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	server := admindb.DBServer{}
-	server, err = admindb.GetDBServer(serverID)
+	server := admindb.Server{}
+	server, err = admindb.GetServer(serverID)
 	if err != nil {
 		logit.Error.Println("GetServerCPUMetrics: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -145,8 +145,8 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var pgport admindb.DBSetting
-	pgport, err = admindb.GetDBSetting("PG-PORT")
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -179,8 +179,8 @@ func GetPG2(w rest.ResponseWriter, r *rest.Request) {
 	var databaseConn *sql.DB
 
 	//fetch cpmtest user credentials
-	var nodeuser admindb.DBNodeUser
-	nodeuser, err = admindb.GetNodeUser(Name, SUPERUSER)
+	var nodeuser admindb.ContainerUser
+	nodeuser, err = admindb.GetContainerUser(Name, SUPERUSER)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)

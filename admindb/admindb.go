@@ -25,12 +25,12 @@ import (
 	"strings"
 )
 
-type DBSetting struct {
+type Setting struct {
 	Name       string
 	Value      string
 	UpdateDate string
 }
-type DBServer struct {
+type Server struct {
 	ID             string
 	Name           string
 	IPAddress      string
@@ -41,7 +41,7 @@ type DBServer struct {
 	NodeCount      string
 }
 
-type DBCluster struct {
+type Cluster struct {
 	ID          string
 	Name        string
 	ClusterType string
@@ -49,7 +49,7 @@ type DBCluster struct {
 	CreateDate  string
 }
 
-type DBClusterNode struct {
+type Container struct {
 	ID         string
 	ClusterID  string
 	ServerID   string
@@ -59,7 +59,7 @@ type DBClusterNode struct {
 	CreateDate string
 }
 
-type DBNodeUser struct {
+type ContainerUser struct {
 	ID            string
 	Containername string
 	Usename       string
@@ -67,13 +67,13 @@ type DBNodeUser struct {
 	UpdateDate    string
 }
 
-type DBLinuxStats struct {
+type LinuxStats struct {
 	ID        string
 	ClusterID string
 	Stats     string
 }
 
-type DBPGStats struct {
+type PGStats struct {
 	ID        string
 	ClusterID string
 	Stats     string
@@ -85,46 +85,46 @@ func SetConnection(conn *sql.DB) {
 	dbConn = conn
 }
 
-func GetDBServer(id string) (DBServer, error) {
-	//logit.Info.Println("GetDBServer called with id=" + id)
-	server := DBServer{}
+func GetServer(id string) (Server, error) {
+	//logit.Info.Println("GetServer called with id=" + id)
+	server := Server{}
 
 	err := dbConn.QueryRow(fmt.Sprintf("select id, name, ipaddress, dockerbip, pgdatapath, serverclass, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from server where id=%s", id)).Scan(&server.ID, &server.Name, &server.IPAddress, &server.DockerBridgeIP, &server.PGDataPath, &server.ServerClass, &server.CreateDate)
 	switch {
 	case err == sql.ErrNoRows:
-		logit.Info.Println("admindb:GetDBServer:no server with that id")
+		logit.Info.Println("admindb:GetServer:no server with that id")
 		return server, err
 	case err != nil:
-		logit.Info.Println("admindb:GetDBServer:" + err.Error())
+		logit.Info.Println("admindb:GetServer:" + err.Error())
 		return server, err
 	default:
-		logit.Info.Println("admindb:GetDBServer: server name returned is " + server.Name)
+		logit.Info.Println("admindb:GetServer: server name returned is " + server.Name)
 	}
 
 	return server, nil
 }
 
-func GetDBCluster(id string) (DBCluster, error) {
-	//logit.Info.Println("admindb:GetDBCluster: called")
-	cluster := DBCluster{}
+func GetCluster(id string) (Cluster, error) {
+	//logit.Info.Println("admindb:GetCluster: called")
+	cluster := Cluster{}
 
 	err := dbConn.QueryRow(fmt.Sprintf("select id, name, clustertype, status, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from cluster where id=%s", id)).Scan(&cluster.ID, &cluster.Name, &cluster.ClusterType, &cluster.Status, &cluster.CreateDate)
 	switch {
 	case err == sql.ErrNoRows:
-		logit.Info.Println("admindb:GetDBCluster:no cluster with that id")
+		logit.Info.Println("admindb:GetCluster:no cluster with that id")
 		return cluster, err
 	case err != nil:
-		logit.Info.Println("admindb:GetDBCluster:" + err.Error())
+		logit.Info.Println("admindb:GetCluster:" + err.Error())
 		return cluster, err
 	default:
-		logit.Info.Println("admindb:GetDBCluster: cluster name returned is " + cluster.Name)
+		logit.Info.Println("admindb:GetCluster: cluster name returned is " + cluster.Name)
 	}
 
 	return cluster, nil
 }
 
-func GetAllDBClusters() ([]DBCluster, error) {
-	//logit.Info.Println("admindb:GetAllDBClusters: called")
+func GetAllClusters() ([]Cluster, error) {
+	//logit.Info.Println("admindb:GetAllClusters: called")
 	var rows *sql.Rows
 	var err error
 	rows, err = dbConn.Query("select id, name, clustertype, status, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from cluster order by name")
@@ -132,9 +132,9 @@ func GetAllDBClusters() ([]DBCluster, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	clusters := make([]DBCluster, 0)
+	clusters := make([]Cluster, 0)
 	for rows.Next() {
-		cluster := DBCluster{}
+		cluster := Cluster{}
 		if err = rows.Scan(
 			&cluster.ID,
 			&cluster.Name,
@@ -150,23 +150,23 @@ func GetAllDBClusters() ([]DBCluster, error) {
 	return clusters, nil
 }
 
-func UpdateDBCluster(cluster DBCluster) error {
+func UpdateCluster(cluster Cluster) error {
 	//logit.Info.Println("admindb:UpdateCluster:called")
 	queryStr := fmt.Sprintf("update cluster set ( name, clustertype, status) = ('%s', '%s', '%s') where id = %s returning id", cluster.Name, cluster.ClusterType, cluster.Status, cluster.ID)
 
-	logit.Info.Println("admindb:UpdateDBCluster:update str=[" + queryStr + "]")
+	logit.Info.Println("admindb:UpdateCluster:update str=[" + queryStr + "]")
 	var clusterid int
 	err := dbConn.QueryRow(queryStr).Scan(&clusterid)
 	switch {
 	case err != nil:
 		return err
 	default:
-		logit.Info.Println("admindb:UpdateDBCluster:cluster updated " + cluster.ID)
+		logit.Info.Println("admindb:UpdateCluster:cluster updated " + cluster.ID)
 	}
 	return nil
 
 }
-func InsertDBCluster(cluster DBCluster) (int, error) {
+func InsertCluster(cluster Cluster) (int, error) {
 	//logit.Info.Println("admindb:InsertCluster:called")
 	queryStr := fmt.Sprintf("insert into cluster ( name, clustertype, status, createdt) values ( '%s', '%s', '%s', now()) returning id", cluster.Name, cluster.ClusterType, cluster.Status)
 
@@ -184,9 +184,9 @@ func InsertDBCluster(cluster DBCluster) (int, error) {
 	return clusterid, nil
 }
 
-func DeleteDBCluster(id string) error {
+func DeleteCluster(id string) error {
 	queryStr := fmt.Sprintf("delete from cluster where  id=%s returning id", id)
-	//logit.Info.Println("admindb:DeleteDBCluster:" + queryStr)
+	//logit.Info.Println("admindb:DeleteCluster:" + queryStr)
 
 	var clusterid int
 	err := dbConn.QueryRow(queryStr).Scan(&clusterid)
@@ -194,249 +194,249 @@ func DeleteDBCluster(id string) error {
 	case err != nil:
 		return err
 	default:
-		logit.Info.Println("admindb:DeleteDBCluster:cluster deleted " + id)
+		logit.Info.Println("admindb:DeleteCluster:cluster deleted " + id)
 	}
 	return nil
 }
 
-func GetDBNode(id string) (DBClusterNode, error) {
-	//logit.Info.Println("admindb:GetDBNode:called")
-	node := DBClusterNode{}
+func GetContainer(id string) (Container, error) {
+	//logit.Info.Println("admindb:GetContainer:called")
+	container := Container{}
 
-	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, noderole, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from node where id=%s", id)
-	err := dbConn.QueryRow(queryStr).Scan(&node.ID, &node.Name, &node.ClusterID, &node.ServerID, &node.Role, &node.Image, &node.CreateDate)
+	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, role, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from container where id=%s", id)
+	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate)
 	switch {
 	case err == sql.ErrNoRows:
-		logit.Info.Println("admindb:GetDBNode:no node with that id " + id)
-		return node, err
+		logit.Info.Println("admindb:GetContainer:no container with that id " + id)
+		return container, err
 	case err != nil:
-		return node, err
+		return container, err
 	}
 
-	return node, nil
+	return container, nil
 }
 
-func GetDBNodeByName(name string) (DBClusterNode, error) {
+func GetContainerByName(name string) (Container, error) {
 	//logit.Info.Println("admindb:GetNodeByName:called")
-	node := DBClusterNode{}
+	container := Container{}
 
-	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, noderole, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from node where name='%s'", name)
-	err := dbConn.QueryRow(queryStr).Scan(&node.ID, &node.Name, &node.ClusterID, &node.ServerID, &node.Role, &node.Image, &node.CreateDate)
+	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, role, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from container where name='%s'", name)
+	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate)
 	switch {
 	case err == sql.ErrNoRows:
-		logit.Info.Println("admindb:GetDBNodeByName:no node with that name " + name)
-		return node, err
+		logit.Info.Println("admindb:GetContainerByName:no container with that name " + name)
+		return container, err
 	case err != nil:
-		return node, err
+		return container, err
 	}
 
-	return node, nil
+	return container, nil
 }
 
-//find the oldest node in a cluster, used for serf join-cluster event
-func GetDBNodeOldestInCluster(clusterid string) (DBClusterNode, error) {
+//find the oldest container in a cluster, used for serf join-cluster event
+func GetContainerOldestInCluster(clusterid string) (Container, error) {
 	//logit.Info.Println("admindb:GetNodeOldestInCluster:called")
-	node := DBClusterNode{}
+	container := Container{}
 
-	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, noderole, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from node where createdt = (select max(createdt) from node where clusterid = %s)", clusterid)
+	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, role, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from container where createdt = (select max(createdt) from container where clusterid = %s)", clusterid)
 	logit.Info.Println("admindb:GetNodeOldestInCluster:" + queryStr)
-	err := dbConn.QueryRow(queryStr).Scan(&node.ID, &node.Name, &node.ClusterID, &node.ServerID, &node.Role, &node.Image, &node.CreateDate)
+	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate)
 	switch {
 	case err == sql.ErrNoRows:
-		logit.Info.Println("admindb:GetDBNodeOldestInCluster: no node with that clusterid " + clusterid)
-		return node, err
+		logit.Info.Println("admindb:GetContainerOldestInCluster: no container with that clusterid " + clusterid)
+		return container, err
 	case err != nil:
-		return node, err
+		return container, err
 	}
 
-	return node, nil
+	return container, nil
 }
 
-//find the master node in a cluster, used for serf fail-over event
-func GetDBNodeMaster(clusterid string) (DBClusterNode, error) {
-	//logit.Info.Println("admindb:GetDBNodeMaster:called")
-	node := DBClusterNode{}
+//find the master container in a cluster, used for serf fail-over event
+func GetContainerMaster(clusterid string) (Container, error) {
+	//logit.Info.Println("admindb:GetContainerMaster:called")
+	container := Container{}
 
-	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, noderole, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from node where noderole = 'master' and clusterid = %s", clusterid)
-	logit.Info.Println("admindb:GetDBNodeMaster:" + queryStr)
-	err := dbConn.QueryRow(queryStr).Scan(&node.ID, &node.Name, &node.ClusterID, &node.ServerID, &node.Role, &node.Image, &node.CreateDate)
+	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, role, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from container where role = 'master' and clusterid = %s", clusterid)
+	logit.Info.Println("admindb:GetContainerMaster:" + queryStr)
+	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate)
 	switch {
 	case err == sql.ErrNoRows:
-		logit.Info.Println("admindb:GetDBNodeMaster: no master node with that clusterid " + clusterid)
-		return node, err
+		logit.Info.Println("admindb:GetContainerMaster: no master container with that clusterid " + clusterid)
+		return container, err
 	case err != nil:
-		return node, err
+		return container, err
 	}
 
-	return node, nil
+	return container, nil
 }
 
-//find the pgpool node in a cluster
-func GetDBNodePgpool(clusterid string) (DBClusterNode, error) {
-	//logit.Info.Println("admindb:GetDBNodeMaster:called")
-	node := DBClusterNode{}
+//find the pgpool container in a cluster
+func GetContainerPgpool(clusterid string) (Container, error) {
+	//logit.Info.Println("admindb:GetContainerMaster:called")
+	container := Container{}
 
-	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, noderole, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from node where noderole = 'pgpool' and clusterid = %s", clusterid)
-	logit.Info.Println("admindb:GetDBNodeMaster:" + queryStr)
-	err := dbConn.QueryRow(queryStr).Scan(&node.ID, &node.Name, &node.ClusterID, &node.ServerID, &node.Role, &node.Image, &node.CreateDate)
+	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, role, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from container where role = 'pgpool' and clusterid = %s", clusterid)
+	logit.Info.Println("admindb:GetContainerMaster:" + queryStr)
+	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate)
 	switch {
 	case err == sql.ErrNoRows:
-		logit.Info.Println("admindb:GetDBNodeMaster: no pgpool node with that clusterid " + clusterid)
-		return node, err
+		logit.Info.Println("admindb:GetContainerMaster: no pgpool container with that clusterid " + clusterid)
+		return container, err
 	case err != nil:
-		return node, err
+		return container, err
 	}
 
-	return node, nil
+	return container, nil
 }
 
 //
-// TODO combine with GetMaster into a GetNodesByRole func
+// TODO combine with GetMaster into a GetContainersByRole func
 //
-func GetAllDBStandbyNodes(clusterid string) ([]DBClusterNode, error) {
+func GetAllStandbyContainers(clusterid string) ([]Container, error) {
 	var rows *sql.Rows
 	var err error
-	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, noderole, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from node where noderole = 'standby' and clusterid = %s", clusterid)
-	logit.Info.Println("admindb:GetAllDBStandbyNodes:" + queryStr)
+	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, role, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from container where role = 'standby' and clusterid = %s", clusterid)
+	logit.Info.Println("admindb:GetAllStandbyContainers:" + queryStr)
 	rows, err = dbConn.Query(queryStr)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	nodes := make([]DBClusterNode, 0)
+	containers := make([]Container, 0)
 	for rows.Next() {
-		node := DBClusterNode{}
-		if err = rows.Scan(&node.ID, &node.Name, &node.ClusterID, &node.ServerID, &node.Role, &node.Image, &node.CreateDate); err != nil {
+		container := Container{}
+		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate); err != nil {
 			return nil, err
 		}
-		nodes = append(nodes, node)
+		containers = append(containers, container)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-	return nodes, nil
+	return containers, nil
 }
 
-func GetAllDBNodesForServer(serverID string) ([]DBClusterNode, error) {
+func GetAllContainersForServer(serverID string) ([]Container, error) {
 	var rows *sql.Rows
 	var err error
-	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, noderole, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from node where serverid = %s order by name", serverID)
-	logit.Info.Println("admindb:GetAllDBNodesForServer:" + queryStr)
+	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, role, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from container where serverid = %s order by name", serverID)
+	logit.Info.Println("admindb:GetAllContainersForServer:" + queryStr)
 	rows, err = dbConn.Query(queryStr)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	nodes := make([]DBClusterNode, 0)
+	containers := make([]Container, 0)
 	for rows.Next() {
-		node := DBClusterNode{}
-		if err = rows.Scan(&node.ID, &node.Name, &node.ClusterID, &node.ServerID, &node.Role, &node.Image, &node.CreateDate); err != nil {
+		container := Container{}
+		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate); err != nil {
 			return nil, err
 		}
-		nodes = append(nodes, node)
+		containers = append(containers, container)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-	return nodes, nil
+	return containers, nil
 }
 
-func GetAllDBNodesForCluster(clusterID string) ([]DBClusterNode, error) {
+func GetAllContainersForCluster(clusterID string) ([]Container, error) {
 	var rows *sql.Rows
 	var err error
-	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, noderole, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from node where clusterid = %s order by name", clusterID)
-	logit.Info.Println("admindb:GetAllDBNodesForCluster:" + queryStr)
+	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, role, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from container where clusterid = %s order by name", clusterID)
+	logit.Info.Println("admindb:GetAllContainersForCluster:" + queryStr)
 	rows, err = dbConn.Query(queryStr)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	nodes := make([]DBClusterNode, 0)
+	containers := make([]Container, 0)
 	for rows.Next() {
-		node := DBClusterNode{}
-		if err = rows.Scan(&node.ID, &node.Name, &node.ClusterID, &node.ServerID, &node.Role, &node.Image, &node.CreateDate); err != nil {
+		container := Container{}
+		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate); err != nil {
 			return nil, err
 		}
-		nodes = append(nodes, node)
+		containers = append(containers, container)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-	return nodes, nil
+	return containers, nil
 }
 
 //
-// GetAllDBNodesNotInCluster is used to fetch all nodes that
+// GetAllContainersNotInCluster is used to fetch all nodes that
 // are eligible to be added into a cluster
 //
-func GetAllDBNodesNotInCluster() ([]DBClusterNode, error) {
+func GetAllContainersNotInCluster() ([]Container, error) {
 	var rows *sql.Rows
 	var err error
-	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, noderole, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from node where noderole != 'standalone' and clusterid = -1 order by name")
-	logit.Info.Println("admindb:GetAllDBNodesNotInCluster:" + queryStr)
+	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, role, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from container where role != 'standalone' and clusterid = -1 order by name")
+	logit.Info.Println("admindb:GetAllContainersNotInCluster:" + queryStr)
 	rows, err = dbConn.Query(queryStr)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	nodes := make([]DBClusterNode, 0)
+	containers := make([]Container, 0)
 	for rows.Next() {
-		node := DBClusterNode{}
-		if err = rows.Scan(&node.ID, &node.Name, &node.ClusterID, &node.ServerID, &node.Role, &node.Image, &node.CreateDate); err != nil {
+		container := Container{}
+		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate); err != nil {
 			return nil, err
 		}
-		nodes = append(nodes, node)
+		containers = append(containers, container)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-	return nodes, nil
+	return containers, nil
 }
 
-func GetAllDBNodes() ([]DBClusterNode, error) {
+func GetAllContainers() ([]Container, error) {
 	var rows *sql.Rows
 	var err error
-	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, noderole, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from node order by name")
-	logit.Info.Println("admindb:GetAllDBNodes:" + queryStr)
+	queryStr := fmt.Sprintf("select id, name, clusterid, serverid, role, image, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from container order by name")
+	logit.Info.Println("admindb:GetAllContainers:" + queryStr)
 	rows, err = dbConn.Query(queryStr)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	nodes := make([]DBClusterNode, 0)
+	containers := make([]Container, 0)
 	for rows.Next() {
-		node := DBClusterNode{}
-		if err = rows.Scan(&node.ID, &node.Name, &node.ClusterID, &node.ServerID, &node.Role, &node.Image, &node.CreateDate); err != nil {
+		container := Container{}
+		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate); err != nil {
 			return nil, err
 		}
-		nodes = append(nodes, node)
+		containers = append(containers, container)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-	return nodes, nil
+	return containers, nil
 }
 
-func InsertDBNode(node DBClusterNode) (int, error) {
-	queryStr := fmt.Sprintf("insert into node ( name, clusterid, serverid, noderole, image, createdt) values ( '%s', %s, %s, '%s','%s', now()) returning id", node.Name, node.ClusterID, node.ServerID, node.Role, node.Image)
+func InsertContainer(container Container) (int, error) {
+	queryStr := fmt.Sprintf("insert into container ( name, clusterid, serverid, role, image, createdt) values ( '%s', %s, %s, '%s','%s', now()) returning id", container.Name, container.ClusterID, container.ServerID, container.Role, container.Image)
 
-	logit.Info.Println("admindb:InsertDBNode:" + queryStr)
+	logit.Info.Println("admindb:InsertContainer:" + queryStr)
 	var nodeid int
 	err := dbConn.QueryRow(queryStr).Scan(&nodeid)
 	switch {
 	case err != nil:
-		logit.Info.Println("admindb:InsertDBNode:" + err.Error())
+		logit.Info.Println("admindb:InsertContainer:" + err.Error())
 		return -1, err
 	default:
-		logit.Info.Println("admindb:InsertDBNode:node inserted returned is " + strconv.Itoa(nodeid))
+		logit.Info.Println("admindb:InsertContainer:container inserted returned is " + strconv.Itoa(nodeid))
 	}
 
 	return nodeid, nil
 }
 
-func DeleteDBNode(id string) error {
-	queryStr := fmt.Sprintf("delete from node where  id=%s returning id", id)
-	logit.Info.Println("admindb:DeleteDBNode:" + queryStr)
+func DeleteContainer(id string) error {
+	queryStr := fmt.Sprintf("delete from container where  id=%s returning id", id)
+	logit.Info.Println("admindb:DeleteContainer:" + queryStr)
 
 	var nodeid int
 	err := dbConn.QueryRow(queryStr).Scan(&nodeid)
@@ -445,14 +445,14 @@ func DeleteDBNode(id string) error {
 		logit.Error.Println(err)
 		return err
 	default:
-		logit.Info.Println("admindb:DeleteDBNode:cluster deleted " + id)
+		logit.Info.Println("admindb:DeleteContainer:cluster deleted " + id)
 	}
 	return nil
 }
 
-func UpdateDBNode(node DBClusterNode) error {
-	queryStr := fmt.Sprintf("update node set ( name, clusterid, serverid, noderole, image) = ('%s', %s, %s, '%s', '%s') where id = %s returning id", node.Name, node.ClusterID, node.ServerID, node.Role, node.Image, node.ID)
-	logit.Info.Println("admindb:UpdateDBNode:" + queryStr)
+func UpdateContainer(container Container) error {
+	queryStr := fmt.Sprintf("update container set ( name, clusterid, serverid, role, image) = ('%s', %s, %s, '%s', '%s') where id = %s returning id", container.Name, container.ClusterID, container.ServerID, container.Role, container.Image, container.ID)
+	logit.Info.Println("admindb:UpdateContainer:" + queryStr)
 
 	var nodeid int
 	err := dbConn.QueryRow(queryStr).Scan(&nodeid)
@@ -460,14 +460,14 @@ func UpdateDBNode(node DBClusterNode) error {
 	case err != nil:
 		return err
 	default:
-		logit.Info.Println("admindb:UpdateDBNode: node updated " + node.ID)
+		logit.Info.Println("admindb:UpdateContainer: container updated " + container.Name)
 	}
 	return nil
 
 }
 
-func GetAllDBServers() ([]DBServer, error) {
-	logit.Info.Println("admindb:GetAllDBServer:called")
+func GetAllServers() ([]Server, error) {
+	logit.Info.Println("admindb:GetAllServer:called")
 	var rows *sql.Rows
 	var err error
 	rows, err = dbConn.Query("select id, name, ipaddress, dockerbip, pgdatapath, serverclass, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from server order by name")
@@ -475,9 +475,9 @@ func GetAllDBServers() ([]DBServer, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	servers := make([]DBServer, 0)
+	servers := make([]Server, 0)
 	for rows.Next() {
-		server := DBServer{}
+		server := Server{}
 		if err = rows.Scan(&server.ID, &server.Name,
 			&server.IPAddress, &server.DockerBridgeIP, &server.PGDataPath, &server.ServerClass, &server.CreateDate); err != nil {
 			return nil, err
@@ -490,20 +490,20 @@ func GetAllDBServers() ([]DBServer, error) {
 	return servers, nil
 }
 
-func GetAllDBServersByClassByCount() ([]DBServer, error) {
+func GetAllServersByClassByCount() ([]Server, error) {
 	//select s.id, s.name, s.serverclass, count(n) from server s left join node n on  s.id = n.serverid  group by s.id order by s.serverclass, count(n);
 
-	logit.Info.Println("admindb:GetAllDBServerByClassByCount:called")
+	logit.Info.Println("admindb:GetAllServerByClassByCount:called")
 	var rows *sql.Rows
 	var err error
-	rows, err = dbConn.Query("select s.id, s.name, s.ipaddress, s.dockerbip, s.pgdatapath, s.serverclass, to_char(s.createdt, 'MM-DD-YYYY HH24:MI:SS'), count(n) from server s left join node n on s.id = n.serverid group by s.id  order by s.serverclass, count(n)")
+	rows, err = dbConn.Query("select s.id, s.name, s.ipaddress, s.dockerbip, s.pgdatapath, s.serverclass, to_char(s.createdt, 'MM-DD-YYYY HH24:MI:SS'), count(n) from server s left join container n on s.id = n.serverid group by s.id  order by s.serverclass, count(n)")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	servers := make([]DBServer, 0)
+	servers := make([]Server, 0)
 	for rows.Next() {
-		server := DBServer{}
+		server := Server{}
 		if err = rows.Scan(&server.ID, &server.Name,
 			&server.IPAddress, &server.DockerBridgeIP, &server.PGDataPath, &server.ServerClass, &server.CreateDate, &server.NodeCount); err != nil {
 			return nil, err
@@ -516,23 +516,23 @@ func GetAllDBServersByClassByCount() ([]DBServer, error) {
 	return servers, nil
 }
 
-func UpdateDBServer(server DBServer) error {
+func UpdateServer(server Server) error {
 	logit.Info.Println("admindb:UpdateServer:called")
 	queryStr := fmt.Sprintf("update server set ( name, ipaddress, pgdatapath, serverclass, dockerbip) = ('%s', '%s', '%s', '%s', '%s') where id = %s returning id", server.Name, server.IPAddress, server.PGDataPath, server.ServerClass, server.DockerBridgeIP, server.ID)
 
-	logit.Info.Println("admindb:UpdateDBServer:update str=" + queryStr)
+	logit.Info.Println("admindb:UpdateServer:update str=" + queryStr)
 	var serverid int
 	err := dbConn.QueryRow(queryStr).Scan(&serverid)
 	switch {
 	case err != nil:
 		return err
 	default:
-		logit.Info.Println("admindb:UpdateDBServer:server updated " + server.ID)
+		logit.Info.Println("admindb:UpdateServer:server updated " + server.ID)
 	}
 	return nil
 
 }
-func InsertDBServer(server DBServer) (int, error) {
+func InsertServer(server Server) (int, error) {
 	//logit.Info.Println("admindb:InsertServer:called")
 	queryStr := fmt.Sprintf("insert into server ( name, ipaddress, pgdatapath, serverclass, dockerbip, createdt) values ( '%s', '%s', '%s', '%s', '%s', now()) returning id", server.Name, server.IPAddress, server.PGDataPath, server.ServerClass, server.DockerBridgeIP)
 
@@ -550,9 +550,9 @@ func InsertDBServer(server DBServer) (int, error) {
 	return serverid, nil
 }
 
-func DeleteDBServer(id string) error {
+func DeleteServer(id string) error {
 	queryStr := fmt.Sprintf("delete from server where  id=%s returning id", id)
-	logit.Info.Println("admindb:DeleteDBServer:" + queryStr)
+	logit.Info.Println("admindb:DeleteServer:" + queryStr)
 
 	var serverid int
 	err := dbConn.QueryRow(queryStr).Scan(&serverid)
@@ -560,13 +560,13 @@ func DeleteDBServer(id string) error {
 	case err != nil:
 		return err
 	default:
-		logit.Info.Println("admindb:DeleteDBServer:server deleted " + id)
+		logit.Info.Println("admindb:DeleteServer:server deleted " + id)
 	}
 	return nil
 }
 
-func GetAllDBSettings() ([]DBSetting, error) {
-	//logit.Info.Println("admindb:GetAllDBSettings: called")
+func GetAllSettings() ([]Setting, error) {
+	//logit.Info.Println("admindb:GetAllSettings: called")
 	var rows *sql.Rows
 	var err error
 	rows, err = dbConn.Query("select name, value, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from settings order by name")
@@ -574,9 +574,9 @@ func GetAllDBSettings() ([]DBSetting, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	settings := make([]DBSetting, 0)
+	settings := make([]Setting, 0)
 	for rows.Next() {
-		setting := DBSetting{}
+		setting := Setting{}
 		if err = rows.Scan(
 			&setting.Name,
 			&setting.Value,
@@ -591,16 +591,16 @@ func GetAllDBSettings() ([]DBSetting, error) {
 	return settings, nil
 }
 
-func GetDBSetting(key string) (DBSetting, error) {
-	//logit.Info.Println("admindb:GetDBSetting:called")
-	setting := DBSetting{}
+func GetSetting(key string) (Setting, error) {
+	//logit.Info.Println("admindb:GetSetting:called")
+	setting := Setting{}
 
 	queryStr := fmt.Sprintf("select value, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from settings where name = '%s'", key)
-	//logit.Info.Println("admindb:GetDBSetting:" + queryStr)
+	//logit.Info.Println("admindb:GetSetting:" + queryStr)
 	err := dbConn.QueryRow(queryStr).Scan(&setting.Value, &setting.UpdateDate)
 	switch {
 	case err == sql.ErrNoRows:
-		logit.Info.Println("admindb:GetDBSetting: no Setting with that key " + key)
+		logit.Info.Println("admindb:GetSetting: no Setting with that key " + key)
 		return setting, err
 	case err != nil:
 		return setting, err
@@ -609,7 +609,7 @@ func GetDBSetting(key string) (DBSetting, error) {
 	return setting, nil
 }
 
-func InsertDBSetting(setting DBSetting) error {
+func InsertSetting(setting Setting) error {
 	logit.Info.Println("admindb:InsertSetting:called")
 	queryStr := fmt.Sprintf("insert into setting ( name, value, createdt) values ( '%s', '%s', now()) returning name", setting.Name, setting.Value)
 
@@ -626,16 +626,16 @@ func InsertDBSetting(setting DBSetting) error {
 	return nil
 }
 
-func UpdateDBSetting(setting DBSetting) error {
+func UpdateSetting(setting Setting) error {
 	logit.Info.Println("admindb:UpdateSetting:called")
 	queryStr := fmt.Sprintf("update settings set ( value, updatedt) = ('%s', now()) where name = '%s'  returning name", setting.Value, setting.Name)
 
-	logit.Info.Println("admindb:UpdateDBSetting:update str=[" + queryStr + "]")
+	logit.Info.Println("admindb:UpdateSetting:update str=[" + queryStr + "]")
 	var name string
 	err := dbConn.QueryRow(queryStr).Scan(&name)
 	switch {
 	case err != nil:
-		logit.Info.Println("admindb:UpdateDBSetting:" + err.Error())
+		logit.Info.Println("admindb:UpdateSetting:" + err.Error())
 		return err
 	default:
 	}
@@ -643,8 +643,8 @@ func UpdateDBSetting(setting DBSetting) error {
 
 }
 
-func GetAllDBSettingsMap() (map[string]string, error) {
-	logit.Info.Println("admindb:GetAllDBSettingsMap: called")
+func GetAllSettingsMap() (map[string]string, error) {
+	logit.Info.Println("admindb:GetAllSettingsMap: called")
 	m := make(map[string]string)
 
 	var rows *sql.Rows
@@ -654,9 +654,9 @@ func GetAllDBSettingsMap() (map[string]string, error) {
 		return m, err
 	}
 	defer rows.Close()
-	//settings := make([]DBSetting, 0)
+	//settings := make([]Setting, 0)
 	for rows.Next() {
-		setting := DBSetting{}
+		setting := Setting{}
 		if err = rows.Scan(
 			&setting.Name,
 			&setting.Value,
@@ -677,7 +677,7 @@ func Test() {
 }
 
 func GetDomain() (string, error) {
-	tmp, err := GetDBSetting("DOMAIN-NAME")
+	tmp, err := GetSetting("DOMAIN-NAME")
 
 	if err != nil {
 		return "", err
@@ -688,30 +688,30 @@ func GetDomain() (string, error) {
 	return domain, nil
 }
 
-func DBAddNodeUser(s DBNodeUser) (int, error) {
+func AddContainerUser(s ContainerUser) (int, error) {
 
-	//logit.Info.Println("DBAddNodeUser called")
+	//logit.Info.Println("AddContainerUser called")
 
 	//encrypt the password...passwords at rest are encrypted
 	encrypted, err := sec.EncryptPassword(s.Passwd)
 
-	queryStr := fmt.Sprintf("insert into nodeuser ( containername, usename, passwd, updatedt) values ( '%s', '%s', '%s',  now()) returning id",
+	queryStr := fmt.Sprintf("insert into containeruser ( containername, usename, passwd, updatedt) values ( '%s', '%s', '%s',  now()) returning id",
 		s.Containername,
 		s.Usename,
 		encrypted)
 
-	logit.Info.Println("DBAddNodeUser:" + queryStr)
+	logit.Info.Println("AddContainerUser:" + queryStr)
 	var theID int
 	err = dbConn.QueryRow(queryStr).Scan(
 		&theID)
 	if err != nil {
-		logit.Error.Println("error in DBAddNodeUser query " + err.Error())
+		logit.Error.Println("error in AddContainerUser query " + err.Error())
 		return theID, err
 	}
 
 	switch {
 	case err != nil:
-		logit.Error.Println("DBAddNodeUser: error " + err.Error())
+		logit.Error.Println("AddContainerUser: error " + err.Error())
 		return theID, err
 	default:
 	}
@@ -719,9 +719,9 @@ func DBAddNodeUser(s DBNodeUser) (int, error) {
 	return theID, nil
 }
 
-func DBDeleteNodeUser(id string) error {
-	queryStr := fmt.Sprintf("delete from nodeuser where id=%s returning id", id)
-	//logit.Info.Println("admindb:DeleteDBCluster:" + queryStr)
+func DeleteContainerUser(id string) error {
+	queryStr := fmt.Sprintf("delete from containeruser where id=%s returning id", id)
+	//logit.Info.Println("admindb:DeleteCluster:" + queryStr)
 
 	var nodeuserid int
 	err := dbConn.QueryRow(queryStr).Scan(&nodeuserid)
@@ -729,24 +729,24 @@ func DBDeleteNodeUser(id string) error {
 	case err != nil:
 		return err
 	default:
-		logit.Info.Println("admindb:DBDeleteNodeUser: deleted " + id)
+		logit.Info.Println("admindb:DeleteContainerUser: deleted " + id)
 	}
 	return nil
 }
 
-func GetAllUsersForNode(containerName string) ([]DBNodeUser, error) {
+func GetAllUsersForContainer(containerName string) ([]ContainerUser, error) {
 	var rows *sql.Rows
 	var err error
-	queryStr := fmt.Sprintf("select id, usename, passwd, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from nodeuser where containername = '%s' order by usename", containerName)
-	logit.Info.Println("admindb:GetAllUsersForNode:" + queryStr)
+	queryStr := fmt.Sprintf("select id, usename, passwd, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from containeruser where containername = '%s' order by usename", containerName)
+	logit.Info.Println("admindb:GetAllUsersForContainer:" + queryStr)
 	rows, err = dbConn.Query(queryStr)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	users := make([]DBNodeUser, 0)
+	users := make([]ContainerUser, 0)
 	for rows.Next() {
-		user := DBNodeUser{}
+		user := ContainerUser{}
 		user.Containername = containerName
 		if err = rows.Scan(&user.ID, &user.Usename, &user.Passwd, &user.UpdateDate); err != nil {
 			return nil, err
@@ -759,12 +759,12 @@ func GetAllUsersForNode(containerName string) ([]DBNodeUser, error) {
 	return users, nil
 }
 
-func GetNodeUser(containername string, usename string) (DBNodeUser, error) {
+func GetContainerUser(containername string, usename string) (ContainerUser, error) {
 	var rows *sql.Rows
-	var user DBNodeUser
+	var user ContainerUser
 	var err error
-	queryStr := fmt.Sprintf("select id, passwd, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from nodeuser where usename = '%s' and containername = '%s'", usename, containername)
-	logit.Info.Println("admindb:GetNodeUser:" + queryStr)
+	queryStr := fmt.Sprintf("select id, passwd, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from containeruser where usename = '%s' and containername = '%s'", usename, containername)
+	logit.Info.Println("admindb:GetContainerUser:" + queryStr)
 	rows, err = dbConn.Query(queryStr)
 	if err != nil {
 		return user, err
@@ -789,9 +789,9 @@ func GetNodeUser(containername string, usename string) (DBNodeUser, error) {
 	return user, nil
 }
 
-func UpdateNodeUser(user DBNodeUser) error {
+func UpdateContainerUser(user ContainerUser) error {
 	//logit.Info.Println("admindb:UpdateCluster:called")
-	queryStr := fmt.Sprintf("update nodeuser set ( passwd, updatedt) = ('%s', now()) where id = %s returning id", user.Passwd, user.ID)
+	queryStr := fmt.Sprintf("update containeruser set ( passwd, updatedt) = ('%s', now()) where id = %s returning id", user.Passwd, user.ID)
 
 	logit.Info.Println("[" + queryStr + "]")
 	var userid int
@@ -800,7 +800,7 @@ func UpdateNodeUser(user DBNodeUser) error {
 	case err != nil:
 		return err
 	default:
-		logit.Info.Println("admindb:UpdateNodeUser:updated " + user.ID)
+		logit.Info.Println("admindb:UpdateContainerUser:updated " + user.ID)
 	}
 	return nil
 

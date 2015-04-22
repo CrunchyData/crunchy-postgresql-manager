@@ -38,16 +38,16 @@ create table cluster (
 	)
 );
 
-create table node (
+create table container (
 	id serial primary key,
 	name varchar(30) unique not null,
 	clusterid int,
 	serverid int references server (id) on delete cascade,
-	noderole varchar(10) not null,
+	role varchar(10) not null,
 	image varchar(30) not null,
 	createdt timestamp not null,
-	constraint valid_node_roles check (
-		noderole in ('standby', 'master', 'unassigned', 'standalone', 'pgpool')
+	constraint valid_roles check (
+		role in ('standby', 'master', 'unassigned', 'standalone', 'pgpool')
 	)
 );
 
@@ -147,7 +147,7 @@ insert into backupprofile (name) values ('pg_dumpall');
 create table backupschedule (
 	id serial primary key,
 	serverid int references server (id) on delete cascade not null,
-	containername varchar(20) references node (name) on delete cascade not null,
+	containername varchar(20) references container (name) on delete cascade not null,
 	profilename varchar(30) references backupprofile (name) not null,
 	name varchar(30) not null,
 	enabled varchar(3) not null,
@@ -208,9 +208,9 @@ insert into monmetric values ('pg1', 'database', 's1');
 insert into monmetric values ('pg2', 'database', 's1');
 insert into monmetric values ('hc1', 'healthck', 's1');
 
-create table nodeuser (
+create table containeruser (
 	id serial primary key,
-	containername varchar(20) references node (name) on delete cascade not null,
+	containername varchar(20) references container (name) on delete cascade not null,
 	usename varchar(30) not null,
 	passwd varchar(30) not null,
 	updatedt timestamp not null,

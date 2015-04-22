@@ -44,7 +44,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	results, err := admindb.GetDBNode(ID)
+	results, err := admindb.GetContainer(ID)
 
 	if results.ID == "" {
 		rest.NotFound(w, r)
@@ -59,8 +59,8 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	var currentStatus = "UNKNOWN"
 
 	//go get the docker server IPAddress
-	server := admindb.DBServer{}
-	server, err = admindb.GetDBServer(results.ServerID)
+	server := admindb.Server{}
+	server, err = admindb.GetServer(results.ServerID)
 	if err != nil {
 		logit.Error.Println("GetNode: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -124,7 +124,7 @@ func GetAllNodes(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	results, err := admindb.GetAllDBNodes()
+	results, err := admindb.GetAllContainers()
 	if err != nil {
 		logit.Error.Println("GetAllNodes: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -156,7 +156,7 @@ func GetAllNodesNotInCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	results, err := admindb.GetAllDBNodesNotInCluster()
+	results, err := admindb.GetAllContainersNotInCluster()
 	if err != nil {
 		logit.Error.Println("GetAllNodesNotInCluster: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -194,7 +194,7 @@ func GetAllNodesForCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	results, err := admindb.GetAllDBNodesForCluster(ClusterID)
+	results, err := admindb.GetAllContainersForCluster(ClusterID)
 	if err != nil {
 		logit.Error.Println("GetAllNodesForCluster:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -237,8 +237,8 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//go get the node we intend to delete
-	var dbNode admindb.DBClusterNode
-	dbNode, err = admindb.GetDBNode(ID)
+	var dbNode admindb.Container
+	dbNode, err = admindb.GetContainer(ID)
 	if err != nil {
 		logit.Error.Println("DeleteNode: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -246,15 +246,15 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//go get the docker server IPAddress
-	server := admindb.DBServer{}
-	server, err = admindb.GetDBServer(dbNode.ServerID)
+	server := admindb.Server{}
+	server, err = admindb.GetServer(dbNode.ServerID)
 	if err != nil {
 		logit.Error.Println("DeleteNode: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = admindb.DeleteDBNode(ID)
+	err = admindb.DeleteContainer(ID)
 	if err != nil {
 		logit.Error.Println("DeleteNode: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -328,7 +328,7 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	results, err := admindb.GetAllDBNodesForServer(serverID)
+	results, err := admindb.GetAllContainersForServer(serverID)
 	if err != nil {
 		logit.Error.Println("GetAllNodesForServer:" + err.Error())
 		logit.Error.Println("error " + err.Error())
@@ -336,7 +336,7 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	server, err2 := admindb.GetDBServer(serverID)
+	server, err2 := admindb.GetServer(serverID)
 	if err2 != nil {
 		logit.Error.Println("GetAllNodesForServer:" + err2.Error())
 		logit.Error.Println("error " + err2.Error())
@@ -391,15 +391,15 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	node, err := admindb.GetDBNode(ID)
+	node, err := admindb.GetContainer(ID)
 	if err != nil {
 		logit.Error.Println("AdminStartNode:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	server := admindb.DBServer{}
-	server, err = admindb.GetDBServer(node.ServerID)
+	server := admindb.Server{}
+	server, err = admindb.GetServer(node.ServerID)
 	if err != nil {
 		logit.Error.Println("AdminStartNode:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -436,15 +436,15 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	node, err := admindb.GetDBNode(ID)
+	node, err := admindb.GetContainer(ID)
 	if err != nil {
 		logit.Error.Println("AdminStopNode:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	server := admindb.DBServer{}
-	server, err = admindb.GetDBServer(node.ServerID)
+	server := admindb.Server{}
+	server, err = admindb.GetServer(node.ServerID)
 	if err != nil {
 		logit.Error.Println("AdminStopNode:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -468,7 +468,7 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 
 func GetPGStatus2(nodename string, hostname string) (string, error) {
 	//fetch cpmtest user credentials
-	nodeuser, err := admindb.GetNodeUser(nodename, "cpmtest")
+	nodeuser, err := admindb.GetContainerUser(nodename, "cpmtest")
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return "", err
@@ -476,8 +476,8 @@ func GetPGStatus2(nodename string, hostname string) (string, error) {
 
 	logit.Info.Println("cpmtest password is " + nodeuser.Passwd)
 
-	var pgport admindb.DBSetting
-	pgport, err = admindb.GetDBSetting("PG-PORT")
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
 
 	dbConn, err := util.GetMonitoringConnection(hostname, "cpmtest", pgport.Value, "cpmtest", nodeuser.Passwd)
 	defer dbConn.Close()

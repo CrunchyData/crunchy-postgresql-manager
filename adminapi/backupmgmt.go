@@ -78,7 +78,7 @@ func BackupNow(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	schedule, err := backup.DBGetSchedule(postMsg.ScheduleID)
+	schedule, err := backup.GetSchedule(postMsg.ScheduleID)
 	if err != nil {
 		logit.Error.Println("BackupNow: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -86,8 +86,8 @@ func BackupNow(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//get the server details for where the backup should be made
-	server := admindb.DBServer{}
-	server, err = admindb.GetDBServer(postMsg.ServerID)
+	server := admindb.Server{}
+	server, err = admindb.GetServer(postMsg.ServerID)
 	if err != nil {
 		logit.Error.Println("BackupNow: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -96,8 +96,8 @@ func BackupNow(w rest.ResponseWriter, r *rest.Request) {
 
 	//get the domain name
 	//get domain name
-	var domainname admindb.DBSetting
-	domainname, err = admindb.GetDBSetting("DOMAIN-NAME")
+	var domainname admindb.Setting
+	domainname, err = admindb.GetSetting("DOMAIN-NAME")
 	if err != nil {
 		logit.Error.Println("BackupNow: DOMAIN-NAME err " + err.Error())
 	}
@@ -179,7 +179,7 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 	s.Month = "*"
 	s.DayOfWeek = "*"
 
-	result, err := backup.DBAddSchedule(s)
+	result, err := backup.AddSchedule(s)
 	if err != nil {
 		logit.Error.Println("GetNode: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -214,7 +214,7 @@ func DeleteSchedule(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	err = backup.DBDeleteSchedule(ID)
+	err = backup.DeleteSchedule(ID)
 	if err != nil {
 		logit.Error.Println("DeleteSchedule: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -225,8 +225,8 @@ func DeleteSchedule(w rest.ResponseWriter, r *rest.Request) {
 
 	//get the domain name
 	//get domain name
-	var domainname admindb.DBSetting
-	domainname, err = admindb.GetDBSetting("DOMAIN-NAME")
+	var domainname admindb.Setting
+	domainname, err = admindb.GetSetting("DOMAIN-NAME")
 	if err != nil {
 		logit.Error.Println("DeleteSchedule: DOMAIN-NAME err " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -267,7 +267,7 @@ func GetSchedule(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	result, err := backup.DBGetSchedule(ID)
+	result, err := backup.GetSchedule(ID)
 	if err != nil {
 		logit.Error.Println("GetNode: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -297,7 +297,7 @@ func GetAllSchedules(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	schedules, err := backup.DBGetAllSchedules(ContainerName)
+	schedules, err := backup.GetAllSchedules(ContainerName)
 	if err != nil {
 		logit.Error.Println("GetAllSchedules: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -325,7 +325,7 @@ func GetStatus(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, "ID required", 400)
 		return
 	}
-	stat, err := backup.DBGetStatus(ID)
+	stat, err := backup.GetStatus(ID)
 	if err != nil {
 		logit.Error.Println("GetStatus: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -354,7 +354,7 @@ func GetAllStatus(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	stats, err := backup.DBGetAllStatus(ID)
+	stats, err := backup.GetAllStatus(ID)
 	if err != nil {
 		logit.Error.Println("GetAllStatus: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -439,7 +439,7 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 	s.DayOfWeek = postMsg.DayOfWeek
 	s.Name = postMsg.Name
 
-	err = backup.DBUpdateSchedule(s)
+	err = backup.UpdateSchedule(s)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -450,8 +450,8 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 
 	//get the domain name
 	//get domain name
-	var domainname admindb.DBSetting
-	domainname, err = admindb.GetDBSetting("DOMAIN-NAME")
+	var domainname admindb.Setting
+	domainname, err = admindb.GetSetting("DOMAIN-NAME")
 	if err != nil {
 		logit.Error.Println("BackupNow: DOMAIN-NAME err " + err.Error())
 	}
@@ -480,7 +480,7 @@ func GetBackupNodes(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	results, err := admindb.GetAllDBNodes()
+	results, err := admindb.GetAllContainers()
 	if err != nil {
 		logit.Error.Println("GetAllNodes: " + err.Error())
 		rest.Error(w, err.Error(), 400)

@@ -94,7 +94,7 @@ func (t *Command) AddStatus(status *BackupStatus, reply *Command) error {
 
 	logit.Info.Println("AddStatus called")
 
-	id, err := DBAddStatus(*status)
+	id, err := AddStatus(*status)
 	if err != nil {
 		logit.Error.Println("AddStatus error " + err.Error())
 	}
@@ -107,7 +107,7 @@ func (t *Command) UpdateStatus(status *BackupStatus, reply *Command) error {
 
 	logit.Info.Println("UpdateStatus called")
 
-	err := DBUpdateStatus(*status)
+	err := UpdateStatus(*status)
 	if err != nil {
 		logit.Error.Println("UpdateStatus error " + err.Error())
 	}
@@ -144,7 +144,7 @@ func LoadSchedules() error {
 	var err error
 	logit.Info.Println("LoadSchedules called")
 
-	schedules, err := DBGetSchedules()
+	schedules, err := GetSchedules()
 	if err != nil {
 		logit.Error.Println("LoadSchedules error " + err.Error())
 	}

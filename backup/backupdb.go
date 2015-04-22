@@ -29,10 +29,10 @@ func SetConnection(conn *sql.DB) {
 	dbConn = conn
 }
 
-func DBAddStatus(status BackupStatus) (string, error) {
+func AddStatus(status BackupStatus) (string, error) {
 
-	logit.Info.Println("DBAddStatus called")
-	//logit.Info.Println("DBAddStatus called")
+	logit.Info.Println("AddStatus called")
+	//logit.Info.Println("AddStatus called")
 
 	queryStr := fmt.Sprintf("insert into backupstatus ( containername, starttime, backupname, servername, serverip, path, elapsedtime, backupsize, status, profilename, scheduleid, updatedt) values ( '%s', now(), '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, now()) returning id",
 		status.ContainerName,
@@ -44,26 +44,26 @@ func DBAddStatus(status BackupStatus) (string, error) {
 		status.BackupSize,
 		status.Status, status.ProfileName, status.ScheduleID)
 
-	logit.Info.Println("DBAddStatus:" + queryStr)
+	logit.Info.Println("AddStatus:" + queryStr)
 	var theID int
 	err := dbConn.QueryRow(queryStr).Scan(
 		&theID)
 	switch {
 	case err != nil:
-		logit.Error.Println("DBAddStatus: error " + err.Error())
+		logit.Error.Println("AddStatus: error " + err.Error())
 		return "", err
 	default:
 	}
 
 	var strvalue string
 	strvalue = strconv.Itoa(theID)
-	logit.Info.Println("DBAddStatus returning ID=" + strvalue)
+	logit.Info.Println("AddStatus returning ID=" + strvalue)
 	return strvalue, nil
 }
 
-func DBUpdateStatus(status BackupStatus) error {
+func UpdateStatus(status BackupStatus) error {
 
-	logit.Info.Println("backup.DBUpdateStatus called")
+	logit.Info.Println("backup.UpdateStatus called")
 
 	queryStr := fmt.Sprintf("update backupstatus set ( status, backupsize, elapsedtime, updatedt) = ('%s', '%s', '%s', now()) where id = %s returning containername",
 		status.Status,
@@ -71,12 +71,12 @@ func DBUpdateStatus(status BackupStatus) error {
 		status.ElapsedTime,
 		status.ID)
 
-	logit.Info.Println("backup:DBUpdateStatus:[" + queryStr + "]")
+	logit.Info.Println("backup:UpdateStatus:[" + queryStr + "]")
 	var name string
 	err := dbConn.QueryRow(queryStr).Scan(&name)
 	switch {
 	case err != nil:
-		logit.Error.Println("backup:DBUpdateStatus:" + err.Error())
+		logit.Error.Println("backup:UpdateStatus:" + err.Error())
 		return err
 	default:
 	}
@@ -84,9 +84,9 @@ func DBUpdateStatus(status BackupStatus) error {
 	return nil
 }
 
-func DBAddSchedule(s BackupSchedule) (string, error) {
+func AddSchedule(s BackupSchedule) (string, error) {
 
-	logit.Info.Println("DBAddSchedule called")
+	logit.Info.Println("AddSchedule called")
 
 	queryStr := fmt.Sprintf("insert into backupschedule ( serverid, containername, profilename, name, enabled, minutes, hours, dayofmonth, month, dayofweek, updatedt) values ( '%s','%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s',  now()) returning id",
 		s.ServerID,
@@ -100,18 +100,18 @@ func DBAddSchedule(s BackupSchedule) (string, error) {
 		s.Month,
 		s.DayOfWeek)
 
-	logit.Info.Println("DBAddSchedule:" + queryStr)
+	logit.Info.Println("AddSchedule:" + queryStr)
 	var theID string
 	err := dbConn.QueryRow(queryStr).Scan(
 		&theID)
 	if err != nil {
-		logit.Error.Println("error in DBAddSchedule query " + err.Error())
+		logit.Error.Println("error in AddSchedule query " + err.Error())
 		return "", err
 	}
 
 	switch {
 	case err != nil:
-		logit.Error.Println("DBAddSchedule: error " + err.Error())
+		logit.Error.Println("AddSchedule: error " + err.Error())
 		return "", err
 	default:
 	}
@@ -119,9 +119,9 @@ func DBAddSchedule(s BackupSchedule) (string, error) {
 	return theID, nil
 }
 
-func DBUpdateSchedule(s BackupSchedule) error {
+func UpdateSchedule(s BackupSchedule) error {
 
-	logit.Info.Println("backup.DBUpdateSchedule called")
+	logit.Info.Println("backup.UpdateSchedule called")
 
 	queryStr := fmt.Sprintf("update backupschedule set ( enabled, serverid, name, minutes, hours, dayofmonth, month, dayofweek, updatedt) = ('%s', %s, '%s', '%s', '%s', '%s', '%s', '%s', now()) where id = %s  returning containername",
 		s.Enabled,
@@ -134,12 +134,12 @@ func DBUpdateSchedule(s BackupSchedule) error {
 		s.DayOfWeek,
 		s.ID)
 
-	logit.Info.Println("backup:DBUpdateSchedule:[" + queryStr + "]")
+	logit.Info.Println("backup:UpdateSchedule:[" + queryStr + "]")
 	var name string
 	err := dbConn.QueryRow(queryStr).Scan(&name)
 	switch {
 	case err != nil:
-		logit.Error.Println("backup:DBUpdateSchedule:" + err.Error())
+		logit.Error.Println("backup:UpdateSchedule:" + err.Error())
 		return err
 	default:
 	}
@@ -147,9 +147,9 @@ func DBUpdateSchedule(s BackupSchedule) error {
 	return nil
 }
 
-func DBDeleteSchedule(id string) error {
+func DeleteSchedule(id string) error {
 	queryStr := fmt.Sprintf("delete from backupschedule where id=%s returning id", id)
-	logit.Info.Println("backup:DBDeleteSchedule:" + queryStr)
+	logit.Info.Println("backup:DeleteSchedule:" + queryStr)
 
 	var theID int
 	err := dbConn.QueryRow(queryStr).Scan(&theID)
@@ -162,17 +162,17 @@ func DBDeleteSchedule(id string) error {
 	return nil
 }
 
-func DBGetSchedule(id string) (BackupSchedule, error) {
-	logit.Info.Println("DBGetSchedule called with id=" + id)
+func GetSchedule(id string) (BackupSchedule, error) {
+	logit.Info.Println("GetSchedule called with id=" + id)
 	s := BackupSchedule{}
 
 	err := dbConn.QueryRow(fmt.Sprintf("select a.id, a.serverid, b.name, b.ipaddress, a.containername, a.profilename, a.name, a.enabled, a.minutes, a.hours, a.dayofmonth, a.month, a.dayofweek, date_trunc('second', a.updatedt)::text from backupschedule a, server b where a.id=%s and b.id = a.serverid", id)).Scan(&s.ID, &s.ServerID, &s.ServerName, &s.ServerIP, &s.ContainerName, &s.ProfileName, &s.Name, &s.Enabled, &s.Minutes, &s.Hours, &s.DayOfMonth, &s.Month, &s.DayOfWeek, &s.UpdateDt)
 	switch {
 	case err == sql.ErrNoRows:
-		logit.Error.Println("backupdb:DBGetSchedule:no schedule with that id")
+		logit.Error.Println("backupdb:GetSchedule:no schedule with that id")
 		return s, err
 	case err != nil:
-		logit.Error.Println("backupdb:DBGetSchedule:" + err.Error())
+		logit.Error.Println("backupdb:GetSchedule:" + err.Error())
 		return s, err
 	default:
 	}
@@ -180,12 +180,12 @@ func DBGetSchedule(id string) (BackupSchedule, error) {
 	return s, nil
 }
 
-func DBGetAllSchedules(containerid string) ([]BackupSchedule, error) {
-	logit.Info.Println("DBGetAllSchedules called with id=" + containerid)
+func GetAllSchedules(containerid string) ([]BackupSchedule, error) {
+	logit.Info.Println("GetAllSchedules called with id=" + containerid)
 	var rows *sql.Rows
 	var err error
 
-	rows, err = dbConn.Query(fmt.Sprintf("select a.id, a.serverid, s.name, s.ipaddress, a.containername, a.profilename, a.name, a.enabled, a.minutes, a.hours, a.dayofmonth, a.month, a.dayofweek, date_trunc('second', a.updatedt)::text from backupschedule a, node b, server s where a.containername= b.name and b.id = %s and a.serverid = s.id", containerid))
+	rows, err = dbConn.Query(fmt.Sprintf("select a.id, a.serverid, s.name, s.ipaddress, a.containername, a.profilename, a.name, a.enabled, a.minutes, a.hours, a.dayofmonth, a.month, a.dayofweek, date_trunc('second', a.updatedt)::text from backupschedule a, container b, server s where a.containername= b.name and b.id = %s and a.serverid = s.id", containerid))
 
 	if err != nil {
 		return nil, err
@@ -220,8 +220,8 @@ func DBGetAllSchedules(containerid string) ([]BackupSchedule, error) {
 	return schedules, nil
 }
 
-func DBGetAllStatus(scheduleid string) ([]BackupStatus, error) {
-	logit.Info.Println("DBGetAllStatus called with scheduleid=" + scheduleid)
+func GetAllStatus(scheduleid string) ([]BackupStatus, error) {
+	logit.Info.Println("GetAllStatus called with scheduleid=" + scheduleid)
 	var rows *sql.Rows
 	var err error
 
@@ -257,17 +257,17 @@ func DBGetAllStatus(scheduleid string) ([]BackupStatus, error) {
 	return stats, nil
 }
 
-func DBGetStatus(id string) (BackupStatus, error) {
-	logit.Info.Println("DBGetStatus called with id=" + id)
+func GetStatus(id string) (BackupStatus, error) {
+	logit.Info.Println("GetStatus called with id=" + id)
 	s := BackupStatus{}
 
 	err := dbConn.QueryRow(fmt.Sprintf("select id, containername, date_trunc('second', starttime), backupname, servername, serverip, path, elapsedtime, backupsize, status, date_trunc('second', updatedt) from backupstatus where id=%s", id)).Scan(&s.ID, &s.ContainerName, &s.StartTime, &s.BackupName, &s.ServerName, &s.ServerIP, &s.Path, &s.ElapsedTime, &s.BackupSize, &s.Status, &s.UpdateDt)
 	switch {
 	case err == sql.ErrNoRows:
-		logit.Error.Println("backupdb:DBGetStatus:no status with that id")
+		logit.Error.Println("backupdb:GetStatus:no status with that id")
 		return s, err
 	case err != nil:
-		logit.Error.Println("backupdb:DBGetStatus:" + err.Error())
+		logit.Error.Println("backupdb:GetStatus:" + err.Error())
 		return s, err
 	default:
 	}
@@ -275,8 +275,8 @@ func DBGetStatus(id string) (BackupStatus, error) {
 	return s, nil
 }
 
-func DBGetSchedules() ([]BackupSchedule, error) {
-	logit.Info.Println("DBGetSchedules called")
+func GetSchedules() ([]BackupSchedule, error) {
+	logit.Info.Println("GetSchedules called")
 	var rows *sql.Rows
 	var err error
 

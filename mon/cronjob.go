@@ -55,8 +55,8 @@ func RunMonJob(args *MonRequest) error {
 		return err
 	}
 
-	var pgport admindb.DBSetting
-	pgport, err = admindb.GetDBSetting("PG-PORT")
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
 	if err != nil {
 		logit.Error.Println("RunMonJob: setting error " + err.Error())
 		return err
@@ -114,12 +114,12 @@ func RunMonJob(args *MonRequest) error {
 		//get connection to database
 		logit.Info.Println("collecting for node " + nodes[y].Name)
 
-		var nodeuser admindb.DBNodeUser
+		var nodeuser admindb.ContainerUser
 		var password string
 
 		if nodes[y].Role == "pgpool" {
 			//fetch cpmtest user credentials
-			nodeuser, err = admindb.GetNodeUser(nodes[y].Name, CPMTESTUSER)
+			nodeuser, err = admindb.GetContainerUser(nodes[y].Name, CPMTESTUSER)
 			if err != nil {
 				logit.Error.Println(err.Error())
 			}
@@ -132,7 +132,7 @@ func RunMonJob(args *MonRequest) error {
 			database = "cpmtest"
 		} else {
 			//fetch postgres user credentials
-			nodeuser, err = admindb.GetNodeUser(nodes[y].Name, SUPERUSER)
+			nodeuser, err = admindb.GetContainerUser(nodes[y].Name, SUPERUSER)
 			if err != nil {
 				logit.Error.Println(err.Error())
 			}
@@ -189,10 +189,10 @@ func RunMonJob(args *MonRequest) error {
 
 }
 
-func getData() (string, []admindb.DBServer, []admindb.DBClusterNode, []MonMetric, error) {
+func getData() (string, []admindb.Server, []admindb.Container, []MonMetric, error) {
 	var domain string
-	var servers []admindb.DBServer
-	var nodes []admindb.DBClusterNode
+	var servers []admindb.Server
+	var nodes []admindb.Container
 	var metrics []MonMetric
 	var dbConn *sql.DB
 	var err error
@@ -212,12 +212,12 @@ func getData() (string, []admindb.DBServer, []admindb.DBClusterNode, []MonMetric
 		return domain, servers, nodes, metrics, err
 	}
 
-	servers, err = admindb.GetAllDBServers()
+	servers, err = admindb.GetAllServers()
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return domain, servers, nodes, metrics, err
 	}
-	nodes, err = admindb.GetAllDBNodes()
+	nodes, err = admindb.GetAllContainers()
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return domain, servers, nodes, metrics, err

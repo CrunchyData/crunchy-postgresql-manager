@@ -47,7 +47,7 @@ func GetCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	ID := r.PathParam("ID")
-	results, err := admindb.GetDBCluster(ID)
+	results, err := admindb.GetCluster(ID)
 	if err != nil {
 		logit.Error.Println("GetCluster:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -69,7 +69,7 @@ func ConfigureCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	ID := r.PathParam("ID")
-	cluster, err := admindb.GetDBCluster(ID)
+	cluster, err := admindb.GetCluster(ID)
 	if err != nil {
 		logit.Error.Println("ConfigureCluster:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -89,24 +89,24 @@ func ConfigureCluster(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
-func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
-	logit.Info.Println("configureCluster:GetDBCluster")
+func configureCluster(cluster admindb.Cluster, autocluster bool) error {
+	logit.Info.Println("configureCluster:GetCluster")
 
 	//get master node for this cluster
-	master, err := admindb.GetDBNodeMaster(cluster.ID)
+	master, err := admindb.GetContainerMaster(cluster.ID)
 	if err != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
 		return err
 	}
 
-	var pgport admindb.DBSetting
-	pgport, err = admindb.GetDBSetting("PG-PORT")
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
 	if err != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
 		return err
 	}
 
-	logit.Info.Println("configureCluster:GetDBNodeMaster")
+	logit.Info.Println("configureCluster:GetContainerMaster")
 
 	//configure master postgresql.conf file
 	var data string
@@ -132,8 +132,8 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 	logit.Info.Println("configureCluster:master postgresql.conf copied to remote")
 
 	//get domain name
-	var domainname admindb.DBSetting
-	domainname, err = admindb.GetDBSetting("DOMAIN-NAME")
+	var domainname admindb.Setting
+	domainname, err = admindb.GetSetting("DOMAIN-NAME")
 	if err != nil {
 		logit.Error.Println("configureCluster: DOMAIN-NAME err " + err.Error())
 		return err
@@ -196,7 +196,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 		return errors.New("timeout waiting for master pg to respond")
 	}
 
-	standbynodes, err2 := admindb.GetAllDBStandbyNodes(cluster.ID)
+	standbynodes, err2 := admindb.GetAllStandbyContainers(cluster.ID)
 	if err2 != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
 		return err
@@ -285,7 +285,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 	logit.Info.Println("configureCluster: sleeping 5 seconds before configuring pgpool...")
 	time.Sleep(5000 * time.Millisecond)
 
-	pgpoolNode, err4 := admindb.GetDBNodePgpool(cluster.ID)
+	pgpoolNode, err4 := admindb.GetContainerPgpool(cluster.ID)
 	if err4 != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
 		return err
@@ -364,7 +364,7 @@ func configureCluster(cluster admindb.DBCluster, autocluster bool) error {
 	//finally, update the cluster to show that it is
 	//initialized!
 	cluster.Status = "initialized"
-	err = admindb.UpdateDBCluster(cluster)
+	err = admindb.UpdateCluster(cluster)
 	if err != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
 		return err
@@ -382,7 +382,7 @@ func GetAllClusters(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	results, err := admindb.GetAllDBClusters()
+	results, err := admindb.GetAllClusters()
 	if err != nil {
 		logit.Error.Println("GetAllClusters: error-" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -426,9 +426,9 @@ func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	logit.Info.Println("PostCluster: have ID=" + cluster.ID + " Name=" + cluster.Name + " type=" + cluster.ClusterType + " status=" + cluster.Status)
-	dbcluster := admindb.DBCluster{cluster.ID, cluster.Name, cluster.ClusterType, cluster.Status, ""}
+	dbcluster := admindb.Cluster{cluster.ID, cluster.Name, cluster.ClusterType, cluster.Status, ""}
 	if cluster.ID == "" {
-		strid, err := admindb.InsertDBCluster(dbcluster)
+		strid, err := admindb.InsertCluster(dbcluster)
 		newid := strconv.Itoa(strid)
 		if err != nil {
 			logit.Error.Println("PostCluster:" + err.Error())
@@ -437,10 +437,10 @@ func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 		}
 		cluster.ID = newid
 	} else {
-		logit.Info.Println("PostCluster: about to call UpdateDBCluster")
-		err2 := admindb.UpdateDBCluster(dbcluster)
+		logit.Info.Println("PostCluster: about to call UpdateCluster")
+		err2 := admindb.UpdateCluster(dbcluster)
 		if err2 != nil {
-			logit.Error.Println("PostCluster: error in UpdateDBCluster " + err.Error())
+			logit.Error.Println("PostCluster: error in UpdateCluster " + err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -465,14 +465,14 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	cluster, err := admindb.GetDBCluster(ID)
+	cluster, err := admindb.GetCluster(ID)
 	if err != nil {
 		logit.Error.Println("DeleteCluster:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
 	//delete docker containers
-	containers, err := admindb.GetAllDBNodesForCluster(ID)
+	containers, err := admindb.GetAllContainersForCluster(ID)
 	if err != nil {
 		logit.Error.Println("DeleteCluster:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -486,7 +486,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		logit.Info.Println("DeleteCluster: delete cluster but not the nodes")
 		for i = range containers {
 			containers[i].ClusterID = "-1"
-			err = admindb.UpdateDBNode(containers[i])
+			err = admindb.UpdateContainer(containers[i])
 			if err != nil {
 				logit.Error.Println("DeleteCluster:" + err.Error())
 				rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -494,7 +494,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 			}
 		}
 
-		err = admindb.DeleteDBCluster(ID)
+		err = admindb.DeleteCluster(ID)
 		if err != nil {
 			logit.Error.Println("DeleteCluster:" + err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -510,11 +510,11 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	i = 0
 	var output string
-	server := admindb.DBServer{}
+	server := admindb.Server{}
 	for i = range containers {
 
 		//go get the docker server IPAddress
-		server, err = admindb.GetDBServer(containers[i].ServerID)
+		server, err = admindb.GetServer(containers[i].ServerID)
 		if err != nil {
 			logit.Error.Println("DeleteCluster:" + err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -567,11 +567,11 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	//delete the container entries
 	//delete the cluster entry
-	admindb.DeleteDBCluster(ID)
+	admindb.DeleteCluster(ID)
 
 	for i = range containers {
 
-		err = admindb.DeleteDBNode(containers[i].ID)
+		err = admindb.DeleteContainer(containers[i].ID)
 		if err != nil {
 			logit.Error.Println("DeleteCluster:" + err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -601,8 +601,8 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 
 	//dbNode is the standby node we are going to fail over and
 	//make the new master in the cluster
-	var dbNode admindb.DBClusterNode
-	dbNode, err = admindb.GetDBNode(ID)
+	var dbNode admindb.Container
+	dbNode, err = admindb.GetContainer(ID)
 	if err != nil {
 		logit.Error.Println("AdminFailover:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -610,7 +610,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	}
 	var output string
 
-	cluster, err := admindb.GetDBCluster(dbNode.ClusterID)
+	cluster, err := admindb.GetCluster(dbNode.ClusterID)
 	if err != nil {
 		logit.Error.Println("AdminFailover:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -626,8 +626,8 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("AdminFailover: fail-over output " + output)
 
 	//update the old master to standalone role
-	oldMaster := admindb.DBClusterNode{}
-	oldMaster, err = admindb.GetDBNodeMaster(dbNode.ClusterID)
+	oldMaster := admindb.Container{}
+	oldMaster, err = admindb.GetContainerMaster(dbNode.ClusterID)
 	if err != nil {
 		logit.Error.Println("AdminFailover:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -635,7 +635,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	}
 	oldMaster.Role = "standalone"
 	oldMaster.ClusterID = "-1"
-	err = admindb.UpdateDBNode(oldMaster)
+	err = admindb.UpdateContainer(oldMaster)
 	if err != nil {
 		logit.Error.Println("AdminFailover:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -644,7 +644,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 
 	//update the failover node to master role
 	dbNode.Role = "master"
-	err = admindb.UpdateDBNode(dbNode)
+	err = admindb.UpdateContainer(dbNode)
 	if err != nil {
 		logit.Error.Println("AdminFailover:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -661,15 +661,15 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	clusterNodes, err := admindb.GetAllDBNodesForCluster(dbNode.ClusterID)
+	clusterNodes, err := admindb.GetAllContainersForCluster(dbNode.ClusterID)
 	if err != nil {
 		logit.Error.Println("AdminFailover:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	var pgport admindb.DBSetting
-	pgport, err = admindb.GetDBSetting("PG-PORT")
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -700,8 +700,8 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 				}
 				logit.Info.Println("AdminFailover: fail-over stop output was" + commandoutput)
 
-				var domainname admindb.DBSetting
-				domainname, err = admindb.GetDBSetting("DOMAIN-NAME")
+				var domainname admindb.Setting
+				domainname, err = admindb.GetSetting("DOMAIN-NAME")
 				if err != nil {
 					logit.Error.Println("configureCluster: DOMAIN-NAME err " + err.Error())
 					rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -831,11 +831,11 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 	i := 0
 	pgpoolCount := 0
 
-	origDBNode := admindb.DBClusterNode{}
+	origDBNode := admindb.Container{}
 	for i = range idList {
 		if idList[i] != "" {
 			logit.Info.Println("EventJoinCluster: idList[" + strconv.Itoa(i) + "]=" + idList[i])
-			origDBNode, err = admindb.GetDBNode(idList[i])
+			origDBNode, err = admindb.GetContainer(idList[i])
 			if err != nil {
 				logit.Error.Println("EventJoinCluster:" + err.Error())
 				rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -857,7 +857,7 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 				return
 			}
 
-			err = admindb.UpdateDBNode(origDBNode)
+			err = admindb.UpdateContainer(origDBNode)
 			if err != nil {
 				logit.Error.Println("EventJoinCluster:" + err.Error())
 				rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -872,7 +872,7 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 	//is at this point
 	if MasterID != "-1" {
 		//update the master node
-		origDBNode, err = admindb.GetDBNode(MasterID)
+		origDBNode, err = admindb.GetContainer(MasterID)
 		if err != nil {
 			logit.Error.Println("EventJoinCluster:" + err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -881,7 +881,7 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 
 		origDBNode.ClusterID = ClusterID
 		origDBNode.Role = "master"
-		err = admindb.UpdateDBNode(origDBNode)
+		err = admindb.UpdateContainer(origDBNode)
 		if err != nil {
 			logit.Error.Println("EventJoinCluster:" + err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -932,9 +932,9 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("AutoCluster: Name=" + params.Name + " ClusterType=" + params.ClusterType + " Profile=" + params.ClusterProfile)
 
 	//create cluster definition
-	dbcluster := admindb.DBCluster{"", params.Name, params.ClusterType, "uninitialized", ""}
+	dbcluster := admindb.Cluster{"", params.Name, params.ClusterType, "uninitialized", ""}
 	var ival int
-	ival, err = admindb.InsertDBCluster(dbcluster)
+	ival, err = admindb.InsertCluster(dbcluster)
 	clusterID := strconv.Itoa(ival)
 	dbcluster.ID = clusterID
 	logit.Info.Println(clusterID)
@@ -952,8 +952,8 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var masterServer admindb.DBServer
-	var chosenServers []admindb.DBServer
+	var masterServer admindb.Server
+	var chosenServers []admindb.Server
 	if profile.Algo == "round-robin" {
 		masterServer, chosenServers, err2 = roundRobin(profile)
 	} else {
@@ -983,9 +983,9 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	logit.Info.Println("AUTO CLUSTER PROFILE master container created")
-	var node admindb.DBClusterNode
+	var node admindb.Container
 	//update node with cluster iD
-	node, err2 = admindb.GetDBNodeByName(dockermaster.ContainerName)
+	node, err2 = admindb.GetContainerByName(dockermaster.ContainerName)
 	if err2 != nil {
 		logit.Error.Println("AutoCluster: error-get node by name " + err2.Error())
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -994,7 +994,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	node.ClusterID = clusterID
 	node.Role = "master"
-	err2 = admindb.UpdateDBNode(node)
+	err2 = admindb.UpdateContainer(node)
 	if err2 != nil {
 		logit.Error.Println("AutoCluster: error-update standby node " + err2.Error())
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -1026,7 +1026,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		}
 
 		//update node with cluster iD
-		node, err2 = admindb.GetDBNodeByName(dockerstandby[i].ContainerName)
+		node, err2 = admindb.GetContainerByName(dockerstandby[i].ContainerName)
 		if err2 != nil {
 			logit.Error.Println("AutoCluster: error-get node by name " + err2.Error())
 			rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -1035,7 +1035,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 
 		node.ClusterID = clusterID
 		node.Role = "standby"
-		err2 = admindb.UpdateDBNode(node)
+		err2 = admindb.UpdateContainer(node)
 		if err2 != nil {
 			logit.Error.Println("AutoCluster: error-update standby node " + err2.Error())
 			rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -1059,7 +1059,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 	logit.Info.Println("AUTO CLUSTER PROFILE pgpool created")
 	//update node with cluster ID
-	node, err2 = admindb.GetDBNodeByName(dockerpgpool.ContainerName)
+	node, err2 = admindb.GetContainerByName(dockerpgpool.ContainerName)
 	if err2 != nil {
 		logit.Error.Println("AutoCluster: error-get pgpool node by name " + err2.Error())
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -1068,7 +1068,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	node.ClusterID = clusterID
 	node.Role = "pgpool"
-	err2 = admindb.UpdateDBNode(node)
+	err2 = admindb.UpdateContainer(node)
 	if err2 != nil {
 		logit.Error.Println("AutoCluster: error-update pgpool node " + err2.Error())
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -1113,8 +1113,8 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 //  to promote least used servers, incoming servers list
 //  should be sorted by class and least used order
 //  returns the master server and the list of standby servers
-func roundRobin(profile ClusterProfiles) (admindb.DBServer, []admindb.DBServer, error) {
-	var masterServer admindb.DBServer
+func roundRobin(profile ClusterProfiles) (admindb.Server, []admindb.Server, error) {
+	var masterServer admindb.Server
 	count, err := strconv.Atoi(profile.Count)
 
 	//add 1 to the standby count to make room for the pgpool node
@@ -1122,10 +1122,10 @@ func roundRobin(profile ClusterProfiles) (admindb.DBServer, []admindb.DBServer, 
 
 	//create a slice to hold servers for standby and pgpool nodes
 	//assumes 1 pgpool node per cluster which is enforced by auto-cluster
-	chosen := make([]admindb.DBServer, count)
+	chosen := make([]admindb.Server, count)
 
 	//get all the servers available
-	servers, err := admindb.GetAllDBServersByClassByCount()
+	servers, err := admindb.GetAllServersByClassByCount()
 	if err != nil {
 		return masterServer, chosen, err
 	}

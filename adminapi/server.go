@@ -34,7 +34,7 @@ func GetServer(w rest.ResponseWriter, r *rest.Request) {
 	}
 	ID := r.PathParam("ID")
 	logit.Info.Println("in GetServer with ID=" + ID)
-	results, err := admindb.GetDBServer(ID)
+	results, err := admindb.GetServer(ID)
 	if err != nil {
 		logit.Error.Println("GetServer:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -81,10 +81,10 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbserver := admindb.DBServer{server.ID, server.Name, server.IPAddress,
+	dbserver := admindb.Server{server.ID, server.Name, server.IPAddress,
 		server.DockerBridgeIP, server.PGDataPath, server.ServerClass, CreateDate, ""}
 	if dbserver.ID == "0" {
-		strid, err := admindb.InsertDBServer(dbserver)
+		strid, err := admindb.InsertServer(dbserver)
 		newid := strconv.Itoa(strid)
 		if err != nil {
 			logit.Error.Println("AddServer:" + err.Error())
@@ -93,7 +93,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 		}
 		server.ID = newid
 	} else {
-		admindb.UpdateDBServer(dbserver)
+		admindb.UpdateServer(dbserver)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -123,7 +123,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//go get the IPAddress
-	server, err := admindb.GetDBServer(ServerID)
+	server, err := admindb.GetServer(ServerID)
 	if err != nil {
 		logit.Error.Println("MonitorServerGetInfo:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -151,7 +151,7 @@ func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	results, err := admindb.GetAllDBServers()
+	results, err := admindb.GetAllServers()
 	if err != nil {
 		logit.Error.Println("GetAllServers: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -187,7 +187,7 @@ func DeleteServer(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	err = admindb.DeleteDBServer(ID)
+	err = admindb.DeleteServer(ID)
 	if err != nil {
 		logit.Error.Println("DeleteServer: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)

@@ -47,7 +47,7 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	node, err := admindb.GetDBNode(ID)
+	node, err := admindb.GetContainer(ID)
 	if err != nil {
 		logit.Error.Println("MonitorContainerGetInfo:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -60,8 +60,8 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//fetch cpmtest user credentials
-	var nodeuser admindb.DBNodeUser
-	nodeuser, err = admindb.GetNodeUser(node.Name, CPMTEST_USER)
+	var nodeuser admindb.ContainerUser
+	nodeuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -71,8 +71,8 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("cpmtest password is " + nodeuser.Passwd)
 
 	//get port
-	var pgport admindb.DBSetting
-	pgport, err = admindb.GetDBSetting("PG-PORT")
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
 
 	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
 	defer dbConn.Close()
@@ -126,7 +126,7 @@ func MonitorContainerControldata(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	node, err := admindb.GetDBNode(ID)
+	node, err := admindb.GetContainer(ID)
 	if err != nil {
 		logit.Error.Println("MonitorContainerControldata:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -185,7 +185,7 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	node, err := admindb.GetDBNode(ID)
+	node, err := admindb.GetContainer(ID)
 	if err != nil {
 		logit.Error.Println("ContainerBgwriter:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -198,8 +198,8 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//get password
-	var nodeuser admindb.DBNodeUser
-	nodeuser, err = admindb.GetNodeUser(node.Name, CPMTEST_USER)
+	var nodeuser admindb.ContainerUser
+	nodeuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println("ContainerBgwriter:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -207,8 +207,8 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//get port
-	var pgport admindb.DBSetting
-	pgport, err = admindb.GetDBSetting("PG-PORT")
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
 
 	var dbConn *sql.DB
 	dbConn, err = util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
@@ -256,7 +256,7 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	node, err := admindb.GetDBNode(ID)
+	node, err := admindb.GetContainer(ID)
 	if err != nil {
 		logit.Error.Println("ContainerStatdatabase:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -269,8 +269,8 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//get password
-	var nodeuser admindb.DBNodeUser
-	nodeuser, err = admindb.GetNodeUser(node.Name, CPMTEST_USER)
+	var nodeuser admindb.ContainerUser
+	nodeuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -278,8 +278,8 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//get port
-	var pgport admindb.DBSetting
-	pgport, err = admindb.GetDBSetting("PG-PORT")
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
 
 	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
 	defer dbConn.Close()
@@ -360,7 +360,7 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	node, err := admindb.GetDBNode(ID)
+	node, err := admindb.GetContainer(ID)
 	if err != nil {
 		logit.Error.Println("ContainerStatrepl:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -373,8 +373,8 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//fetch cpmtest user credentials
-	var nodeuser admindb.DBNodeUser
-	nodeuser, err = admindb.GetNodeUser(node.Name, CPMTEST_USER)
+	var nodeuser admindb.ContainerUser
+	nodeuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -382,8 +382,8 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//get port
-	var pgport admindb.DBSetting
-	pgport, err = admindb.GetDBSetting("PG-PORT")
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
 
 	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
 	defer dbConn.Close()
@@ -464,7 +464,7 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	node, err := admindb.GetDBNode(ID)
+	node, err := admindb.GetContainer(ID)
 	if err != nil {
 		logit.Error.Println("ContainerLoadTest:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -497,12 +497,12 @@ func loadtest(nodename string, host string, writes int) ([]Loadtestresults, erro
 	var results = make([]Loadtestresults, 4)
 
 	//get port
-	var pgport admindb.DBSetting
-	pgport, err = admindb.GetDBSetting("PG-PORT")
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
 
 	//fetch cpmtest user credentials
-	var nodeuser admindb.DBNodeUser
-	nodeuser, err = admindb.GetNodeUser(nodename, CPMTEST_USER)
+	var nodeuser admindb.ContainerUser
+	nodeuser, err = admindb.GetContainerUser(nodename, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return results, err

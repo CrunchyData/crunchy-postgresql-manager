@@ -44,7 +44,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	params.Standalone = "false"
 
 	//get server info
-	server, err := admindb.GetDBServer(params.ServerID)
+	server, err := admindb.GetServer(params.ServerID)
 	if err != nil {
 		logit.Error.Println("Provision:" + err.Error())
 		return err
@@ -53,15 +53,15 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	params.PGDataPath = server.PGDataPath + "/" + backupcontainername + "/" + getFormattedDate()
 
 	//get the docker profile settings
-	var setting admindb.DBSetting
-	setting, err = admindb.GetDBSetting("S-DOCKER-PROFILE-CPU")
+	var setting admindb.Setting
+	setting, err = admindb.GetSetting("S-DOCKER-PROFILE-CPU")
 	params.CPU = setting.Value
-	setting, err = admindb.GetDBSetting("S-DOCKER-PROFILE-MEM")
+	setting, err = admindb.GetSetting("S-DOCKER-PROFILE-MEM")
 	params.MEM = setting.Value
 
 	params.EnvVars = make(map[string]string)
 
-	setting, err = admindb.GetDBSetting("DOMAIN-NAME")
+	setting, err = admindb.GetSetting("DOMAIN-NAME")
 	if err != nil {
 		logit.Error.Println("Provision:" + err.Error())
 		return err
@@ -77,7 +77,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	params.EnvVars["BACKUP_PATH"] = params.PGDataPath
 	params.EnvVars["BACKUP_HOST"] = args.ContainerName + "." + setting.Value
 
-	setting, err = admindb.GetDBSetting("PG-PORT")
+	setting, err = admindb.GetSetting("PG-PORT")
 	if err != nil {
 		logit.Error.Println("Provision:" + err.Error())
 		return err

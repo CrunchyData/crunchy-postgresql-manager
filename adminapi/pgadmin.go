@@ -39,7 +39,7 @@ func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbNode, err := admindb.GetDBNode(ID)
+	dbNode, err := admindb.GetContainer(ID)
 	if err != nil {
 		logit.Error.Println("AdminStartpg: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -85,7 +85,7 @@ func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbNode, err := admindb.GetDBNode(ID)
+	dbNode, err := admindb.GetContainer(ID)
 	if err != nil {
 		logit.Error.Println("AdminStartpg: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)

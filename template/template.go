@@ -130,7 +130,7 @@ func Hba(kubeEnv bool, mode string, hostname string, port string, clusterid stri
 		hbaInfo.ADMIN_HOST = "cpm-admin." + domainname
 	}
 
-	servers, err := admindb.GetAllDBServers()
+	servers, err := admindb.GetAllServers()
 	if err != nil {
 		logit.Error.Println("Hba:" + err.Error())
 		return "", err
@@ -197,13 +197,13 @@ func Hba(kubeEnv bool, mode string, hostname string, port string, clusterid stri
 //
 // getMasterValues returns a master node, pgpool node, and list of standby nodes
 //
-func getMasterValues(kubeEnv bool, clusterID string, domainname string) (admindb.DBClusterNode, admindb.DBClusterNode, []string, error) {
-	master := admindb.DBClusterNode{}
-	pgpool := admindb.DBClusterNode{}
+func getMasterValues(kubeEnv bool, clusterID string, domainname string) (admindb.Container, admindb.Container, []string, error) {
+	master := admindb.Container{}
+	pgpool := admindb.Container{}
 	//we pass in a list of containers in this cluster
 	//that will be added to the pg_hba.conf of the master
 	//for allowing replication
-	nodes, err1 := admindb.GetAllDBNodesForCluster(clusterID)
+	nodes, err1 := admindb.GetAllContainersForCluster(clusterID)
 	if err1 != nil {
 		return master, pgpool, make([]string, 1), err1
 	}
