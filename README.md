@@ -14,7 +14,7 @@ been provisioned by CPM.
 ![CPM Web UI](./docs/cpm.png)
 
 A user guide is available at:
-https://s3.amazonaws.com/crunchydata/cpm-user-guide.pdf
+https://s3.amazonaws.com/crunchydata/cpm/cpm-user-guide.pdf
 
 Installation
 ------------
