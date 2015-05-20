@@ -164,5 +164,6 @@ func main() {
 		log.Fatal(err)
 	}
 	//	http.HandleFunc("/", handler)
+	log.Fatal(http.ListenAndServe(":13001", &handler))
 	log.Fatal(http.ListenAndServeTLS(":13000", "/cpmkeys/cert.pem", "/cpmkeys/key.pem", &handler))
 }

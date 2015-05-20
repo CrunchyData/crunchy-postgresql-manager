@@ -15,6 +15,7 @@ VOLUME ["/cpmkeys"]
 RUN chown -R daemon:daemon /cpmkeys
 
 EXPOSE 13000
+EXPOSE 13001
 
 # set up cluster directory
 #
