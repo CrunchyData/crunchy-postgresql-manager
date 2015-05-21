@@ -74,6 +74,7 @@ type Setting struct {
 	Name       string
 	Value      string
 	UpdateDate string
+	Token      string
 }
 
 type Settings struct {

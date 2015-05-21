@@ -22,6 +22,32 @@ import (
 	"net/http"
 )
 
+func GetAllGeneralSettings(w rest.ResponseWriter, r *rest.Request) {
+
+	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	if err != nil {
+		logit.Error.Println("GetAllGeneralSettings: validate token error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	results, err := admindb.GetAllGeneralSettings()
+	if err != nil {
+		logit.Error.Println("GetAllGeneralSettings: error-" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	settings := make([]Setting, len(results))
+	i := 0
+	for i = range results {
+		settings[i].Name = results[i].Name
+		settings[i].Value = results[i].Value
+		settings[i].UpdateDate = results[i].UpdateDate
+		i++
+	}
+
+	w.WriteJson(&settings)
+}
+
 func GetAllSettings(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
@@ -46,6 +72,39 @@ func GetAllSettings(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteJson(&settings)
+}
+
+func SaveSetting(w rest.ResponseWriter, r *rest.Request) {
+	logit.Info.Println("SaveSetting:")
+	setting := Setting{}
+	err := r.DecodeJsonPayload(&setting)
+	if err != nil {
+		logit.Error.Println("SaveSetting: error in decode" + err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = secimpl.Authorize(setting.Token, "perm-setting")
+	if err != nil {
+		logit.Error.Println("SaveSetting: authorize error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	dbSetting := admindb.Setting{}
+	dbSetting.Name = setting.Name
+	dbSetting.Value = setting.Value
+
+	err2 := admindb.UpdateSetting(dbSetting)
+	if err2 != nil {
+		logit.Error.Println("SaveSetting: error in UpdateSetting " + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	status := SimpleStatus{}
+	status.Status = "OK"
+	w.WriteJson(&status)
 }
 
 func SaveSettings(w rest.ResponseWriter, r *rest.Request) {

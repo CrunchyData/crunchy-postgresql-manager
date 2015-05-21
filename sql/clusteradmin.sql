@@ -114,6 +114,7 @@ insert into settings (name, value, updatedt) values ('L-DOCKER-PROFILE-MEM', '0'
 insert into settings (name, value, updatedt) values ('DOCKER-REGISTRY', 'registry:5000', now());
 insert into settings (name, value, updatedt) values ('PG-PORT', '5432', now());
 insert into settings (name, value, updatedt) values ('DOMAIN-NAME', 'crunchy.lab', now());
+insert into settings (name, value, updatedt) values ('ADMIN-URL', 'http://cpm:13001', now());
 
 insert into settings (name, value, updatedt) values ('CP-SM-COUNT', '1', now());
 insert into settings (name, value, updatedt) values ('CP-SM-M-PROFILE', 'small', now());

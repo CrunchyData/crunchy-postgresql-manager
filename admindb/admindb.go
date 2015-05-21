@@ -565,6 +565,31 @@ func DeleteServer(id string) error {
 	return nil
 }
 
+func GetAllGeneralSettings() ([]Setting, error) {
+	var rows *sql.Rows
+	var err error
+	rows, err = dbConn.Query("select name, value, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from settings where name in ('PG-PORT', 'DOMAIN-NAME', 'DOCKER-REGISTRY', 'ADMIN-URL') order by name")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	settings := make([]Setting, 0)
+	for rows.Next() {
+		setting := Setting{}
+		if err = rows.Scan(
+			&setting.Name,
+			&setting.Value,
+			&setting.UpdateDate); err != nil {
+			return nil, err
+		}
+		settings = append(settings, setting)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return settings, nil
+}
+
 func GetAllSettings() ([]Setting, error) {
 	//logit.Info.Println("admindb:GetAllSettings: called")
 	var rows *sql.Rows
