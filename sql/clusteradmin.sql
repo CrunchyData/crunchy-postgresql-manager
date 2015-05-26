@@ -11,6 +11,13 @@ create table settings (
 	updatedt timestamp not null
 );
 
+create table project (
+	id serial primary key,
+	name varchar(30) unique not null,
+	description varchar(230),
+	updatedt timestamp not null
+);
+
 create table server (
 	id serial primary key,
 	name varchar(20) unique not null,

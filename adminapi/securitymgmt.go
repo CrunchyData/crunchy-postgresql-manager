@@ -90,6 +90,8 @@ func UpdateUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	logit.Info.Println("UpdateUser: Name=" + user.Name)
+	logit.Info.Println("UpdateUser: token=" + user.Token)
 	err = secimpl.Authorize(user.Token, "perm-user")
 	if err != nil {
 		logit.Error.Println("UpdateUser: authorize error " + err.Error())

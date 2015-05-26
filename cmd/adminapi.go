@@ -160,7 +160,12 @@ func main() {
 		&rest.Route{"POST", "/dbuser/add/:Token", adminapi.AddContainerUser},
 		&rest.Route{"GET", "/dbuser/delete/:ID.:Token", adminapi.DeleteContainerUser},
 		&rest.Route{"GET", "/dbuser/get/:Containername.:Usename.:Token", adminapi.GetContainerUser},
-		&rest.Route{"GET", "/dbuser/getall/:Containername:Token", adminapi.GetAllUsersForContainer},
+		&rest.Route{"GET", "/dbuser/getall/:Containername.:Token", adminapi.GetAllUsersForContainer},
+		&rest.Route{"POST", "/project/add", adminapi.AddProject},
+		&rest.Route{"POST", "/project/update", adminapi.UpdateProject},
+		&rest.Route{"GET", "/project/get/:ID.:Token", adminapi.GetProject},
+		&rest.Route{"GET", "/project/getall/:Token", adminapi.GetAllProjects},
+		&rest.Route{"GET", "/project/delete/:ID.:Token", adminapi.DeleteProject},
 	)
 	if err != nil {
 		log.Fatal(err)

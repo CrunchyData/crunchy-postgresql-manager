@@ -49,6 +49,13 @@ type Cluster struct {
 	CreateDate  string
 }
 
+type Project struct {
+	ID         string
+	Name       string
+	Desc       string
+	UpdateDate string
+}
+
 type Container struct {
 	ID         string
 	ClusterID  string
@@ -829,4 +836,100 @@ func UpdateContainerUser(user ContainerUser) error {
 	}
 	return nil
 
+}
+
+func GetProject(id string) (Project, error) {
+	//logit.Info.Println("GetProject called with id=" + id)
+	project := Project{}
+
+	err := dbConn.QueryRow(fmt.Sprintf("select id, name, description, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from project where id=%s", id)).Scan(&project.ID, &project.Name, &project.Desc, &project.UpdateDate)
+	switch {
+	case err == sql.ErrNoRows:
+		logit.Info.Println("admindb:GetProject:no server with that id")
+		return project, err
+	case err != nil:
+		logit.Info.Println("admindb:GetProject:" + err.Error())
+		return project, err
+	default:
+		logit.Info.Println("admindb:GetProject: Project name returned is " + project.Name)
+	}
+
+	return project, nil
+}
+
+func GetAllProjects() ([]Project, error) {
+	//logit.Info.Println("admindb:GetAllProjects: called")
+	var rows *sql.Rows
+	var err error
+	rows, err = dbConn.Query("select id, name, description, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from project order by name")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	projects := make([]Project, 0)
+	for rows.Next() {
+		project := Project{}
+		if err = rows.Scan(
+			&project.ID,
+			&project.Name,
+			&project.Desc,
+			&project.UpdateDate); err != nil {
+			return nil, err
+		}
+		projects = append(projects, project)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return projects, nil
+}
+
+func UpdateProject(project Project) error {
+	//logit.Info.Println("admindb:UpdateProject:called")
+	queryStr := fmt.Sprintf("update project set ( name, description, updatedt) = ('%s', '%s', now()) where id = %s returning id", project.Name, project.Desc, project.ID)
+
+	logit.Info.Println("admindb:UpdateProject:update str=[" + queryStr + "]")
+	var projectid int
+	err := dbConn.QueryRow(queryStr).Scan(&projectid)
+	switch {
+	case err != nil:
+		return err
+	default:
+		logit.Info.Println("admindb:UpdateProject:project updated " + project.ID)
+	}
+	return nil
+
+}
+
+func DeleteProject(id string) error {
+	queryStr := fmt.Sprintf("delete from project where  id=%s returning id", id)
+	//logit.Info.Println("admindb:DeleteProject:" + queryStr)
+
+	var projectid int
+	err := dbConn.QueryRow(queryStr).Scan(&projectid)
+	switch {
+	case err != nil:
+		return err
+	default:
+		logit.Info.Println("admindb:DeleteProject:project deleted " + id)
+	}
+	return nil
+}
+
+func InsertProject(project Project) (int, error) {
+	//logit.Info.Println("admindb:InsertProject:called")
+	queryStr := fmt.Sprintf("insert into project ( name, description, updatedt) values ( '%s', '%s', now()) returning id", project.Name, project.Desc)
+
+	logit.Info.Println("admindb:InsertProject:" + queryStr)
+	var projectid int
+	err := dbConn.QueryRow(queryStr).Scan(&projectid)
+	switch {
+	case err != nil:
+		logit.Info.Println("admindb:InsertProject:" + err.Error())
+		return -1, err
+	default:
+		logit.Info.Println("admindb:InsertProject: Project inserted returned is " + strconv.Itoa(projectid))
+	}
+
+	return projectid, nil
 }

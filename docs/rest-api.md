@@ -1389,3 +1389,98 @@ return container controldata data
 ~~~~~~~~~~~~~~~~~~~~~~~~
 curl --insecure https://cpm-admin.crunchy.lab:13000/monitor/container/controldata/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+###POST /project/add
+
++ ID : can be empty
++ Name : the name to use for this project
++ Desc : the project description
++ CreateDt : can be empty
++ Token : the generated auth token for this session
+
+adds a project
+
+
+###Example
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl -X POST -d @addproject.json http://cpm-admin:13001/project/add
+
+addproject.json:
+
+{
+"ID": "1",
+"Name": "donut",
+"Desc": "some desc",
+"UpdateDate": "02-10-2015 14:35:34",
+"Token": "572107c9-294e-4668-8993-5c089febd1da"
+}
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###GET /project/getall/:Token
+
++ Token : the generated auth token for this session
+
+return all projects
+
+
+###Example
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl http://cpm-admin.crunchy.lab:13001/project/getall/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###GET /project/get/:ID.Token
+
++ ID : id of a project
++ Token : the generated auth token for this session
+
+return a single project
+
+
+###Example
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl http://cpm-admin.crunchy.lab:13001/project/get/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###GET /project/delete/:ID.Token
+
++ ID : id of a project
++ Token : the generated auth token for this session
+
+delete a single project
+
+
+###Example
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl http://cpm-admin.crunchy.lab:13001/project/delete/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###POST /project/update
+
++ ID : the generated id of a project
++ Name : the name to use for this project
++ Desc : the description of the project
++ UpdateDate : can be empty
++ Token : the generated auth token for this session
+
+updates a project
+
+
+###Example
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl -X POST -d @updateproject.json http://cpm-admin.crunchy.lab:13001/project/update
+
+updateproject.json:
+{
+"ID": "1",
+"Name": "donut",
+"Desc": "some desc two",
+"UpdateDate": "",
+"Token": "572107c9-294e-4668-8993-5c089febd1da"
+}
+~~~~~~~~~~~~~~~~~~~~~~~~
