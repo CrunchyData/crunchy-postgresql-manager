@@ -53,7 +53,7 @@ func GetCluster(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 	cluster := Cluster{results.ID, results.Name, results.ClusterType,
-		results.Status, results.CreateDate, ""}
+		results.Status, results.CreateDate, "", results.Containers}
 	logit.Info.Println("GetCluser:db call results=" + results.ID)
 
 	w.WriteJson(&cluster)
@@ -395,6 +395,7 @@ func GetAllClusters(w rest.ResponseWriter, r *rest.Request) {
 		clusters[i].ClusterType = results[i].ClusterType
 		clusters[i].Status = results[i].Status
 		clusters[i].CreateDate = results[i].CreateDate
+		clusters[i].Containers = results[i].Containers
 		i++
 	}
 
@@ -426,7 +427,7 @@ func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	logit.Info.Println("PostCluster: have ID=" + cluster.ID + " Name=" + cluster.Name + " type=" + cluster.ClusterType + " status=" + cluster.Status)
-	dbcluster := admindb.Cluster{cluster.ID, cluster.Name, cluster.ClusterType, cluster.Status, ""}
+	dbcluster := admindb.Cluster{cluster.ID, cluster.Name, cluster.ClusterType, cluster.Status, "", cluster.Containers}
 	if cluster.ID == "" {
 		strid, err := admindb.InsertCluster(dbcluster)
 		newid := strconv.Itoa(strid)
@@ -932,7 +933,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("AutoCluster: Name=" + params.Name + " ClusterType=" + params.ClusterType + " Profile=" + params.ClusterProfile)
 
 	//create cluster definition
-	dbcluster := admindb.Cluster{"", params.Name, params.ClusterType, "uninitialized", ""}
+	dbcluster := admindb.Cluster{"", params.Name, params.ClusterType, "uninitialized", "", make(map[string]string)}
 	var ival int
 	ival, err = admindb.InsertCluster(dbcluster)
 	clusterID := strconv.Itoa(ival)

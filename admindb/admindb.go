@@ -41,14 +41,6 @@ type Server struct {
 	NodeCount      string
 }
 
-type Cluster struct {
-	ID          string
-	Name        string
-	ClusterType string
-	Status      string
-	CreateDate  string
-}
-
 type Project struct {
 	ID         string
 	Name       string
@@ -64,6 +56,15 @@ type Container struct {
 	Role       string
 	Image      string
 	CreateDate string
+}
+
+type Cluster struct {
+	ID          string
+	Name        string
+	ClusterType string
+	Status      string
+	CreateDate  string
+	Containers  map[string]string
 }
 
 type ContainerUser struct {
@@ -127,6 +128,19 @@ func GetCluster(id string) (Cluster, error) {
 		logit.Info.Println("admindb:GetCluster: cluster name returned is " + cluster.Name)
 	}
 
+	var containers []Container
+	cluster.Containers = make(map[string]string)
+
+	containers, err = GetAllContainersForCluster(cluster.ID)
+	if err != nil {
+		logit.Info.Println("admindb:GetCluster:" + err.Error())
+		return cluster, err
+	}
+
+	for i := range containers {
+		cluster.Containers[containers[i].ID] = containers[i].Name
+	}
+
 	return cluster, nil
 }
 
@@ -139,6 +153,7 @@ func GetAllClusters() ([]Cluster, error) {
 		return nil, err
 	}
 	defer rows.Close()
+	var containers []Container
 	clusters := make([]Cluster, 0)
 	for rows.Next() {
 		cluster := Cluster{}
@@ -149,6 +164,18 @@ func GetAllClusters() ([]Cluster, error) {
 			&cluster.Status, &cluster.CreateDate); err != nil {
 			return nil, err
 		}
+
+		cluster.Containers = make(map[string]string)
+		containers, err = GetAllContainersForCluster(cluster.ID)
+		if err != nil {
+			logit.Info.Println("admindb:GetCluster:" + err.Error())
+		}
+
+		for i := range containers {
+			cluster.Containers[containers[i].ID] = containers[i].Name
+			logit.Info.Println("admindb:GetCluster: add to map " + cluster.Containers[containers[i].ID])
+		}
+
 		clusters = append(clusters, cluster)
 	}
 	if err = rows.Err(); err != nil {

@@ -85,15 +85,6 @@ type Settings struct {
 	Token          string
 }
 
-type Cluster struct {
-	ID          string
-	Name        string
-	ClusterType string
-	Status      string
-	CreateDate  string
-	Token       string
-}
-
 type ClusterNode struct {
 	ID         string
 	ClusterID  string
@@ -103,6 +94,16 @@ type ClusterNode struct {
 	Image      string
 	CreateDate string
 	Status     string
+}
+
+type Cluster struct {
+	ID          string
+	Name        string
+	ClusterType string
+	Status      string
+	CreateDate  string
+	Token       string
+	Containers  map[string]string
 }
 
 type LinuxStats struct {

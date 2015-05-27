@@ -104,7 +104,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("GetAllServers: authorize error " + err.Error())
+		logit.Error.Println("MonitorServerGetInfo: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -162,6 +162,7 @@ func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 		servers[i].ID = results[i].ID
 		servers[i].Name = results[i].Name
 		servers[i].IPAddress = results[i].IPAddress
+		servers[i].DockerBridgeIP = results[i].DockerBridgeIP
 		servers[i].PGDataPath = results[i].PGDataPath
 		servers[i].ServerClass = results[i].ServerClass
 		servers[i].CreateDate = results[i].CreateDate
