@@ -86,14 +86,18 @@ type Settings struct {
 }
 
 type ClusterNode struct {
-	ID         string
-	ClusterID  string
-	ServerID   string
-	Name       string
-	Role       string
-	Image      string
-	CreateDate string
-	Status     string
+	ID          string
+	ClusterID   string
+	ServerID    string
+	Name        string
+	Role        string
+	Image       string
+	CreateDate  string
+	Status      string
+	ProjectID   string
+	ProjectName string
+	ServerName  string
+	ClusterName string
 }
 
 type Cluster struct {

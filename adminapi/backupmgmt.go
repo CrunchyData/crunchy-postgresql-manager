@@ -499,6 +499,8 @@ func GetBackupNodes(w rest.ResponseWriter, r *rest.Request) {
 			n.Role = results[i].Role
 			n.Image = results[i].Image
 			n.CreateDate = results[i].CreateDate
+			n.ProjectName = results[i].ProjectName
+			n.ServerName = results[i].ServerName
 			n.Status = "UNKNOWN"
 			nodes = append(nodes, n)
 		}

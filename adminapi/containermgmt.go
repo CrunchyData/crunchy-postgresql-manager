@@ -110,7 +110,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	node := ClusterNode{results.ID, results.ClusterID, results.ServerID,
-		results.Name, results.Role, results.Image, results.CreateDate, currentStatus}
+		results.Name, results.Role, results.Image, results.CreateDate, currentStatus, results.ProjectID, results.ProjectName, results.ServerName, results.ClusterName}
 
 	w.WriteJson(node)
 }
@@ -139,6 +139,10 @@ func GetAllNodes(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].Role = results[i].Role
 		nodes[i].Image = results[i].Image
 		nodes[i].CreateDate = results[i].CreateDate
+		nodes[i].ProjectID = results[i].ProjectID
+		nodes[i].ProjectName = results[i].ProjectName
+		nodes[i].ServerName = results[i].ServerName
+		nodes[i].ClusterName = results[i].ClusterName
 		//nodes[i].Status = "UNKNOWN"
 		i++
 	}
@@ -171,6 +175,10 @@ func GetAllNodesNotInCluster(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].Role = results[i].Role
 		nodes[i].Image = results[i].Image
 		nodes[i].CreateDate = results[i].CreateDate
+		nodes[i].ProjectID = results[i].ProjectID
+		nodes[i].ProjectName = results[i].ProjectName
+		nodes[i].ServerName = results[i].ServerName
+		nodes[i].ClusterName = results[i].ClusterName
 		//nodes[i].Status = "UNKNOWN"
 		i++
 	}
@@ -209,6 +217,10 @@ func GetAllNodesForCluster(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].Role = results[i].Role
 		nodes[i].Image = results[i].Image
 		nodes[i].CreateDate = results[i].CreateDate
+		nodes[i].ProjectID = results[i].ProjectID
+		nodes[i].ProjectName = results[i].ProjectName
+		nodes[i].ServerName = results[i].ServerName
+		nodes[i].ClusterName = results[i].ClusterName
 		//nodes[i].Status = "UNKNOWN"
 		i++
 	}
@@ -356,6 +368,9 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].Role = results[i].Role
 		nodes[i].Image = results[i].Image
 		nodes[i].CreateDate = results[i].CreateDate
+		nodes[i].ProjectID = results[i].ProjectID
+		nodes[i].ProjectName = results[i].ProjectName
+		nodes[i].ServerName = results[i].ServerName
 		nodes[i].Status = "down"
 
 		output, e = cpmserveragent.DockerInspect2Command(results[i].Name, server.IPAddress)

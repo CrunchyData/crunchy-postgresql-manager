@@ -18,6 +18,8 @@ create table project (
 	updatedt timestamp not null
 );
 
+insert into project (name, description, updatedt) values ('default', 'default project', now());
+
 create table server (
 	id serial primary key,
 	name varchar(20) unique not null,
@@ -50,6 +52,7 @@ create table container (
 	name varchar(30) unique not null,
 	clusterid int,
 	serverid int references server (id) on delete cascade,
+	projectid int references project (id) on delete cascade,
 	role varchar(10) not null,
 	image varchar(30) not null,
 	createdt timestamp not null,

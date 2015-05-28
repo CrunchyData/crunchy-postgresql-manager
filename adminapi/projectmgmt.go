@@ -28,6 +28,7 @@ type Project struct {
 	Desc       string
 	UpdateDate string
 	Token      string
+	Containers map[string]string
 }
 
 func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
@@ -52,7 +53,13 @@ func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbproject := admindb.Project{project.ID, project.Name, project.Desc, project.UpdateDate}
+	dbproject := admindb.Project{
+		ID:         project.ID,
+		Name:       project.Name,
+		Desc:       project.Desc,
+		UpdateDate: project.UpdateDate,
+		Containers: project.Containers}
+
 	err = admindb.UpdateProject(dbproject)
 	if err != nil {
 		logit.Error.Println("UpdateProject: error secimpl call" + err.Error())
@@ -83,7 +90,12 @@ func AddProject(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbproject := admindb.Project{project.ID, project.Name, project.Desc, project.UpdateDate}
+	dbproject := admindb.Project{
+		ID:         project.ID,
+		Name:       project.Name,
+		Desc:       project.Desc,
+		UpdateDate: project.UpdateDate,
+		Containers: project.Containers}
 	var newid int
 	newid, err = admindb.InsertProject(dbproject)
 	if err != nil {
@@ -121,7 +133,7 @@ func GetProject(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	project := Project{results.ID, results.Name, results.Desc, results.UpdateDate, ""}
+	project := Project{results.ID, results.Name, results.Desc, results.UpdateDate, "", results.Containers}
 
 	w.WriteJson(&project)
 }
@@ -148,6 +160,7 @@ func GetAllProjects(w rest.ResponseWriter, r *rest.Request) {
 		projects[i].Name = projectsList[i].Name
 		projects[i].Desc = projectsList[i].Desc
 		projects[i].UpdateDate = projectsList[i].UpdateDate
+		projects[i].Containers = projectsList[i].Containers
 		i++
 	}
 
