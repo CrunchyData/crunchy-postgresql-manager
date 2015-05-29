@@ -259,6 +259,7 @@ func provisionImpl(params *cpmserveragent.DockerRunArgs, PROFILE string, standby
 	dbnode.Name = params.ContainerName
 	dbnode.Image = params.Image
 	dbnode.ClusterID = "-1"
+	dbnode.ProjectID = "1"
 	dbnode.ServerID = params.ServerID
 
 	if params.Standalone == "true" {

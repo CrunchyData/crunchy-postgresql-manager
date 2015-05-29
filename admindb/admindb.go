@@ -585,7 +585,7 @@ func GetAllContainers() ([]Container, error) {
 }
 
 func InsertContainer(container Container) (int, error) {
-	queryStr := fmt.Sprintf("insert into container ( name, clusterid, serverid, role, image, createdt) values ( '%s', %s, %s, '%s','%s', now()) returning id", container.Name, container.ClusterID, container.ServerID, container.Role, container.Image)
+	queryStr := fmt.Sprintf("insert into container ( name, clusterid, serverid, role, image, createdt, projectid) values ( '%s', %s, %s, '%s','%s', now(), %s) returning id", container.Name, container.ClusterID, container.ServerID, container.Role, container.Image, container.ProjectID)
 
 	logit.Info.Println("admindb:InsertContainer:" + queryStr)
 	var nodeid int
