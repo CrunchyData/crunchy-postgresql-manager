@@ -360,6 +360,7 @@ func GetContainerMaster(clusterid string) (Container, error) {
 			logit.Info.Println("admindb:GetContainerGetMaster:error " + err.Error())
 			return container, err
 		}
+		logit.Info.Println("admindb:GetContainerGetMaster:clustername  " + clustername)
 		container.ClusterName = clustername
 	}
 
@@ -372,11 +373,11 @@ func GetContainerPgpool(clusterid string) (Container, error) {
 	container := Container{}
 
 	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s, container c  where c.serverid = s.id and c.role = 'pgpool' and c.clusterid = %s and c.projectid = p.id", clusterid)
-	logit.Info.Println("admindb:GetContainerMaster:" + queryStr)
-	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName)
+	logit.Info.Println("admindb:GetContainerPgpool:" + queryStr)
+	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName)
 	switch {
 	case err == sql.ErrNoRows:
-		logit.Info.Println("admindb:GetContainerMaster: no pgpool container with that clusterid " + clusterid)
+		logit.Info.Println("admindb:GetContainerPgpool: no pgpool container with that clusterid " + clusterid)
 		return container, err
 	case err != nil:
 		return container, err

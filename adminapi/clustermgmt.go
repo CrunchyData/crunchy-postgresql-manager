@@ -286,6 +286,7 @@ func configureCluster(cluster admindb.Cluster, autocluster bool) error {
 	time.Sleep(5000 * time.Millisecond)
 
 	pgpoolNode, err4 := admindb.GetContainerPgpool(cluster.ID)
+	logit.Info.Println("configureCluster: lookup pgpool node")
 	if err4 != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
 		return err
