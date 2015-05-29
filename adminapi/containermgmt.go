@@ -20,11 +20,13 @@ import (
 	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmnodeagent"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserveragent"
 	"github.com/crunchydata/crunchy-postgresql-manager/kubeclient"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
+	"time"
 )
 
 const CONTAINER_NOT_FOUND = "CONTAINER NOT FOUND"
@@ -511,4 +513,137 @@ func GetPGStatus2(nodename string, hostname string) (string, error) {
 	}
 
 	return "RUNNING", nil
+}
+
+func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
+	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	if err != nil {
+		logit.Error.Println("AdminStartServerContainers: validate token error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	//serverID
+	serverid := r.PathParam("ID")
+	if serverid == "" {
+		logit.Error.Println("AdminStartServerContainers: error ID required")
+		rest.Error(w, "ID required", http.StatusBadRequest)
+		return
+	}
+
+	containers, err := admindb.GetAllContainersForServer(serverid)
+	if err != nil {
+		logit.Error.Println("AdminStartServerContainers:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//for each, get server, start container
+	//use a 'best effort' approach here since containers
+	//can be removed outside of CPM's control
+
+	for i := range containers {
+		//fetch the server
+		server := admindb.Server{}
+		server, err = admindb.GetServer(containers[i].ServerID)
+		if err != nil {
+			logit.Error.Println("AdminStartServerContainers:" + err.Error())
+			rest.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		//start the container
+		var output string
+		output, err = cpmserveragent.DockerStartContainer(containers[i].Name,
+			server.IPAddress)
+		if err != nil {
+			logit.Error.Println("AdminStartServerContainers: error when trying to start container " + err.Error())
+		}
+		logit.Info.Println(output)
+
+		//sleep for a few seconds to give the container time to start
+		//time.Sleep(3000 * time.Millisecond)
+
+		//send the start command
+		//var cmd = "startpg.sh"
+		//if containers[i].Role == "pgpool" {
+		//cmd = "startpgpool.sh"
+		//}
+		//output, err = cpmnodeagent.AgentCommand(cmd, "", containers[i].Name)
+		//if err != nil {
+		//	logit.Error.Println("AdminStartServerContainers:" + err.Error())
+		//}
+		//logit.Info.Println("AdminStartServerContainers:" + output)
+
+	}
+
+	w.WriteHeader(http.StatusOK)
+	status := SimpleStatus{}
+	status.Status = "OK"
+	w.WriteJson(&status)
+
+}
+func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
+	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	if err != nil {
+		logit.Error.Println("AdminStopServerContainers: validate token error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	//serverID
+	serverid := r.PathParam("ID")
+	if serverid == "" {
+		logit.Error.Println("AdminStopoServerContainers: error ID required")
+		rest.Error(w, "ID required", http.StatusBadRequest)
+		return
+	}
+
+	//fetch the server
+	containers, err := admindb.GetAllContainersForServer(serverid)
+	if err != nil {
+		logit.Error.Println("AdminStopServerContainers:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//for each, get server, stop container
+	for i := range containers {
+		server := admindb.Server{}
+		server, err = admindb.GetServer(containers[i].ServerID)
+		if err != nil {
+			logit.Error.Println("AdminStopServerContainers:" + err.Error())
+			rest.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		//send stop command before stopping container
+		var output string
+		var cmd = "stoppg.sh"
+		if containers[i].Role == "pgpool" {
+			cmd = "stop-pgpool.sh"
+		}
+		output, err = cpmnodeagent.AgentCommand(cmd, "", containers[i].Name)
+		if err != nil {
+			logit.Error.Println("AdminStopServerContainers:" + err.Error())
+			rest.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		logit.Info.Println("AdminStoppg:" + output)
+
+		time.Sleep(2000 * time.Millisecond)
+		//stop container
+		output, err = cpmserveragent.DockerStopContainer(containers[i].Name,
+			server.IPAddress)
+		if err != nil {
+			logit.Error.Println("AdminStopServerContainers: error when trying to start container " + err.Error())
+		}
+		logit.Info.Println(output)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	status := SimpleStatus{}
+	status.Status = "OK"
+	w.WriteJson(&status)
+
 }

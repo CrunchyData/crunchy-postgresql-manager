@@ -27,5 +27,5 @@ export KUBE_URL=$KUBE_URL
 
 adminapi > /cpmlogs/adminapi.log
 
-#dummyserver > /tmp/dummyserver.log 
+dummyserver > /tmp/dummyserver.log 
 
