@@ -1,0 +1,6 @@
+<h2>All Users</h2>
+<ul>
+  <li ng-repeat="user in users">
+    <a ui-sref="users.detail({userId:user.id})">{{user.name}}</a>
+  </li>
+</ul>    

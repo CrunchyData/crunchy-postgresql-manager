@@ -1,0 +1,22 @@
+<form class="form-horizontal">
+
+		<table>
+			<thead>
+				<th width="10%">Selected</th>
+				<th width="60%">Role</th>
+			</thead>
+			<tr ng-repeat="role in user.Roles">
+				<td width="10%">
+					<input class="checkbox" type="checkbox" ng-model="role.Selected">
+				</td>
+				<td width="60%">{{role.Name}}</td>
+			</tr>
+		</table>
+
+		<div class="form-group">
+			<div class="col-xs-offset-2 col-xs-10">
+				<button type="submit" ng-click="save()" class="btn btn-primary">Save</button>
+			</div>
+		</div>
+
+	</form>

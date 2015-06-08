@@ -1,0 +1,19 @@
+<div class="row">
+	<div class="col-sm-3 col-md-2 sidebar">
+		<div class="pa-sidebar well well-small">
+			<ul class="nav nav-list">
+				<p class="nav-header"><strong>Authentication</strong></p>
+			</ul>
+			<hr>
+		</div>
+	</div>
+	<div class="col-sm-8 main slide">
+		<form class="form-horizontal">
+			<div class="input-group">
+				<button type="submit" class="btn btn-primary" ng-click="logout()">Logout</button>
+			</div>
+		</form>
+		<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+
+	</div>
+</div>

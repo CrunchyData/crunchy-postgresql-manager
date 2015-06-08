@@ -1,0 +1,100 @@
+angular.module('uiRouterSample.clusters.service', ['ngCookies'])
+
+.factory('clustersFactory', ['$http', '$cookieStore', 'utils', function($http, $cookieStore, $scope, utils) {
+
+    var clustersFactory = {};
+
+    clustersFactory.all = function() {
+        var url = $cookieStore.get('AdminURL') + '/clusters/' + $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
+
+    clustersFactory.get = function(id) {
+
+        var url = $cookieStore.get('AdminURL') + '/cluster/' + id + '.' + $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
+    //get list of containers in a cluster
+    clustersFactory.getcontainers = function(id) {
+
+        var url = $cookieStore.get('AdminURL') + '/clusternodes/' + id + '.' + $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
+    clustersFactory.delete = function(id) {
+
+        var url = $cookieStore.get('AdminURL') + '/cluster/delete/' + id + '.' + $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
+    clustersFactory.failover = function(containerid) {
+
+        var url = $cookieStore.get('AdminURL') + '/admin/failover/' + containerid + '.' + $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
+    clustersFactory.configure = function(id) {
+
+        var url = $cookieStore.get('AdminURL') + '/cluster/configure/' + id + '.' + $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
+    clustersFactory.join = function(names, masterID, clusterID) {
+
+        var url = $cookieStore.get('AdminURL') + '/event/join-cluster/' + names + '.' + masterID + '.' + clusterID + '.' + $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
+    //get list of containers not in a cluster
+    clustersFactory.nocluster = function() {
+
+        var url = $cookieStore.get('AdminURL') + '/nodes/nocluster/' + $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
+    clustersFactory.add = function(cluster) {
+
+        var url = $cookieStore.get('AdminURL') + '/cluster/';
+        console.log(url);
+
+        return $http.post(url, {
+            'Name': cluster.Name,
+            'Status': 'uninitialized',
+            'ClusterType': cluster.ClusterType,
+            'Token': $cookieStore.get('cpm_token')
+        });
+    };
+
+    clustersFactory.autocluster = function(cluster, profile) {
+
+        var url = $cookieStore.get('AdminURL') + '/autocluster';
+        console.log(url);
+
+        return $http.post(url, {
+            'Name': cluster.Name,
+            'ClusterType': cluster.ClusterType,
+            'ClusterProfile': profile,
+            'Token': $cookieStore.get('cpm_token')
+        });
+    };
+
+    return clustersFactory;
+}]);

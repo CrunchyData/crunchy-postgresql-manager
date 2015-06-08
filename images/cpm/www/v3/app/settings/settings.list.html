@@ -1,0 +1,6 @@
+<h2>All Settings</h2>
+<ul>
+  <li ng-repeat="setting in settings">
+    <a ui-sref="settings.detail({settingId:setting.Name})">{{setting.Name}}</a>
+  </li>
+</ul>    

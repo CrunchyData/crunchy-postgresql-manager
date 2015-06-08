@@ -1,0 +1,6 @@
+<h2>All Projects </h2>
+<ul>
+  <li ng-repeat="project in projects">
+    <a ui-sref="projects.detail({projectId:project.id})">{{project.name}}</a>
+  </li>
+</ul>    

@@ -1,0 +1,6 @@
+<h2>All roles</h2>
+<ul>
+  <li ng-repeat="role in roles">
+    <a ui-sref="roles.detail({roleId:role.id})">{{role.name}}</a>
+  </li>
+</ul>    

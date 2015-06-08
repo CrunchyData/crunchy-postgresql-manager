@@ -1,0 +1,32 @@
+<div class="row">
+	<div class="col-sm-3 col-md-2 sidebar">
+		<div class="pa-sidebar well well-small">
+			<ul class="nav nav-list">
+				<p class="nav-header"><strong>Authentication</strong></p>
+			</ul>
+			<hr>
+		</div>
+	</div>
+	<div class="col-sm-8 main slide">
+		<form class="form-horizontal">
+			<div class="col-xs-5 input-group" style="margin-bottom: 25px">
+				<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+					<input class="form-control" type="text" ng-model="user_id" name="user_id" placeholder="User Id"/>
+			</div>
+			<div style="margin-bottom: 25px" class="col-xs-5 input-group">
+				<span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+				<input class="form-control" type="password" ng-model="password" name="password" placeholder="Password"/>
+			</div>
+			<div style="margin-bottom: 25px" class="col-xs-5 input-group">
+				<span class="input-group-addon"><i class="glyphicon glyphicon-cloud"></i></span>
+				<input class="form-control" type="text" ng-model="admin_url" name="admin_url" placeholder="Admin URL" />
+			</div>
+
+			<div class="input-group">
+				<button type="submit" class="btn btn-primary" ng-click="login()">Login</button>
+			</div>
+		</form>
+		<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+
+	</div>
+</div>

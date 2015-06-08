@@ -1,0 +1,27 @@
+<div>
+    <h3>{{setting.Name}}</h3>
+    <ul>
+        <form class="form-horizontal">
+
+            <div class="form-group">
+                <label for="inputUser" class="control-label col-xs-3">{{setting.Name}}</label>
+                <div class="col-xs-5">
+                    <input type="text" class="form-control" id="inputUser" ng-model="setting.Value">
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div class="col-xs-offset-2 col-xs-2">
+                    <button type="submit" class="btn btn-primary" ng-click="save()">Save</button>
+                </div>
+            </div>
+
+        </form>
+    </ul>
+    <div>
+        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+    </div>
+    <div ui-view class="slide">
+    </div>
+</div>

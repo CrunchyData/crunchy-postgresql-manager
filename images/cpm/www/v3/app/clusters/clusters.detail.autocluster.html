@@ -1,0 +1,44 @@
+<p><strong>Auto Create Cluster</strong></p>
+
+<form class="form-horizontal">
+    <div class="form-group">
+        <label for="inputName" class="control-label col-xs-2">Cluster Name</label>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" id="inputName" placeholder="Cluster Name"
+            ng-model="cluster.Name">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputRepl" class="control-label col-xs-2">Replication Type</label>
+        <div class="col-xs-5">
+            <select class="form-control" ng-model="cluster.ClusterType">
+                <option value="asynchronous" selected>asynchronous</option>
+                <option value="synchronous" selected>synchronous</option>
+            </select>
+
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputProfile" class="control-label col-xs-2">Cluster Profile</label>
+        <div class="col-xs-5">
+            <select class="form-control" ng-model="ClusterProfile">
+                <option value="SM" selected>small</option>
+                <option value="MED" selected>medium</option>
+                <option value="LG" selected>large</option>
+            </select>
+
+        </div>
+    </div>
+
+    <div class="form-group">
+        <span us-spinner spinner-key="spinner-1"></span>
+        <div class="col-xs-offset-2 col-xs-5">
+            <button type="submit" ng-click="create()" class="btn btn-primary">Create</button>
+        </div>
+    </div>
+    <div>
+        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+    </div>
+
+</form>
+~

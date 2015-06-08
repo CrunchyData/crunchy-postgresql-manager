@@ -1,0 +1,21 @@
+	<form class="form-horizontal">
+		<table>
+			<thead>
+				<th width="10%">Selected</th>
+				<th width="60%">Permission</th>
+			</thead>
+			<tr ng-repeat="perm in role.Permissions">
+				<td width="10%">
+					<input class="checkbox" type="checkbox" ng-model="perm.Selected">
+				</td>
+				<td width="60%">{{perm.Name}}</td>
+			</tr>
+		</table>
+
+		<div class="form-group">
+			<div class="col-xs-offset-2 col-xs-2">
+				<button ng-click="save()" type="submit" class="btn btn-primary">Save</button>
+			</div>
+		</div>
+	</form>
+

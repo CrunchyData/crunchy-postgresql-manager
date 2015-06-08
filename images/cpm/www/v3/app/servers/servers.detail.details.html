@@ -1,0 +1,45 @@
+<form class="form-horizontal">
+	<div class="form-group">
+		<label for="inputName" class="control-label col-xs-2">Name</label>
+		<div class="col-xs-5">
+			<input type="text" class="form-control" id="inputName" ng-model="server.Name">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="inputIP" class="control-label col-xs-2">IP Address</label>
+		<div class="col-xs-5">
+			<input type="text" class="form-control" id="inputIP" ng-model="server.IPAddress">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="inputDockerIP" class="control-label col-xs-2">Docker IP</label>
+		<div class="col-xs-5">
+			<input type="text" class="form-control" id="inputDockerIP" ng-model="server.DockerBridgeIP">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="inputPgdata" class="control-label col-xs-2">PGDATA</label>
+		<div class="col-xs-5">
+			<input type="text" class="form-control" id="inputPgdata" ng-model="server.PGDataPath">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="inputServerClass" class="control-label col-xs-2">Server Class</label>
+		<div class="col-xs-5">
+			<select ng-model="server.ServerClass" class="form-control" id="inputServerClass">
+				<option value="low">low</option>
+				<option value="medium">medium</option>
+				<option value="high">high</option>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-xs-offset-2 col-xs-5">
+			<button type="submit" ng-click="save()" class="btn btn-primary">Save</button>
+		</div>
+	</div>
+	<div>
+		  <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+	</div>
+</form>
+

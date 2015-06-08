@@ -1,0 +1,125 @@
+<!doctype html>
+<!-- Our uiRouterSample module defined here -->
+<html lang="en" ng-app="uiRouterSample">
+
+<head>
+    <meta charset="utf-8">
+
+    <!-- using twitter bootstrap, but of course -->
+    <link rel="stylesheet" type="text/css" href="vendor/bootstrap.min.css">
+    <!-- styles for ng-animate are located here -->
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css" />
+
+    <!-- Include angular.js, angular-animate.js and angular-ui-router.js-->
+    <script src="lib/angular-1.3.9/angular.js"></script>
+    <script src="lib/angular-1.3.9/angular-animate.js"></script>
+    <script src="lib/angular-1.3.9/angular-cookies.js"></script>
+    <script src="release/angular-ui-router.js"></script>
+    <script src="lib/ui-bootstrap-tpls-0.13.0.min.js"></script>
+    <script src="release/angular-spinner.min.js"></script>
+    <script src="release/spin.min.js"></script>
+
+    <!-- app.js declares the uiRouterSample module and adds items to $rootScope, and defines
+		the "home" and "about" states
+		-->
+    <script src="app/app.js"></script>
+
+    <!-- containers.js declares the uiRouterSample.containers module, and adds a number of container
+		related states 
+		-->
+    <script src="app/projects/projects.js"></script>
+    <script src="app/containers/containers.js"></script>
+    <script src="app/servers/servers.js"></script>
+    <script src="app/clusters/clusters.js"></script>
+    <script src="app/settings/settings.js"></script>
+    <script src="app/users/users.js"></script>
+    <script src="app/home/home.js"></script>
+    <script src="app/roles/roles.js"></script>
+    <script src="app/authn/authn.js"></script>
+
+    <!-- containers-service.js, and utils-service.js define services for use by the 
+		uiRouterSample.containers module.
+		-->
+    <script src="app/projects/projects-service.js"></script>
+    <script src="app/containers/containers-service.js"></script>
+    <script src="app/containers/tasks-service.js"></script>
+    <script src="app/servers/servers-service.js"></script>
+    <script src="app/clusters/clusters-service.js"></script>
+    <script src="app/settings/settings-service.js"></script>
+    <script src="app/users/users-service.js"></script>
+    <script src="app/home/home-service.js"></script>
+    <script src="app/roles/roles-service.js"></script>
+    <script src="app/authn/authn-service.js"></script>
+    <script src="common/utils/utils-service.js"></script>
+
+    <!-- could easily use a custom property of the state here instead of 'name' -->
+    <title ng-bind="$state.current.name + ' - CPM'">Crunchy PostgreSQL Manager</title>
+</head>
+
+<body>
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+
+                <!-- ui-sref is a great directive for linking a state location with an anchor link.
+					You should almost always use ui-sref instead of href on your links when you want
+					then to navigate to a state. When this link is clicked it will take the application
+					to the 'home' state. Behind the scenes the directive also adds the correct href attr
+					and url. -->
+                <a class="navbar-brand" ui-sref="home.list"><img src="images/logo.png" /></a>
+                <ul class="nav navbar-nav navbar-right">
+
+                    <!-- Here you can see ui-sref in action again. Also notice the use of $state.includes, which
+						will set the links to 'active' if, for example on the first link, 'containers' or any of
+						its descendant states are activated. -->
+                    <li ng-class="{active: $state.includes('projects')}"><a ui-sref="projects.list">Projects</a></li>
+                    <li ng-class="{active: $state.includes('containers')}"><a ui-sref="containers.list">Containers</a></li>
+                    <li ng-class="{active: $state.includes('clusters')}"><a ui-sref="clusters.list">Clusters</a></li>
+                    <li ng-class="{active: $state.includes('servers')}"><a ui-sref="servers.list">Servers</a></li>
+                    <li ng-class="{active: $state.includes('authn')}">
+                        <li class="dropdown" dropdown on-toggle="toggled(open)">
+                            <a href class="dropdown-toggle" dropdown-toggle><i class="fa fa-bars fa-2x"></i></a>
+                            <ul class="dropdown-menu">
+                                <li ng-if="!$cookieStore.get('cpm_token')" ng-class="{active: $state.includes('login')}"><a ui-sref="login">Login</a></li>
+                                <li ng-if="$cookieStore.get('cpm_token')" ng-class="{active: $state.includes('logout')}"><a ui-sref="logout">Logout</a></li>
+                                <li ng-class="{active: $state.includes('about')}"><a ui-sref="about">About</a></li>
+                                <li ng-class="{active: $state.includes('settings')}"><a ui-sref="settings.list">Settings</a></li>
+                                <li ng-class="{active: $state.includes('users')}"><a ui-sref="users.list">Users</a></li>
+                                <li ng-class="{active: $state.includes('roles')}"><a ui-sref="roles.list">Roles</a></li>
+                            </ul>
+                        </li>
+                </ul>
+
+            </div>
+        </div>
+        <p ui-view="hint" class="navbar-text pull-right"></p>
+    </div>
+
+    <!-- Here is the main ui-view (unnamed) and will be populated by its immediate children's templates
+		unless otherwise explicitly named views are targeted. It's also employing ng-animate. -->
+    <div ui-view class="container-fluid slide" style="padding-top: 80px;"></div>
+
+
+    <hr>
+    <button class="btn btn-default" ng-click="isCollapsed = !isCollapsed">
+	    <i class="fa fa-bug"></i></button>
+    <hr>
+    <div collapse="isCollapsed">
+        <div class="well well-lg">Some content
+            <pre>
+      <!-- Here's some values to keep an eye on in the sample in order to understand $state and $stateParams -->
+      $state = {{$state.current.name}}
+      $stateParams = {{$stateParams}}
+      $state full url = {{ $state.$current.url.source }}
+      cookie cpm_token = [{{$cookieStore.get('cpm_token')}}]
+      cookie cpm_user_id = {{ $cookieStore.get('cpm_user_id') }}
+      cookie adminurl = {{ $cookieStore.get('AdminURL') }}
+      <!-- $state.$current is not a public api, we are using it to
+	   display the full url for learning purposes-->
+    </pre>
+        </div>
+    </div>
+</body>
+
+</html>

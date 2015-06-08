@@ -1,0 +1,25 @@
+<div id="viewiostat">
+	<h2>I/O Utilization - {{server.Name}}</h2>
+	<table class="table">
+		<thead>
+			<th>DEVICE</th>
+			<th>IO/S</th>
+			<th>KB READS/S</th>
+			<th>KB WRITES/S</th>
+			<th>KB READS TOTAL</th>
+			<th>kB WRITES TOTAL</th>
+		</thead>
+		<tbody>
+			<tr ng-repeat="x in iostatresults">
+				<td>{{x.device}}</td>
+				<td>{{x.tps}}</td>
+				<td>{{x.kbreadpersec}}</td>
+				<td>{{x.kbwritespersec}}</td>
+				<td>{{x.kbreads}}</td>
+				<td>{{x.kbwrites}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<a class="btn btn-primary" ng-click="refresh()" ><i class="fa fa-refresh fa-lg"></i> Refresh</a>
+

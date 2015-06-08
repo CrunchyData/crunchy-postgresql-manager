@@ -1,0 +1,40 @@
+<form class="form-horizontal">
+
+	<div class="form-group">
+		<label for="inputName" class="control-label col-xs-2">Name</label>
+		<div class="col-xs-5">
+
+			<input type="text" class="form-control" id="inputName" ng-model="user.Name">
+
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="inputPassword" class="control-label col-xs-2">Password</label>
+		<div class="col-xs-5">
+
+			<input type="password" class="form-control" id="inputPassword" ng-model="user.Password">
+
+		</div>
+
+	</div>
+
+	<table>
+		<thead>
+			<th width="10%">Selected</th>
+			<th width="60%">Role</th>
+		</thead>
+		<tr ng-repeat="role in user.Roles">
+			<td width="10%">
+				<input class="checkbox" type="checkbox" ng-model="role.Selected">
+			</td>
+			<td width="60%">{{role.Name}}</td>
+		</tr>
+	</table>
+
+	<div class="form-group">
+		<div class="col-xs-offset-2 col-xs-10">
+			<button type="submit" ng-click="add()" class="btn btn-primary">Create</button>
+		</div>
+	</div>
+
+</form>

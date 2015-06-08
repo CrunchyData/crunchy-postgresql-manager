@@ -1,0 +1,28 @@
+	<form class="form-horizontal">
+		 <div class="form-group">
+			                 <label for="inputName" class="control-label col-xs-2">Name</label>
+					                 <div class="col-xs-5">
+								                         <input type="text" class="form-control" id="inputName" ng-model="newrole.Name">
+											                 </div>
+													         </div>
+
+		<table>
+			<thead>
+				<th width="10%">Selected</th>
+				<th width="60%">Permission</th>
+			</thead>
+			<tr ng-repeat="perm in newrole.Permissions">
+				<td width="10%">
+					<input class="checkbox" type="checkbox" ng-model="perm.Selected">
+				</td>
+				<td width="60%">{{perm.Name}}</td>
+			</tr>
+		</table>
+
+		<div class="form-group">
+			<div class="col-xs-offset-2 col-xs-2">
+				<button ng-click="add()" type="submit" class="btn btn-primary">Create</button>
+			</div>
+		</div>
+	</form>
+

@@ -1,0 +1,22 @@
+<div style="border:0px" id="viewstatdb">
+	<p style="font-family: Arial, Helvetica, sans-serif;">This page shows pg_controldata values.</p>
+	<h1>{{container.Name}}</h1>
+	<div class="datagrid">
+
+		<table class="table">
+			<thead>
+				<th>NAME</th>
+				<th>VALUE</th>
+			</thead>
+			<tbody>
+
+				<tr ng-repeat="x in controldataresults">
+					<td>{{x.Name}}</td>
+					<td>{{x.Value}}</td>
+				</tr>
+
+			</tbody>
+		</table>
+	</div>
+	<a class="btn btn-primary" ng-click="refresh()" ><i class="fa fa-refresh fa-lg"></i>Refresh</a>
+

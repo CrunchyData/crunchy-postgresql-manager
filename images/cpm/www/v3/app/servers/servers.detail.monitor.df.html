@@ -1,0 +1,25 @@
+<div id="viewdf">
+	<h2>File system disk utilization - {{server.Name}}</h2>
+	<table class="table">
+		<thead>
+			<th>FILE SYSTEM</th>
+			<th>TOTAL</th>
+			<th>USED</th>
+			<th>AVAILABLE</th>
+			<th>% USED</th>
+			<th>MOUNT POINT</th>
+		</thead>
+		<tbody>
+			<tr ng-repeat="x in dfresults">
+				<td>{{x.filesystem}}</td>
+				<td>{{x.total}}</td>
+				<td>{{x.used}}</td>
+				<td>{{x.available}}</td>
+				<td>{{x.pctused}}</td>
+				<td>{{x.mountpt}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<a class="btn btn-primary" ng-click="refresh()" ><i class="fa fa-refresh fa-lg"></i>Refresh</a>
+

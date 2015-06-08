@@ -75,8 +75,16 @@ type Cluster struct {
 type ContainerUser struct {
 	ID            string
 	Containername string
-	Usename       string
+	ContainerID   string
 	Passwd        string
+	Usename       string
+	Usesysid      string
+	Usecreatedb   string
+	Usesuper      string
+	Usecatupd     string
+	Userepl       string
+	Valuntil      string
+	Useconfig     string
 	UpdateDate    string
 }
 
@@ -913,43 +921,15 @@ func AddContainerUser(s ContainerUser) (int, error) {
 }
 
 func DeleteContainerUser(id string) error {
-	queryStr := fmt.Sprintf("delete from containeruser where id=%s returning id", id)
+	queryStr := fmt.Sprintf("drop user %s", id)
 	//logit.Info.Println("admindb:DeleteCluster:" + queryStr)
 
-	var nodeuserid int
-	err := dbConn.QueryRow(queryStr).Scan(&nodeuserid)
-	switch {
-	case err != nil:
-		return err
-	default:
-		logit.Info.Println("admindb:DeleteContainerUser: deleted " + id)
-	}
-	return nil
-}
-
-func GetAllUsersForContainer(containerName string) ([]ContainerUser, error) {
-	var rows *sql.Rows
-	var err error
-	queryStr := fmt.Sprintf("select id, usename, passwd, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from containeruser where containername = '%s' order by usename", containerName)
-	logit.Info.Println("admindb:GetAllUsersForContainer:" + queryStr)
-	rows, err = dbConn.Query(queryStr)
+	_, err := dbConn.Query(queryStr)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	defer rows.Close()
-	users := make([]ContainerUser, 0)
-	for rows.Next() {
-		user := ContainerUser{}
-		user.Containername = containerName
-		if err = rows.Scan(&user.ID, &user.Usename, &user.Passwd, &user.UpdateDate); err != nil {
-			return nil, err
-		}
-		users = append(users, user)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-	return users, nil
+	logit.Info.Println("admindb:DeleteContainerUser: deleted " + id)
+	return nil
 }
 
 func GetContainerUser(containername string, usename string) (ContainerUser, error) {

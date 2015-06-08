@@ -16,9 +16,12 @@
 package adminapi
 
 import (
+	"database/sql"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
+	_ "github.com/lib/pq"
 	"net/http"
 )
 
@@ -139,20 +142,84 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	containername := r.PathParam("Containername")
+	ID := r.PathParam("ID")
 
-	if containername == "" {
-		rest.Error(w, "Containername required", 400)
+	if ID == "" {
+		rest.Error(w, "ID required", 400)
 		return
 	}
 
-	result, err := admindb.GetAllUsersForContainer(containername)
+	//get container info
+	node, err := admindb.GetContainer(ID)
 	if err != nil {
 		logit.Error.Println("GetAllUsersForContainer: " + err.Error())
-		rest.Error(w, err.Error(), 400)
+		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	w.WriteJson(result)
+	//get connection to container's database
+	var host = node.Name
+	if KubeEnv {
+		host = node.Name + "-db"
+	}
+
+	//fetch cpmtest user credentials
+	var nodeuser admindb.ContainerUser
+	nodeuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	logit.Info.Println("cpmtest password is " + nodeuser.Passwd)
+
+	//get port
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
+
+	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+	defer dbConn.Close()
+
+	users := make([]admindb.ContainerUser, 0)
+
+	//query results
+	var rows *sql.Rows
+
+	rows, err = dbConn.Query("select usename, usesysid, usecreatedb, usesuper, usecatupd, userepl, coalesce(valuntil::text, '') from pg_user order by usename")
+	if err != nil {
+		logit.Error.Println("GetAllUsersForContainer:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		user := admindb.ContainerUser{}
+		if err = rows.Scan(
+			&user.Usename,
+			&user.Usesysid,
+			&user.Usecreatedb,
+			&user.Usesuper,
+			&user.Usecatupd,
+			&user.Userepl,
+			&user.Valuntil,
+		); err != nil {
+			logit.Error.Println("GetAllUsersForContainer:" + err.Error())
+			rest.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		user.Containername = node.Name
+		user.ContainerID = node.ID
+		users = append(users, user)
+	}
+	if err = rows.Err(); err != nil {
+		logit.Error.Println("GetAllUsersForContainer:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.WriteJson(&users)
 
 }

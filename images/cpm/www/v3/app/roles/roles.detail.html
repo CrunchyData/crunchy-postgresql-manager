@@ -1,0 +1,15 @@
+<div>
+	<h2>{{role.Name}}</h2>
+	<div class="navbar-inner"><div class="container">
+			<ul class="nav navbar-nav navbar-left">
+
+				<a ui-sref="roles.add()"><i class="fa fa-plus fa-fw"></i>Add</a>
+				<a ui-sref="roles.detail.delete()"><i class="fa fa-minus fa-fw"></i>Delete</a>
+			</ul>
+		</div>
+	</div>
+	<hr>
+
+	<div ui-view class="slide">
+	</div>
+</div>
