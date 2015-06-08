@@ -694,6 +694,36 @@ angular.module('uiRouterSample.containers', [
                 }
             })
 
+            .state('containers.detail.monitor.pgstatreplication', {
+                url: '/monitor/pgstatreplication/:itemId',
+                views: {
+                    '': {
+                        templateUrl: 'app/containers/containers.detail.monitor.pgstatreplication.html',
+                        controller: ['$scope', '$stateParams', '$state', 'containersFactory', 'utils',
+                            function($scope, $stateParams, $state, containersFactory, utils) {
+                                $scope.refresh = function() {
+                                    containersFactory.pgstatreplication($stateParams.containerId)
+                                        .success(function(data) {
+                                            console.log('successful get with data=' + data);
+                                            $scope.statreplresults = data;
+                                        })
+                                        .error(function(error) {
+                                            $scope.alerts = [{
+                                                type: 'danger',
+                                                msg: error.message
+                                            }];
+                                            console.log('here is an error ' + error.message);
+                                        });
+                                };
+
+                                $scope.refresh();
+
+                            }
+                        ]
+                    },
+                }
+            })
+
             .state('containers.detail.monitor.bgwriter', {
                 url: '/monitor/bgwriter/:itemId',
                 views: {

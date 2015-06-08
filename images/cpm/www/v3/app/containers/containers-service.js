@@ -65,6 +65,14 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
         return $http.get(url);
     };
 
+    containersFactory.pgstatreplication = function(id) {
+
+        var url = $cookieStore.get('AdminURL') + '/monitor/container/repl/' + id + '.' + $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
     containersFactory.bgwriter = function(id) {
 
         var url = $cookieStore.get('AdminURL') + '/monitor/container/bgwriter/' + id + '.' + $cookieStore.get('cpm_token');
