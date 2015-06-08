@@ -9,51 +9,51 @@ angular.module('uiRouterSample.containers', [
             $stateProvider
                 .state('containers', {
 
-                abstract: true,
+                    abstract: true,
 
-                url: '/containers',
+                    url: '/containers',
 
-                templateUrl: 'app/containers/containers.html',
+                    templateUrl: 'app/containers/containers.html',
 
-                resolve: {
-                    containers: ['$cookieStore', 'containersFactory',
-                        function($cookieStore, containersFactory) {
-                            console.log('resolving containers at the top');
-                            if (!$cookieStore.get('cpm_token')) {
-                                var nothing = [];
-                                console.log('returning nothing');
-                                return nothing;
+                    resolve: {
+                        containers: ['$cookieStore', 'containersFactory',
+                            function($cookieStore, containersFactory) {
+                                console.log('resolving containers at the top');
+                                if (!$cookieStore.get('cpm_token')) {
+                                    var nothing = [];
+                                    console.log('returning nothing');
+                                    return nothing;
+                                }
+
+                                return containersFactory.all();
                             }
+                        ]
+                    },
 
-                            return containersFactory.all();
+                    controller: ['$scope', '$state', '$cookieStore', '$stateParams', 'containers', 'utils',
+                        function($scope, $state, $cookieStore, $stateParams, containers, utils) {
+
+                            console.log('next 1');
+                            if (!$cookieStore.get('cpm_token')) {
+                                console.log('next 2');
+                                $state.go('login', {
+                                    userId: 'hi'
+                                });
+                            }
+                            $scope.containers = containers;
+
+                            $scope.goToFirst = function() {
+                                console.log('go to first called in containers');
+                                var randId = $scope.containers.data[0].ID;
+
+                                $state.go('containers.detail.details', {
+                                    containerId: randId
+                                });
+                            };
+                            console.log('stateParams=' + JSON.stringify($stateParams));
                         }
                     ]
-                },
-
-                controller: ['$scope', '$state', '$cookieStore', '$stateParams', 'containers', 'utils',
-                    function($scope, $state, $cookieStore, $stateParams, containers, utils) {
-
-                        console.log('next 1');
-                        if (!$cookieStore.get('cpm_token')) {
-                            console.log('next 2');
-                            $state.go('login', {
-                                userId: 'hi'
-                            });
-                        }
-                        $scope.containers = containers;
-
-                        $scope.goToFirst = function() {
-                            console.log('go to first called in containers');
-                            var randId = $scope.containers.data[0].ID;
-
-                            $state.go('containers.detail.details', {
-                                containerId: randId
-                            });
-                        };
-                        console.log('stateParams=' + JSON.stringify($stateParams));
-                    }
-                ]
-            })
+                })
 
             .state('containers.list', {
 
@@ -490,18 +490,18 @@ angular.module('uiRouterSample.containers', [
                         templateUrl: 'app/containers/containers.detail.users.html',
                         controller: ['$scope', '$stateParams', '$state', 'containersFactory', 'utils',
                             function($scope, $stateParams, $state, containersFactory, utils) {
-                                    containersFactory.getallusers($stateParams.containerId)
-                                        .success(function(data) {
-                                            console.log('successful get with data=' + data);
-                                            $scope.users = data;
-                                        })
-                                        .error(function(error) {
-                                            $scope.alerts = [{
-                                                type: 'danger',
-                                                msg: error.message
-                                            }];
-                                            console.log('here is an error ' + error.message);
-                                        });
+                                containersFactory.getallusers($stateParams.containerId)
+                                    .success(function(data) {
+                                        console.log('successful get with data=' + data);
+                                        $scope.users = data;
+                                    })
+                                    .error(function(error) {
+                                        $scope.alerts = [{
+                                            type: 'danger',
+                                            msg: error.message
+                                        }];
+                                        console.log('here is an error ' + error.message);
+                                    });
 
                                 $scope.edit = function() {
                                     $state.go('.edit', $stateParams);
@@ -518,7 +518,7 @@ angular.module('uiRouterSample.containers', [
                         templateUrl: 'app/containers/containers.detail.users.edit.html',
                         controller: ['$scope', '$stateParams', '$state', 'containersFactory', 'utils',
                             function($scope, $stateParams, $state, containersFactory, utils) {
-			    	console.log('doing edit user');
+                                console.log('doing edit user');
                                 $scope.done = function() {
                                     $state.go('^', $stateParams);
                                 };
@@ -534,9 +534,65 @@ angular.module('uiRouterSample.containers', [
                         templateUrl: 'app/containers/containers.detail.users.add.html',
                         controller: ['$scope', '$stateParams', '$state', 'containersFactory', 'utils',
                             function($scope, $stateParams, $state, containersFactory, utils) {
+                                $scope.user = {};
+                                $scope.user.Password = '';
+                                $scope.user.Password2 = '';
+                                $scope.user.Superuser = false;
+                                $scope.user.Createdb = false;
+                                $scope.user.Createrole = false;
+                                $scope.user.Login = false;
+
+                                $scope.user.Usename = 'usename';
                                 console.log('doing add user');
-                                $scope.done = function() {
-                                    $state.go('^', $stateParams);
+                                $scope.create = function() {
+                                    $scope.user.ContainerID = $stateParams.containerId;
+                                    console.log($scope.user);
+                                    if ($scope.user.Password !=
+                                        $scope.user.Password2) {
+                                        $scope.alerts = [{
+                                            type: 'danger',
+                                            msg: 'passwords do not match'
+                                        }];
+                                        return;
+                                    }
+                                    if ($scope.user.Superuser) {
+                                        $scope.user.Superuser = 'SUPERUSER';
+                                    } else {
+                                        $scope.user.Superuser = '';
+                                    }
+
+                                    if ($scope.user.Createdb) {
+                                        $scope.user.Createdb = 'CREATEDB';
+                                    } else {
+                                        $scope.user.Createdb = '';
+                                    }
+                                    if ($scope.user.Createrole) {
+                                        $scope.user.Createrole = 'CREATEROLE';
+                                    } else {
+                                        $scope.user.Createrole = '';
+                                    }
+                                    if ($scope.user.Login) {
+                                        $scope.user.Login = 'LOGIN';
+                                    } else {
+                                        $scope.user.Login = '';
+                                    }
+                                    containersFactory.adduser($scope.user)
+                                        .success(function(data) {
+                                            console.log('successful adduser with data=' + data);
+                                            $state.go('containers.detail.users', $stateParams, {
+                                                reload: true,
+                                                inherit: false
+                                            });
+
+                                        })
+                                        .error(function(error) {
+                                            $scope.alerts = [{
+                                                type: 'danger',
+                                                msg: error.message
+                                            }];
+                                            console.log('here is an error ' + error.message);
+                                        });
+
                                 };
                             }
                         ]
@@ -668,62 +724,62 @@ angular.module('uiRouterSample.containers', [
             })
 
             .state('containers.detail.monitor.pgsettings', {
-                    url: '/monitor/pgsettings/:itemId',
-                    views: {
-                        '': {
-                            templateUrl: 'app/containers/containers.detail.monitor.pgsettings.html',
-                            controller: ['$scope', '$stateParams', '$state', 'containersFactory', 'utils',
-                                function($scope, $stateParams, $state, containersFactory, utils) {
-                                    $scope.refresh = function() {
-                                        containersFactory.pgsettings($stateParams.containerId)
-                                            .success(function(data) {
-                                                console.log('successful get with data=' + data);
-                                                $scope.settingsresults = data;
-                                            })
-                                            .error(function(error) {
-                                                $scope.alerts = [{
-                                                    type: 'danger',
-                                                    msg: error.message
-                                                }];
-                                                console.log('here is an error ' + error.message);
-                                            });
-                                    };
+                url: '/monitor/pgsettings/:itemId',
+                views: {
+                    '': {
+                        templateUrl: 'app/containers/containers.detail.monitor.pgsettings.html',
+                        controller: ['$scope', '$stateParams', '$state', 'containersFactory', 'utils',
+                            function($scope, $stateParams, $state, containersFactory, utils) {
+                                $scope.refresh = function() {
+                                    containersFactory.pgsettings($stateParams.containerId)
+                                        .success(function(data) {
+                                            console.log('successful get with data=' + data);
+                                            $scope.settingsresults = data;
+                                        })
+                                        .error(function(error) {
+                                            $scope.alerts = [{
+                                                type: 'danger',
+                                                msg: error.message
+                                            }];
+                                            console.log('here is an error ' + error.message);
+                                        });
+                                };
 
-                                    $scope.refresh();
-                                }
-                            ]
-                        },
-                    }
-                })
-                
-                .state('containers.detail.monitor.pgcontroldata', {
-                    url: '/monitor/pgcontroldata/:itemId',
-                    views: {
-                        '': {
-                            templateUrl: 'app/containers/containers.detail.monitor.pgcontroldata.html',
-                            controller: ['$scope', '$stateParams', '$state', 'containersFactory', 'utils',
-                                function($scope, $stateParams, $state, containersFactory, utils) {
-                                    $scope.refresh = function() {
-                                        containersFactory.pgcontroldata($stateParams.containerId)
-                                            .success(function(data) {
-                                                console.log('successful get with data=' + data);
-                                                $scope.controldataresults = data;
-                                            })
-                                            .error(function(error) {
-                                                $scope.alerts = [{
-                                                    type: 'danger',
-                                                    msg: error.message
-                                                }];
-                                                console.log('here is an error ' + error.message);
-                                            });
-                                    };
+                                $scope.refresh();
+                            }
+                        ]
+                    },
+                }
+            })
 
-                                    $scope.refresh();
-                                }
-                            ]
-                        },
-                    }
-                })
+            .state('containers.detail.monitor.pgcontroldata', {
+                url: '/monitor/pgcontroldata/:itemId',
+                views: {
+                    '': {
+                        templateUrl: 'app/containers/containers.detail.monitor.pgcontroldata.html',
+                        controller: ['$scope', '$stateParams', '$state', 'containersFactory', 'utils',
+                            function($scope, $stateParams, $state, containersFactory, utils) {
+                                $scope.refresh = function() {
+                                    containersFactory.pgcontroldata($stateParams.containerId)
+                                        .success(function(data) {
+                                            console.log('successful get with data=' + data);
+                                            $scope.controldataresults = data;
+                                        })
+                                        .error(function(error) {
+                                            $scope.alerts = [{
+                                                type: 'danger',
+                                                msg: error.message
+                                            }];
+                                            console.log('here is an error ' + error.message);
+                                        });
+                                };
+
+                                $scope.refresh();
+                            }
+                        ]
+                    },
+                }
+            })
 
             .state('containers.detail.monitor.loadtest', {
                 url: '/monitor/loadtest/:itemId',
@@ -784,8 +840,7 @@ angular.module('uiRouterSample.containers', [
                     '': {
                         templateUrl: 'app/containers/containers.detail.details.html',
                         controller: ['$scope', '$stateParams', '$state', 'utils',
-                            function($scope, $stateParams, $state, utils) {
-                            }
+                            function($scope, $stateParams, $state, utils) {}
                         ]
                     },
                 }
@@ -900,7 +955,7 @@ angular.module('uiRouterSample.containers', [
                         controller: ['$scope', '$stateParams', '$state', 'containersFactory', 'utils', 'usSpinnerService',
                             function($scope, $stateParams, $state, containersFactory, utils, usSpinnerService) {
                                 var container = $scope.container;
-				console.log('here in start top');
+                                console.log('here in start top');
 
                                 $scope.start = function() {
                                     usSpinnerService.spin('spinner-1');

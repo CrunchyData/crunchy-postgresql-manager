@@ -147,6 +147,10 @@ type NodeUser struct {
 	Passwd        string
 	Updatedt      string
 	Token         string
+	Superuser     string
+	Createdb      string
+	Createrole    string
+	Login         string
 }
 
 func Kube(w rest.ResponseWriter, r *rest.Request) {

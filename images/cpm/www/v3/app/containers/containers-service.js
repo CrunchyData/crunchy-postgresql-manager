@@ -115,5 +115,25 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
         return $http.get(url);
     };
 
+    containersFactory.adduser = function(user) {
+
+        var url = $cookieStore.get('AdminURL') + '/dbuser/add';
+        console.log(url);
+        console.log('id is ' + user.ContainerID);
+	user.Token = $cookieStore.get('cpm_token');
+
+        return $http.post(url,  {
+		'ID' : user.ContainerID,
+		'Usename' : user.Usename,
+		'Passwd' : user.Password,
+		'Superuser' : user.Superuser,
+		'Createdb' : user.Createdb,
+		'Createrole' : user.Createrole,
+		'Login' : user.Login,
+		'Token' : $cookieStore.get('cpm_token'),
+	});
+    };
+
+
     return containersFactory;
 }]);

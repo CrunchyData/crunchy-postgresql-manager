@@ -34,16 +34,16 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	err = secimpl.Authorize(postMsg.Token, "perm-backup")
+	err = secimpl.Authorize(postMsg.Token, "perm-user")
 	if err != nil {
 		logit.Error.Println("AddSchedule: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	if postMsg.Containername == "" {
-		logit.Error.Println("AddContainerUser: error node Containername required")
-		rest.Error(w, "Containername required", 400)
+	if postMsg.ID == "" {
+		logit.Error.Println("AddContainerUser: error node ID required")
+		rest.Error(w, "ID required", 400)
 		return
 	}
 
@@ -58,8 +58,58 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	//create user on the container
+	//get container info
+	node, err := admindb.GetContainer(postMsg.ID)
+	if err != nil {
+		logit.Error.Println("AddContainUser: " + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//get connection to container's database
+	var host = node.Name
+	if KubeEnv {
+		host = node.Name + "-db"
+	}
+
+	//fetch cpmtest user credentials
+	var nodeuser admindb.ContainerUser
+	nodeuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	logit.Info.Println("cpmtest password is " + nodeuser.Passwd)
+
+	//get port
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
+
+	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+	defer dbConn.Close()
+
+	query := "create user " + postMsg.Usename + " " +
+		postMsg.Superuser +
+		postMsg.Createdb +
+		postMsg.Createrole +
+		postMsg.Login +
+		"PASSWORD '" + postMsg.Passwd + "'"
+
+	logit.Info.Println(query)
+
+	_, err = dbConn.Query(query)
+	if err != nil {
+		logit.Error.Println("AddContainerUser:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//create user in the admin db
 	dbuser := admindb.ContainerUser{}
-	dbuser.Containername = postMsg.Containername
+	dbuser.Containername = node.Name
 	dbuser.Passwd = postMsg.Passwd
 	dbuser.Usename = postMsg.Usename
 
