@@ -29,6 +29,7 @@ type Project struct {
 	UpdateDate string
 	Token      string
 	Containers map[string]string
+	Clusters   map[string]string
 }
 
 func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
@@ -58,7 +59,8 @@ func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
 		Name:       project.Name,
 		Desc:       project.Desc,
 		UpdateDate: project.UpdateDate,
-		Containers: project.Containers}
+		Containers: project.Containers,
+		Clusters:   project.Clusters}
 
 	err = admindb.UpdateProject(dbproject)
 	if err != nil {
@@ -133,7 +135,7 @@ func GetProject(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	project := Project{results.ID, results.Name, results.Desc, results.UpdateDate, "", results.Containers}
+	project := Project{results.ID, results.Name, results.Desc, results.UpdateDate, "", results.Containers, results.Clusters}
 
 	w.WriteJson(&project)
 }
@@ -161,6 +163,7 @@ func GetAllProjects(w rest.ResponseWriter, r *rest.Request) {
 		projects[i].Desc = projectsList[i].Desc
 		projects[i].UpdateDate = projectsList[i].UpdateDate
 		projects[i].Containers = projectsList[i].Containers
+		projects[i].Clusters = projectsList[i].Clusters
 		i++
 	}
 

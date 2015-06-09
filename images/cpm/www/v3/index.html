@@ -74,7 +74,7 @@
 						will set the links to 'active' if, for example on the first link, 'containers' or any of
 						its descendant states are activated. -->
                     <li ng-class="{active: $state.includes('projects')}"><a ui-sref="projects.list">Projects</a></li>
-                    <li ng-class="{active: $state.includes('containers')}"><a ui-sref="containers.list">Containers</a></li>
+                    <li ng-class="{active: $state.includes('containers')}"><a ui-sref="containers.list">Databases</a></li>
                     <li ng-class="{active: $state.includes('clusters')}"><a ui-sref="clusters.list">Clusters</a></li>
                     <li ng-class="{active: $state.includes('servers')}"><a ui-sref="servers.list">Servers</a></li>
                     <li ng-class="{active: $state.includes('authn')}">
@@ -110,6 +110,7 @@
             <pre>
       <!-- Here's some values to keep an eye on in the sample in order to understand $state and $stateParams -->
       $state = {{$state.current.name}}
+      $rootScope.projectId = {{projectId}}
       $stateParams = {{$stateParams}}
       $state full url = {{ $state.$current.url.source }}
       cookie cpm_token = [{{$cookieStore.get('cpm_token')}}]

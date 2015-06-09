@@ -33,6 +33,7 @@ import (
 
 type AutoClusterInfo struct {
 	Name           string
+	ProjectID      string
 	ClusterType    string
 	ClusterProfile string
 	Token          string
@@ -52,7 +53,7 @@ func GetCluster(w rest.ResponseWriter, r *rest.Request) {
 		logit.Error.Println("GetCluster:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	cluster := Cluster{results.ID, results.Name, results.ClusterType,
+	cluster := Cluster{results.ID, results.ProjectID, results.Name, results.ClusterType,
 		results.Status, results.CreateDate, "", results.Containers}
 	logit.Info.Println("GetCluser:db call results=" + results.ID)
 
@@ -375,6 +376,42 @@ func configureCluster(cluster admindb.Cluster, autocluster bool) error {
 
 }
 
+func GetAllClustersForProject(w rest.ResponseWriter, r *rest.Request) {
+	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	if err != nil {
+		logit.Error.Println("GetAllClustersForProject: authorize error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	ID := r.PathParam("ID")
+	if ID == "" {
+		logit.Error.Println("GetAllClustersForProject: error project ID required")
+		rest.Error(w, "project ID required", http.StatusBadRequest)
+		return
+	}
+
+	results, err := admindb.GetAllClustersForProject(ID)
+	if err != nil {
+		logit.Error.Println("GetAllClustersForProject: error-" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	clusters := make([]Cluster, len(results))
+	i := 0
+	for i = range results {
+		clusters[i].ID = results[i].ID
+		clusters[i].ProjectID = results[i].ProjectID
+		clusters[i].Name = results[i].Name
+		clusters[i].ClusterType = results[i].ClusterType
+		clusters[i].Status = results[i].Status
+		clusters[i].CreateDate = results[i].CreateDate
+		clusters[i].Containers = results[i].Containers
+		i++
+	}
+
+	w.WriteJson(&clusters)
+}
+
 func GetAllClusters(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
@@ -392,6 +429,7 @@ func GetAllClusters(w rest.ResponseWriter, r *rest.Request) {
 	i := 0
 	for i = range results {
 		clusters[i].ID = results[i].ID
+		clusters[i].ProjectID = results[i].ProjectID
 		clusters[i].Name = results[i].Name
 		clusters[i].ClusterType = results[i].ClusterType
 		clusters[i].Status = results[i].Status
@@ -428,7 +466,7 @@ func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	logit.Info.Println("PostCluster: have ID=" + cluster.ID + " Name=" + cluster.Name + " type=" + cluster.ClusterType + " status=" + cluster.Status)
-	dbcluster := admindb.Cluster{cluster.ID, cluster.Name, cluster.ClusterType, cluster.Status, "", cluster.Containers}
+	dbcluster := admindb.Cluster{cluster.ID, cluster.ProjectID, cluster.Name, cluster.ClusterType, cluster.Status, "", cluster.Containers}
 	if cluster.ID == "" {
 		strid, err := admindb.InsertCluster(dbcluster)
 		newid := strconv.Itoa(strid)
@@ -925,6 +963,11 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, "ClusterType name required", http.StatusBadRequest)
 		return
 	}
+	if params.ProjectID == "" {
+		logit.Error.Println("AutoCluster: error in ProjectID")
+		rest.Error(w, "ProjectID name required", http.StatusBadRequest)
+		return
+	}
 	if params.ClusterProfile == "" {
 		logit.Error.Println("AutoCluster: error in ClusterProfile")
 		rest.Error(w, "ClusterProfile name required", http.StatusBadRequest)
@@ -934,7 +977,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("AutoCluster: Name=" + params.Name + " ClusterType=" + params.ClusterType + " Profile=" + params.ClusterProfile)
 
 	//create cluster definition
-	dbcluster := admindb.Cluster{"", params.Name, params.ClusterType, "uninitialized", "", make(map[string]string)}
+	dbcluster := admindb.Cluster{"", params.ProjectID, params.Name, params.ClusterType, "uninitialized", "", make(map[string]string)}
 	var ival int
 	ival, err = admindb.InsertCluster(dbcluster)
 	clusterID := strconv.Itoa(ival)

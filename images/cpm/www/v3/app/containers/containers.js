@@ -4,7 +4,7 @@ angular.module('uiRouterSample.containers', [
 ])
 
 .config(
-    ['$stateProvider', '$urlRouterProvider',
+    ['$stateProvider', '$urlRouterProvider', 
         function($stateProvider, $urlRouterProvider) {
             $stateProvider
                 .state('containers', {
@@ -519,39 +519,20 @@ angular.module('uiRouterSample.containers', [
                         controller: ['$scope', '$stateParams', '$state', 'containersFactory', 'utils', 
                             function($scope, $stateParams, $state, containersFactory, utils ) {
 			    $scope.user = {};
+			    $scope.user.ContainerID = $stateParams.containerId;
+
                                     containersFactory.getuser($stateParams.containerId, $stateParams.itemId)
                                         .success(function(data) {
 						$scope.user = data;
                                             console.log('successful get user with Rolname=' + data.Rolname);
-					    if ($scope.user.Rolsuper == 'true') 
-					    	$scope.user.Rolsuper = true;
-						else
-					    	$scope.user.Rolsuper = false;
-					    if ($scope.user.Rolinherit == 'true') 
-					    	$scope.user.Rolinherit = true;
-						else
-					    	$scope.user.Rolinherit = false;
-					    if ($scope.user.Rolcreaterole == 'true') 
-					    	$scope.user.Rolcreaterole = true;
-						else
-					    	$scope.user.Rolcreaterole = false;
-					    if ($scope.user.Rolcreatedb == 'true') 
-					    	$scope.user.Rolcreatedb = true;
-						else
-					    	$scope.user.Rolcreatedb = false;
-					    if ($scope.user.Rolcatupdate == 'true') 
-					    	$scope.user.Rolcatupdate = true;
-						else
-					    	$scope.user.Rolcatupdate = false;
-					    if ($scope.user.Rolcanlogin == 'true') 
-					    	$scope.user.Rolcanlogin = true;
-						else
-					    	$scope.user.Rolcanlogin = false;
-					    if ($scope.user.Rolreplication == 'true') 
-					    	$scope.user.Rolreplication = true;
-						else
-					    	$scope.user.Rolreplication = false;
-
+					    $scope.user.Rolinherit = (data.Rolinherit === "true");
+					    $scope.user.Rolsuper = (data.Rolsuper === "true");
+					    console.log('fetched Rolsuper 1=' + data.Rolsuper);
+					    console.log('fetched Rolsuper=' + $scope.user.Rolsuper);
+					    $scope.user.Rolcreatedb = (data.Rolcreatedb === "true");
+					    $scope.user.Rolcreaterole = (data.Rolcreaterole === "true");
+					    $scope.user.Rollogin = (data.Rollogin === "true");
+					    $scope.user.Rolreplication = (data.Rolreplication === "true");
                                         })
                                         .error(function(error) {
                                             $scope.alerts = [{
@@ -562,6 +543,26 @@ angular.module('uiRouterSample.containers', [
                                         });
                                 $scope.save = function() {
                                     console.log('save called');
+			    	$scope.user.ContainerID = $stateParams.containerId;
+				console.log('saving Rolsuper is ' + $scope.user.Rolsuper);
+                                    containersFactory.updateuser($scope.user)
+                                        .success(function(data) {
+                                            console.log('successful updateuser with data=' + data);
+                                            $state.go('containers.detail.users', $stateParams, {
+                                                reload: true,
+                                                inherit: false
+                                            });
+
+                                        })
+                                        .error(function(error) {
+						console.log(JSON.stringify(error));
+                                            $scope.alerts = [{
+                                                type: 'danger',
+                                                msg: error.Error
+                                            }];
+                                            console.log('here is an error ' + error.message);
+                                        });
+
                                 };
                             }
                         ]
@@ -586,7 +587,7 @@ angular.module('uiRouterSample.containers', [
                                 $scope.user.Rollogin = false;
                                 $scope.user.Rolreplication = false;
 
-                                $scope.user.Usename = 'usename';
+                                $scope.user.Rolname = '';
                                 console.log('doing add user');
                                 $scope.create = function() {
                                     $scope.user.ContainerID = $stateParams.containerId;
@@ -599,38 +600,7 @@ angular.module('uiRouterSample.containers', [
                                         }];
                                         return;
                                     }
-                                    if ($scope.user.Rolsuper) {
-                                        $scope.user.Rolsuper = 'SUPERUSER';
-                                    } else {
-                                        $scope.user.Rolsuper = '';
-                                    }
 
-                                    if ($scope.user.Rolcreatedb) {
-                                        $scope.user.Rolcreatedb = 'CREATEDB';
-                                    } else {
-                                        $scope.user.Rolcreatedb = '';
-                                    }
-
-                                    if ($scope.user.Rolcreaterole) {
-                                        $scope.user.Rolcreaterole = 'CREATEROLE';
-                                    } else {
-                                        $scope.user.Rolcreaterole = '';
-                                    }
-                                    if ($scope.user.Rollogin) {
-                                        $scope.user.Rollogin = 'LOGIN';
-                                    } else {
-                                        $scope.user.Rollogin = '';
-                                    }
-                                    if ($scope.user.Rolreplication) {
-                                        $scope.user.Rolreplication = 'REPLICATION';
-                                    } else {
-                                        $scope.user.Rolreplication = '';
-                                    }
-                                    if ($scope.user.Rolinherit) {
-                                        $scope.user.Rolinherit = 'INHERIT';
-                                    } else {
-                                        $scope.user.Rolinherit = '';
-                                    }
                                     containersFactory.adduser($scope.user)
                                         .success(function(data) {
                                             console.log('successful adduser with data=' + data);
@@ -641,9 +611,10 @@ angular.module('uiRouterSample.containers', [
 
                                         })
                                         .error(function(error) {
+						console.log(JSON.stringify(error));
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
                                             console.log('here is an error ' + error.message);
                                         });
@@ -943,8 +914,22 @@ angular.module('uiRouterSample.containers', [
 
                     '': {
                         templateUrl: 'app/containers/containers.detail.details.html',
-                        controller: ['$scope', '$stateParams', '$state', 'utils',
-                            function($scope, $stateParams, $state, utils) {}
+                        controller: ['$scope', '$stateParams', '$state', 'utils', 'containersFactory',
+                            function($scope, $stateParams, $state, utils, containersFactory) {
+console.log('containers details called containerId ' + $stateParams.containerId);
+                                    containersFactory.get($stateParams.containerId)
+                                        .success(function(data) {
+                                            console.log('successful get with data=' + data);
+                                            $scope.container=data;
+                                        })
+                                        .error(function(error) {
+                                            $scope.alerts = [{
+                                                type: 'danger',
+                                                msg: error.message
+                                            }];
+                                            console.log('here is an error ' + error.message);
+                                        });
+			    }
                         ]
                     },
                 }

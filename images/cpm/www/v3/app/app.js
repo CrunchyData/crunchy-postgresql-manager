@@ -106,9 +106,10 @@ angular.module('uiRouterSample', [
                 //'<a href="#/user/42">Bob</a>—to see a url redirect in action.</p>'
                 '': {
                     templateUrl: 'app/home/home.html',
-                    controller: ['$scope', '$state', '$stateParams', 'utils',
-                        function($scope, $stateParams, utils) {
+                    controller: ['$rootScope', '$scope', '$state', '$stateParams', 'utils',
+                        function($rootScope, $scope, $stateParams, utils) {
 			    $scope.isCollapsed = true;
+			    $scope.projectId = $rootScope.projectId;;
                             console.log('here in app.js controller for home');
                             $scope.home = utils.findById($scope.home, $stateParams.userId);
                             $state.go('home.detail', {});

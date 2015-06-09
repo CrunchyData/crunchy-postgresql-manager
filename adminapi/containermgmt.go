@@ -117,6 +117,48 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(node)
 }
 
+func GetAllNodesForProject(w rest.ResponseWriter, r *rest.Request) {
+
+	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	if err != nil {
+		logit.Error.Println("GetAllNodes: validate token error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	ID := r.PathParam("ID")
+	if ID == "" {
+		logit.Error.Println("GetAllNodesForProject: error project ID required")
+		rest.Error(w, "project ID required", http.StatusBadRequest)
+		return
+	}
+
+	results, err := admindb.GetAllContainersForProject(ID)
+	if err != nil {
+		logit.Error.Println("GetAllNodes: " + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	nodes := make([]ClusterNode, len(results))
+	i := 0
+	for i = range results {
+		nodes[i].ID = results[i].ID
+		nodes[i].Name = results[i].Name
+		nodes[i].ClusterID = results[i].ClusterID
+		nodes[i].ServerID = results[i].ServerID
+		nodes[i].Role = results[i].Role
+		nodes[i].Image = results[i].Image
+		nodes[i].CreateDate = results[i].CreateDate
+		nodes[i].ProjectID = results[i].ProjectID
+		nodes[i].ProjectName = results[i].ProjectName
+		nodes[i].ServerName = results[i].ServerName
+		nodes[i].ClusterName = results[i].ClusterName
+		//nodes[i].Status = "UNKNOWN"
+		i++
+	}
+
+	w.WriteJson(&nodes)
+
+}
 func GetAllNodes(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")

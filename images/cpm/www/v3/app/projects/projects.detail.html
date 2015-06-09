@@ -1,29 +1,32 @@
 <div>
 
-	<h2>{{project.Name}}</h2>
-	<p>{{project.Desc}}</p>
+    <h2>{{project.Name}}</h2>
+    <p>{{project.Desc}}</p>
 
-	<div class="navbar-inner"><div class="container">
-			<ul class="nav navbar-nav navbar-left">
-				<a ui-sref="projects.detail.add()"><i class="fa fa-plus fa-fw"></i>Add</a>
-				<a ui-sref="projects.detail.delete()"><i class="fa fa-trash fa-fw"></i>Delete</a>
-			</ul>
-		</div>
-	</div>
-	<div ui-view class="slide">
-		<!-- Example of default content. This content will be replace as soon as
+    <div class="navbar-inner">
+        <div class="container">
+            <ul class="nav navbar-nav navbar-left">
+                <a ui-sref="projects.detail.add()"><i class="fa fa-plus fa-fw"></i>Add</a>
+                <a ui-sref="projects.detail.delete()"><i class="fa fa-trash fa-fw"></i>Delete</a>
+            </ul>
+        </div>
+    </div>
+    <div ui-view class="slide">
+        <!-- Example of default content. This content will be replace as soon as
 		this ui-view is populate with a template -->
-	</div>
-	<hr>
+    </div>
+    <hr>
 
-	<p><strong>Containers</string></p>
-	<ul>
-		<li ng-repeat="(id, name) in project.Containers">
-
-		<!-- Here's another ui-sref except THIS time we are passing parameters
-		AND inheriting parameters from active ancestor states. So we don't
-		need to resupply the projectId parameter. -->
-		<a ui-sref="containers.detail.details({containerId:id})">{{name}}</a>
-		</li>
-	</ul>
+			<p>Databases</p>
+                <ul>
+                    <li ng-repeat="(id, name) in project.Containers">
+                        <a ui-sref="containers.detail.details({containerId:id})">{{name}}</a>
+                    </li>
+                </ul>
+			<p>Clusters</p>
+                <ul>
+                    <li ng-repeat="(id, name) in project.Clusters">
+                        <a ui-sref="clusters.detail.details({clusterId:id})">{{name}}</a>
+                    </li>
+                </ul>
 </div>

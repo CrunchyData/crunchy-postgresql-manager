@@ -23,6 +23,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	_ "github.com/lib/pq"
 	"net/http"
+	"strconv"
 )
 
 func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
@@ -47,9 +48,9 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	if postMsg.Usename == "" {
-		logit.Error.Println("AddContainerUser: error node Usename required")
-		rest.Error(w, "Usename required", 400)
+	if postMsg.Rolname == "" {
+		logit.Error.Println("AddContainerUser: error node Rolname required")
+		rest.Error(w, "Rolname required", 400)
 		return
 	}
 	if postMsg.Passwd == "" {
@@ -91,13 +92,39 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
 	defer dbConn.Close()
 
-	query := "create user " + postMsg.Usename + " " +
-		postMsg.Rolsuper + " " +
-		postMsg.Rolinherit + " " +
-		postMsg.Rolcreaterole + " " +
-		postMsg.Rolcreatedb + " " +
-		postMsg.Rollogin + " " +
-		postMsg.Rolreplication + " " +
+	var SUPERUSER = ""
+	var INHERIT = ""
+	var CREATEROLE = ""
+	var CREATEDB = ""
+	var LOGIN = ""
+	var REPLICATION = ""
+
+	logit.Info.Println("Rolsuper is " + strconv.FormatBool(postMsg.Rolsuper))
+	if postMsg.Rolsuper {
+		SUPERUSER = "SUPERUSER"
+	}
+	if postMsg.Rolinherit {
+		INHERIT = "INHERIT"
+	}
+	if postMsg.Rolcreaterole {
+		CREATEROLE = "CREATEROLE"
+	}
+	if postMsg.Rolcreatedb {
+		CREATEDB = "CREATEDB"
+	}
+	if postMsg.Rollogin {
+		LOGIN = "LOGIN"
+	}
+	if postMsg.Rolreplication {
+		REPLICATION = "REPLICATION"
+	}
+	query := "create user " + postMsg.Rolname + " " +
+		SUPERUSER + " " +
+		INHERIT + " " +
+		CREATEROLE + " " +
+		CREATEDB + " " +
+		LOGIN + " " +
+		REPLICATION + " " +
 		"PASSWORD '" + postMsg.Passwd + "'"
 
 	logit.Info.Println(query)
@@ -113,7 +140,7 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	dbuser := admindb.ContainerUser{}
 	dbuser.Containername = node.Name
 	dbuser.Passwd = postMsg.Passwd
-	dbuser.Rolname = postMsg.Usename
+	dbuser.Rolname = postMsg.Rolname
 
 	result, err := admindb.AddContainerUser(dbuser)
 	if err != nil {
@@ -218,9 +245,9 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	usename := r.PathParam("Usename")
-	if usename == "" {
-		rest.Error(w, "Usename required", 400)
+	Rolname := r.PathParam("Rolname")
+	if Rolname == "" {
+		rest.Error(w, "Rolname required", 400)
 		return
 	}
 
@@ -240,7 +267,7 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//fetch  user credentials
 	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(node.Name, usename)
+	nodeuser, err = admindb.GetContainerUser(node.Name, Rolname)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -263,7 +290,7 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, cpmuser.Passwd)
 	defer dbConn.Close()
 
-	query := "select rolname::text, rolsuper::text, rolinherit::text, rolcreaterole::text, rolcreatedb::text, rolcatupdate::text, rolcanlogin::text, rolreplication::text from pg_roles where rolname = '" + usename + "' order by rolname"
+	query := "select rolname::text, rolsuper::text, rolinherit::text, rolcreaterole::text, rolcreatedb::text, rolcatupdate::text, rolcanlogin::text, rolreplication::text from pg_roles where rolname = '" + Rolname + "' order by rolname"
 
 	logit.Info.Println(query)
 
@@ -374,4 +401,140 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&users)
 
+}
+
+func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
+	postMsg := NodeUser{}
+	err := r.DecodeJsonPayload(&postMsg)
+	if err != nil {
+		logit.Error.Println("UpdateContainerUser: error in decode" + err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = secimpl.Authorize(postMsg.Token, "perm-user")
+	if err != nil {
+		logit.Error.Println("UpdateContainerUser: validate token error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	if postMsg.ID == "" {
+		logit.Error.Println("UpdateContainerUser: error node ID required")
+		rest.Error(w, "ID required", 400)
+		return
+	}
+
+	if postMsg.Rolname == "" {
+		logit.Error.Println("UpdateContainerUser: error node Rolname required")
+		rest.Error(w, "Rolname required", 400)
+		return
+	}
+
+	//create user on the container
+	//get container info
+	node, err := admindb.GetContainer(postMsg.ID)
+	if err != nil {
+		logit.Error.Println("AddContainUser: " + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if postMsg.Passwd == "" {
+	} else {
+		//update the password
+	}
+
+	//get connection to container's database
+	var host = node.Name
+	if KubeEnv {
+		host = node.Name + "-db"
+	}
+
+	//fetch cpmtest user credentials
+	var cpmuser admindb.ContainerUser
+	cpmuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//get port
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
+
+	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, cpmuser.Passwd)
+	defer dbConn.Close()
+
+	var SUPERUSER = "SUPERUSER"
+	var INHERIT = "INHERIT"
+	var CREATEROLE = "CREATEROLE"
+	var CREATEDB = "CREATEDB"
+	var LOGIN = "LOGIN"
+	var REPLICATION = "REPLICATION"
+
+	logit.Info.Println("Rolsuper is " + strconv.FormatBool(postMsg.Rolsuper))
+	if !postMsg.Rolsuper {
+		SUPERUSER = "NOSUPERUSER"
+	}
+
+	if !postMsg.Rolinherit {
+		INHERIT = "NOINHERIT"
+	}
+
+	if !postMsg.Rolcreaterole {
+		CREATEROLE = "NOCREATEROLE"
+	}
+	if !postMsg.Rolcreatedb {
+		CREATEDB = "NOCREATEDB"
+	}
+
+	if !postMsg.Rollogin {
+		LOGIN = "NOLOGIN"
+	}
+	if !postMsg.Rolreplication {
+		REPLICATION = "NOREPLICATION"
+	}
+
+	query := "alter user " + postMsg.Rolname + " " +
+		SUPERUSER + " " +
+		INHERIT + " " +
+		CREATEROLE + " " +
+		CREATEDB + " " +
+		LOGIN + " " +
+		REPLICATION + " "
+
+	if postMsg.Passwd != "" {
+		query = query + " PASSWORD '" + postMsg.Passwd + "'"
+	}
+
+	logit.Info.Println(query)
+
+	_, err = dbConn.Query(query)
+	if err != nil {
+		logit.Error.Println("UpdateContainerUser:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if postMsg.Passwd != "" {
+		//update user's password
+		dbuser := admindb.ContainerUser{}
+		dbuser.Containername = node.Name
+		dbuser.Passwd = postMsg.Passwd
+		dbuser.Rolname = postMsg.Rolname
+
+		err = admindb.UpdateContainerUser(dbuser)
+		if err != nil {
+			logit.Error.Println("UpdateContainerUser: " + err.Error())
+			rest.Error(w, err.Error(), 400)
+			return
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	status := SimpleStatus{}
+	status.Status = "OK"
+	w.WriteJson(&status)
 }

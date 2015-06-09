@@ -93,6 +93,7 @@ func main() {
 	}
 
 	err = handler.SetRoutes(
+		&rest.Route{"GET", "/projectclusters/:ID.:Token", adminapi.GetAllClustersForProject},
 		&rest.Route{"GET", "/clusters/:Token", adminapi.GetAllClusters},
 		&rest.Route{"GET", "/servers/:Token", adminapi.GetAllServers},
 		&rest.Route{"POST", "/cluster", adminapi.PostCluster},
@@ -109,6 +110,7 @@ func main() {
 		&rest.Route{"GET", "/cluster/configure/:ID.:Token", adminapi.ConfigureCluster},
 		&rest.Route{"GET", "/cluster/delete/:ID.:Token", adminapi.DeleteCluster},
 		&rest.Route{"GET", "/deleteserver/:ID.:Token", adminapi.DeleteServer},
+		&rest.Route{"GET", "/projectnodes/:ID.:Token", adminapi.GetAllNodesForProject},
 		&rest.Route{"GET", "/nodes/:Token", adminapi.GetAllNodes},
 		&rest.Route{"GET", "/nodes/nocluster/:Token", adminapi.GetAllNodesNotInCluster},
 		&rest.Route{"GET", "/clusternodes/:ClusterID.:Token", adminapi.GetAllNodesForCluster},
@@ -160,8 +162,9 @@ func main() {
 		&rest.Route{"GET", "/mon/hc1/:Token", adminapi.GetHC1},
 		&rest.Route{"GET", "/version", adminapi.GetVersion},
 		&rest.Route{"POST", "/dbuser/add", adminapi.AddContainerUser},
+		&rest.Route{"POST", "/dbuser/update", adminapi.UpdateContainerUser},
 		&rest.Route{"GET", "/dbuser/delete/:ContainerID.:Rolname.:Token", adminapi.DeleteContainerUser},
-		&rest.Route{"GET", "/dbuser/get/:ContainerID.:Usename.:Token", adminapi.GetContainerUser},
+		&rest.Route{"GET", "/dbuser/get/:ContainerID.:Rolname.:Token", adminapi.GetContainerUser},
 		&rest.Route{"GET", "/dbuser/getall/:ID.:Token", adminapi.GetAllUsersForContainer},
 		&rest.Route{"POST", "/project/add", adminapi.AddProject},
 		&rest.Route{"POST", "/project/update", adminapi.UpdateProject},

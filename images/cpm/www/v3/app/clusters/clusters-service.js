@@ -1,11 +1,12 @@
 angular.module('uiRouterSample.clusters.service', ['ngCookies'])
 
-.factory('clustersFactory', ['$http', '$cookieStore', 'utils', function($http, $cookieStore, $scope, utils) {
+.factory('clustersFactory', ['$rootScope', '$http', '$cookieStore', 'utils', function($rootScope, $http, $cookieStore, utils) {
 
     var clustersFactory = {};
 
     clustersFactory.all = function() {
-        var url = $cookieStore.get('AdminURL') + '/clusters/' + $cookieStore.get('cpm_token');
+    	console.log('in clusters all with projectId = ' + $rootScope.projectId);
+        var url = $cookieStore.get('AdminURL') + '/projectclusters/' + $rootScope.projectId + '.' + $cookieStore.get('cpm_token');
         console.log(url);
 
         return $http.get(url);
@@ -77,6 +78,7 @@ angular.module('uiRouterSample.clusters.service', ['ngCookies'])
 
         return $http.post(url, {
             'Name': cluster.Name,
+            'ProjectID': $rootScope.projectId,
             'Status': 'uninitialized',
             'ClusterType': cluster.ClusterType,
             'Token': $cookieStore.get('cpm_token')
@@ -90,6 +92,7 @@ angular.module('uiRouterSample.clusters.service', ['ngCookies'])
 
         return $http.post(url, {
             'Name': cluster.Name,
+            'ProjectID': $rootScope.projectId, 
             'ClusterType': cluster.ClusterType,
             'ClusterProfile': profile,
             'Token': $cookieStore.get('cpm_token')

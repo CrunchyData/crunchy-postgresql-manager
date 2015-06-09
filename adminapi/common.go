@@ -102,6 +102,7 @@ type ClusterNode struct {
 
 type Cluster struct {
 	ID          string
+	ProjectID   string
 	Name        string
 	ClusterType string
 	Status      string
@@ -143,17 +144,16 @@ type PostgresControldata struct {
 type NodeUser struct {
 	ID             string
 	Containername  string
-	Usename        string
+	Rolname        string
 	Passwd         string
 	Updatedt       string
 	Token          string
-	Rolsuper       string
-	Rolinherit     string
-	Rolcreaterole  string
-	Rolcreatedb    string
-	Rollogin       string
-	Rolcatupdate   string
-	Rolreplication string
+	Rolsuper       bool
+	Rolinherit     bool
+	Rolcreaterole  bool
+	Rolcreatedb    bool
+	Rollogin       bool
+	Rolreplication bool
 }
 
 func Kube(w rest.ResponseWriter, r *rest.Request) {

@@ -219,9 +219,12 @@ angular.module('uiRouterSample.projects', [
                 views: {
                     '': {
                         templateUrl: 'app/projects/projects.detail.edit.html',
-                        controller: ['$scope', '$stateParams', 'projectsFactory', '$state', 'utils',
-                            function($scope, $stateParams, projectsFactory, $state, utils) {
+                        controller: ['$rootScope', '$scope', '$stateParams', 'projectsFactory', '$state', 'utils',
+                            function($rootScope, $scope, $stateParams, projectsFactory, $state, utils) {
                                 console.log('edit controller called');
+                                console.log('projectId=' + $stateParams.projectId);
+				$rootScope.projectId = $stateParams.projectId;
+
                                 console.log('in detail.edit');
                                 $scope.save = function() {
                                     projectsFactory.update($scope.project)

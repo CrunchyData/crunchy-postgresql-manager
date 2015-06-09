@@ -46,6 +46,7 @@ type Project struct {
 	Name       string
 	Desc       string
 	Containers map[string]string
+	Clusters   map[string]string
 	UpdateDate string
 }
 
@@ -65,6 +66,7 @@ type Container struct {
 
 type Cluster struct {
 	ID          string
+	ProjectID   string
 	Name        string
 	ClusterType string
 	Status      string
@@ -175,11 +177,11 @@ func GetCluster(id string) (Cluster, error) {
 	return cluster, nil
 }
 
-func GetAllClusters() ([]Cluster, error) {
+func GetAllClustersForProject(projectId string) ([]Cluster, error) {
 	//logit.Info.Println("admindb:GetAllClusters: called")
 	var rows *sql.Rows
 	var err error
-	rows, err = dbConn.Query("select id, name, clustertype, status, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from cluster order by name")
+	rows, err = dbConn.Query("select id, projectid, name, clustertype, status, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from cluster where projectid = " + projectId + " order by name")
 	if err != nil {
 		return nil, err
 	}
@@ -190,6 +192,47 @@ func GetAllClusters() ([]Cluster, error) {
 		cluster := Cluster{}
 		if err = rows.Scan(
 			&cluster.ID,
+			&cluster.ProjectID,
+			&cluster.Name,
+			&cluster.ClusterType,
+			&cluster.Status, &cluster.CreateDate); err != nil {
+			return nil, err
+		}
+
+		cluster.Containers = make(map[string]string)
+		containers, err = GetAllContainersForCluster(cluster.ID)
+		if err != nil {
+			logit.Info.Println("admindb:GetCluster:" + err.Error())
+		}
+
+		for i := range containers {
+			cluster.Containers[containers[i].ID] = containers[i].Name
+			logit.Info.Println("admindb:GetCluster: add to map " + cluster.Containers[containers[i].ID])
+		}
+
+		clusters = append(clusters, cluster)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return clusters, nil
+}
+func GetAllClusters() ([]Cluster, error) {
+	//logit.Info.Println("admindb:GetAllClusters: called")
+	var rows *sql.Rows
+	var err error
+	rows, err = dbConn.Query("select id, projectid, name, clustertype, status, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from cluster order by name")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var containers []Container
+	clusters := make([]Cluster, 0)
+	for rows.Next() {
+		cluster := Cluster{}
+		if err = rows.Scan(
+			&cluster.ID,
+			&cluster.ProjectID,
 			&cluster.Name,
 			&cluster.ClusterType,
 			&cluster.Status, &cluster.CreateDate); err != nil {
@@ -233,7 +276,7 @@ func UpdateCluster(cluster Cluster) error {
 }
 func InsertCluster(cluster Cluster) (int, error) {
 	//logit.Info.Println("admindb:InsertCluster:called")
-	queryStr := fmt.Sprintf("insert into cluster ( name, clustertype, status, createdt) values ( '%s', '%s', '%s', now()) returning id", cluster.Name, cluster.ClusterType, cluster.Status)
+	queryStr := fmt.Sprintf("insert into cluster ( name, projectid, clustertype, status, createdt) values ( '%s', %s, '%s', '%s', now()) returning id", cluster.Name, cluster.ProjectID, cluster.ClusterType, cluster.Status)
 
 	logit.Info.Println("admindb:InsertCluster:" + queryStr)
 	var clusterid int
@@ -966,12 +1009,13 @@ func GetContainerUser(containername string, usename string) (ContainerUser, erro
 }
 
 func UpdateContainerUser(user ContainerUser) error {
-	//logit.Info.Println("admindb:UpdateCluster:called")
-	queryStr := fmt.Sprintf("update containeruser set ( passwd, updatedt) = ('%s', now()) where id = %s returning id", user.Passwd, user.ID)
+	logit.Info.Println("admindb:UpdateContainerUser encrypting password of " + user.Passwd)
+	encrypted, err := sec.EncryptPassword(user.Passwd)
+	queryStr := fmt.Sprintf("update containeruser set ( passwd, updatedt) = ('%s', now()) where usename = '%s' returning id", encrypted, user.Rolname)
 
 	logit.Info.Println("[" + queryStr + "]")
 	var userid int
-	err := dbConn.QueryRow(queryStr).Scan(&userid)
+	err = dbConn.QueryRow(queryStr).Scan(&userid)
 	switch {
 	case err != nil:
 		return err
@@ -1009,6 +1053,17 @@ func GetProject(id string) (Project, error) {
 	for i := range containers {
 		project.Containers[containers[i].ID] = containers[i].Name
 	}
+	project.Clusters = make(map[string]string)
+	var clusters []Cluster
+	clusters, err = GetAllClustersForProject(project.ID)
+	if err != nil {
+		logit.Info.Println("admindb:GetProject:" + err.Error())
+		return project, err
+	}
+
+	for i := range clusters {
+		project.Clusters[clusters[i].ID] = clusters[i].Name
+	}
 
 	return project, nil
 }
@@ -1024,6 +1079,7 @@ func GetAllProjects() ([]Project, error) {
 	defer rows.Close()
 	projects := make([]Project, 0)
 	var containers []Container
+	var clusters []Cluster
 
 	for rows.Next() {
 		project := Project{}
@@ -1044,6 +1100,17 @@ func GetAllProjects() ([]Project, error) {
 
 		for i := range containers {
 			project.Containers[containers[i].ID] = containers[i].Name
+		}
+		project.Clusters = make(map[string]string)
+
+		clusters, err = GetAllClustersForProject(project.ID)
+		if err != nil {
+			logit.Info.Println("admindb:GetAllProjects:" + err.Error())
+			return projects, err
+		}
+
+		for i := range clusters {
+			project.Clusters[clusters[i].ID] = clusters[i].Name
 		}
 		projects = append(projects, project)
 	}

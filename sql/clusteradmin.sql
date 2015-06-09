@@ -39,6 +39,7 @@ create table cluster (
 	clustertype varchar(20) not null,
 	status varchar(20) not null,
 	createdt timestamp not null,
+	projectid int references project (id) on delete cascade,
 	constraint valid_cluster_types check (
 		clustertype in ('bdr', 'asynchronous', 'synchronous')
 	),

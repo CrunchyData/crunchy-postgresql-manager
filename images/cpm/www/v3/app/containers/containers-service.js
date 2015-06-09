@@ -1,11 +1,12 @@
 angular.module('uiRouterSample.containers.service', ['ngCookies'])
 
-.factory('containersFactory', ['$http', '$cookieStore', 'utils', function($http, $cookieStore, $scope, utils) {
+.factory('containersFactory', ['$rootScope', '$http', '$cookieStore', 'utils', function($rootScope, $http, $cookieStore, utils) {
 
     var containersFactory = {};
 
     containersFactory.all = function() {
-        var url = $cookieStore.get('AdminURL') + '/nodes/' + $cookieStore.get('cpm_token');
+    	console.log('in containers all with projectId=' + $rootScope.projectId);
+        var url = $cookieStore.get('AdminURL') + '/projectnodes/' + $rootScope.projectId + '.' + $cookieStore.get('cpm_token');
         console.log(url);
 
         return $http.get(url);
@@ -148,16 +149,39 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
 
         return $http.post(url,  {
 		'ID' : user.ContainerID,
-		'Usename' : user.Usename,
+		'Rolname' : user.Rolname,
 		'Passwd' : user.Password,
 		'Superuser' : user.Superuser,
 		'Createdb' : user.Createdb,
 		'Createrole' : user.Createrole,
+		'TestBool' : user.TestBool,
 		'Login' : user.Login,
 		'Token' : $cookieStore.get('cpm_token'),
 	});
     };
 
+    containersFactory.updateuser = function(user) {
+
+        var url = $cookieStore.get('AdminURL') + '/dbuser/update';
+        console.log(url);
+        console.log('id is ' + user.ContainerID);
+	user.Token = $cookieStore.get('cpm_token');
+
+        return $http.post(url,  {
+		'ID' : user.ContainerID,
+		'Rolname' : user.Rolname,
+		'Passwd' : user.Password,
+		'Rolsuper' : user.Rolsuper,
+		'Rolinherit' : user.Rolinherit,
+		'Rolcreaterole' : user.Rolcreaterole,
+		'Rolcreatedb' : user.Rolcreatedb,
+		'Rollogin' : user.Rollogin,
+		'Rolcatupdate' : user.Rolcatupdate,
+		'Rolreplication' : user.Rolreplication,
+		'Login' : user.Rollogin,
+		'Token' : $cookieStore.get('cpm_token'),
+	});
+    };
 
     return containersFactory;
 }]);
