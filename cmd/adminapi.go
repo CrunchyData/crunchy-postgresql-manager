@@ -160,7 +160,7 @@ func main() {
 		&rest.Route{"GET", "/mon/hc1/:Token", adminapi.GetHC1},
 		&rest.Route{"GET", "/version", adminapi.GetVersion},
 		&rest.Route{"POST", "/dbuser/add", adminapi.AddContainerUser},
-		&rest.Route{"GET", "/dbuser/delete/:ID.:Token", adminapi.DeleteContainerUser},
+		&rest.Route{"GET", "/dbuser/delete/:ContainerID.:Rolname.:Token", adminapi.DeleteContainerUser},
 		&rest.Route{"GET", "/dbuser/get/:ContainerID.:Usename.:Token", adminapi.GetContainerUser},
 		&rest.Route{"GET", "/dbuser/getall/:ID.:Token", adminapi.GetAllUsersForContainer},
 		&rest.Route{"POST", "/project/add", adminapi.AddProject},

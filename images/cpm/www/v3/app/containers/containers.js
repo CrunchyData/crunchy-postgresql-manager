@@ -659,11 +659,30 @@ angular.module('uiRouterSample.containers', [
                 views: {
                     '@containers.detail.users': {
                         templateUrl: 'app/containers/containers.detail.users.delete.html',
-                        controller: ['$scope', '$stateParams', '$state', 'containersFactory', 'utils',
+                        controller: ['$scope', '$stateParams', '$state', 'containersFactory', 'utils', 
                             function($scope, $stateParams, $state, containersFactory, utils) {
-                                console.log('doing delete user');
-                                $scope.done = function() {
-                                    $state.go('^', $stateParams);
+                                	console.log('before doing delete user id=' + $stateParams.containerId + ' name=' + $stateParams.itemId);
+					$scope.rolname = $stateParams.itemId;
+
+                                $scope.delete = function() {
+                                	console.log('doing delete user id=' + $stateParams.containerId + ' name=' + $scope.rolname);
+                                    containersFactory.deleteuser($stateParams.containerId, $scope.rolname)
+                                        .success(function(data) {
+                                            console.log('successful deleteuser with data=' + data);
+                                            $state.go('containers.detail.users', $stateParams, {
+                                                reload: true,
+                                                inherit: false
+                                            });
+
+                                        })
+                                        .error(function(error) {
+                                            $scope.alerts = [{
+                                                type: 'danger',
+                                                msg: error.message
+                                            }];
+                                            console.log('here is an error ' + error.message);
+                                        });
+
                                 };
                             }
                         ]

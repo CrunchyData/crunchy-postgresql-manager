@@ -131,6 +131,14 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
         return $http.get(url);
     };
 
+    containersFactory.deleteuser = function(containerid, rolname) {
+
+        var url = $cookieStore.get('AdminURL') + '/dbuser/delete/' + containerid + '.' + rolname + '.' +  $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
     containersFactory.adduser = function(user) {
 
         var url = $cookieStore.get('AdminURL') + '/dbuser/add';

@@ -920,15 +920,18 @@ func AddContainerUser(s ContainerUser) (int, error) {
 	return theID, nil
 }
 
-func DeleteContainerUser(id string) error {
-	queryStr := fmt.Sprintf("drop user %s", id)
-	//logit.Info.Println("admindb:DeleteCluster:" + queryStr)
+func DeleteContainerUser(containername string, rolname string) error {
+	queryStr := fmt.Sprintf("delete from containeruser where  containername='%s'  and usename = '%s' returning id", containername, rolname)
+	logit.Info.Println("admindb:DeleteContainerUser:" + queryStr)
 
-	_, err := dbConn.Query(queryStr)
-	if err != nil {
+	var id int
+	err := dbConn.QueryRow(queryStr).Scan(&id)
+	switch {
+	case err != nil:
 		return err
+	default:
+		logit.Info.Println("admindb:DeleteContainerUser:deleted " + containername + ":" + rolname)
 	}
-	logit.Info.Println("admindb:DeleteContainerUser: deleted " + id)
 	return nil
 }
 

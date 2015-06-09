@@ -137,17 +137,64 @@ func DeleteContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	ID := r.PathParam("ID")
+	ContainerID := r.PathParam("ContainerID")
 
-	if ID == "" {
-		rest.Error(w, "NodeUser ID required", 400)
+	if ContainerID == "" {
+		rest.Error(w, "ContainerID required", 400)
+		return
+	}
+	rolname := r.PathParam("Rolname")
+
+	if rolname == "" {
+		rest.Error(w, "Rolname required", 400)
 		return
 	}
 
-	err = admindb.DeleteContainerUser(ID)
+	//get node info
+	node, err := admindb.GetContainer(ContainerID)
+	if err != nil {
+		logit.Error.Println("AddContainUser: " + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = admindb.DeleteContainerUser(node.Name, rolname)
 	if err != nil {
 		logit.Error.Println("DeleteContainerUser: " + err.Error())
 		rest.Error(w, err.Error(), 400)
+		return
+	}
+
+	//get connection to container's database
+	var host = node.Name
+	if KubeEnv {
+		host = node.Name + "-db"
+	}
+
+	//fetch cpmtest user credentials
+	var cpmuser admindb.ContainerUser
+	cpmuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//get port
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
+
+	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, cpmuser.Passwd)
+	defer dbConn.Close()
+
+	query := "drop role " + rolname
+
+	logit.Info.Println(query)
+
+	_, err = dbConn.Query(query)
+	if err != nil {
+		logit.Error.Println("DeleteContainerUser:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 

@@ -1,7 +1,7 @@
 <p><strong>Container Users</strong><a ui-sref="containers.detail.users.add()"><i class="fa fa-plus fa-fw"></i></a></p>
 <ul>
 	 <li ng-repeat="user in users">
-	 <a ui-sref="containers.detail.users.edit({itemId:user.Rolname})">{{user.Rolname}}</a><a ui-sref="containers.detail.users.delete()"><i class="fa fa-trash fa-fw"></i></a>
+	 <a ui-sref="containers.detail.users.edit({itemId:user.Rolname})">{{user.Rolname}}</a><a ui-sref="containers.detail.users.delete({itemId:user.Rolname})"><i class="fa fa-trash fa-fw"></i></a>
 	 </li>
 </ul>
 
