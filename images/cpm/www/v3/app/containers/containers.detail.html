@@ -29,7 +29,7 @@
 					<li><a ui-sref="containers.detail.monitor.bgwriter()">bgwriter</a></li>
 					<li><a ui-sref="containers.detail.monitor.databasesize()">databasesize</a></li>
 					<li><a ui-sref="containers.detail.monitor.loadtest()">loadtest</a></li>
-					<li><a ui-sref="containers.detail.monitor.pgstatreplication()">pgstatreplication</a></li>
+						<li ng-show="container.Role == 'master'"><a ui-sref="containers.detail.monitor.pgstatreplication()">pgstatreplication</a></li>
 					<li><a ui-sref="containers.detail.monitor.pgcontroldata()">pgcontroldata</a></li>
 					<li><a ui-sref="containers.detail.monitor.pgsettings()">pgsettings</a></li>
 					<li><a ui-sref="containers.detail.monitor.pgstatdatabase()">pgstatdatabase</a></li>

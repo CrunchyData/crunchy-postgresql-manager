@@ -123,6 +123,14 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
         return $http.get(url);
     };
 
+    containersFactory.getuser = function(containerid, rolname) {
+
+        var url = $cookieStore.get('AdminURL') + '/dbuser/get/' + containerid + '.' + rolname + '.' +  $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
     containersFactory.adduser = function(user) {
 
         var url = $cookieStore.get('AdminURL') + '/dbuser/add';

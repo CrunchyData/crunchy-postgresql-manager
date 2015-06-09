@@ -73,19 +73,19 @@ type Cluster struct {
 }
 
 type ContainerUser struct {
-	ID            string
-	Containername string
-	ContainerID   string
-	Passwd        string
-	Usename       string
-	Usesysid      string
-	Usecreatedb   string
-	Usesuper      string
-	Usecatupd     string
-	Userepl       string
-	Valuntil      string
-	Useconfig     string
-	UpdateDate    string
+	ID             string
+	Containername  string
+	ContainerID    string
+	Passwd         string
+	Rolname        string
+	Rolsuper       string
+	Rolinherit     string
+	Rolcreaterole  string
+	Rolcreatedb    string
+	Rolcatupdate   string
+	Rolcanlogin    string
+	Rolreplication string
+	UpdateDate     string
 }
 
 type LinuxStats struct {
@@ -898,7 +898,7 @@ func AddContainerUser(s ContainerUser) (int, error) {
 
 	queryStr := fmt.Sprintf("insert into containeruser ( containername, usename, passwd, updatedt) values ( '%s', '%s', '%s',  now()) returning id",
 		s.Containername,
-		s.Usename,
+		s.Rolname,
 		encrypted)
 
 	logit.Info.Println("AddContainerUser:" + queryStr)
@@ -944,7 +944,7 @@ func GetContainerUser(containername string, usename string) (ContainerUser, erro
 	}
 	defer rows.Close()
 	for rows.Next() {
-		user.Usename = usename
+		user.Rolname = usename
 		user.Containername = containername
 		if err = rows.Scan(&user.ID, &user.Passwd, &user.UpdateDate); err != nil {
 			return user, err

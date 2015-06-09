@@ -92,10 +92,12 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	defer dbConn.Close()
 
 	query := "create user " + postMsg.Usename + " " +
-		postMsg.Superuser +
-		postMsg.Createdb +
-		postMsg.Createrole +
-		postMsg.Login +
+		postMsg.Rolsuper + " " +
+		postMsg.Rolinherit + " " +
+		postMsg.Rolcreaterole + " " +
+		postMsg.Rolcreatedb + " " +
+		postMsg.Rollogin + " " +
+		postMsg.Rolreplication + " " +
 		"PASSWORD '" + postMsg.Passwd + "'"
 
 	logit.Info.Println(query)
@@ -111,7 +113,7 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	dbuser := admindb.ContainerUser{}
 	dbuser.Containername = node.Name
 	dbuser.Passwd = postMsg.Passwd
-	dbuser.Usename = postMsg.Usename
+	dbuser.Rolname = postMsg.Usename
 
 	result, err := admindb.AddContainerUser(dbuser)
 	if err != nil {
@@ -163,9 +165,9 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	containername := r.PathParam("Containername")
-	if containername == "" {
-		rest.Error(w, "Containername required", 400)
+	ContainerID := r.PathParam("ContainerID")
+	if ContainerID == "" {
+		rest.Error(w, "ContainerID required", 400)
 		return
 	}
 
@@ -175,16 +177,68 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	result, err := admindb.GetContainerUser(containername, usename)
+	//get container info
+	node, err := admindb.GetContainer(ContainerID)
 	if err != nil {
-		logit.Error.Println("GetContainerUser: " + err.Error())
-		rest.Error(w, err.Error(), 400)
+		logit.Error.Println("AddContainUser: " + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	w.WriteJson(result)
+	//get connection to container's database
+	var host = node.Name
+	if KubeEnv {
+		host = node.Name + "-db"
+	}
+
+	//fetch  user credentials
+	var nodeuser admindb.ContainerUser
+	nodeuser, err = admindb.GetContainerUser(node.Name, usename)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//fetch cpmtest user credentials
+	var cpmuser admindb.ContainerUser
+	cpmuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//get port
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
+
+	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, cpmuser.Passwd)
+	defer dbConn.Close()
+
+	query := "select rolname::text, rolsuper::text, rolinherit::text, rolcreaterole::text, rolcreatedb::text, rolcatupdate::text, rolcanlogin::text, rolreplication::text from pg_roles where rolname = '" + usename + "' order by rolname"
+
+	logit.Info.Println(query)
+
+	err = dbConn.QueryRow(query).Scan(
+		&nodeuser.Rolname,
+		&nodeuser.Rolsuper,
+		&nodeuser.Rolinherit,
+		&nodeuser.Rolcreaterole,
+		&nodeuser.Rolcreatedb,
+		&nodeuser.Rolcatupdate,
+		&nodeuser.Rolcanlogin,
+		&nodeuser.Rolreplication)
+	if err != nil {
+		logit.Error.Println("GetContainerUser:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.WriteJson(&nodeuser)
 
 }
+
 func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
@@ -236,7 +290,7 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 	//query results
 	var rows *sql.Rows
 
-	rows, err = dbConn.Query("select usename, usesysid, usecreatedb, usesuper, usecatupd, userepl, coalesce(valuntil::text, '') from pg_user order by usename")
+	rows, err = dbConn.Query("select rolname::text, rolsuper::text, rolinherit::text, rolcreaterole::text, rolcreatedb::text, rolcatupdate::text, rolcanlogin::text, rolreplication::text from pg_roles order by rolname")
 	if err != nil {
 		logit.Error.Println("GetAllUsersForContainer:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -247,13 +301,14 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 	for rows.Next() {
 		user := admindb.ContainerUser{}
 		if err = rows.Scan(
-			&user.Usename,
-			&user.Usesysid,
-			&user.Usecreatedb,
-			&user.Usesuper,
-			&user.Usecatupd,
-			&user.Userepl,
-			&user.Valuntil,
+			&user.Rolname,
+			&user.Rolsuper,
+			&user.Rolinherit,
+			&user.Rolcreaterole,
+			&user.Rolcreatedb,
+			&user.Rolcatupdate,
+			&user.Rolcanlogin,
+			&user.Rolreplication,
 		); err != nil {
 			logit.Error.Println("GetAllUsersForContainer:" + err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)

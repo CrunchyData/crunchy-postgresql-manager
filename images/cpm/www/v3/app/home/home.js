@@ -24,19 +24,6 @@ angular.module('uiRouterSample.home', [
                 // within index.html.
                 templateUrl: 'app/home/home.html',
 
-                // Use `resolve` to resolve any asynchronous controller dependencies
-                // *before* the controller is instantiated. In this case, since home
-                // returns a promise, the controller will wait until home.all() is
-                // resolved before instantiation. Non-promise return values are considered
-                // to be resolved immediately.
-                resolve: {
-                    home: ['home',
-                        function(home) {
-                            return home.all();
-                        }
-                    ]
-                },
-
                 // You can pair a controller to your template. There *must* be a template to pair with.
                 controller: ['$scope', '$state', 'home', 'utils',
                     function($scope, $state, home, utils) {
@@ -91,7 +78,7 @@ angular.module('uiRouterSample.home', [
                 // So its url will end up being '/home/{roleId:[0-9]{1,4}}'. When the
                 // url becomes something like '/home/42' then this state becomes active
                 // and the $stateParams object becomes { roleId: 42 }.
-                url: '/{roleId:[0-9]{1,4}}',
+                url: '',
 
                 // If there is more than a single ui-view in the parent template, or you would
                 // like to target a ui-view from even higher up the state tree, you can use the
@@ -109,6 +96,7 @@ angular.module('uiRouterSample.home', [
                         templateUrl: 'app/home/home.detail.html',
                         controller: ['$scope', '$stateParams', 'utils',
                             function($scope, $stateParams, utils) {
+			    console.log('here in home 2');
                             }
                         ]
                     },

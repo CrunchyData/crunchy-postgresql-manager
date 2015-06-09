@@ -25,25 +25,37 @@
     <div class="form-group">
         <label for="inputSuperuser" class="control-label col-xs-2">Superuser</label>
         <div class="col-xs-1">
-            <input type="checkbox" class="form-control" ng-model="user.Superuser">
+            <input type="checkbox" class="form-control" ng-model="user.Rolsuper">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputInherit" class="control-label col-xs-2">Inherit</label>
+        <div class="col-xs-1">
+            <input type="checkbox" class="form-control" ng-model="user.Rolinherit">
         </div>
     </div>
     <div class="form-group">
         <label for="inputCreatedb" class="control-label col-xs-2">Create DB</label>
         <div class="col-xs-1">
-            <input type="checkbox" class="form-control" ng-model="user.Createdb">
+            <input type="checkbox" class="form-control" ng-model="user.Rolcreatedb">
         </div>
     </div>
     <div class="form-group">
         <label for="inputCreaterole" class="control-label col-xs-2">Create Role</label>
         <div class="col-xs-1">
-            <input type="checkbox" class="form-control" ng-model="user.Createrole">
+            <input type="checkbox" class="form-control" ng-model="user.Rolcreaterole">
         </div>
     </div>
     <div class="form-group">
         <label for="inputLogin" class="control-label col-xs-2">Login</label>
         <div class="col-xs-1">
-            <input type="checkbox" class="form-control" ng-model="user.Login">
+            <input type="checkbox" class="form-control" ng-model="user.Rollogin">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputRepl" class="control-label col-xs-2">Replication</label>
+        <div class="col-xs-1">
+            <input type="checkbox" class="form-control" ng-model="user.Rolreplication">
         </div>
     </div>
 
@@ -55,7 +67,6 @@
     </div>
     <div>
         <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
-    </div>
+</div>
 
 </form>
-~

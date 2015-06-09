@@ -299,7 +299,7 @@ func createDBUsers(dbnode admindb.Container) error {
 	//register postgres user
 	var user = admindb.ContainerUser{}
 	user.Containername = dbnode.Name
-	user.Usename = "postgres"
+	user.Rolname = "postgres"
 	user.Passwd = password.Value
 	_, err = admindb.AddContainerUser(user)
 	if err != nil {
@@ -318,7 +318,7 @@ func createDBUsers(dbnode admindb.Container) error {
 	}
 	//register cpmtest user
 	user.Containername = dbnode.Name
-	user.Usename = "cpmtest"
+	user.Rolname = "cpmtest"
 	user.Passwd = password.Value
 	_, err = admindb.AddContainerUser(user)
 	if err != nil {
@@ -333,7 +333,7 @@ func createDBUsers(dbnode admindb.Container) error {
 		return err
 	}
 	user.Containername = dbnode.Name
-	user.Usename = "pgpool"
+	user.Rolname = "pgpool"
 	user.Passwd = password.Value
 	//register pgpool user
 	_, err = admindb.AddContainerUser(user)

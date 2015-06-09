@@ -108,7 +108,7 @@ angular.module('uiRouterSample', [
                     templateUrl: 'app/home/home.html',
                     controller: ['$scope', '$state', '$stateParams', 'utils',
                         function($scope, $stateParams, utils) {
-			    $scope.isCollapsed = false;
+			    $scope.isCollapsed = true;
                             console.log('here in app.js controller for home');
                             $scope.home = utils.findById($scope.home, $stateParams.userId);
                             $state.go('home.detail', {});

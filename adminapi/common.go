@@ -141,16 +141,19 @@ type PostgresControldata struct {
 }
 
 type NodeUser struct {
-	ID            string
-	Containername string
-	Usename       string
-	Passwd        string
-	Updatedt      string
-	Token         string
-	Superuser     string
-	Createdb      string
-	Createrole    string
-	Login         string
+	ID             string
+	Containername  string
+	Usename        string
+	Passwd         string
+	Updatedt       string
+	Token          string
+	Rolsuper       string
+	Rolinherit     string
+	Rolcreaterole  string
+	Rolcreatedb    string
+	Rollogin       string
+	Rolcatupdate   string
+	Rolreplication string
 }
 
 func Kube(w rest.ResponseWriter, r *rest.Request) {

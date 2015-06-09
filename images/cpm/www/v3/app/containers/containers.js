@@ -516,11 +516,52 @@ angular.module('uiRouterSample.containers', [
                 views: {
                     '@containers.detail.users': {
                         templateUrl: 'app/containers/containers.detail.users.edit.html',
-                        controller: ['$scope', '$stateParams', '$state', 'containersFactory', 'utils',
-                            function($scope, $stateParams, $state, containersFactory, utils) {
-                                console.log('doing edit user');
-                                $scope.done = function() {
-                                    $state.go('^', $stateParams);
+                        controller: ['$scope', '$stateParams', '$state', 'containersFactory', 'utils', 
+                            function($scope, $stateParams, $state, containersFactory, utils ) {
+			    $scope.user = {};
+                                    containersFactory.getuser($stateParams.containerId, $stateParams.itemId)
+                                        .success(function(data) {
+						$scope.user = data;
+                                            console.log('successful get user with Rolname=' + data.Rolname);
+					    if ($scope.user.Rolsuper == 'true') 
+					    	$scope.user.Rolsuper = true;
+						else
+					    	$scope.user.Rolsuper = false;
+					    if ($scope.user.Rolinherit == 'true') 
+					    	$scope.user.Rolinherit = true;
+						else
+					    	$scope.user.Rolinherit = false;
+					    if ($scope.user.Rolcreaterole == 'true') 
+					    	$scope.user.Rolcreaterole = true;
+						else
+					    	$scope.user.Rolcreaterole = false;
+					    if ($scope.user.Rolcreatedb == 'true') 
+					    	$scope.user.Rolcreatedb = true;
+						else
+					    	$scope.user.Rolcreatedb = false;
+					    if ($scope.user.Rolcatupdate == 'true') 
+					    	$scope.user.Rolcatupdate = true;
+						else
+					    	$scope.user.Rolcatupdate = false;
+					    if ($scope.user.Rolcanlogin == 'true') 
+					    	$scope.user.Rolcanlogin = true;
+						else
+					    	$scope.user.Rolcanlogin = false;
+					    if ($scope.user.Rolreplication == 'true') 
+					    	$scope.user.Rolreplication = true;
+						else
+					    	$scope.user.Rolreplication = false;
+
+                                        })
+                                        .error(function(error) {
+                                            $scope.alerts = [{
+                                                type: 'danger',
+                                                msg: error.message
+                                            }];
+                                            console.log('here is an error ' + error.message);
+                                        });
+                                $scope.save = function() {
+                                    console.log('save called');
                                 };
                             }
                         ]
@@ -537,10 +578,13 @@ angular.module('uiRouterSample.containers', [
                                 $scope.user = {};
                                 $scope.user.Password = '';
                                 $scope.user.Password2 = '';
-                                $scope.user.Superuser = false;
-                                $scope.user.Createdb = false;
-                                $scope.user.Createrole = false;
-                                $scope.user.Login = false;
+                                $scope.user.Rolsuper = false;
+                                $scope.user.Rolinherit = false;
+                                $scope.user.Rolcreaterole = false;
+                                $scope.user.Rolcreatedb = false;
+                                $scope.user.Rolcatupdate = false;
+                                $scope.user.Rollogin = false;
+                                $scope.user.Rolreplication = false;
 
                                 $scope.user.Usename = 'usename';
                                 console.log('doing add user');
@@ -555,26 +599,37 @@ angular.module('uiRouterSample.containers', [
                                         }];
                                         return;
                                     }
-                                    if ($scope.user.Superuser) {
-                                        $scope.user.Superuser = 'SUPERUSER';
+                                    if ($scope.user.Rolsuper) {
+                                        $scope.user.Rolsuper = 'SUPERUSER';
                                     } else {
-                                        $scope.user.Superuser = '';
+                                        $scope.user.Rolsuper = '';
                                     }
 
-                                    if ($scope.user.Createdb) {
-                                        $scope.user.Createdb = 'CREATEDB';
+                                    if ($scope.user.Rolcreatedb) {
+                                        $scope.user.Rolcreatedb = 'CREATEDB';
                                     } else {
-                                        $scope.user.Createdb = '';
+                                        $scope.user.Rolcreatedb = '';
                                     }
-                                    if ($scope.user.Createrole) {
-                                        $scope.user.Createrole = 'CREATEROLE';
+
+                                    if ($scope.user.Rolcreaterole) {
+                                        $scope.user.Rolcreaterole = 'CREATEROLE';
                                     } else {
-                                        $scope.user.Createrole = '';
+                                        $scope.user.Rolcreaterole = '';
                                     }
-                                    if ($scope.user.Login) {
-                                        $scope.user.Login = 'LOGIN';
+                                    if ($scope.user.Rollogin) {
+                                        $scope.user.Rollogin = 'LOGIN';
                                     } else {
-                                        $scope.user.Login = '';
+                                        $scope.user.Rollogin = '';
+                                    }
+                                    if ($scope.user.Rolreplication) {
+                                        $scope.user.Rolreplication = 'REPLICATION';
+                                    } else {
+                                        $scope.user.Rolreplication = '';
+                                    }
+                                    if ($scope.user.Rolinherit) {
+                                        $scope.user.Rolinherit = 'INHERIT';
+                                    } else {
+                                        $scope.user.Rolinherit = '';
                                     }
                                     containersFactory.adduser($scope.user)
                                         .success(function(data) {
