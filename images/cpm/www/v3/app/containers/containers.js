@@ -123,9 +123,9 @@ angular.module('uiRouterSample.containers', [
                                     .error(function(error) {
                                         $scope.alerts = [{
                                             type: 'danger',
-                                            msg: error.message
+                                            msg: error.Error
                                         }];
-                                        console.log('here is an error ' + error.message);
+                                        console.log('here is an error ' + error.Error);
                                     });
 
                                 console.log('containers len here is ' + $scope.containers.data.length);
@@ -140,6 +140,44 @@ angular.module('uiRouterSample.containers', [
                             }
                         ]
                     },
+
+                }
+            })
+
+            .state('containers.detail.schedule.execute', {
+
+                url: '/execute/:scheduleID',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/containers/containers.detail.schedule.execute.html',
+                        controller: ['$scope', '$stateParams', '$state', 'tasksFactory', 'utils', 'usSpinnerService',
+                            function($scope, $stateParams, $state, tasksFactory, utils, usSpinnerService) {
+
+                                console.log('in schedule execute' + $stateParams.scheduleID);
+                                    usSpinnerService.spin('spinner-2');
+
+                                    tasksFactory.execute($scope.schedule)
+                                        .success(function(data) {
+                                            console.log('successful post execute with data=' + data);
+                                            $scope.alerts = [{
+                                                type: 'success',
+                                                msg: 'success'
+                                            }];
+                                            console.log(JSON.stringify(data));
+                                        })
+                                        .error(function(error) {
+                                            $scope.alerts = [{
+                                                type: 'danger',
+                                                msg: error.Error
+                                            }];
+                                            usSpinnerService.stop('spinner-2');
+                                            console.log('here is an error ' + error.Error);
+                                        });
+                                            usSpinnerService.stop('spinner-2');
+                            }
+                        ]
+                    }
 
                 }
             })
@@ -167,9 +205,9 @@ angular.module('uiRouterSample.containers', [
                                     .error(function(error) {
                                         $scope.alerts = [{
                                             type: 'danger',
-                                            msg: error.message
+                                            msg: error.Error
                                         }];
-                                        console.log('here is an error ' + error.message);
+                                        console.log('here is an error ' + error.Error);
                                     });
                             }
                         ]
@@ -199,9 +237,9 @@ angular.module('uiRouterSample.containers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 };
                             }
@@ -249,9 +287,9 @@ angular.module('uiRouterSample.containers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 };
 
@@ -268,24 +306,31 @@ angular.module('uiRouterSample.containers', [
 
                     '': {
                         templateUrl: 'app/containers/containers.detail.schedule.html',
-                        controller: ['$scope', '$stateParams', '$state', 'serversFactory', 'tasksFactory', 'utils',
-                            function($scope, $stateParams, $state, serversFactory, tasksFactory, utils) {
+                        controller: ['$scope', '$stateParams', '$state', 'serversFactory', 'tasksFactory', 'utils', 'usSpinnerService',
+                            function($scope, $stateParams, $state, serversFactory, tasksFactory, utils, usSpinnerService) {
 
                                 $scope.executenow = function() {
                                     console.log('execute now called');
+                                    usSpinnerService.spin('spinner-1');
 
                                     tasksFactory.execute($scope.schedule)
                                         .success(function(data) {
                                             console.log('successful post execute with data=' + data);
+                                            $scope.alerts = [{
+                                                type: 'success',
+                                                msg: 'success'
+                                            }];
                                             console.log(JSON.stringify(data));
                                         })
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            usSpinnerService.stop('spinner-1');
+                                            console.log('here is an error ' + error.Error);
                                         });
+                                            usSpinnerService.stop('spinner-1');
                                 };
 
                                 $scope.refresh = function() {
@@ -297,9 +342,9 @@ angular.module('uiRouterSample.containers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 };
                                 console.log('in schedule...');
@@ -329,9 +374,9 @@ angular.module('uiRouterSample.containers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 }
                             ]
@@ -373,9 +418,9 @@ angular.module('uiRouterSample.containers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 }
 
@@ -400,9 +445,9 @@ angular.module('uiRouterSample.containers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 };
 
@@ -442,9 +487,9 @@ angular.module('uiRouterSample.containers', [
                                             .error(function(error) {
                                                 $scope.alerts = [{
                                                     type: 'danger',
-                                                    msg: error.message
+                                                    msg: error.Error
                                                 }];
-                                                console.log('here is an error ' + error.message);
+                                                console.log('here is an error ' + error.Error);
                                             });
                                     } else {
 
@@ -456,9 +501,9 @@ angular.module('uiRouterSample.containers', [
                                             .error(function(error) {
                                                 $scope.alerts = [{
                                                     type: 'danger',
-                                                    msg: error.message
+                                                    msg: error.Error
                                                 }];
-                                                console.log('here is an error ' + error.message);
+                                                console.log('here is an error ' + error.Error);
                                             });
                                     }
 
@@ -498,9 +543,9 @@ angular.module('uiRouterSample.containers', [
                                     .error(function(error) {
                                         $scope.alerts = [{
                                             type: 'danger',
-                                            msg: error.message
+                                            msg: error.Error
                                         }];
-                                        console.log('here is an error ' + error.message);
+                                        console.log('here is an error ' + error.Error);
                                     });
 
                                 $scope.edit = function() {
@@ -537,9 +582,9 @@ angular.module('uiRouterSample.containers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 $scope.save = function() {
                                     console.log('save called');
@@ -560,7 +605,7 @@ angular.module('uiRouterSample.containers', [
                                                 type: 'danger',
                                                 msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
 
                                 };
@@ -616,7 +661,7 @@ angular.module('uiRouterSample.containers', [
                                                 type: 'danger',
                                                 msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
 
                                 };
@@ -649,9 +694,9 @@ angular.module('uiRouterSample.containers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
 
                                 };
@@ -725,9 +770,9 @@ angular.module('uiRouterSample.containers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 };
 
@@ -755,9 +800,9 @@ angular.module('uiRouterSample.containers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 };
 
@@ -785,9 +830,9 @@ angular.module('uiRouterSample.containers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 };
 
@@ -814,9 +859,9 @@ angular.module('uiRouterSample.containers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 };
 
@@ -843,9 +888,9 @@ angular.module('uiRouterSample.containers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 };
 
@@ -876,9 +921,9 @@ angular.module('uiRouterSample.containers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 };
 
@@ -925,9 +970,9 @@ console.log('containers details called containerId ' + $stateParams.containerId)
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
 			    }
                         ]
@@ -957,12 +1002,13 @@ console.log('containers details called containerId ' + $stateParams.containerId)
                                         newcontainer.ServerID = $scope.servers[0].ID;
                                         $scope.selectedServer = $scope.servers[0];
                                         $scope.dockerprofile = 'SM';
+                                        $scope.standalone = false;
                                         $scope.container = newcontainer;
                                     })
                                     .error(function(error) {
                                         $scope.alerts = [{
                                             type: 'danger',
-                                            msg: error.message
+                                            msg: error.Error
                                         }];
                                     });
 
@@ -972,6 +1018,7 @@ console.log('containers details called containerId ' + $stateParams.containerId)
                                     $scope.container.ServerID = $scope.selectedServer.ID;
 
                                     $scope.container.ID = 0; //0 means to do an insert
+				    console.log('standalone is '  + $scope.standalone);
 
                                     containersFactory.add($scope.container, $scope.standalone, $scope.dockerprofile)
                                         .success(function(data) {
@@ -985,7 +1032,7 @@ console.log('containers details called containerId ' + $stateParams.containerId)
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
                                             usSpinnerService.stop('spinner-1');
                                         });
@@ -1021,9 +1068,9 @@ console.log('containers details called containerId ' + $stateParams.containerId)
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                             usSpinnerService.stop('spinner-1');
                                         });
                                 };
@@ -1057,9 +1104,9 @@ console.log('containers details called containerId ' + $stateParams.containerId)
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                             usSpinnerService.stop('spinner-1');
                                         });
                                 };
@@ -1091,9 +1138,9 @@ console.log('containers details called containerId ' + $stateParams.containerId)
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                             usSpinnerService.stop('spinner-1');
                                         });
                                 };

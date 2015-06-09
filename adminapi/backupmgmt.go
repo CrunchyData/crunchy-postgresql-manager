@@ -117,6 +117,8 @@ func BackupNow(w rest.ResponseWriter, r *rest.Request) {
 	output, err := backup.BackupNowClient(backupServerURL, request)
 	if err != nil {
 		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	logit.Info.Println("output=" + output)
 
