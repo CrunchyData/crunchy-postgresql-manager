@@ -130,10 +130,17 @@ angular.module('uiRouterSample.containers', [
 
                                 console.log('containers len here is ' + $scope.containers.data.length);
                                 if ($scope.containers.data.length > 0) {
-                                    angular.forEach($scope.containers.data, function(item) {
-                                        if (item.ID == $stateParams.containerId) {
-                                            $scope.container = item;
-                                        }
+                                	containersFactory.get($stateParams.containerId)
+                                    .success(function(data) {
+                                        console.log('got me container =' + data);
+                                        $scope.container = data;
+                                    })
+                                    .error(function(error) {
+                                        $scope.alerts = [{
+                                            type: 'danger',
+                                            msg: error.Error
+                                        }];
+                                        console.log('here is an error ' + error.Error);
                                     });
                                 }
 
