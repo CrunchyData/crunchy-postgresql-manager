@@ -38,11 +38,11 @@ rm -rf $LOGDIR/*
 echo "restarting cpm container..."
 docker stop cpm
 docker rm cpm
-chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v2
+chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v3
 docker run --name=cpm -d \
 	-v $LOGDIR:/cpmlogs \
 	-v $KEYSDIR:/cpmkeys \
-	-v $INSTALLDIR/images/cpm/www/v2:/www crunchydata/cpm:latest
+	-v $INSTALLDIR/images/cpm/www/v3:/www crunchydata/cpm:latest
 
 echo "restarting cpm-admin container..."
 sleep 2
