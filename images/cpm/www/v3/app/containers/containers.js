@@ -987,6 +987,69 @@ console.log('containers details called containerId ' + $stateParams.containerId)
                 }
             })
 
+            .state('containers.add', {
+
+                url: '',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/containers/containers.add.html',
+                        controller: ['$scope', '$stateParams', '$state', 'serversFactory', 'containersFactory', 'utils', 'usSpinnerService',
+                            function($scope, $stateParams, $state, serversFactory, containersFactory, utils, usSpinnerService) {
+
+                                var newcontainer = {};
+
+                                serversFactory.all()
+                                    .success(function(data) {
+                                        console.log('got servers' + data.length);
+                                        $scope.servers = data;
+                                        newcontainer.ID = 0;
+                                        newcontainer.Name = 'newcontainer';
+                                        newcontainer.Image = 'cpm-node';
+                                        newcontainer.ServerID = $scope.servers[0].ID;
+                                        $scope.selectedServer = $scope.servers[0];
+                                        $scope.dockerprofile = 'SM';
+                                        $scope.standalone = false;
+                                        $scope.container = newcontainer;
+                                    })
+                                    .error(function(error) {
+                                        $scope.alerts = [{
+                                            type: 'danger',
+                                            msg: error.Error
+                                        }];
+                                    });
+
+
+                                $scope.add = function() {
+                                    usSpinnerService.spin('spinner-1');
+                                    $scope.container.ServerID = $scope.selectedServer.ID;
+
+                                    $scope.container.ID = 0; //0 means to do an insert
+				    console.log('standalone is '  + $scope.standalone);
+
+                                    containersFactory.add($scope.container, $scope.standalone, $scope.dockerprofile)
+                                        .success(function(data) {
+                                            console.log('successful add with data=' + data);
+                                            usSpinnerService.stop('spinner-1');
+                                            $state.go('containers.list', $stateParams, {
+                                                reload: true,
+                                                inherit: false
+                                            });
+                                        })
+                                        .error(function(error) {
+                                            $scope.alerts = [{
+                                                type: 'danger',
+                                                msg: error.Error
+                                            }];
+                                            usSpinnerService.stop('spinner-1');
+                                        });
+                                };
+                            }
+                        ]
+                    },
+                }
+            })
+
             .state('containers.detail.add', {
 
                 url: '/add/:itemId',

@@ -24,7 +24,8 @@ angular.module('uiRouterSample', [
     'ui.router',
     'ui.bootstrap',
     'ngCookies',
-    'ngAnimate'
+    'ngAnimate',
+    'treeControl'
 ])
 
 .run(

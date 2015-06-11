@@ -128,13 +128,13 @@ angular.module('uiRouterSample.clusters', [
             })
 
 
-            .state('clusters.detail.autocluster', {
+            .state('clusters.autocluster', {
 
-                url: '/autocluster/:itemId',
+                url: '/autocluster',
                 views: {
 
                     '': {
-                        templateUrl: 'app/clusters/clusters.detail.autocluster.html',
+                        templateUrl: 'app/clusters/clusters.autocluster.html',
                         controller: ['$scope', '$stateParams', '$state', 'clustersFactory', 'utils', 'usSpinnerService',
                             function($scope, $stateParams, $state, clustersFactory, utils, usSpinnerService) {
 

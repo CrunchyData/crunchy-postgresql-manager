@@ -10,51 +10,183 @@ angular.module('uiRouterSample.projects', [
             $stateProvider
                 .state('projects', {
 
-                abstract: true,
+                    abstract: true,
 
-                url: '/projects',
+                    url: '/projects',
 
-                templateUrl: 'app/projects/projects.html',
+                    templateUrl: 'app/projects/projects.html',
 
-                resolve: {
-                    projects: ['$cookieStore', 'projectsFactory',
-                        function($cookieStore, projectsFactory) {
+                    resolve: {
+                        projects: ['$cookieStore', 'projectsFactory',
+                            function($cookieStore, projectsFactory) {
+
+                                if (!$cookieStore.get('cpm_token')) {
+                                    var nothing = [];
+                                    console.log('returning nothing');
+                                    return nothing;
+                                }
+
+                                return projectsFactory.all();
+                            }
+                        ]
+                    },
+
+                    controller: ['$scope', '$cookieStore', '$state', 'projects', 'utils',
+                        function($scope, $cookieStore, $state, projects, utils) {
 
                             if (!$cookieStore.get('cpm_token')) {
-                                var nothing = [];
-                                console.log('returning nothing');
-                                return nothing;
+                                $state.go('login', {
+                                    userId: 'hi'
+                                });
                             }
 
-                            return projectsFactory.all();
+                            $scope.treeOptions = {
+                                nodeChildren: "children",
+                                dirSelectable: true,
+                                injectClasses: {
+                                    ul: "a1",
+                                    li: "a2",
+                                    liSelected: "a7",
+                                    iExpanded: "a3",
+                                    iCollapsed: "a4",
+                                    iLeaf: "a5",
+                                    label: "a6",
+                                    labelSelected: "a8"
+                                }
+                            }
+
+                            $scope.dataForTheTree = [
+			    {
+                                "name": "Project 1",
+                                "type": "project",
+                                "id": "1",
+                                "children": [
+				{
+                                    "name": "Clusters",
+                                    "type": "label",
+                                    "projectid": "1",
+                                    "children": [{
+                                        "name": "Jenifer",
+                                        "type": "cluster",
+                                        "id": "1",
+                                        "projectid": "1",
+                                        "children": []
+                                    }]
+                                },
+				{
+                                    "name": "Databases",
+                                    "type": "label",
+                                    "id": "3",
+                                    "projectid": "1",
+                                    "children": [
+				    {
+                                        "name": "One",
+                                        "type": "Database",
+                                        "id": "23",
+                                        "projectid": "1",
+                                        "children": []
+                                    },
+				    {
+                                        "name": "Two",
+                                        "type": "Database",
+                                        "id": "28",
+                                        "projectid": "1",
+                                        "children": []
+                                    }
+				    ]
+                                }
+				]
+                            }
+			    ];
+
+                            $scope.loadTree = function(projects) {
+			    	var data = [];
+				angular.forEach(projects, function(d) {
+				   //load databases
+				   var databases = [];
+				   angular.forEach(d.Containers, function(name, id) {
+				   	databases.push( {
+					type: 'database',
+					name: name,
+					id: id
+					});
+				   });
+
+				   //load clusters
+				   var clusters = [];
+				   angular.forEach(d.Clusters, function(name, id) {
+				   	clusters.push( {
+					type: 'cluster',
+					name: name,
+					id: id
+					});
+				   });
+
+				   //load project children
+			       	   var childs = [];
+				   childs.push( {
+					type: 'label',
+					name: 'Clusters',
+					projectid: d.ID,
+					children: clusters
+
+				   });
+				   childs.push( {
+					type: 'label',
+					name: 'Databases',
+					projectid: d.ID,
+					children: databases
+				   });
+
+				   //load project
+				   data.push( { name : d.Name, 
+				   	id : d.ID,
+				   	type : 'project' ,
+					children: childs }
+				   );
+				});
+				console.log('data is ' + JSON.stringify(data));
+                            	$scope.dataForTheTree = data;
+			    };
+
+                            $scope.projects = projects;
+			    $scope.loadTree(projects.data);
+
+                            $scope.showSelected = function(node) {
+			    console.log('tree ' + node.name + ' selected id=' + node.id + ' type=' + node.type + ' projectid=' + node.projectid);
+			    	if (node.type == 'database') { 
+                                	$state.go('containers.detail.details', {
+                                    		containerId: node.id
+                                	});
+				} else if (node.type == 'cluster') {
+                                	$state.go('clusters.detail.details', {
+                                    		clusterId: node.id
+                                	});
+				} else if (node.type == 'project') {
+                                	$state.go('projects.detail.details', {
+                                    		projectId: node.id
+                                	});
+				} else if (node.type == 'label') {
+                                	$state.go('projects.detail.details', {
+                                    		projectId: node.projectid
+                                	});
+				}
+			    };
+
+                            $scope.goToFirst = function() {
+                                console.log('projects=' + JSON.stringify($scope.projects));
+                                var randId = $scope.projects.data[0].ID;
+
+                                $state.go('projects.detail', {
+                                    projectId: randId
+                                });
+                            };
+                            $scope.goToFirst();
+
+
                         }
                     ]
-                },
-
-                controller: ['$scope', '$cookieStore', '$state', 'projects', 'utils',
-                    function($scope, $cookieStore, $state, projects, utils) {
-
-                        if (!$cookieStore.get('cpm_token')) {
-                            $state.go('login', {
-                                userId: 'hi'
-                            });
-                        }
-
-
-                        $scope.projects = projects;
-
-                        $scope.goToFirst = function() {
-                            console.log('projects=' + JSON.stringify($scope.projects));
-                            var randId = $scope.projects.data[0].ID;
-
-                            $state.go('projects.detail', {
-                                projectId: randId
-                            });
-                        };
-                        $scope.goToFirst();
-                    }
-                ]
-            })
+                })
 
             .state('projects.list', {
 
@@ -223,7 +355,7 @@ angular.module('uiRouterSample.projects', [
                             function($rootScope, $scope, $stateParams, projectsFactory, $state, utils) {
                                 console.log('edit controller called');
                                 console.log('projectId=' + $stateParams.projectId);
-				$rootScope.projectId = $stateParams.projectId;
+                                $rootScope.projectId = $stateParams.projectId;
 
                                 console.log('in detail.edit');
                                 $scope.save = function() {

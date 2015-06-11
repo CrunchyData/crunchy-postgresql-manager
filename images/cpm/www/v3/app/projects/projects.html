@@ -3,12 +3,21 @@
     <div class="pa-sidebar well well-small">
       <ul class="nav nav-list" style="overflow:hidden; overflow-y:scroll; height:300px;">
 	      <p class="nav-header"><strong>Projects</strong></p>
-
+<!--
         <li ng-repeat="project in projects.data" ui-sref-active="active">
 
           <a ui-sref="projects.detail.edit({projectId:project.ID})">{{project.Name}}</a>
-        </li>
-      </ul>
+	  </li>
+	  -->
+
+	<div treecontrol class="tree-classic"
+	   tree-model="dataForTheTree"
+	      options="treeOptions"
+	         on-selection="showSelected(node)"
+		    selected-node="node1">
+		       {{node.name}}
+	</div>
+</ul>
       <hr>
       <!-- Another named view -->
       <div ui-view="menuTip" class="slide"></div>
