@@ -40,6 +40,7 @@ type DockerRunArgs struct {
 	MEM           string
 	ClusterID     string
 	ServerID      string
+	ProjectID     string
 	Image         string
 	IPAddress     string
 	Standalone    string

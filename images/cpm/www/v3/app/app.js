@@ -2,10 +2,8 @@
 angular.module('uiRouterSample', [
     'uiRouterSample.projects',
     'uiRouterSample.projects.service',
-    'uiRouterSample.containers',
     'uiRouterSample.containers.service',
     'uiRouterSample.tasks.service',
-    'uiRouterSample.clusters',
     'uiRouterSample.clusters.service',
     'uiRouterSample.servers',
     'uiRouterSample.servers.service',
@@ -112,8 +110,8 @@ angular.module('uiRouterSample', [
 			    $scope.isCollapsed = true;
 			    $scope.projectId = $rootScope.projectId;;
                             console.log('here in app.js controller for home');
-                            $scope.home = utils.findById($scope.home, $stateParams.userId);
-                            $state.go('home.detail', {});
+                            //$scope.home = utils.findById($scope.home, $stateParams.userId);
+                            $state.go('home.detail', { });
                         }
                     ]
                 }

@@ -160,7 +160,7 @@ angular.module('uiRouterSample.projects', [
                                         projectId: node.id
                                     });
                                 } else if (node.type == 'label') {
-                                    $state.go('projects.detail.details', {
+                                    $state.go('projects.detail.edit', {
                                         projectId: node.projectid
                                     });
                                 }
@@ -228,6 +228,7 @@ angular.module('uiRouterSample.projects', [
                                     });
                                 }
 
+				if ($stateParams.containerId != "") {
                                 containersFactory.get($stateParams.containerId)
                                     .success(function(data) {
                                         $scope.container = data;
@@ -240,6 +241,7 @@ angular.module('uiRouterSample.projects', [
                                         }];
                                         console.log('here is an error ' + error.message);
                                     });
+				    }
 
                             }
                         ]
@@ -247,6 +249,18 @@ angular.module('uiRouterSample.projects', [
 
                 }
             })
+
+            .state('projects.container.add', {
+                url: '/add/:projectId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.add.html',
+                        controller: ContainerAddController
+                    },
+                }
+            })
+
 
             .state('projects.container.details', {
                 url: '/details/:itemId',
@@ -313,12 +327,12 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
-            .state('projects.container.schedule.add', {
+            .state('projects.container.scheduleadd', {
                 url: '',
                 views: {
 
                     '': {
-                        templateUrl: 'app/projects/projects.container.schedule.add.html',
+                        templateUrl: 'app/projects/projects.container.scheduleadd.html',
                         resolve: {
                             servers: ['serversFactory',
                                 function(serversFactory) {
@@ -652,6 +666,17 @@ angular.module('uiRouterSample.projects', [
                         ]
                     },
 
+                }
+            })
+
+            .state('projects.detail.autocluster', {
+
+                url: '/autocluster/:itemId',
+                views: {
+                    '': {
+                        templateUrl: 'app/projects/projects.detail.autocluster.html',
+                        controller: ClusterAutoClusterController
+                    },
                 }
             })
 

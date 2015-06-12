@@ -21,13 +21,13 @@
 		<div class="form-group" ng-show="container.ClusterID != '-1'">
 			<label for="inputCluster" class="control-label col-xs-2">Cluster</label>
 			<div class="col-xs-5">
-				<a ui-sref="clusters.detail({{container.ClusterID}})">{{container.ClusterName}}</a>
+				<a ui-sref="projects.cluster.details({clusterId:container.ClusterID})">{{container.ClusterName}}</a>
 			</div>
 		</div>
 		<div class="form-group">
 			<label for="inputProject" class="control-label col-xs-2">Project</label>
 			<div class="col-xs-5">
-				<a ui-sref="projects.detail({{container.ProjectID}})">{{container.ProjectName}}</a>
+				<a ui-sref="projects.detail.details({projectId:container.ProjectID})">{{container.ProjectName}}</a>
 			</div>
 		</div>
 		<div class="form-group">

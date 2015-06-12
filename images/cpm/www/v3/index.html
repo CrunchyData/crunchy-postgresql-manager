@@ -32,11 +32,9 @@
 		related states 
 		-->
     <script src="app/projects/projects.js"></script>
-    <script src="app/containers/containers.js"></script>
-    <script src="app/containers/containers-logic.js"></script>
+    <script src="app/projects/containers-logic.js"></script>
     <script src="app/servers/servers.js"></script>
-    <script src="app/clusters/clusters-logic.js"></script>
-    <script src="app/clusters/clusters.js"></script>
+    <script src="app/projects/clusters-logic.js"></script>
     <script src="app/settings/settings.js"></script>
     <script src="app/users/users.js"></script>
     <script src="app/home/home.js"></script>
@@ -47,10 +45,10 @@
 		uiRouterSample.containers module.
 		-->
     <script src="app/projects/projects-service.js"></script>
-    <script src="app/containers/containers-service.js"></script>
-    <script src="app/containers/tasks-service.js"></script>
+    <script src="app/projects/containers-service.js"></script>
+    <script src="app/projects/tasks-service.js"></script>
     <script src="app/servers/servers-service.js"></script>
-    <script src="app/clusters/clusters-service.js"></script>
+    <script src="app/projects/clusters-service.js"></script>
     <script src="app/settings/settings-service.js"></script>
     <script src="app/users/users-service.js"></script>
     <script src="app/home/home-service.js"></script>
@@ -119,6 +117,7 @@
       $state = {{$state.current.name}}
       $rootScope.projectId = {{projectId}}
       $stateParams = {{$stateParams}}
+      $isCollapsed = {{isCollapsed}}
       $state full url = {{ $state.$current.url.source }}
       cookie cpm_token = [{{$cookieStore.get('cpm_token')}}]
       cookie cpm_user_id = {{ $cookieStore.get('cpm_user_id') }}

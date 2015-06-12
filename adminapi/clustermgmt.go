@@ -974,7 +974,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	logit.Info.Println("AutoCluster: Name=" + params.Name + " ClusterType=" + params.ClusterType + " Profile=" + params.ClusterProfile)
+	logit.Info.Println("AutoCluster: Name=" + params.Name + " ClusterType=" + params.ClusterType + " Profile=" + params.ClusterProfile + " ProjectID=" + params.ProjectID)
 
 	//create cluster definition
 	dbcluster := admindb.Cluster{"", params.ProjectID, params.Name, params.ClusterType, "uninitialized", "", make(map[string]string)}
@@ -1012,6 +1012,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	dockermaster.Image = "cpm-node"
 	dockermaster.ContainerName = params.Name + "-master"
 	dockermaster.ServerID = masterServer.ID
+	dockermaster.ProjectID = params.ProjectID
 	dockermaster.Standalone = "false"
 	if err != nil {
 		logit.Error.Println("AutoCluster: error-create master node " + err.Error())
@@ -1060,6 +1061,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		logit.Info.Println("working on standby ....")
 		//	loop - provision standby
 		dockerstandby[i].ServerID = chosenServers[i].ID
+		dockerstandby[i].ProjectID = params.ProjectID
 		dockerstandby[i].Image = "cpm-node"
 		dockerstandby[i].ContainerName = params.Name + "-standby-" + strconv.Itoa(i)
 		dockerstandby[i].Standalone = "false"
@@ -1094,6 +1096,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	dockerpgpool.ContainerName = params.Name + "-pgpool"
 	dockerpgpool.Image = "cpm-pgpool"
 	dockerpgpool.ServerID = chosenServers[count].ID
+	dockerpgpool.ProjectID = params.ProjectID
 	dockerpgpool.Standalone = "false"
 
 	err2 = provisionImpl(&dockerpgpool, profile.StandbyProfile, true)

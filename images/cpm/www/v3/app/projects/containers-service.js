@@ -50,6 +50,7 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
             dockerprofile + '.' +
             container.Image + '.' +
             container.ServerID + '.' +
+            container.ProjectID + '.' +
             container.Name + '.' +
             standalone + '.' +
             $cookieStore.get('cpm_token');

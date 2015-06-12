@@ -32,6 +32,7 @@ import (
 )
 
 //docker run
+//TODO:  convert this to POST
 func Provision(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-container")
@@ -45,6 +46,7 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 	PROFILE := r.PathParam("Profile")
 	params.Image = r.PathParam("Image")
 	params.ServerID = r.PathParam("ServerID")
+	params.ProjectID = r.PathParam("ProjectID")
 	params.ContainerName = r.PathParam("ContainerName")
 	params.Standalone = r.PathParam("Standalone")
 
@@ -59,6 +61,12 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 	if params.ServerID == "" {
 		logit.Error.Println("Provision error serverid required")
 		errorStr = "ServerID required"
+		rest.Error(w, errorStr, http.StatusBadRequest)
+		return
+	}
+	if params.ProjectID == "" {
+		logit.Error.Println("Provision error ProjectID required")
+		errorStr = "ProjectID required"
 		rest.Error(w, errorStr, http.StatusBadRequest)
 		return
 	}
@@ -83,6 +91,7 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("params.Image=" + params.Image)
 	logit.Info.Println("params.Profile=" + PROFILE)
 	logit.Info.Println("params.ServerID=" + params.ServerID)
+	logit.Info.Println("params.ProjectID=" + params.ProjectID)
 	logit.Info.Println("params.ContainerName=" + params.ContainerName)
 	logit.Info.Println("params.Standalone=" + params.Standalone)
 
@@ -259,7 +268,7 @@ func provisionImpl(params *cpmserveragent.DockerRunArgs, PROFILE string, standby
 	dbnode.Name = params.ContainerName
 	dbnode.Image = params.Image
 	dbnode.ClusterID = "-1"
-	dbnode.ProjectID = "1"
+	dbnode.ProjectID = params.ProjectID
 	dbnode.ServerID = params.ServerID
 
 	if params.Standalone == "true" {

@@ -92,7 +92,7 @@ angular.module('uiRouterSample.clusters.service', ['ngCookies'])
 
         return $http.post(url, {
             'Name': cluster.Name,
-            'ProjectID': $rootScope.projectId, 
+            'ProjectID': cluster.ProjectID, 
             'ClusterType': cluster.ClusterType,
             'ClusterProfile': profile,
             'Token': $cookieStore.get('cpm_token')
