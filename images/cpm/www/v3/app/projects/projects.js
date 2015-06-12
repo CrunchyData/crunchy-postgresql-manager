@@ -400,6 +400,17 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
+            .state('projects.container.taskschedules.delete', {
+                url: '/taskschedules/:scheduleID',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.taskschedules.delete.html',
+                        controller: ContainerScheduleDeleteController
+                    },
+                }
+            })
+
             .state('projects.container.accessrules', {
                 url: '/accessrules/:itemId',
                 views: {
@@ -412,7 +423,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.users', {
-                url: '/users/:scheduleId',
+                url: '/users/:itemId',
                 views: {
 
                     '': {
@@ -434,7 +445,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.users.add', {
-                url: '/users/:itemId',
+                url: '/users/add/:itemId',
                 views: {
 
                     '': {
@@ -445,7 +456,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.users.delete', {
-                url: '/users/:itemId',
+                url: '/users/delete/:itemId',
                 views: {
 
                     '': {
