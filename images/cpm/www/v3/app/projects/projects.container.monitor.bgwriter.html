@@ -1,0 +1,49 @@
+<div id="viewbgwriter">
+	<p style="font-family: Arial, Helvetica, sans-serif;">Background writer activity statistics are displayed in MB/s.</p>
+	<p style="font-family: Arial, Helvetica, sans-serif;">
+	<table>
+		<tr>
+			<td><b>ALLOC</b></td><td>New memory allocation rate in the database buffer cache.</td.>
+			</tr>
+			<tr>
+				<td><b>CHECKPOINT</b></td><td>Amount of disk write I/O happening due to background database checkpoints.</td>
+			</tr>
+			<tr>
+				<td><b>CLEAN</b></td><td>Amount of disk write I/O started by the database background writer.</td>
+			</tr>
+			<tr>
+				<td><b>BACKEND</b></td><td>Amount of disk write I/O done by database clients.</td>
+			</tr>
+			<tr>
+				<td><b>WRITE</b></td><td>Total of the write activity from checkpoints, cleaning, and backend clients.</td>
+			</tr>
+		</table>
+		</p>
+		<h1>{{container.Name}}</h1>
+		<div class="datagrid">
+
+			<table class="table">
+				<thead>
+					<th>CURRENT TIME</th>
+					<th>ALLOC (Mb/s)</th>
+					<th>CHECKPOINT (Mb/s)</th>
+					<th>CLEAN (Mb/s)</th>
+					<th>BACKEND (Mb/s)</th>
+					<th>WRITE (Mb/s)</th>
+				</thead>
+				<tbody>
+
+					<tr>
+						<td>{{bgwriterresults.Now}}</td>
+						<td>{{bgwriterresults.AllocMbps}}</td>
+						<td>{{bgwriterresults.CheckpointMbps}}</td>
+						<td>{{bgwriterresults.CleanMbps}}</td>
+						<td>{{bgwriterresults.BackendMbps}}</td>
+						<td>{{bgwriterresults.WriteMbps}}</td>
+					</tr>
+
+				</tbody>
+			</table>
+		</div>
+		<a class="btn btn-primary" ng-click="refresh()"><i class="fa fa-refresh fa-lg"></i>Refresh</a>
+

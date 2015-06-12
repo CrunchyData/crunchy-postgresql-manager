@@ -1,0 +1,74 @@
+<form class="form-horizontal">
+
+    <div>
+        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+    </div>
+
+    <div class="form-group">
+        <label for="inputEnabled" class="control-label col-xs-2">Enabled</label>
+        <div class="col-xs-1">
+            <input type="checkbox" class="form-control" id="inputEnabled" ng-model="thething.checked">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputName" class="control-label col-xs-2">Name</label>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" id="inputName" ng-model="schedule.Name">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="inputProf" class="control-label col-xs-2">Task</label>
+        <div class="col-xs-3">
+		<select type="text" class="form-control" id="inputProf" ng-model="currentProfileName" ng-options="profile.name for profile in profiles">
+		</select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="inputHours" class="control-label col-xs-2">Hours</label>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" id="inputHours" placeholder="1" ng-model="schedule.Hours">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputMinutes" class="control-label col-xs-2">Minutes</label>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" id="inputMinutes" placeholder="14" ng-model="schedule.Minutes">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputMonth" class="control-label col-xs-2">Month</label>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" id="inputMonth" placeholder="*" ng-model="schedule.Month">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputDayOfMonth" class="control-label col-xs-2">DayOfMonth</label>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" id="inputDayOfMonth" placeholder="14" ng-model="schedule.DayOfMonth">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputDayOfWeek" class="control-label col-xs-2">DayOfWeek</label>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" id="inputDayOfWeek" placeholder="4" ng-model="schedule.DayOfWeek">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="inputServer" class="control-label col-xs-2">Servers</label>
+        <div class="col-xs-5">
+            <select type="text" class="form-control" id="inputServer" ng-model="myServer" ng-options="server.ID as server.Name for server in servers">
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-xs-5">
+            <button type="submit" ng-click="create()" class="btn btn-primary">Create</button>
+        </div>
+    </div>
+
+
+</form>

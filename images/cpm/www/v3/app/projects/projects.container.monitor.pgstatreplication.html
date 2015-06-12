@@ -1,0 +1,58 @@
+<div style="border:0px" id="viewstatdb">
+    <p style="font-family: Arial, Helvetica, sans-serif;">This page shows pg_stat_replication values.</p>
+    <h1>{{container.Name}}</h1>
+    <div class="datagrid">
+
+        <table class="table">
+            <thead>
+                <th>PID</th>
+                <th>USESYSID</th>
+                <th>USENAME</th>
+                <th>APPNAME</th>
+                <th>CLIENTADDR</th>
+                <th>CLIENTHOST</th>
+                <th>CLIENTPORT</th>
+                <th>BACKEND START</th>
+            </thead>
+            <tbody>
+
+                <tr ng-repeat="x in statreplresults">
+                    <td>{{x.Pid}}</td>
+                    <td>{{x.Usesysid}}</td>
+                    <td>{{x.Usename}}</td>
+                    <td>{{x.AppName}}</td>
+                    <td>{{x.ClientAddr}}</td>
+                    <td>{{x.ClientHostname}}</td>
+                    <td>{{x.ClientPort}}</td>
+                    <td>{{x.BackendStart}}</td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="table">
+            <thead>
+                <th>STATE</th>
+                <th>SENT LOC</th>
+                <th>WRITE LOC</th>
+                <th>FLUSH LOC</th>
+                <th>REPLAY LOC</th>
+                <th>SYNC PRIO</th>
+                <th>SYNC STATE</th>
+            </thead>
+            <tbody>
+
+                <tr ng-repeat="x in statreplresults">
+                    <td>{{x.State}}</td>
+                    <td>{{x.SentLocation}}</td>
+                    <td>{{x.WriteLocation}}</td>
+                    <td>{{x.FlushLocation}}</td>
+                    <td>{{x.ReplayLocation}}</td>
+                    <td>{{x.SyncPriority}}</td>
+                    <td>{{x.SyncState}}</td>
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+    <a class="btn btn-primary" ng-click="refresh()"><i class="fa fa-refresh fa-lg"></i>Refresh</a>

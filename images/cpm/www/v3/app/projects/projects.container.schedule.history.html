@@ -1,0 +1,8 @@
+<p><strong>task history</strong></p>
+
+<ul>
+	<li ng-repeat="stat in stats">
+	Started {{stat.StartTime}} - {{stat.Status}} - Elapsed {{stat.ElapsedTime}} - Size {{stat.BackupSize}}<a ui-sref="projects.container.taskhistory.delete()"><i class="fa fa-trash fa-fw"></i></a>
+	</li>
+</ul>
+

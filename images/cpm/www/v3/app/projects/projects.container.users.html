@@ -1,0 +1,8 @@
+<p><strong>Container Users</strong><a ui-sref="projects.container.users.add()"><i class="fa fa-plus fa-fw"></i></a></p>
+<ul>
+	 <li ng-repeat="user in users">
+	 <a ui-sref="projects.container.users.edit({itemId:user.Rolname})">{{user.Rolname}}</a><a ui-sref="projects.container.users.delete({itemId:user.Rolname})"><i class="fa fa-trash fa-fw"></i></a>
+	 </li>
+</ul>
+
+<div ui-view class="slide"></div>
