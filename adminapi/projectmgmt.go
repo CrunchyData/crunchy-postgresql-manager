@@ -32,6 +32,27 @@ type Project struct {
 	Clusters   map[string]string
 }
 
+type Child2 struct {
+	Name      string `json:"name"`
+	Type      string `json:"type"`
+	ID        string `json:"id"`
+	ProjectID string `json:"projectid"`
+}
+type Child struct {
+	Name      string  `json:"name"`
+	Type      string  `json:"type"`
+	ID        string  `json:"id"`
+	ProjectID string  `json:"projectid"`
+	Children  []Child `json:"children"`
+}
+
+type Project2 struct {
+	Name     string  `json:"name"`
+	Type     string  `json:"type"`
+	ID       string  `json:"id"`
+	Children []Child `json:"children"`
+}
+
 func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("UpdateProject: in UpdateProject")
 	project := Project{}
@@ -155,15 +176,52 @@ func GetAllProjects(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	projects := make([]Project, len(projectsList))
+	projects := make([]Project2, len(projectsList))
 	i := 0
 	for i = range projectsList {
 		projects[i].ID = projectsList[i].ID
 		projects[i].Name = projectsList[i].Name
-		projects[i].Desc = projectsList[i].Desc
-		projects[i].UpdateDate = projectsList[i].UpdateDate
-		projects[i].Containers = projectsList[i].Containers
-		projects[i].Clusters = projectsList[i].Clusters
+		projects[i].Type = "project"
+
+		projectchildren := make([]Child, 2)
+		projects[i].Children = projectchildren
+
+		projects[i].Children[0].Name = "Clusters"
+		projects[i].Children[0].Type = "label"
+		projects[i].Children[0].ProjectID = projects[i].ID
+		//projects[i].Children[0].Children := make([]Child, len(projectsList[i].Clusters))
+		j := 0
+		clusterchilds := make([]Child, len(projectsList[i].Clusters))
+		for jk, jv := range projectsList[i].Clusters {
+			ch := Child{
+				Name: jv,
+				Type: "cluster",
+				ID:   jk,
+			}
+			ch.ProjectID = projects[i].ID
+			clusterchilds[j] = ch
+			j++
+		}
+		projects[i].Children[0].Children = clusterchilds
+
+		projects[i].Children[1].Name = "Databases"
+		projects[i].Children[1].Type = "label"
+		projects[i].Children[1].ProjectID = projects[i].ID
+		dbchilds := make([]Child, len(projectsList[i].Containers))
+		//projects[i].Children[1].Children := make([]Child, len(projectsList[i].Containers))
+		k := 0
+		for kk, kv := range projectsList[i].Containers {
+			ch := Child{
+				Name: kv,
+				Type: "database",
+				ID:   kk,
+			}
+			ch.ProjectID = projects[i].ID
+			dbchilds[k] = ch
+			k++
+		}
+		projects[i].Children[1].Children = dbchilds
+
 		i++
 	}
 

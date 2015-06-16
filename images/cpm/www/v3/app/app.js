@@ -111,7 +111,7 @@ angular.module('uiRouterSample', [
 			    $scope.projectId = $rootScope.projectId;;
                             console.log('here in app.js controller for home');
                             //$scope.home = utils.findById($scope.home, $stateParams.userId);
-                            $state.go('home.detail', { });
+                            $state.go('home.list', { });
                         }
                     ]
                 }

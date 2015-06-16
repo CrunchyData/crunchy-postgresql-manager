@@ -404,8 +404,8 @@ var ContainerUsersAddController = function($scope, $stateParams, $state, contain
             .success(function(data) {
                 console.log('successful adduser with data=' + data);
                 $state.go('projects.container.users', $stateParams, {
-                    reload: true,
-                    inherit: true
+                    reload: false,
+                    inherit: false
                 });
 
             })
