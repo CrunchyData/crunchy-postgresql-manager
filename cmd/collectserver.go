@@ -34,6 +34,14 @@ func main() {
 				"server",
 			})
 		prometheus.MustRegister(guage)
+		guageMem := prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "cpm_server_mem",
+				Help: "Memory Utilization.",
+			}, []string{
+				"server",
+			})
+		prometheus.MustRegister(guageMem)
 
 		//get servers
 		var dbConn *sql.DB
@@ -58,7 +66,10 @@ func main() {
 				//v := rand.Float64() * 100.00
 				metric, err = collect.Collectcpu(servers[i].IPAddress)
 				guage.WithLabelValues(servers[i].Name).Set(metric.Value)
-				logit.Info.Println("setting metric for " + servers[i].Name + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
+				logit.Info.Println("setting cpu metric for " + servers[i].Name + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
+				metric, err = collect.Collectmem(servers[i].IPAddress)
+				guageMem.WithLabelValues(servers[i].Name).Set(metric.Value)
+				logit.Info.Println("setting mem metric for " + servers[i].Name + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
 				i++
 			}
 

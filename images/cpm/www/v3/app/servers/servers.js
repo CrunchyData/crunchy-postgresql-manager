@@ -202,13 +202,12 @@ angular.module('uiRouterSample.servers', [
 
                     '': {
                         templateUrl: 'app/servers/servers.detail.monitor.mem.html',
-                        controller: ['$scope', '$stateParams', '$state', 'utils',
-                            function($scope, $stateParams, $state, utils) {
-                                $scope.item = utils.findById($scope.server.items, $stateParams.itemId);
+                        controller: ['$sce', '$scope', '$stateParams', '$state', 'utils',
+                            function($sce, $scope, $stateParams, $state, utils) {
+                                console.log('in mem mon with serverId=' + $stateParams.serverId);
+                                console.log('in mem mon with servername=' + $scope.server.Name);
+				$scope.servergraphlink=$sce.trustAsResourceUrl('http://cpm-promdash:3000/embed/servermemdashboard#!?var.host=' + $scope.server.Name);
 
-                                $scope.edit = function() {
-                                    $state.go('.edit', $stateParams);
-                                };
                             }
                         ]
                     },
