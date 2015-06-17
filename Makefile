@@ -1,6 +1,7 @@
 
 gendeps:
 		godep save \
+		github.com/crunchydata/crunchy-postgresql-manager/collect \
 		github.com/crunchydata/crunchy-postgresql-manager/util \
 		github.com/crunchydata/crunchy-postgresql-manager/logit \
 		github.com/crunchydata/crunchy-postgresql-manager/adminapi \
@@ -16,6 +17,7 @@ gendeps:
 		github.com/crunchydata/crunchy-postgresql-manager/admindb 
 
 build:
+		godep go install cmd/adminapi.go
 		godep go install cmd/cpmnodeagent.go
 		godep go install cmd/cpmserveragent.go
 		godep go install cmd/backupcommand.go
@@ -23,7 +25,7 @@ build:
 		godep go install cmd/monserver.go
 		godep go install cmd/dummyserver.go
 		godep go install cmd/dockerapi.go
-		godep go install cmd/adminapi.go
+		godep go install cmd/collectserver.go
 
 buildimages:
 		cd images/cpm-dashboard && make

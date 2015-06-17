@@ -71,20 +71,32 @@ docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cpm-backup -d crunchydata/cpm-backup:latest
 
-echo "restarting cpm-mon container..."
+#echo "restarting cpm-mon container..."
+#sleep 2
+#docker stop cpm-mon
+#docker rm cpm-mon
+#INFLUXDIR=/var/cpm/data/influxdb
+#mkdir -p $INFLUXDIR
+#chcon -Rt svirt_sandbox_file_t $INFLUXDIR
+#docker run -e DB_HOST=cpm-admin.crunchy.lab \
+#	--hostname="cpm-mon" \
+#	-e CPMBASE=/var/cpm \
+#	-e DB_PORT=5432 -e DB_USER=postgres \
+#	-v $LOGDIR:/cpmlogs \
+#	-v $INFLUXDIR:/monitordata \
+#	-d --name=cpm-mon crunchydata/cpm-mon:latest
+#
+#sleep 2
+echo "restarting cpm-collect container..."
 sleep 2
-docker stop cpm-mon
-docker rm cpm-mon
-INFLUXDIR=/var/cpm/data/influxdb
-mkdir -p $INFLUXDIR
-chcon -Rt svirt_sandbox_file_t $INFLUXDIR
+docker stop cpm-collect
+docker rm cpm-collect
 docker run -e DB_HOST=cpm-admin.crunchy.lab \
-	--hostname="cpm-mon" \
+	--hostname="cpm-collect" \
 	-e CPMBASE=/var/cpm \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	-v $LOGDIR:/cpmlogs \
-	-v $INFLUXDIR:/monitordata \
-	-d --name=cpm-mon crunchydata/cpm-mon:latest
+	-d --name=cpm-collect crunchydata/cpm-collect:latest
 
 sleep 2
 
