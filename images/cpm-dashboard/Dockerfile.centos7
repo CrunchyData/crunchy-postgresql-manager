@@ -1,25 +1,17 @@
 FROM docker.io/centos:centos7
 MAINTAINER crunchy
 
-RUN rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
-RUN yum install -y tar procps-ng nginx which hostname wget && yum clean all -y
+VOLUME ["/cpmlogs"]
+VOLUME ["/cpmdata"]
 
-# set up cluster directory
-#
-RUN mkdir -p /var/cpm/conf
-RUN mkdir -p /var/cpm/bin
-ADD conf /var/cpm/conf
-ADD bin /var/cpm/bin
+RUN yum install -y procps-ng && yum clean all -y
+RUN yum install -y https://grafanarel.s3.amazonaws.com/builds/grafana-2.0.2-1.x86_64.rpm && yum clean all -y
+ADD conf/grafana.ini /etc/grafana/
+ADD conf/grafana.ini /usr/share/grafana/conf/
+ADD grafana-plugins/datasources/prometheus /usr/share/grafana/public/app/plugins/datasource/prometheus
 
-WORKDIR /var/cpm
-
-RUN wget http://grafanarel.s3.amazonaws.com/grafana-1.9.1.tar.gz
-RUN gunzip grafana-1.9.1.tar.gz
-RUN tar -xf grafana-1.9.1.tar
-ADD conf/config.js /var/cpm/grafana-1.9.1/
-
-RUN chown -R daemon:daemon /var/cpm
+EXPOSE 3000
 
 USER daemon
 
-CMD ["/var/cpm/bin/startnginx.sh"]
+ENTRYPOINT ["/usr/sbin/grafana-server", "-config", "/etc/grafana/grafana.ini", "-homepath", "/usr/share/grafana"]

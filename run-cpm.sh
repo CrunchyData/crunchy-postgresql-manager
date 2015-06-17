@@ -87,14 +87,55 @@ docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-d --name=cpm-mon crunchydata/cpm-mon:latest
 
 sleep 2
+
+###############
+echo "restarting cpm-promdash container..."
+sleep 2
+export DATADIR=/tmp/prom
+mkdir -p  $DATADIR
+chmod 777 $DATADIR
+chcon -Rt svirt_sandbox_file_t $DATADIR
+
+docker stop cpm-promdash
+docker rm cpm-promdash
+docker run  \
+	-v $DATADIR:/tmp/prom \
+	-e DATABASE_URL=sqlite3:/tmp/prom/file.sqlite3 \
+	--name=cpm-promdash -d prom/promdash
+###############
+#echo "restarting cpm-dashboard container..."
+#sleep 2
+#export DATADIR=/var/cpm/data/grafana
+#mkdir -p  $DATADIR
+#chmod 777 $DATADIR
+#chcon -Rt svirt_sandbox_file_t $DATADIR
+
+#docker stop cpm-dashboard
+#docker rm cpm-dashboard
+#docker run  \
+#	-v $LOGDIR:/cpmlogs \
+#	-v $DATADIR:/cpmdata \
+#	--name=cpm-dashboard -d crunchydata/cpm-dashboard:latest
+##############
+
+echo "restarting cpm-prometheus container..."
+sleep 2
+export PROMCONFIG=/tmp/prometheus.yml
+chmod 777 $PROMCONFIG
+chcon -Rt svirt_sandbox_file_t $PROMCONFIG
+
+docker stop cpm-prometheus
+docker rm cpm-prometheus
+docker run  \
+	-v $PROMCONFIG:/etc/prometheus/prometheus.yml \
+	--name=cpm-prometheus -d prom/prometheus:latest
+##############
+
 echo "testing containers for DNS resolution...."
 ping -c 2 cpm.crunchy.lab
 ping -c 2 cpm-admin.crunchy.lab
 ping -c 2 cpm-backup.crunchy.lab
 ping -c 2 cpm-mon.crunchy.lab
-
-exit
-
-docker rm cpm-dashboard
-docker run --name=cpm-dashboard -d crunchydata/cpm-dashboard:latest
+ping -c 2 cpm-promdash.crunchy.lab
+ping -c 2 cpm-prometheus.crunchy.lab
 

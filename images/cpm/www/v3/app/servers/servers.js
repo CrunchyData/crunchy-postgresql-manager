@@ -97,6 +97,7 @@ angular.module('uiRouterSample.servers', [
                         templateUrl: 'app/servers/servers.monitor.html',
                         controller: ['$scope', '$stateParams', '$state', 'utils',
                             function($scope, $stateParams, $state, utils) {
+			    	console.log('at monitor serverId=' + $stateParams.serverId);
                                 $scope.item = utils.findById($scope.server.items, $stateParams.itemId);
 
                                 $scope.edit = function() {
@@ -179,9 +180,12 @@ angular.module('uiRouterSample.servers', [
 
                     '': {
                         templateUrl: 'app/servers/servers.detail.monitor.cpu.html',
-                        controller: ['$scope', '$stateParams', '$state', 'utils',
-                            function($scope, $stateParams, $state, utils) {
-                                $scope.item = utils.findById($scope.server.items, $stateParams.itemId);
+                        controller: ['$sce', '$scope', '$stateParams', '$state', 'utils',
+                            function($sce, $scope, $stateParams, $state, utils) {
+                                console.log('in cpu mon with serverId=' + $stateParams.serverId);
+                                console.log('in cpu mon with servername=' + $scope.server.Name);
+				$scope.servergraphlink=$sce.trustAsResourceUrl('http://cpm-promdash:3000/embed/seconddashboard#!?var.host=' + $scope.server.Name);
+
 
                                 $scope.edit = function() {
                                     $state.go('.edit', $stateParams);
