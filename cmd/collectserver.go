@@ -2,11 +2,12 @@ package main
 
 import (
 	"database/sql"
-	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
+	"github.com/crunchydata/crunchy-postgresql-manager/collect"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"github.com/prometheus/client_golang/prometheus"
@@ -49,13 +50,15 @@ func main() {
 		}
 		dbConn.Close()
 
+		var metric collect.Metric
 		for {
 			//get metrics for each server
 			i := 0
 			for i = range servers {
-				v := rand.Float64() * 100.00
-				guage.WithLabelValues(servers[i].Name).Set(v)
-				logit.Info.Println("setting metric for " + servers[i].Name)
+				//v := rand.Float64() * 100.00
+				metric, err = collect.Collectcpu(servers[i].IPAddress)
+				guage.WithLabelValues(servers[i].Name).Set(metric.Value)
+				logit.Info.Println("setting metric for " + servers[i].Name + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
 				i++
 			}
 
