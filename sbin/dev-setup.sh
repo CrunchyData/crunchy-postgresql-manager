@@ -26,27 +26,35 @@
 
 # install deps
 
-sudo rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
+# Make sure only root can run our script
+if [[ $EUID -ne 0 ]]; then
+	echo "This script must be run as root" 1>&2
+	exit 1
+fi
 
-sudo yum install -y postgresql94 postgresql94-contrib postgresql94-server
+rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
+
+yum install -y postgresql94 postgresql94-contrib postgresql94-server
 
 export DEVROOT=/home/jeffmc/devproject
 export DEVBASE=$DEVROOT/src/github.com/crunchydata/crunchy-postgresql-manager
 export CPMBASE=/var/cpm
 
-sudo mkdir -p $CPMBASE/bin
-sudo mkdir -p $CPMBASE/config
-sudo mkdir -p $CPMBASE/data/pgsql
-sudo mkdir -p $CPMBASE/logs
-sudo mkdir -p $CPMBASE/keys
+mkdir -p $CPMBASE/bin
+mkdir -p $CPMBASE/config
+mkdir -p $CPMBASE/data/pgsql
+mkdir -p $CPMBASE/logs
+mkdir -p $CPMBASE/keys
 
-sudo cp $DEVROOT/bin/cpmserveragent $CPMBASE/bin
-sudo cp $DEVBASE/sbin/cert.pem $DEVBASE/sbin/key.pem $CPMBASE/keys
+chcon -Rt svirt_sandbox_file_t $CPMBASE
 
-sudo cp $DEVBASE/sbin/* $CPMBASE/bin
+cp $DEVROOT/bin/cpmserveragent $CPMBASE/bin
+cp $DEVBASE/sbin/cert.pem $DEVBASE/sbin/key.pem $CPMBASE/keys
 
-sudo cp $DEVBASE/config/cpmserveragent.service  /usr/lib/systemd/system
+cp $DEVBASE/sbin/* $CPMBASE/bin
 
-sudo systemctl enable cpmserveragent.service
-sudo systemctl start cpmserveragent.service
+cp $DEVBASE/config/cpmserveragent.service  /usr/lib/systemd/system
+
+systemctl enable cpmserveragent.service
+systemctl start cpmserveragent.service
 
