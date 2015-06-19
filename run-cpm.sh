@@ -54,7 +54,7 @@ mkdir -p $DBDIR
 chown postgres:postgres $DBDIR
 chcon -Rt svirt_sandbox_file_t $DBDIR
 docker run -e DB_HOST=127.0.0.1 \
-	-p 192.168.56.103:14000:13000 \
+	-p 192.168.56.103:14001:13001 \
 	-e DOMAIN=crunchy.lab \
 	-e CPMBASE=/var/cpm \
 	-e DB_PORT=5432 -e DB_USER=postgres \

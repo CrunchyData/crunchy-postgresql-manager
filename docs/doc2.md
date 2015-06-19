@@ -16,10 +16,14 @@ install
 	- mercurial
 	- net-tools
 	- bind-utils
+	- sysstat
+
+	- yum -y install docker golang git mercurial net-tools bind-utils sysstat
 
 set up network adapters
 	- static address is set using nm-tui on the enp0s8 adapter
-		- specify 192.168.56.103 as IP address
+		- specify 192.168.56.103 as IPADDR
+		- specify 192.168.56.1 as GATEWAY
 		- dns 192.168.0.1 (this is my routers dns nameserver addr)
 	- set both adapters to connect at startup
 
