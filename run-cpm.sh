@@ -40,7 +40,7 @@ docker stop cpm
 docker rm cpm
 chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v3
 docker run --name=cpm -d \
-	-p 192.168.56.103:13050:13000 \
+	-p 192.168.56.103:13001:13001 \
 	-v $LOGDIR:/cpmlogs \
 	-v $KEYSDIR:/cpmkeys \
 	-v $INSTALLDIR/images/cpm/www/v3:/www crunchydata/cpm:latest
