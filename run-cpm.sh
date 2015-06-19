@@ -40,6 +40,7 @@ docker stop cpm
 docker rm cpm
 chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v3
 docker run --name=cpm -d \
+	-p 192.168.56.103:13050:13000 \
 	-v $LOGDIR:/cpmlogs \
 	-v $KEYSDIR:/cpmkeys \
 	-v $INSTALLDIR/images/cpm/www/v3:/www crunchydata/cpm:latest
@@ -53,6 +54,7 @@ mkdir -p $DBDIR
 chown postgres:postgres $DBDIR
 chcon -Rt svirt_sandbox_file_t $DBDIR
 docker run -e DB_HOST=127.0.0.1 \
+	-p 192.168.56.103:14000:13000 \
 	-e DOMAIN=crunchy.lab \
 	-e CPMBASE=/var/cpm \
 	-e DB_PORT=5432 -e DB_USER=postgres \
@@ -71,22 +73,6 @@ docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cpm-backup -d crunchydata/cpm-backup:latest
 
-#echo "restarting cpm-mon container..."
-#sleep 2
-#docker stop cpm-mon
-#docker rm cpm-mon
-#INFLUXDIR=/var/cpm/data/influxdb
-#mkdir -p $INFLUXDIR
-#chcon -Rt svirt_sandbox_file_t $INFLUXDIR
-#docker run -e DB_HOST=cpm-admin.crunchy.lab \
-#	--hostname="cpm-mon" \
-#	-e CPMBASE=/var/cpm \
-#	-e DB_PORT=5432 -e DB_USER=postgres \
-#	-v $LOGDIR:/cpmlogs \
-#	-v $INFLUXDIR:/monitordata \
-#	-d --name=cpm-mon crunchydata/cpm-mon:latest
-#
-#sleep 2
 echo "restarting cpm-collect container..."
 sleep 2
 docker stop cpm-collect
@@ -99,7 +85,6 @@ docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-d --name=cpm-collect crunchydata/cpm-collect:latest
 
 sleep 2
-
 ###############
 echo "restarting cpm-promdash container..."
 sleep 2
@@ -112,24 +97,10 @@ docker stop cpm-promdash
 docker rm cpm-promdash
 docker run  \
 	-v $DATADIR:/tmp/prom \
+	-p 192.168.56.103:15000:8080 \
 	-e DATABASE_URL=sqlite3:/tmp/prom/file.sqlite3 \
 	--name=cpm-promdash -d prom/promdash
 ###############
-#echo "restarting cpm-dashboard container..."
-#sleep 2
-#export DATADIR=/var/cpm/data/grafana
-#mkdir -p  $DATADIR
-#chmod 777 $DATADIR
-#chcon -Rt svirt_sandbox_file_t $DATADIR
-
-#docker stop cpm-dashboard
-#docker rm cpm-dashboard
-#docker run  \
-#	-v $LOGDIR:/cpmlogs \
-#	-v $DATADIR:/cpmdata \
-#	--name=cpm-dashboard -d crunchydata/cpm-dashboard:latest
-##############
-
 echo "restarting cpm-prometheus container..."
 sleep 2
 export PROMCONFIG=/tmp/prometheus.yml
@@ -140,14 +111,15 @@ docker stop cpm-prometheus
 docker rm cpm-prometheus
 docker run  \
 	-v $PROMCONFIG:/etc/prometheus/prometheus.yml \
+	-p 192.168.56.103:16000:3000 \
 	--name=cpm-prometheus -d prom/prometheus:latest
 ##############
 
 echo "testing containers for DNS resolution...."
+
 ping -c 2 cpm.crunchy.lab
 ping -c 2 cpm-admin.crunchy.lab
 ping -c 2 cpm-backup.crunchy.lab
-ping -c 2 cpm-mon.crunchy.lab
 ping -c 2 cpm-promdash.crunchy.lab
 ping -c 2 cpm-prometheus.crunchy.lab
 

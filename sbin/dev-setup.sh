@@ -30,7 +30,7 @@ sudo rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9
 
 sudo yum install -y postgresql94 postgresql94-contrib postgresql94-server
 
-export DEVROOT=$HOME/devproject
+export DEVROOT=/home/jeffmc/devproject
 export DEVBASE=$DEVROOT/src/github.com/crunchydata/crunchy-postgresql-manager
 export CPMBASE=/var/cpm
 
