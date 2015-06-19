@@ -30,25 +30,23 @@ sudo rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9
 
 sudo yum install -y postgresql94 postgresql94-contrib postgresql94-server
 
-export DEVROOT=/home/jeffmc/dev2
+export DEVROOT=$HOME/devproject
 export DEVBASE=$DEVROOT/src/github.com/crunchydata/crunchy-postgresql-manager
 export CPMBASE=/var/cpm
 
 sudo mkdir -p $CPMBASE/bin
 sudo mkdir -p $CPMBASE/config
-sudo mkdir -p $CPMBASE/data
+sudo mkdir -p $CPMBASE/data/pgsql
 sudo mkdir -p $CPMBASE/logs
 sudo mkdir -p $CPMBASE/keys
 
-server=$(hostname)
+sudo cp $DEVROOT/bin/cpmserveragent $CPMBASE/bin
+sudo cp $DEVBASE/sbin/cert.pem $DEVBASE/sbin/key.pem $CPMBASE/keys
 
-scp $DEVROOT/bin/cpmserveragent root@$server:$CPMBASE/bin
-scp $DEVBASE/sbin/cert.pem $DEVBASE/sbin/key.pem root@$server:$CPMBASE/keys
+sudo cp $DEVBASE/sbin/* $CPMBASE/bin
 
-scp $DEVBASE/sbin/* root@$server:$CPMBASE/bin
+sudo cp $DEVBASE/config/cpmserveragent.service  /usr/lib/systemd/system
 
-scp $DEVBASE/config/cpmserveragent.service  root@$server:/usr/lib/systemd/system
-
-ssh root@$server "systemctl enable cpmserveragent.service"
-ssh root@$server "systemctl start cpmserveragent.service"
+sudo systemctl enable cpmserveragent.service
+sudo systemctl start cpmserveragent.service
 

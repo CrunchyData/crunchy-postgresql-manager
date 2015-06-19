@@ -37,6 +37,8 @@ buildimages:
 		cd images/cpm-backup && make
 		cd images/cpm-backup-job && make
 		cd images/cpm-mon && make
+		cd images/cpm-prometheus && make
+		cd images/cpm-collect && make
 
 clean:
 		rm -rf $(GOBIN)/*

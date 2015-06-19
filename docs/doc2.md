@@ -13,6 +13,7 @@ install
 	- docker
 	- golang
 	- git
+	- mercurial
 	- net-tools
 	- bind-utils
 
@@ -42,4 +43,25 @@ Install Skybridge
 	- sudo vi /etc/resolv.conf
 		- add 192.168.56.103 as a primary DNS nameserver
 	
+
+Setup the CPM Source Environment
+---------------------
+export GOPATH=~/devproject
+export GOBIN=$GOPATH/bin
+export PATH=$GOBIN:$PATH
+
+cd devproject
+
+go get github.com/tools/godep
+go get github.com/crunchydata/crunchy-postgresql-manager
+cd src/github.com/crunchydata/crunchy-postgresql-manager
+
+godep restore
+make build
+
+make buildimages
+
+Run CPM
+--------------
+sudo ./sbin/dev-setup.sh
 
