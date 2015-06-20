@@ -1,6 +1,6 @@
 <div>
 
-    <h2>Project {{project.Name}}</h2>
+	<h2>Project {{project.Name}}</h2>
     <p>{{project.Desc}}</p>
 
     <div class="navbar-inner">
@@ -9,7 +9,7 @@
                 <a ui-sref="projects.detail.add()"><i class="fa fa-plus fa-fw"></i>Add Project&nbsp;</a>
                 <a ui-sref="projects.detail.delete()"><i class="fa fa-trash fa-fw"></i>Delete Project&nbsp;</a>
 		<a ui-sref="projects.detail.autocluster({projectId:project.ID})"><i class="fa fa-sitemap fa-fw"></i>Create Cluster&nbsp;</a>
-		<a ui-sref="projects.container.add({projectId:project.ID})"><i class="fa fa-cubes fa-fw"></i>Create Database</a>
+		<a ui-sref="projects.container.add( {projectId:project.ID} )"><i class="fa fa-cubes fa-fw"></i>Create Database</a>
             </ul>
         </div>
 </div>
