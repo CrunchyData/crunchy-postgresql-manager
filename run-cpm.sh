@@ -97,7 +97,7 @@ docker stop cpm-promdash
 docker rm cpm-promdash
 docker run  \
 	-v $DATADIR:/tmp/prom \
-	-p 192.168.56.103:15000:8080 \
+	-p 192.168.56.103:15000:3000 \
 	-e DATABASE_URL=sqlite3:/tmp/prom/file.sqlite3 \
 	--name=cpm-promdash -d prom/promdash
 ###############
@@ -111,7 +111,7 @@ docker stop cpm-prometheus
 docker rm cpm-prometheus
 docker run  \
 	-v $PROMCONFIG:/etc/prometheus/prometheus.yml \
-	-p 192.168.56.103:16000:3000 \
+	-p 192.168.56.103:16000:9090 \
 	--name=cpm-prometheus -d prom/prometheus:latest
 ##############
 
