@@ -77,6 +77,32 @@ func main() {
 		}
 	}()
 
+	go func() {
+		for true {
+			collect.Collecthc()
+			time.Sleep(time.Duration(30000 * time.Millisecond))
+		}
+	}()
+
+	go func() {
+		//register a guage vector
+		dbsizeguage := prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "cpm_container_dbsize",
+				Help: "Database Size.",
+			}, []string{
+				"containername",
+				"databasename",
+			})
+		prometheus.MustRegister(dbsizeguage)
+
+		for true {
+			//dbsizeguage.WithLabelValues("node1", "db1").Set(v)
+			collect.CollectDBSize(dbsizeguage)
+			time.Sleep(time.Duration(30000 * time.Millisecond))
+		}
+	}()
+
 	http.Handle("/metrics", prometheus.Handler())
 	http.ListenAndServe(":8080", nil)
 }

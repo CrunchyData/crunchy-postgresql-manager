@@ -28,7 +28,6 @@ build:
 		godep go install cmd/collectserver.go
 
 buildimages:
-		cd images/cpm-dashboard && make
 		cd images/cpm-base && make  
 		cd images/cpm-admin && make  
 		cd images/cpm && make 
@@ -36,7 +35,6 @@ buildimages:
 		cd images/cpm-pgpool && make
 		cd images/cpm-backup && make
 		cd images/cpm-backup-job && make
-		cd images/cpm-mon && make
 		cd images/cpm-prometheus && make
 		cd images/cpm-collect && make
 

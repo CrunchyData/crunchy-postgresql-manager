@@ -232,3 +232,17 @@ create table containeruser (
 insert into settings (name, value, updatedt) values ('POSTGRESPSW', '', now());
 insert into settings (name, value, updatedt) values ('CPMTESTPSW', 'cpmtest', now());
 insert into settings (name, value, updatedt) values ('PGPOOLPSW', 'pgpool', now());
+
+
+create table healthcheck (
+	id serial primary key,
+	projectname varchar(20) not null,
+	projectid int references project (id) on delete cascade,
+	containername varchar(20) not null,
+	containerid int references project (id) on delete cascade,
+	containerrole varchar(10) not null,
+	containerimage varchar(30) not null,
+	status varchar(20) not null,
+	updatedt timestamp not null
+);
+

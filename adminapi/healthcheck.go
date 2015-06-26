@@ -17,83 +17,40 @@ package adminapi
 
 import (
 	"github.com/ant0ine/go-json-rest/rest"
-	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
+	"database/sql"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
-	"github.com/crunchydata/crunchy-postgresql-manager/myinfluxdb/client"
+	"github.com/crunchydata/crunchy-postgresql-manager/collect"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
-	"strconv"
 )
 
-func GetHC1(w rest.ResponseWriter, r *rest.Request) {
+func GetHealthCheck(w rest.ResponseWriter, r *rest.Request) {
 
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("GetHC1: validate token error " + err.Error())
+		logit.Error.Println("validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	var domain string
-	var hostname = "cpm-mon"
-	domain, err = admindb.GetDomain()
+	var results []collect.HealthCheck
 
-	if KubeEnv {
-		hostname = hostname + "-api"
-	}
-
-	c, err := client.NewClient(&client.ClientConfig{
-		Host:     hostname + "." + domain + ":8086",
-		Username: "root",
-		Password: "root",
-		Database: "cpm",
-	})
-
+	var dbConn *sql.DB
+	dbConn, err = util.GetConnection("clusteradmin")
 	if err != nil {
-		logit.Error.Println("GetHC1: " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	defer dbConn.Close()
 
-	var results []*client.Series
-
-	//get the latest HC1 record and it's seconds value
-	var query = "select seconds, service, servicetype, status from hc1 limit 1"
-	logit.Info.Println(query)
-
-	results, err = c.Query(query)
+	results, err = collect.GetHealthCheck(dbConn)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		w.WriteJson(&results)
-		//rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if len(results) == 0 {
-		logit.Info.Println("GetHC1: no results yet")
-		w.WriteJson(&results)
-		return
-	}
-
-	var resultsLen = len(results[0].Points)
-	if resultsLen == 0 {
-		logit.Info.Println("GetHC1: no results yet 2")
-		w.WriteJson(&results)
-		return
-	}
-
-	logit.Info.Printf("results len = %d\n", resultsLen)
-	var seconds = results[0].Points[0][2].(float64)
-	logit.Info.Printf("results seconds=%f\n", seconds)
-
-	query = "select seconds, service, servicetype, status from hc1 where seconds = " + strconv.FormatFloat(seconds, 'f', 2, 64)
-	logit.Info.Println(query)
-
-	results, err = c.Query(query)
-
-	resultsLen = len(results[0].Points)
-	if resultsLen == 0 {
-		logit.Info.Println("GetHC1 b: no results")
-	}
 
 	w.WriteJson(&results)
 
