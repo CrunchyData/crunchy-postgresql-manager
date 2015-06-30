@@ -14,6 +14,6 @@
 # limitations under the License.
 
 # clean up leftovers from previous runs of pgpool
-rm -rf /tmp/.s.PGSQL.*
+rm -rf /tmp/pgpool.pid
 
 /bin/pgpool -a /var/cpm/bin/pool_hba.conf -f /var/cpm/bin/pgpool.conf > /tmp/pgpoolstart.log 2> /tmp/pgpoolstart.err

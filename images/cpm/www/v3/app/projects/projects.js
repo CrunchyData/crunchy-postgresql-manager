@@ -550,6 +550,16 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
+            .state('projects.cluster.scale', {
+
+                url: '/scale/:itemId',
+                views: {
+                    '': {
+                        templateUrl: 'app/projects/projects.cluster.scale.html',
+                        controller: ClusterScaleController
+                    },
+                }
+            })
 
 
             .state('projects.detail', {

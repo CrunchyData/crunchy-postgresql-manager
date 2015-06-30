@@ -45,6 +45,33 @@ var ClusterDeleteController = function($scope, $stateParams, $state, clustersFac
 
 };
 
+var ClusterScaleController = function($scope, $stateParams, $state, clustersFactory, utils, usSpinnerService) {
+    var cluster = $scope.cluster;
+
+    $scope.scale = function() {
+        usSpinnerService.spin('spinner-1');
+        console.log('scale cluster called');
+        clustersFactory.scale($stateParams.clusterId)
+            .success(function(data) {
+                console.log('successful scale with data=' + data);
+                usSpinnerService.stop('spinner-1');
+                $state.go('projects.list', $stateParams, {
+                    reload: true,
+                    inherit: false
+                });
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.message
+                }];
+                console.log('here is an error ' + error.message);
+                usSpinnerService.stop('spinner-1');
+            });
+    };
+
+};
+
 var ClusterAutoClusterController = function($scope, $stateParams, $state, clustersFactory, utils, usSpinnerService) {
 
     $scope.ClusterProfile = 'SM';

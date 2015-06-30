@@ -38,6 +38,15 @@ angular.module('uiRouterSample.clusters.service', ['ngCookies'])
         return $http.get(url);
     };
 
+    clustersFactory.scale = function(id) {
+
+        var url = $cookieStore.get('AdminURL') + '/cluster/scale/' + id + '.' + $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
+
     clustersFactory.failover = function(containerid) {
 
         var url = $cookieStore.get('AdminURL') + '/admin/failover/' + containerid + '.' + $cookieStore.get('cpm_token');

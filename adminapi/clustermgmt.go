@@ -17,6 +17,7 @@ package adminapi
 
 import (
 	"errors"
+	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmnodeagent"
@@ -31,12 +32,108 @@ import (
 	"time"
 )
 
+const (
+	STANDBY = "standby"
+)
+
 type AutoClusterInfo struct {
 	Name           string
 	ProjectID      string
 	ClusterType    string
 	ClusterProfile string
 	Token          string
+}
+
+func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
+	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	if err != nil {
+		logit.Error.Println("GetCluster: authorize error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	ID := r.PathParam("ID")
+	cluster, err := admindb.GetCluster(ID)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var containers []admindb.Container
+	containers, err = admindb.GetAllContainersForCluster(ID)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//determine number of standby nodes currently
+	standbyCnt := 0
+	for i := range containers {
+		if containers[i].Role == STANDBY {
+			standbyCnt++
+		}
+	}
+
+	logit.Info.Printf("standbyCnt ends at %d\n", standbyCnt)
+
+	//provision new container
+	params := new(cpmserveragent.DockerRunArgs)
+	params.Image = "cpm-node"
+	//TODO make the server choice smart
+	params.ServerID = containers[0].ServerID
+	params.ProjectID = cluster.ProjectID
+	params.ContainerName = cluster.Name + "-" + STANDBY + "-" + fmt.Sprintf("%d", standbyCnt)
+	params.Standalone = "false"
+	var standby = true
+	var PROFILE = "LG"
+
+	logit.Info.Printf("here with ProjectID %s\n", cluster.ProjectID)
+
+	err = provisionImpl(params, PROFILE, standby)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = provisionImplInit(params, PROFILE, false)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//need to update the new container's ClusterID
+	var node admindb.Container
+	node, err = admindb.GetContainerByName(params.ContainerName)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, "error"+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	node.ClusterID = cluster.ID
+	node.Role = STANDBY
+	err = admindb.UpdateContainer(node)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, "error"+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = configureCluster(cluster, false)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	status := SimpleStatus{}
+	status.Status = "OK"
+	w.WriteJson(&status)
 }
 
 func GetCluster(w rest.ResponseWriter, r *rest.Request) {
@@ -205,7 +302,7 @@ func configureCluster(cluster admindb.Cluster, autocluster bool) error {
 	//configure all standby nodes
 	i := 0
 	for i = range standbynodes {
-		if standbynodes[i].Role == "standby" {
+		if standbynodes[i].Role == STANDBY {
 
 			//stop standby
 			if !autocluster {
@@ -240,7 +337,7 @@ func configureCluster(cluster admindb.Cluster, autocluster bool) error {
 			}
 			logit.Info.Println("configureCluster:standby recovery.conf copied remotely")
 
-			data, err = template.Postgresql("standby", pgport.Value, "")
+			data, err = template.Postgresql(STANDBY, pgport.Value, "")
 			if err != nil {
 				logit.Error.Println("configureCluster:" + err.Error())
 				return err
@@ -255,7 +352,7 @@ func configureCluster(cluster admindb.Cluster, autocluster bool) error {
 			logit.Info.Println("configureCluster:standby postgresql.conf copied remotely")
 
 			//configure standby pg_hba.conf file
-			data, err = template.Hba(KubeEnv, "standby", standbynodes[i].Name, pgport.Value, cluster.ID, domainname.Value)
+			data, err = template.Hba(KubeEnv, STANDBY, standbynodes[i].Name, pgport.Value, cluster.ID, domainname.Value)
 			if err != nil {
 				logit.Error.Println("configureCluster:" + err.Error())
 				return err
@@ -774,9 +871,9 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 				logit.Info.Println("AdminFailover: fail-over standby recovery.conf copied remotely")
 
 				if cluster.ClusterType == "synchronous" {
-					data, err = template.Postgresql("standby", pgport.Value, "*")
+					data, err = template.Postgresql(STANDBY, pgport.Value, "*")
 				} else {
-					data, err = template.Postgresql("standby", pgport.Value, "")
+					data, err = template.Postgresql(STANDBY, pgport.Value, "")
 				}
 				if err != nil {
 					logit.Error.Println("AdminFailover: " + err.Error())
@@ -794,7 +891,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 				logit.Info.Println("AdminFailover: standby postgresql.conf copied remotely")
 
 				//configure standby pg_hba.conf file
-				data, err = template.Hba(KubeEnv, "standby", clusterNodes[i].Name, pgport.Value, dbNode.ClusterID, domainname.Value)
+				data, err = template.Hba(KubeEnv, STANDBY, clusterNodes[i].Name, pgport.Value, dbNode.ClusterID, domainname.Value)
 				if err != nil {
 					logit.Error.Println("AdminFailover:" + err.Error())
 					rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -885,7 +982,7 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 			//update the node to be in the cluster
 			origDBNode.ClusterID = ClusterID
 			if origDBNode.Image == "cpm-node" {
-				origDBNode.Role = "standby"
+				origDBNode.Role = STANDBY
 			} else {
 				origDBNode.Role = "pgpool"
 				pgpoolCount++
@@ -1063,7 +1160,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		dockerstandby[i].ServerID = chosenServers[i].ID
 		dockerstandby[i].ProjectID = params.ProjectID
 		dockerstandby[i].Image = "cpm-node"
-		dockerstandby[i].ContainerName = params.Name + "-standby-" + strconv.Itoa(i)
+		dockerstandby[i].ContainerName = params.Name + "-" + STANDBY + "-" + strconv.Itoa(i)
 		dockerstandby[i].Standalone = "false"
 		err2 = provisionImpl(&dockerstandby[i], profile.StandbyProfile, true)
 		if err2 != nil {
@@ -1081,7 +1178,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		}
 
 		node.ClusterID = clusterID
-		node.Role = "standby"
+		node.Role = STANDBY
 		err2 = admindb.UpdateContainer(node)
 		if err2 != nil {
 			logit.Error.Println("AutoCluster: error-update standby node " + err2.Error())

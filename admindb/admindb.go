@@ -149,7 +149,7 @@ func GetCluster(id string) (Cluster, error) {
 	//logit.Info.Println("admindb:GetCluster: called")
 	cluster := Cluster{}
 
-	err := dbConn.QueryRow(fmt.Sprintf("select id, name, clustertype, status, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from cluster where id=%s", id)).Scan(&cluster.ID, &cluster.Name, &cluster.ClusterType, &cluster.Status, &cluster.CreateDate)
+	err := dbConn.QueryRow(fmt.Sprintf("select projectid, id, name, clustertype, status, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from cluster where id=%s", id)).Scan(&cluster.ProjectID, &cluster.ID, &cluster.Name, &cluster.ClusterType, &cluster.Status, &cluster.CreateDate)
 	switch {
 	case err == sql.ErrNoRows:
 		logit.Info.Println("admindb:GetCluster:no cluster with that id")
