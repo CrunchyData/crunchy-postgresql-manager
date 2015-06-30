@@ -282,6 +282,33 @@ var ContainerDeleteController = function($scope, $stateParams, $state, container
 
 };
 
+var ContainerFailoverController = function($scope, $stateParams, $state, containersFactory, utils, usSpinnerService) {
+    var container = $scope.container;
+
+    $scope.failover = function() {
+        usSpinnerService.spin('spinner-1');
+        containersFactory.failover($stateParams.containerId)
+            .success(function(data) {
+                console.log('successful failover with data=' + data);
+                usSpinnerService.stop('spinner-1');
+                $state.go('projects.list', $stateParams, {
+                    reload: true,
+                    inherit: false
+                });
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+                usSpinnerService.stop('spinner-1');
+            });
+    };
+
+};
+
+
 var ContainerAccessRulesController = function($scope, $stateParams, $state, utils) {
     $scope.done = function() {
         $state.go('^', $stateParams);

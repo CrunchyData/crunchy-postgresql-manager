@@ -14,6 +14,9 @@
 				<li>
 				<a ui-sref="projects.container.delete()"><i class="fa fa-trash fa-fw"></i>Delete</a>
 				</li>
+				<li ng-show="container.Role == 'standby'">
+				<a ui-sref="projects.container.failover()"><i class="fa fa-fire-extinguisher fa-fw"></i>Failover</a>
+				</li>
 				<li ng-show="container.Status != 'RUNNING'">
 				<a ui-sref="projects.container.start()"><i class="fa fa-play fa-fw"></i>Start</a>
 				</li>

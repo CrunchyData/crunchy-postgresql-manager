@@ -1,0 +1,13 @@
+<p><strong>Trigger cluster failover to container ({{container.Name}})?</strong></p>
+<form class="form-horizontal">
+    <div class="form-group">
+        <span us-spinner spinner-key="spinner-1" spinner-start-active="false"></span>
+        <div class="col-xs-offset-2 col-xs-10">
+            <button type="submit" ng-click="failover()" class="btn btn-primary">Failover</button>
+        </div>
+        <div>
+            <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+        </div>
+
+    </div>
+</form>

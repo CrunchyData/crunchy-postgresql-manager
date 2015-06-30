@@ -798,136 +798,19 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	clusterNodes, err := admindb.GetAllContainersForCluster(dbNode.ClusterID)
-	if err != nil {
-		logit.Error.Println("AdminFailover:" + err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting("PG-PORT")
+	err = configureCluster(cluster, false)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	i := 0
-	for i = range clusterNodes {
-
-		if clusterNodes[i].Name == oldMaster.Name {
-			logit.Info.Println("AdminFailover: fail-over is skipping previous master")
-		} else if clusterNodes[i].Name == dbNode.Name {
-			logit.Info.Println("fail-over is skipping new master " + clusterNodes[i].Name)
-		} else {
-			if clusterNodes[i].Image == "cpm-pgpool" {
-				logit.Info.Println("AdminFailover: fail-over is reconfiguring pgpool  " + clusterNodes[i].Name)
-				//reconfigure pgpool node
-			} else {
-				//reconfigure other standby nodes
-				logit.Info.Println("AdminFailover: fail-over is reconfiguring standby  " + clusterNodes[i].Name)
-				//stop standby
-				var commandoutput string
-				commandoutput, err = PGCommand("stoppg.sh", clusterNodes[i].Name)
-				if err != nil {
-					logit.Error.Println("AdminFailover:" + err.Error())
-					rest.Error(w, err.Error(), http.StatusBadRequest)
-					return
-				}
-				logit.Info.Println("AdminFailover: fail-over stop output was" + commandoutput)
-
-				var domainname admindb.Setting
-				domainname, err = admindb.GetSetting("DOMAIN-NAME")
-				if err != nil {
-					logit.Error.Println("configureCluster: DOMAIN-NAME err " + err.Error())
-					rest.Error(w, err.Error(), http.StatusBadRequest)
-				}
-				//create base backup from master
-				commandoutput, err = cpmnodeagent.Command2("basebackup.sh", dbNode.Name+"."+domainname.Value, clusterNodes[i].Name)
-				if err != nil {
-					logit.Error.Println("AdminFailover:" + err.Error())
-					rest.Error(w, err.Error(), http.StatusBadRequest)
-					return
-				}
-				logit.Info.Println("AdminFailover: fail-over basebackup output was" + commandoutput)
-
-				var data string
-				data, err = template.Recovery(dbNode.Name, pgport.Value, "postgres")
-				if err != nil {
-					logit.Error.Println("AdminFailover:" + err.Error())
-					rest.Error(w, err.Error(), http.StatusBadRequest)
-					return
-				}
-				logit.Info.Println("AdminFailover:fail-over\t standby recovery.conf generated")
-
-				//write standby recovery.conf file remotely
-				err = RemoteWritefile("/pgdata/recovery.conf", data, clusterNodes[i].Name)
-				if err != nil {
-					logit.Error.Println("AdminFailover:" + err.Error())
-					rest.Error(w, err.Error(), http.StatusBadRequest)
-					return
-				}
-				logit.Info.Println("AdminFailover: fail-over standby recovery.conf copied remotely")
-
-				if cluster.ClusterType == "synchronous" {
-					data, err = template.Postgresql(STANDBY, pgport.Value, "*")
-				} else {
-					data, err = template.Postgresql(STANDBY, pgport.Value, "")
-				}
-				if err != nil {
-					logit.Error.Println("AdminFailover: " + err.Error())
-					rest.Error(w, err.Error(), http.StatusBadRequest)
-					return
-				}
-
-				//write standby postgresql.conf file remotely
-				err = RemoteWritefile("/pgdata/postgresql.conf", data, clusterNodes[i].Name)
-				if err != nil {
-					logit.Error.Println("AdminFailover: " + err.Error())
-					rest.Error(w, err.Error(), http.StatusBadRequest)
-					return
-				}
-				logit.Info.Println("AdminFailover: standby postgresql.conf copied remotely")
-
-				//configure standby pg_hba.conf file
-				data, err = template.Hba(KubeEnv, STANDBY, clusterNodes[i].Name, pgport.Value, dbNode.ClusterID, domainname.Value)
-				if err != nil {
-					logit.Error.Println("AdminFailover:" + err.Error())
-					rest.Error(w, err.Error(), http.StatusBadRequest)
-					return
-				}
-
-				logit.Info.Println("AdminFailover: fail-over\t standby pg_hba.conf generated")
-
-				//write standby pg_hba.conf file remotely
-				err = RemoteWritefile("/pgdata/pg_hba.conf", data, clusterNodes[i].Name)
-				if err != nil {
-					logit.Error.Println("AdminFailover: " + err.Error())
-					rest.Error(w, err.Error(), http.StatusBadRequest)
-					return
-				}
-				logit.Info.Println("AdminFailover:  standby pg_hba.conf copied remotely")
-
-				//start standby
-
-				commandoutput, err = PGCommand("startpgonstandby.sh", clusterNodes[i].Name)
-				if err != nil {
-					logit.Error.Println("AdminFailover:" + err.Error())
-					rest.Error(w, err.Error(), http.StatusBadRequest)
-					return
-				}
-				logit.Info.Println("AdminFailover: standby startpg output was" + commandoutput)
-			}
-		}
-
-		i++
-	}
-
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
+
+	return
 }
 
 func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {

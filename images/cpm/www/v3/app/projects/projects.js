@@ -311,6 +311,17 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
+            .state('projects.container.failover', {
+                url: '/failover/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.failover.html',
+                        controller: ContainerFailoverController
+                    },
+                }
+            })
+
             .state('projects.container.stop', {
                 url: '/stop/:itemId',
                 views: {

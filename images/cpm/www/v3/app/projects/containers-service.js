@@ -29,6 +29,14 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
         return $http.get(url);
     };
 
+    containersFactory.failover = function(id) {
+
+        var url = $cookieStore.get('AdminURL') + '/admin/failover/' + id + '.' + $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
     containersFactory.start = function(id) {
 
         var url = $cookieStore.get('AdminURL') + '/admin/start/' + id + '.' + $cookieStore.get('cpm_token');
