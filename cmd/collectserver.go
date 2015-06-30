@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -13,35 +14,68 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+//var gauges = make([]prometheus.Gauge, 3)
 var (
-	uniformDomain     = 200
-	normDomain        = 200
-	normMean          = 10
-	oscillationPeriod = 10 * time.Minute
+	HC_POLL_INT     int64
+	SERVER_POLL_INT int64
+	CONT_POLL_INT   int64
 )
-
-//var guages = make([]prometheus.Gauge, 3)
 
 func main() {
 
+	var err error
+	var tempVal string
+
+	tempVal = os.Getenv("HC_POLL_INT")
+	if tempVal == "" {
+		HC_POLL_INT = 3
+	}
+
+	tempVal = os.Getenv("SERVER_POLL_INT")
+	if tempVal == "" {
+		SERVER_POLL_INT = 3
+	}
+	tempVal = os.Getenv("SERVER_POLL_INT")
+	if tempVal == "" {
+		CONT_POLL_INT = 3
+	}
+	HC_POLL_INT, err = strconv.ParseInt(tempVal, 10, 64)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return
+	}
+	SERVER_POLL_INT, err = strconv.ParseInt(tempVal, 10, 64)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return
+	}
+	CONT_POLL_INT, err = strconv.ParseInt(tempVal, 10, 64)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return
+	}
+	logit.Info.Printf("HealthCheck Polling Interval: %d\n", HC_POLL_INT)
+	logit.Info.Printf("Server Polling Interval: %d\n", SERVER_POLL_INT)
+	logit.Info.Printf("Container Polling Interval: %d\n", CONT_POLL_INT)
+
 	go func() {
-		//register a guage vector
-		guage := prometheus.NewGaugeVec(
+		//register a gauge vector
+		gauge := prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Name: "cpm_server_cpu",
 				Help: "CPU Utilization.",
 			}, []string{
 				"server",
 			})
-		prometheus.MustRegister(guage)
-		guageMem := prometheus.NewGaugeVec(
+		prometheus.MustRegister(gauge)
+		gaugeMem := prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Name: "cpm_server_mem",
 				Help: "Memory Utilization.",
 			}, []string{
 				"server",
 			})
-		prometheus.MustRegister(guageMem)
+		prometheus.MustRegister(gaugeMem)
 
 		//get servers
 		var dbConn *sql.DB
@@ -65,28 +99,28 @@ func main() {
 			for i = range servers {
 				//v := rand.Float64() * 100.00
 				metric, err = collect.Collectcpu(servers[i].IPAddress)
-				guage.WithLabelValues(servers[i].Name).Set(metric.Value)
+				gauge.WithLabelValues(servers[i].Name).Set(metric.Value)
 				logit.Info.Println("setting cpu metric for " + servers[i].Name + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
 				metric, err = collect.Collectmem(servers[i].IPAddress)
-				guageMem.WithLabelValues(servers[i].Name).Set(metric.Value)
+				gaugeMem.WithLabelValues(servers[i].Name).Set(metric.Value)
 				logit.Info.Println("setting mem metric for " + servers[i].Name + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
 				i++
 			}
 
-			time.Sleep(time.Duration(10000 * time.Millisecond))
+			time.Sleep(time.Duration(SERVER_POLL_INT) * time.Minute)
 		}
 	}()
 
 	go func() {
 		for true {
 			collect.Collecthc()
-			time.Sleep(time.Duration(30000 * time.Millisecond))
+			time.Sleep(time.Duration(HC_POLL_INT) * time.Minute)
 		}
 	}()
 
 	go func() {
-		//register a guage vector
-		dbsizeguage := prometheus.NewGaugeVec(
+		//register a gauge vector
+		dbsizegauge := prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Name: "cpm_container_dbsize",
 				Help: "Database Size.",
@@ -94,12 +128,13 @@ func main() {
 				"containername",
 				"databasename",
 			})
-		prometheus.MustRegister(dbsizeguage)
+		prometheus.MustRegister(dbsizegauge)
 
 		for true {
-			//dbsizeguage.WithLabelValues("node1", "db1").Set(v)
-			collect.CollectDBSize(dbsizeguage)
-			time.Sleep(time.Duration(30000 * time.Millisecond))
+			//dbsizegauge.WithLabelValues("node1", "db1").Set(v)
+			logit.Info.Println("collecting dbsize")
+			collect.CollectDBSize(dbsizegauge)
+			time.Sleep(time.Duration(CONT_POLL_INT) * time.Minute)
 		}
 	}()
 

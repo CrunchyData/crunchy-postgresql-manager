@@ -21,28 +21,27 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	_ "github.com/lib/pq"
 	"strconv"
-	"errors"
 )
 
 type HealthCheck struct {
-	ID       string
-	ProjectName       string
-	ProjectID       string
-	ContainerName       string
-	ContainerID       string
-	ContainerRole      string
-	ContainerImage      string
-	Status string
-	UpdateDate string
+	ID             string
+	ProjectName    string
+	ProjectID      string
+	ContainerName  string
+	ContainerID    string
+	ContainerRole  string
+	ContainerImage string
+	Status         string
+	UpdateDate     string
 }
 
 func GetHealthCheck(dbConn *sql.DB) ([]HealthCheck, error) {
 	var rows *sql.Rows
 	var err error
 	rows, err = dbConn.Query(
-	"select ID, ProjectName, ProjectID, ContainerName, ContainerID, " +
-	"ContainerRole, ContainerImage, Status, to_char(UpdateDate, 'MM-DD-YYYY HH24:MI:SS') " +
-	"from healthcheck order by ProjectName, ContainerName")
+		"select ID, ProjectName, ProjectID, ContainerName, ContainerID, " +
+			"ContainerRole, ContainerImage, Status, to_char(UpdateDt, 'MM-DD-YYYY HH24:MI:SS') " +
+			"from healthcheck order by ProjectName, ContainerName")
 	if err != nil {
 		return nil, err
 	}
@@ -53,8 +52,8 @@ func GetHealthCheck(dbConn *sql.DB) ([]HealthCheck, error) {
 		check := HealthCheck{}
 		if err = rows.Scan(
 			&check.ID,
-			&check.ProjectID,
 			&check.ProjectName,
+			&check.ProjectID,
 			&check.ContainerName,
 			&check.ContainerID,
 			&check.ContainerRole,
@@ -73,13 +72,13 @@ func GetHealthCheck(dbConn *sql.DB) ([]HealthCheck, error) {
 
 func InsertHealthCheck(dbConn *sql.DB, hc HealthCheck) (int, error) {
 	queryStr := fmt.Sprintf(
-	"insert into healthcheck ( " +
-	"ProjectName, ProjectID, ContainerName, ContainerID, " +
-	"ContainerRole, ContainerImage, Status, UpdateDate) values (" + 
-	"'%s', %s, '%s', %s, " +
-	"'%s', '%s', now()) returning ID", 
-	hc.ProjectName, hc.ProjectID, hc.ContainerName, 
-	hc.ContainerID, hc.ContainerRole, hc.ContainerImage, hc.Status)
+		"insert into healthcheck ( "+
+			"ProjectName, ProjectID, ContainerName, ContainerID, "+
+			"ContainerRole, ContainerImage, Status, UpdateDt) values ("+
+			"'%s', %s, '%s', %s, "+
+			"'%s', '%s', '%s', now()) returning ID",
+		hc.ProjectName, hc.ProjectID, hc.ContainerName,
+		hc.ContainerID, hc.ContainerRole, hc.ContainerImage, hc.Status)
 
 	logit.Info.Println("admindb:InsertHealthCheck:" + queryStr)
 	var id int
@@ -97,16 +96,14 @@ func InsertHealthCheck(dbConn *sql.DB, hc HealthCheck) (int, error) {
 
 func DeleteHealthCheck(dbConn *sql.DB) error {
 	queryStr := fmt.Sprintf("delete from healthcheck")
-	logit.Info.Println("admindb:DeleteCluster:" + queryStr)
+	logit.Info.Println(queryStr)
 
-	err := dbConn.QueryRow(queryStr)
-	switch {
-	case err != nil:
-		logit.Error.Println("DeleteHealthCheck:delete problem ")
-		return errors.New("problemin delete")
-	default:
-		logit.Info.Println("DeleteHealthCheck:deleted ")
+	_, err := dbConn.Query(queryStr)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
 	}
+
+	logit.Info.Println("DeleteHealthCheck:deleted ")
 	return nil
 }
-

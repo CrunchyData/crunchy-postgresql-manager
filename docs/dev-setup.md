@@ -97,5 +97,3 @@ https://cpm.crunchy.lab:13000
 The CPM REST API is located at:
 https://cpm-admin.crunchy.lab:13000
 
-The CPM influxdb web interface is located at:
-http://cpm-mon.crunchy.lab:8083

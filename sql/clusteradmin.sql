@@ -239,7 +239,7 @@ create table healthcheck (
 	projectname varchar(20) not null,
 	projectid int references project (id) on delete cascade,
 	containername varchar(20) not null,
-	containerid int references project (id) on delete cascade,
+	containerid int references container (id) on delete cascade,
 	containerrole varchar(10) not null,
 	containerimage varchar(30) not null,
 	status varchar(20) not null,

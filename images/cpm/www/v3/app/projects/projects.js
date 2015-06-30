@@ -54,96 +54,6 @@ angular.module('uiRouterSample.projects', [
                                         labelSelected: "a8"
                                     }
                                 }
-                                /**
-                                                            $scope.dataForTheTree = [{
-                                                                "name": "Project 1",
-                                                                "type": "project",
-                                                                "id": "1",
-                                                                "children": [{
-                                                                    "name": "Clusters",
-                                                                    "type": "label",
-                                                                    "projectid": "1",
-                                                                    "children": [{
-                                                                        "name": "Jenifer",
-                                                                        "type": "cluster",
-                                                                        "id": "1",
-                                                                        "projectid": "1",
-                                                                        "children": []
-                                                                    }]
-                                                                }, {
-                                                                    "name": "Databases",
-                                                                    "type": "label",
-                                                                    "id": "3",
-                                                                    "projectid": "1",
-                                                                    "children": [{
-                                                                        "name": "One",
-                                                                        "type": "Database",
-                                                                        "id": "23",
-                                                                        "projectid": "1",
-                                                                        "children": []
-                                                                    }, {
-                                                                        "name": "Two",
-                                                                        "type": "Database",
-                                                                        "id": "28",
-                                                                        "projectid": "1",
-                                                                        "children": []
-                                                                    }]
-                                                                }]
-                                                            }];
-
-                                                            $scope.loadTree = function(projects) {
-                                                                var data = [];
-                                                                angular.forEach(projects, function(p) {
-                                                                    //load databases
-                                                                    var databases = [];
-                                                                    angular.forEach(p.Containers, function(name, id) {
-                                                                        databases.push({
-                                                                            type: 'database',
-                                                                            name: name,
-                                                                            projectid: p.id,
-                                                                            id: id
-                                                                        });
-                                                                    });
-
-                                                                    //load clusters
-                                                                    var clusters = [];
-                                                                    angular.forEach(p.Clusters, function(name, id) {
-                                                                        clusters.push({
-                                                                            type: 'cluster',
-                                                                            projectid: p.id,
-                                                                            name: name,
-                                                                            id: id
-                                                                        });
-                                                                    });
-
-                                                                    //load project children
-                                                                    var childs = [];
-                                                                    childs.push({
-                                                                        type: 'label',
-                                                                        name: 'Clusters',
-                                                                        projectid: p.ID,
-                                                                        children: clusters
-
-                                                                    });
-                                                                    childs.push({
-                                                                        type: 'label',
-                                                                        name: 'Databases',
-                                                                        projectid: p.ID,
-                                                                        children: databases
-                                                                    });
-
-                                                                    //load project
-                                                                    data.push({
-                                                                        name: p.Name,
-                                                                        id: p.ID,
-                                                                        type: 'project',
-                                                                        children: childs
-                                                                    });
-                                                                });
-                                                                console.log('data is ' + JSON.stringify(data));
-                                                                $scope.dataForTheTree = data;
-                                                            };
-                                			    */
 
                             $scope.projects = projects.data;
                             $scope.dataForTheTree = projects.data;
@@ -170,8 +80,9 @@ angular.module('uiRouterSample.projects', [
                                     });
                                 }
                             };
-
+/**
                             $scope.goToFirst = function() {
+			    	console.log('in projects (abstract) going to first');
                                 //console.log('projects=' + JSON.stringify($scope.projects));
                                 //var randId = $scope.projects.data[0].ID;
                                 var randId = $scope.projects[0].id;
@@ -181,6 +92,7 @@ angular.module('uiRouterSample.projects', [
                                 });
                             };
                             $scope.goToFirst();
+			    */
 
 
                         }
@@ -205,6 +117,7 @@ angular.module('uiRouterSample.projects', [
                         $scope.projects = projects;
 
                         $scope.goToFirst = function() {
+				console.log('projects.list called going to first project by default');
                             var randId = $scope.projects.data[0].ID;
                             $state.go('projects.detail', {
                                 projectId: randId

@@ -79,10 +79,13 @@ docker stop cpm-collect
 docker rm cpm-collect
 docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	--hostname="cpm-collect" \
+	-e CONT_POLL_INT=4 \
+	-e SERVER_POLL_INT=4 \
+	-e HC_POLL_INT=4 \
 	-e CPMBASE=/var/cpm \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	-v $LOGDIR:/cpmlogs \
-	-d --name=cpm-collect crunchydata/cpm-collect:latest
+	-d --name=cpm-collect crunchydata/cpm-collect:latest 
 
 sleep 2
 ###############

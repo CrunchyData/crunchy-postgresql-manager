@@ -44,7 +44,7 @@ angular.module('uiRouterSample.authn', [
                                             $cookieStore.put('AdminURL', $scope.admin_url);
                                             $cookieStore.put('cpm_token', results.Contents);
                                             console.log('token returned was =' + results.Contents);
-                                            $state.go('home.list', {
+                                            $state.go('home.detail', {
                                                 userId: $scope.user_id
                                             });
                                         })

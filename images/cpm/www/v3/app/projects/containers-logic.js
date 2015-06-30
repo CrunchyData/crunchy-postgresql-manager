@@ -6,6 +6,8 @@ var ContainerDetailController = function($scope, $state, $cookieStore, $statePar
         });
     }
 
+	//$state.go('projects.container.details', $stateParams);
+
 };
 
 var ContainerTaskSchedulesController = function($scope, $stateParams, $state, containersFactory, utils) {
@@ -245,25 +247,12 @@ var ContainerMonitorloadtestController = function($scope, $stateParams, $state, 
 
 };
 
-var ContainerMonitordatabasesizeController = function($scope, $stateParams, $state, containersFactory, utils) {
-    $scope.slidervaluehigh = "10000";
-    $scope.slidervaluelow = "1000";
-    $scope.slidervalue = "1000";
+var ContainerMonitordatabasesizeController = function($sce, $scope, $stateParams, $state, containersFactory, utils) {
 
-    $scope.refresh = function() {
-        containersFactory.loadtest($stateParams.containerId, $scope.slidervalue)
-            .success(function(data) {
-                console.log('successful get with data=' + data);
-                $scope.loadtestresults = data;
-            })
-            .error(function(error) {
-                $scope.alerts = [{
-                    type: 'danger',
-                    msg: error.Error
-                }];
-                console.log('here is an error ' + error.Error);
-            });
-    };
+	console.log('dbsize called with container Name ' + $scope.container.Name);
+	console.log('dbsize called with container ID ' + $stateParams.containerId);
+	$scope.dbsizegraphlink=$sce.trustAsResourceUrl('http://cpm-promdash:3000/embed/dbsizedashboard#!?var.container=' + $scope.container.Name);
+
 
 };
 

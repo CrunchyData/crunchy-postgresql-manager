@@ -1,3 +1,17 @@
-<div>
-	<h2>home is here</h2>
+<div class="center-block">
+    <p><strong>HealthCheck</strong></p>
+    <table>
+	    <th>Project</th>
+	    <th>Container</th>
+	    <th>Status</th>
+        <tr ng-repeat="hc in hcdata">
+		<td class="col-md-2"><a ui-sref="projects.detail.edit({projectId:hc.ProjectID})">{{hc.ProjectName}}</a></td>
+		<td class="col-md-2"><a ui-sref="projects.container.details({projectId:hc.ProjectID,containerId:hc.ContainerID})" ui-sref-opts="{relative:projects.detail}">{{hc.ContainerName}}</a></td>
+            <td  class="col-md-2"header-class="text-left" data-title="'Status'" width="200">
+                <a tooltip="{{hc.Status}}" style="color:red" ng-if="hc.Status == 'down'" href=""><i class="fa fa-warning"></i></a>
+                <a tooltip="{{hc.Status}}" style="color:green" ng-if="hc.Status == 'up'" href=""><i class="fa fa-check"></i></a>
+            </td>
+
+        </tr>
+    </table>
 </div>

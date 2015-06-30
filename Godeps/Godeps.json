@@ -11,13 +11,16 @@
 		"github.com/crunchydata/crunchy-postgresql-manager/cpmserveragent",
 		"github.com/crunchydata/crunchy-postgresql-manager/dummy",
 		"github.com/crunchydata/crunchy-postgresql-manager/kubeclient",
-		"github.com/crunchydata/crunchy-postgresql-manager/myinfluxdb/client",
-		"github.com/crunchydata/crunchy-postgresql-manager/mon",
 		"github.com/crunchydata/crunchy-postgresql-manager/sec",
 		"github.com/crunchydata/crunchy-postgresql-manager/template",
 		"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	],
 	"Deps": [
+		{
+			"ImportPath": "bitbucket.org/ww/goautoneg",
+			"Comment": "null-5",
+			"Rev": "75cd24fc2f2c2a2088577d12123ddee5f54e0675"
+		},
 		{
 			"ImportPath": "github.com/Sirupsen/logrus",
 			"Comment": "v0.7.2-4-gcdd90c3",
@@ -27,6 +30,10 @@
 			"ImportPath": "github.com/ant0ine/go-json-rest/rest",
 			"Comment": "v3.1.0",
 			"Rev": "fc0d6bacef3ca8295c53fb0232cc042734521394"
+		},
+		{
+			"ImportPath": "github.com/beorn7/perks/quantile",
+			"Rev": "b965b613227fddccbfffe13eae360ed3fa822f8d"
 		},
 		{
 			"ImportPath": "github.com/docker/docker/pkg/archive",
@@ -73,9 +80,41 @@
 			"Rev": "5a070ba03ad313e2f0183c9f9c369fd10161583a"
 		},
 		{
+			"ImportPath": "github.com/golang/protobuf/proto",
+			"Rev": "aece6fb931241ad332956db4f62798dfbea944b3"
+		},
+		{
 			"ImportPath": "github.com/lib/pq",
 			"Comment": "go1.0-cutoff-31-ga33d605",
 			"Rev": "a33d6053e025943d5dc89dfa1f35fe5500618df7"
+		},
+		{
+			"ImportPath": "github.com/matttproud/golang_protobuf_extensions/pbutil",
+			"Rev": "fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a"
+		},
+		{
+			"ImportPath": "github.com/prometheus/client_golang/model",
+			"Comment": "0.6.0-15-g00e4c46",
+			"Rev": "00e4c4629626a912cb8b44f8839a058768fc9c3f"
+		},
+		{
+			"ImportPath": "github.com/prometheus/client_golang/prometheus",
+			"Comment": "0.6.0-15-g00e4c46",
+			"Rev": "00e4c4629626a912cb8b44f8839a058768fc9c3f"
+		},
+		{
+			"ImportPath": "github.com/prometheus/client_golang/text",
+			"Comment": "0.6.0-15-g00e4c46",
+			"Rev": "00e4c4629626a912cb8b44f8839a058768fc9c3f"
+		},
+		{
+			"ImportPath": "github.com/prometheus/client_model/go",
+			"Comment": "model-0.0.2-12-gfa8ad6f",
+			"Rev": "fa8ad6fec33561be4280a8f0514318c79d7f6cb6"
+		},
+		{
+			"ImportPath": "github.com/prometheus/procfs",
+			"Rev": "c91d8eefde16bd047416409eb56353ea84a186e4"
 		},
 		{
 			"ImportPath": "github.com/robfig/cron",

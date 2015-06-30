@@ -1,54 +1,74 @@
 .slide.ng-leave {
-	position: relative;
-}
-.slide.ng-enter {
-	position: absolute;
-}
-.slide.ng-enter, .slide.ng-leave {
-	-webkit-transition: -webkit-transform 0.3s ease-in, opacity 0.3s ease-in;
-	-moz-transition: -moz-transform 0.3s ease-in, opacity 0.3s ease-in;
-	-o-transition: -o-transform 0.3s ease-in, opacity 0.3s ease-in;
-	transition: transform 0.3s ease-in, opacity 0.3s ease-in;
-}
-.slide.ng-enter, .slide.ng-leave.ng-leave-active {
-	-webkit-transform: scaleX(0.0001);
-	-o-transform: scaleX(0.0001);
-	transform: scaleX(0.0001);
-	opacity: 0;
-}
-.slide, .slide.ng-enter.ng-enter-active {
-	-webkit-transform: scaleX(1);
-	-o-transform: scaleX(1);
-	transform: scaleX(1);
-	opacity: 1;
+    position: relative;
 }
 
-.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+.slide.ng-enter {
+    position: absolute;
+}
+
+.slide.ng-enter,
+.slide.ng-leave {
+    -webkit-transition: -webkit-transform 0.3s ease-in, opacity 0.3s ease-in;
+    -moz-transition: -moz-transform 0.3s ease-in, opacity 0.3s ease-in;
+    -o-transition: -o-transform 0.3s ease-in, opacity 0.3s ease-in;
+    transition: transform 0.3s ease-in, opacity 0.3s ease-in;
+}
+
+.slide.ng-enter,
+.slide.ng-leave.ng-leave-active {
+    -webkit-transform: scaleX(0.0001);
+    -o-transform: scaleX(0.0001);
+    transform: scaleX(0.0001);
+    opacity: 0;
+}
+
+.slide,
+.slide.ng-enter.ng-enter-active {
+    -webkit-transform: scaleX(1);
+    -o-transform: scaleX(1);
+    transform: scaleX(1);
+    opacity: 1;
+}
+
+.nav,
+.pagination,
+.carousel,
+.panel-title a {
+    cursor: pointer;
+}
 
 table.gridtable {
-	font-family: verdana,arial,sans-serif;
-	font-size:11px;
-	color:#333333;
-	border-width: 2px;
-	border-color: #666666;
-	border-collapse: collapse;
+    font-family: verdana, arial, sans-serif;
+    font-size: 11px;
+    color: #333333;
+    border-width: 2px;
+    border-color: #666666;
+    border-collapse: collapse;
 }
+
 table.gridtable th {
-	border-width: 2px;
-	padding: 22;
-	border-style: solid;
-	border-color: #666666;
-	background-color: #dedede;
+    border-width: 2px;
+    padding: 22;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #dedede;
 }
+
 table.gridtable td {
-	border-width: 2px;
-	padding: 22;
-	border-style: solid;
-	border-color: #666666;
-	background-color: #ffffff;
+    border-width: 2px;
+    padding: 22;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #ffffff;
 }
 
 .navbar-brand img {
-	        height: 42px;
+    height: 42px;
 }
 
+.center-block {
+    width: 450px;
+    padding: 10px;
+    background-color: #eceadc;
+    color: #ec8007
+}

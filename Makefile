@@ -11,7 +11,6 @@ gendeps:
 		github.com/crunchydata/crunchy-postgresql-manager/dummy \
 		github.com/crunchydata/crunchy-postgresql-manager/kubeclient \
 		github.com/crunchydata/crunchy-postgresql-manager/myinfluxdb/client \
-		github.com/crunchydata/crunchy-postgresql-manager/mon \
 		github.com/crunchydata/crunchy-postgresql-manager/sec \
 		github.com/crunchydata/crunchy-postgresql-manager/template \
 		github.com/crunchydata/crunchy-postgresql-manager/admindb 
@@ -22,7 +21,6 @@ build:
 		godep go install cmd/cpmserveragent.go
 		godep go install cmd/backupcommand.go
 		godep go install cmd/backupserver.go
-		godep go install cmd/monserver.go
 		godep go install cmd/dummyserver.go
 		godep go install cmd/dockerapi.go
 		godep go install cmd/collectserver.go
