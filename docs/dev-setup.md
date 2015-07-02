@@ -48,11 +48,11 @@ Start CPM Server Agent
 After you have successfully compiled CPM and built the CPM Docker images,
 on each server that is to run CPM, you will need to start a CPM Server
 Agent, this is started using systemd.  CPM server files are copied to
-each server by the sbin/dev-setup.sh script.  Modify this script
+each server by the sbin/install-cpmserverapi.sh script.  Modify this script
 if you are going to configure multiple CPM hosts.  The script is currently
 setup for a single CPM host installation.
 ~~~~~~~~~~~~~~~~~~~~~~~~
-./sbin/dev-setup.sh
+./sbin/install-cpmserverapi.sh
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Network Configuration
