@@ -12,7 +12,7 @@ Obtain the Media
 Download the binary install archives for skybridge and CPM
 from the following:
 ~~~~~~~~~~~~~~~~~
-https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.3-linux-amd64.tar.gz
+https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.4-linux-amd64.tar.gz
 https://s3.amazonaws.com/crunchydata/cpm/skybridge.1.0.2-linux-amd64.tar.gz
 ~~~~~~~~~~~~~~~~~
 
@@ -28,7 +28,7 @@ tar xvzf ../skybridge.1.0.2-linux-amd64.tar.gz
 
 mkdir cpm-install
 cd cpm-install
-tar xvzf ../cpm.0.9.3-linux-amd64.tar.gz
+tar xvzf ../cpm.0.9.4-linux-amd64.tar.gz
 
 ./basic-user-install.sh
 ~~~~~~~~~~~~~~~~~

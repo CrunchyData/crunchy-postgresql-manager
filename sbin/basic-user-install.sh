@@ -22,13 +22,20 @@
 # Exit installation on any unexpected error
 set -e
 
-# set the istall directory
+# set the install directory
 export INSTALLDIR=/var/cpm
+# set the development directory
+export DEVDIR=/home/jeffmc/crunchy-postgresql-manager
 
 sudo mkdir -p $INSTALLDIR/bin
 sudo mkdir -p $INSTALLDIR/config
 sudo mkdir -p $INSTALLDIR/www
 sudo mkdir -p $INSTALLDIR/keys
+sudo mkdir -p $INSTALLDIR/data
+sudo mkdir -p $INSTALLDIR/data/promdash
+sudo mkdir -p $INSTALLDIR/data/prometheus
+sudo mkdir -p $INSTALLDIR/data/etcd
+sudo mkdir -p $INSTALLDIR/data/pgsql
 export LOGDIR=$INSTALLDIR/logs
 sudo mkdir -p $LOGDIR
 
@@ -64,19 +71,19 @@ sudo systemctl enable docker.service
 sudo systemctl start docker.service
 
 # move the CPM media to the /var/cpm installation directory
-sudo mv `pwd`/bin/* $INSTALLDIR/bin
-sudo mv `pwd`/config/* $INSTALLDIR/config
-sudo mv `pwd`/www/* $INSTALLDIR/www
+sudo cp -r $DEVDIR/bin/* $INSTALLDIR/bin
+sudo cp -r $DEVDIR/config/* $INSTALLDIR/config
+sudo cp -r $DEVDIR/www/* $INSTALLDIR/www
 
 echo "SECURITY WARNING- turning off and disabling your firewall!"
 sudo systemctl stop firewalld.service
 sudo systemctl disable firewalld.service
 
-# start up local cpmserveragent
-echo "starting cpmserveragent...."
-sudo cp $INSTALLDIR/config/cpmserveragent.service /etc/systemd/system
-sudo systemctl enable cpmserveragent.service
-sudo systemctl start cpmserveragent.service
+# start up local cpmserverapi
+echo "starting cpmserverapi...."
+sudo cp $INSTALLDIR/config/cpmserverapi.service /etc/systemd/system
+sudo systemctl enable cpmserverapi.service
+sudo systemctl start cpmserverapi.service
 
 
 sed -i "s/crunchy.lab/$DOMAIN/g" ./bu-init-cpm.sh

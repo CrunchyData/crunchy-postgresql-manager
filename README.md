@@ -39,62 +39,6 @@ configure, and develop new CPM functionality to suit your needs.
 
 The developer install and setup is documented in [docs/dev-setup.md](docs/dev-setup.md)
 
-Pre-requisite Installation
-============
-
-Install the skybridge or dnsbridge program before installing CPM.
-
-skybridge is the preferred DNS bridge solution and is found
-at the following location: 
-[https://github.com/CrunchyData/skybridge](https://github.com/CrunchyData/skybridge)
-
-dnsbridge is a similar solution to skybridge except that it
-supports the BIND DNS server.  dnsbridge information can be found
-at: [https://github.com/CrunchyData/dnsbridge](https://github.com/CrunchyData/dnsbridge)
-
-
-
-Developer Build Requirements
-==================
-
-Build and install CPM from source by running the install.sh script
-
-Building CPM requires development tools like the GCC compiler, along with
-the Go language.  On Fedora and RedHat Linux distributions, those packages
-can be installed as root like this:
-~~~~~~~~~~~~~~~~~~~~~~~~~
-yum install -y gcc
-yum install -y golang
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-CPM also requires the Docker program is installed, running, and will stay
-running after a restart:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~
-yum install -y docker-io
-systemctl start docker
-systemctl enable docker
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The user who is building will need to be part of the docker group
-to issue docker comments.  Run this command as root, substituting
-build userid in for the one at the end of the line:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~
-usermod -a -G docker userid
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You will need to logout and login again as that user for this
-change to be useful.
-
-You can confirm that Docker is available to the user you're building as
-by running its info command:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~
-docker info
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
 Running CPM
 ===========
 
