@@ -60,6 +60,8 @@ cp $DEVBASE/sbin/df.awk $CPMBASE/bin
 cp $DEVBASE/sbin/iostat.awk $CPMBASE/bin
 cp $DEVBASE/sbin/monitor-mem $CPMBASE/bin
 cp $DEVBASE/sbin/monitor-load $CPMBASE/bin
+cp $DEVBASE/sbin/start-cpmserverapi.sh $CPMBASE/bin
+cp $DEVBASE/sbin/stop-cpmserverapi.sh $CPMBASE/bin
 
 cp $DEVBASE/config/cpmserverapi.service  /usr/lib/systemd/system
 

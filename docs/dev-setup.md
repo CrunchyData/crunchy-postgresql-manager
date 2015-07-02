@@ -78,22 +78,34 @@ in github at the following locations:
 
 https://github.com/CrunchyData/skybridge
 
-https://github.com/CrunchyData/dnsbridge
-
 The DNS installation will enable and configure the Docker service
 to specify the DNS server as the primary DNS nameserver.  This
 DNS server will also be your primary nameserver in your /etc/resolv.conf
-configuration.
+configuration.  You can install the Docker version of skybridge
+as follows, you will need to EDIT the run-skybridge.sh file
+to specify your IP address it will listen on:
+
+~~~~~~~~~~~~~~~~~
+git clone git@github.com/crunchydata/skybridge
+cd skybridge/bin
+./run-skybridge.sh
+~~~~~~~~~~~~~~~~~
 
 Running CPM
 --------------
 After building and deploying CPM, you start CPM up by running the
 run-cpm.sh script located in the CPM root directory.  This script
-will start several Docker containers that make up CPM.
+will start several Docker containers that make up CPM.  You will
+need to edit the run-cpm.sh script to specify your IP address you
+want to bind ports to, or remove the port bindings if you want
+to run CPM just locally on your dev instance.
 
 The CPM web interface is located at:
-https://cpm.crunchy.lab:13000
+http://cpm.crunchy.lab:13001
+
+Log in with a user id of 'cpm' and a password  of 'cpm', the URL
+of the CPM admin API is http://cpm-admin:13001
 
 The CPM REST API is located at:
-https://cpm-admin.crunchy.lab:13000
+http://cpm-admin.crunchy.lab:13001
 
