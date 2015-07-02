@@ -91,7 +91,7 @@ sleep 2
 ###############
 echo "restarting cpm-promdash container..."
 sleep 2
-export DATADIR=/tmp/prom
+export DATADIR=/var/cpm/data/promdash
 mkdir -p  $DATADIR
 chmod 777 $DATADIR
 chcon -Rt svirt_sandbox_file_t $DATADIR
@@ -101,7 +101,7 @@ docker rm cpm-promdash
 docker run  \
 	-v $DATADIR:/tmp/prom \
 	-p 192.168.56.103:15000:3000 \
-	-e DATABASE_URL=sqlite3:/tmp/prom/file.sqlite3 \
+	-e DATABASE_URL=sqlite3:/var/cpm/data/promdash/file.sqlite3 \
 	--name=cpm-promdash -d prom/promdash
 ###############
 echo "restarting cpm-prometheus container..."
