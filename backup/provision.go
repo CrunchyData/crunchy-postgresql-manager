@@ -18,7 +18,7 @@ package backup
 import (
 	"fmt"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmserveragent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/kubeclient"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/template"
@@ -35,8 +35,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	logit.Info.Println("with containername=" + args.ContainerName)
 	logit.Info.Println("with profilename=" + args.ProfileName)
 
-	var params cpmserveragent.DockerRunArgs
-	params = cpmserveragent.DockerRunArgs{}
+	params := &cpmserverapi.DockerRunRequest{}
 	params.Image = "crunchydata/cpm-backup-job"
 	params.ServerID = args.ServerID
 	backupcontainername := args.ContainerName + "-backup"
@@ -87,11 +86,14 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	params.EnvVars["BACKUP_SERVER_URL"] = "cpm-backup" + "." + domain + ":" + "13000"
 
 	//provision the volume
-	var responseStr string
-	responseStr, err = cpmserveragent.AgentCommand("provisionvolume.sh",
-		params.PGDataPath,
-		server.IPAddress)
-	logit.Info.Println(responseStr)
+	request := &cpmserverapi.DiskProvisionRequest{"/tmp/foo"}
+	request.Path = params.PGDataPath
+	var url = "http://" + server.IPAddress + ":10001"
+	_, err = cpmserverapi.DiskProvisionClient(url, request)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
 
 	//run the container
 	if kubeEnv {
@@ -125,16 +127,15 @@ func ProvisionBackupJob(args *BackupRequest) error {
 			return err
 		}
 	} else {
-		var output string
 		params.CommandPath = "docker-run-backup.sh"
-
-		output, err = cpmserveragent.AgentDockerRun(params, server.IPAddress)
-
+		var response cpmserverapi.DockerRunResponse
+		var url = "http://" + server.IPAddress + ":10001"
+		response, err = cpmserverapi.DockerRunClient(url, params)
 		if err != nil {
-			logit.Error.Println("Provision: " + output)
+			logit.Error.Println("Provision: " + response.Output)
 			return err
 		}
-		logit.Info.Println("docker-run-backup.sh output=" + output)
+		logit.Info.Println("docker-run-backup.sh output=" + response.Output)
 	}
 
 	return nil

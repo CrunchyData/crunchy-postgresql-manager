@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # Copyright 2015 Crunchy Data Solutions, Inc.
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +14,9 @@
 # limitations under the License.
 
 #
-# stop the cpm agent
 #
 
-HOSTNAME=`hostname`
-PID=`ps ax | grep cpmagent | cut -f 2 -d ' '`
-echo $PID is the pid to kill
-kill -9 $PID
+source /var/cpm/bin/setenv.sh
+
+cpmserverapi > /tmp/cpmserverapi.log 2> /tmp/cpmserverapi.err
 

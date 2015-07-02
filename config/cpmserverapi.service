@@ -1,5 +1,5 @@
 [Unit]
-Description=cpmserveragent
+Description=cpmserverapi
 After=network.target
 
 [Service]
@@ -9,12 +9,12 @@ User=root
 Group=root
 
 Environment="PATH=/var/cpm/bin:/usr/pgsql-9.4/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"
-SyslogIdentifier=cpmserveragent
+SyslogIdentifier=cpmserverapi
 
 
-ExecStart=/var/cpm/bin/start-cpmserveragent.sh
-ExecReload=/var/cpm/bin/reload-cpmserveragent.sh
-ExecStop=/bin/killall cpmserveragent
+ExecStart=/var/cpm/bin/start-cpmserverapi.sh
+ExecReload=/var/cpm/bin/reload-cpmserverapi.sh
+ExecStop=/bin/killall cpmserverapi
 
 [Install]
 WantedBy=multi-user.target

@@ -14,10 +14,11 @@
 # limitations under the License.
 
 #
-# start up the cpm server agent
+# stop the cpm agent
 #
 
+HOSTNAME=`hostname`
+PID=`ps ax | grep cpmserverapi | cut -f 2 -d ' '`
+echo $PID is the pid to kill
+kill -9 $PID
 
-killall cpmserveragent
-sleep 2
-/var/cpm/bin/start-cpmserveragent.sh

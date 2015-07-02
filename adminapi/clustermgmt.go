@@ -21,7 +21,7 @@ import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmnodeagent"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmserveragent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/kubeclient"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/template"
@@ -79,7 +79,7 @@ func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Printf("standbyCnt ends at %d\n", standbyCnt)
 
 	//provision new container
-	params := new(cpmserveragent.DockerRunArgs)
+	params := new(cpmserverapi.DockerRunRequest)
 	params.Image = "cpm-node"
 	//TODO make the server choice smart
 	params.ServerID = containers[0].ServerID
@@ -646,7 +646,6 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	i = 0
-	var output string
 	server := admindb.Server{}
 	for i = range containers {
 
@@ -688,16 +687,23 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 			}
 
 		} else {
-			output, err = cpmserveragent.DockerRemoveContainer(containers[i].Name,
-				server.IPAddress)
+			dremreq := &cpmserverapi.DockerRemoveRequest{}
+			dremreq.ContainerName = containers[i].Name
+			var url = "http://" + server.IPAddress + ":10001"
+			_, err = cpmserverapi.DockerRemoveClient(url, dremreq)
 			if err != nil {
 				logit.Error.Println("DeleteCluster: error when trying to remove container" + err.Error())
 			}
 		}
 
 		//send the server a deletevolume command
-		output, err = cpmserveragent.AgentCommand("deletevolume", server.PGDataPath+"/"+containers[i].Name, server.IPAddress)
-		logit.Info.Println("DeleteCluster:" + output)
+		var url = "http://" + server.IPAddress + ":10001"
+		ddreq := &cpmserverapi.DiskDeleteRequest{}
+		ddreq.Path = server.PGDataPath + "/" + containers[i].Name
+		_, err = cpmserverapi.DiskDeleteClient(url, ddreq)
+		if err != nil {
+			logit.Error.Println("DeleteCluster: error when trying to remove disk volume" + err.Error())
+		}
 
 		i++
 	}
@@ -988,7 +994,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//create master container
-	dockermaster := cpmserveragent.DockerRunArgs{}
+	dockermaster := cpmserverapi.DockerRunRequest{}
 	dockermaster.Image = "cpm-node"
 	dockermaster.ContainerName = params.Name + "-master"
 	dockermaster.ServerID = masterServer.ID
@@ -1036,7 +1042,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dockerstandby := make([]cpmserveragent.DockerRunArgs, count)
+	dockerstandby := make([]cpmserverapi.DockerRunRequest, count)
 	for i := 0; i < count; i++ {
 		logit.Info.Println("working on standby ....")
 		//	loop - provision standby
@@ -1072,7 +1078,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("AUTO CLUSTER PROFILE standbys created")
 	//create pgpool container
 	//	provision
-	dockerpgpool := cpmserveragent.DockerRunArgs{}
+	dockerpgpool := cpmserverapi.DockerRunRequest{}
 	dockerpgpool.ContainerName = params.Name + "-pgpool"
 	dockerpgpool.Image = "cpm-pgpool"
 	dockerpgpool.ServerID = chosenServers[count].ID
@@ -1234,7 +1240,7 @@ func roundRobin(profile ClusterProfiles) (admindb.Server, []admindb.Server, erro
 	return masterServer, chosen, nil
 }
 
-func waitTillAllReady(dockermaster cpmserveragent.DockerRunArgs, dockerpgpool cpmserveragent.DockerRunArgs, dockerstandby []cpmserveragent.DockerRunArgs) error {
+func waitTillAllReady(dockermaster cpmserverapi.DockerRunRequest, dockerpgpool cpmserverapi.DockerRunRequest, dockerstandby []cpmserverapi.DockerRunRequest) error {
 	err := waitTillReady(dockermaster.ContainerName)
 	if err != nil {
 		logit.Error.Println("time out waiting for " + dockermaster.ContainerName)

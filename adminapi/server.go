@@ -18,7 +18,7 @@ package adminapi
 import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmserveragent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"net/http"
 	"strconv"
@@ -131,9 +131,29 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var output string
-	output, err = cpmserveragent.AgentCommand(Metric, "", server.IPAddress)
-	if err != nil {
-		logit.Error.Println("MonitorServerGetInfo:" + err.Error())
+	url := "http://" + server.IPAddress + ":10001"
+	if Metric == "cpmiostat" {
+		iostatreq := cpmserverapi.MetricIostatRequest{}
+		var iostatResp cpmserverapi.MetricIostatResponse
+		iostatResp, err = cpmserverapi.MetricIostatClient(url, &iostatreq)
+		if err != nil {
+			logit.Error.Println("MonitorServerGetInfo:" + err.Error())
+			rest.Error(w, err.Error(), 400)
+			return
+		}
+		output = iostatResp.Output
+	} else if Metric == "cpmdf" {
+		dfreq := cpmserverapi.MetricDfRequest{}
+		var dfResp cpmserverapi.MetricDfResponse
+		dfResp, err = cpmserverapi.MetricDfClient(url, &dfreq)
+		if err != nil {
+			logit.Error.Println("MonitorServerGetInfo:" + err.Error())
+			rest.Error(w, err.Error(), 400)
+			return
+		}
+		output = dfResp.Output
+	} else {
+		logit.Error.Println("unknown Metric received")
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

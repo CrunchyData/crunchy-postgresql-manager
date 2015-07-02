@@ -1,7 +1,7 @@
 package collect
 
 import (
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmserveragent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"strconv"
 	"strings"
@@ -22,15 +22,17 @@ func Collectcpu(serverName string) (Metric, error) {
 	var err error
 	values.Timestamp = time.Now()
 	values.MetricType = "cpu"
-	var output string
 
-	output, err = cpmserveragent.AgentCommand("monitor-load", "", serverName)
+	var response cpmserverapi.MetricCPUResponse
+	request := &cpmserverapi.MetricCPURequest{}
+	var url = "http://" + serverName + ":10001"
+	response, err = cpmserverapi.MetricCPUClient(url, request)
 	if err != nil {
 		logit.Error.Println("cpu metric error:" + err.Error())
 		return values, err
 	}
 
-	output = strings.TrimSpace(output)
+	var output = strings.TrimSpace(response.Output)
 
 	values.Value, err = strconv.ParseFloat(output, 64)
 	if err != nil {
@@ -49,13 +51,16 @@ func Collectmem(serverName string) (Metric, error) {
 	values.MetricType = "mem"
 	var output string
 
-	output, err = cpmserveragent.AgentCommand("monitor-mem", "", serverName)
+	var response cpmserverapi.MetricMEMResponse
+	request := &cpmserverapi.MetricMEMRequest{}
+	var url = "http://" + serverName + ":10001"
+	response, err = cpmserverapi.MetricMEMClient(url, request)
 	if err != nil {
 		logit.Error.Println("mem metric error:" + err.Error())
 		return values, err
 	}
 
-	output = strings.TrimSpace(output)
+	output = strings.TrimSpace(response.Output)
 
 	values.Value, err = strconv.ParseFloat(output, 64)
 	if err != nil {

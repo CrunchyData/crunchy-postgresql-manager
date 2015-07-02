@@ -20,7 +20,8 @@ import (
 	"errors"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmserveragent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmnodeagent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/kubeclient"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/template"
@@ -42,7 +43,7 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	params := new(cpmserveragent.DockerRunArgs)
+	params := &cpmserverapi.DockerRunRequest{}
 	PROFILE := r.PathParam("Profile")
 	params.Image = r.PathParam("Image")
 	params.ServerID = r.PathParam("ServerID")
@@ -114,7 +115,7 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
-func provisionImpl(params *cpmserveragent.DockerRunArgs, PROFILE string, standby bool) error {
+func provisionImpl(params *cpmserverapi.DockerRunRequest, PROFILE string, standby bool) error {
 	logit.Info.Println("PROFILE: provisionImpl starts 1")
 
 	var errorStr string
@@ -150,9 +151,10 @@ func provisionImpl(params *cpmserveragent.DockerRunArgs, PROFILE string, standby
 
 	logit.Info.Println("PROFILE provisionImpl 2 about to provision volume")
 	if params.Image != "cpm-pgpool" {
-		responseStr, err = cpmserveragent.AgentCommand("provisionvolume.sh",
-			params.PGDataPath,
-			server.IPAddress)
+		preq := &cpmserverapi.DiskProvisionRequest{}
+		preq.Path = params.PGDataPath
+		var url = "http://" + server.IPAddress + ":10001"
+		_, err = cpmserverapi.DiskProvisionClient(url, preq)
 		if err != nil {
 			logit.Error.Println("Provision: problem in provisionvolume call" + err.Error())
 			return err
@@ -180,16 +182,17 @@ func provisionImpl(params *cpmserveragent.DockerRunArgs, PROFILE string, standby
 	if !KubeEnv {
 		//remove any existing docker containers with this name
 		logit.Info.Println("PROFILE provisionImpl remove old container start")
-		responseStr, err = cpmserveragent.DockerRemoveContainer(params.ContainerName,
-			server.IPAddress)
+		rreq := &cpmserverapi.DockerRemoveRequest{}
+		rreq.ContainerName = params.ContainerName
+		var url = "http://" + server.IPAddress + ":10001"
+		_, err = cpmserverapi.DockerRemoveClient(url, rreq)
 		if err != nil {
 			logit.Error.Println("Provision:" + err.Error())
 			return err
 		}
 		logit.Info.Println("PROFILE provisionImpl remove old container end")
 		params.CommandPath = "docker-run.sh"
-		output, err = cpmserveragent.AgentDockerRun(*params, server.IPAddress)
-
+		_, err = cpmserverapi.DockerRunClient(url, params)
 		if err != nil {
 			logit.Error.Println("Provision: " + output)
 			return err
@@ -354,7 +357,7 @@ func createDBUsers(dbnode admindb.Container) error {
 	return err
 }
 
-func provisionImplInit(params *cpmserveragent.DockerRunArgs, PROFILE string, standby bool) error {
+func provisionImplInit(params *cpmserverapi.DockerRunRequest, PROFILE string, standby bool) error {
 	//go get the domain name from the settings
 	var domainname admindb.Setting
 	var pgport admindb.Setting
@@ -455,9 +458,9 @@ func RemoteWritefile(path string, filecontents string, ipaddress string) error {
 		return errors.New("client was null on rpc call to " + ipaddress)
 	}
 
-	var command cpmserveragent.Command
+	var command cpmnodeagent.Command
 
-	args := &cpmserveragent.Args{}
+	args := &cpmnodeagent.Args{}
 	args.A = filecontents
 	args.B = path
 	err = client.Call("Command.Writefile", args, &command)
@@ -480,9 +483,9 @@ func PGCommand(pgcommand string, ipaddress string) (string, error) {
 		return "", errors.New("client was null on pgcommand rpc to " + ipaddress)
 	}
 
-	var command cpmserveragent.Command
+	var command cpmnodeagent.Command
 
-	args := &cpmserveragent.Args{}
+	args := &cpmnodeagent.Args{}
 	args.A = util.GetBase() + "/bin/" + pgcommand
 	err = client.Call("Command.PGCommand", args, &command)
 	if err != nil {
