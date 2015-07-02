@@ -55,6 +55,9 @@ cp $DEVROOT/bin/cpmserverapi $CPMBASE/bin
 cp $DEVBASE/sbin/cert.pem $DEVBASE/sbin/key.pem $CPMBASE/keys
 
 cp $DEVBASE/sbin/cpmdf $CPMBASE/bin
+cp $DEVBASE/sbin/docker-run.sh $CPMBASE/bin
+cp $DEVBASE/sbin/docker-run-backup.sh $CPMBASE/bin
+cp $DEVBASE/sbin/provisionvolume.sh $CPMBASE/bin
 cp $DEVBASE/sbin/cpmiostat $CPMBASE/bin
 cp $DEVBASE/sbin/df.awk $CPMBASE/bin
 cp $DEVBASE/sbin/iostat.awk $CPMBASE/bin

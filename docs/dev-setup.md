@@ -6,9 +6,12 @@ Development Environment
 Here are the steps required to set up a CPM development environment, CPM is 
 built using Centos 7.1  and Docker 1.5
 
+This instruction assumes you are using a static IP address of
+192.168.56.103 for your CPM server.
+
 ### Setup Go Project Structure ###
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-yum -y install golang mercurial
+yum -y install golang git docker  mercurial sysstat
 mkdir -p devproject/src devproject/bin devproject/pkg
 
 export GOPATH=~/devproject
@@ -42,6 +45,16 @@ make build
 ~~~~~~~~~~~~~~~~~~~~~~~~
 make buildimages
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Disable Firewalld ###
+~~~~~~~~~~~~~~~~~~~~~~~~
+systemctl disable firewalld.service
+systemctl stop firewalld.service
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+There is a starter script in CPM /sbin directory
+that attempts to open up only the required CPM ports, adjust
+this for your local use if you require firewalld.
 
 Start CPM Server Agent
 ----------------------
@@ -86,7 +99,7 @@ as follows, you will need to EDIT the run-skybridge.sh file
 to specify your IP address it will listen on:
 
 ~~~~~~~~~~~~~~~~~
-git clone git@github.com/crunchydata/skybridge
+git clone git@github.com:/crunchydata/skybridge
 cd skybridge/bin
 ./run-skybridge.sh
 ~~~~~~~~~~~~~~~~~
@@ -116,19 +129,62 @@ This will cause the skybridge DNS nameserver to be queried first.
 
 Running CPM
 --------------
-After building and deploying CPM, you start CPM up by running the
-run-cpm.sh script located in the CPM root directory.  This script
-will start several Docker containers that make up CPM.  You will
-need to edit the run-cpm.sh script to specify your IP address you
-want to bind ports to, or remove the port bindings if you want
-to run CPM just locally on your dev instance.
+You can run CPM by running the following script:
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+sudo ./run-cpm.sh
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+This script will start several Docker containers that make up CPM.  You will
+need to edit the run-cpm.sh script to specify your IP address of your
+server as well as your CPM installation directory path.  You can
+also adjust or remove the local port bindings if you want.
 
-The CPM web interface is located at:
+On the dev host, the following URLs are useful:
+
+CPM Web User Interface
+----------------------
 http://cpm.crunchy.lab:13001
+http://192.168.56.103:13001
 
-Log in with a user id of 'cpm' and a password  of 'cpm', the URL
-of the CPM admin API is http://cpm-admin:13001
-
-The CPM REST API is located at:
+CPM Admin API
+----------------------
 http://cpm-admin.crunchy.lab:13001
+http://192.168.56.103:14001
+
+Prometheus Dashboard
+----------------------
+http://cpm-promdash.crunchy.lab:3000
+http://192.168.56.103:15000
+
+Prometheus DB
+----------------------
+http://cpm-prometheus.crunchy.lab:9090
+http://192.168.56.103:16000
+
+If you are running the CPM user interface from outside the dev host
+(e.g.  from your vbox host browser), you will need to update
+a couple of javascript files with the promdash URL.  By default
+these are specified in the javascript as cpm-promdash:3000, this will
+not be accessible from your vbox host unless you specify the 
+skybridge DNS server.
+
+The js files to change are:
+servers/servers.js
+projects/container-logic.js
+
+Look for occurances of cpm-promdash:3000 and change them to
+the static IP address and ports listed above.
+
+Login
+--------
+
+Browse to the CPM web user interface
+user id is cpm
+password is cpm
+Admin URL is either http://cpm-admin:13001 (on your CPM host)
+or http://192.168.56.103:13001
+
+Initially you will need to first define your CPM server which
+is your CPM host (e.g. 192.168.56.103)
+
+Then you will be ready to start creating PostgreSQL instances.
 

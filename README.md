@@ -52,15 +52,22 @@ run-cpm.sh
 This should start the the following containers:
 
 * cpm - cpm.crunchy.lab - the nginx server that hosts the CPM
-   	      web app, https://cpm.crunchy.lab:13000
+   	      web app, http://cpm.crunchy.lab:13001
 
-* cpm-admin - cpm-admin.crunchy.lab - the REST API for CPM, https://cpm-admin.crunchy.lab:13000
+* cpm-admin - cpm-admin.crunchy.lab - the REST API for CPM, http://cpm-admin.crunchy.lab:13001
 
 * cpm-backup - cpm-backup.crunchy.lab - the backup process used by CPM to schedule and run backup jobs
 
-* cpm-mon - cpm-mon.crunchy.lab - the monitoring process used by CPM to collect metrics, cpm-mon hosts the Influxdb which is used to store metrics collected by CPM, the Influxdb web console is located at http://cpm-mon.crunchy.lab:8083
+* cpm-collect - cpm-collect.crunchy.lab - the monitoring process used 
+to collect metrics, these metrics are collected by the Prometheus server
+running as cpm-prometheus
 
-* cpm-dashboard - dashboard.crunchy.lab - the Grafana dashboard that can be used to view/query collected CPM metrics - this is an optional container
+* cpm-promdash - cpm-promdash.crunchy.lab - the Prometheus dashboard that can be used to view/query collected CPM metrics , graphs from this dashboard
+are displayed within the CPM user interface, the user interface is
+found at http://cpm-promdash:3000
+
+* cpm-prometheus - cpm-prometheus.crunchy.lab - the Prometheus database
+is found at http://cpm-prometheus:9090
 
 Testing the Install
 ===========
@@ -74,23 +81,6 @@ You can view the running containers by issuing the following command:
 docker ps
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Beta is built to use https as it's transport protocols, it
-includes self-signed certificates.  
-
-To work with the self-signed certificates in your browser, first
-access https://cpm-admin.crunchy.lab:13000 and accept the 
-certificate.
-
-Then, browse to https://cpm.crunchy.lab:13000 to get started.  You will
-need to accept the browser's warnings regarding the untrusted certificates
-being used.
-
-Log into the application using and ID of 'cpm' and password of 'cpm'.
-Also enter into the Admin URL field the value of:
-https://cpm-admin.crunchy.lab:13000
-
-If the log in is successful, you are ready to start working with CPM.
-
 Shutting Down CPM
 ===========
 
@@ -98,9 +88,11 @@ To shut down CPM, run the following commands:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 docker stop cpm
-docker stop cluster-backup
-docker stop cluster-mon
-docker stop cluster-admin
+docker stop cpm-backup
+docker stop cpm-collect
+docker stop cpm-admin
+docker stop cpm-promdash
+docker stop cpm-prometheus
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 	
 
@@ -108,8 +100,10 @@ To start CPM, run the following commands:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 docker start cpm
-docker start cluster-backup
-docker start cluster-mon
-docker start cluster-admin
+docker start cpm-backup
+docker start cpm-collect
+docker start cpm-admin
+docker start cpm-promdash
+docker start cpm-prometheus
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 	
