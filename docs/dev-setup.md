@@ -91,6 +91,29 @@ cd skybridge/bin
 ./run-skybridge.sh
 ~~~~~~~~~~~~~~~~~
 
+For Docker to use the new DNS nameserver, you will need to modify
+the docker config file /etc/sysconfig/docker.  Add lines in it
+like this:
+~~~~~~~~~~~~~~~~~
+OPTIONS='--selinux-enabled --bip=172.17.42.1/16 --dns-search=crunchy.lab --dns=192.168.0.106 --dns=192.168.0.1'
+~~~~~~~~~~~~~~~~~
+This example shows that skybridge is running on 192.168.0.106, I am using
+a domain of crunchy.lab, and that my secondary nameserver (from my ISP)
+is 192.168.0.1.  This configuration will have all the containers
+in CPM trying to use the skybridge DNS nameserver as the primary
+nameserver which is required by CPM.
+
+Your /etc/resolv.conf should look similar to this if your network
+configuration is set up correctly:
+~~~~~~~~~~~~~~~~~
+search crunchy.lab
+nameserver 192.168.0.106
+nameserver 192.168.0.1
+~~~~~~~~~~~~~~~~~
+
+This will cause the skybridge DNS nameserver to be queried first.
+
+
 Running CPM
 --------------
 After building and deploying CPM, you start CPM up by running the
