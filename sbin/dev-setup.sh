@@ -48,13 +48,13 @@ mkdir -p $CPMBASE/keys
 
 chcon -Rt svirt_sandbox_file_t $CPMBASE
 
-cp $DEVROOT/bin/cpmserveragent $CPMBASE/bin
+cp $DEVROOT/bin/cpmserverapi $CPMBASE/bin
 cp $DEVBASE/sbin/cert.pem $DEVBASE/sbin/key.pem $CPMBASE/keys
 
 cp $DEVBASE/sbin/* $CPMBASE/bin
 
-cp $DEVBASE/config/cpmserveragent.service  /usr/lib/systemd/system
+cp $DEVBASE/config/cpmserverapi.service  /usr/lib/systemd/system
 
-systemctl enable cpmserveragent.service
-systemctl start cpmserveragent.service
+systemctl enable cpmserverapi.service
+systemctl start cpmserverapi.service
 

@@ -6,20 +6,9 @@ Development Environment
 Here are the steps required to set up a CPM development environment, CPM is 
 built using Centos 7.1  and Docker 1.5
 
-### Dependency Setup ###
-Set up your developer account with sudo privs, some of the scripts
-and docker commands will require you run them as superuser.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-git clone git@github.com:crunchydata/crunchy-postgresql-manager
-cd crunchy-postgresql-manager
-cd sbin
-./basic-user-install.sh
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
 ### Setup Go Project Structure ###
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+yum -y install golang mercurial
 mkdir -p devproject/src devproject/bin devproject/pkg
 
 export GOPATH=~/devproject
