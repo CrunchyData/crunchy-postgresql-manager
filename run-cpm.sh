@@ -101,12 +101,12 @@ docker rm cpm-promdash
 docker run  \
 	-v $DATADIR:/tmp/prom \
 	-p 192.168.56.103:15000:3000 \
-	-e DATABASE_URL=sqlite3:/var/cpm/data/promdash/file.sqlite3 \
+	-e DATABASE_URL=sqlite3:/tmp/prom/file.sqlite3 \
 	--name=cpm-promdash -d prom/promdash
 ###############
 echo "restarting cpm-prometheus container..."
 sleep 2
-export PROMCONFIG=/tmp/prometheus.yml
+export PROMCONFIG=/var/cpm/config/prometheus.yml
 chmod 777 $PROMCONFIG
 chcon -Rt svirt_sandbox_file_t $PROMCONFIG
 
