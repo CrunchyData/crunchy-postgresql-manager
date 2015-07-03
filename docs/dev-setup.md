@@ -155,6 +155,13 @@ Prometheus Dashboard
 http://cpm-promdash.crunchy.lab:3000
 http://192.168.56.103:15000
 
+If you are running CPM on a VM (host-only) and
+accessing CPM from the VM host (not the guest), then
+you will need to edit the dashboard server
+configuration via the PromDash user interface
+and specify the prometheus server URL
+as http://192.168.56.103:16000.
+
 Prometheus DB
 ----------------------
 http://cpm-prometheus.crunchy.lab:9090
