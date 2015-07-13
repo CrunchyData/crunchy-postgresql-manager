@@ -15,8 +15,6 @@ RUN yum install -y procps-ng postgresql94 postgresql94-contrib pgpool-II-94 libx
 
 # open up the pgpool port
 EXPOSE 5432
-# open up the cpmagentserver port
-EXPOSE 13000
 
 ADD bin /var/cpm/bin
 ADD conf/pgpool /var/cpm/conf/pgpool
@@ -25,4 +23,4 @@ ADD conf/pgpool/pool_passwd /etc/pgpool-II-94/pool_passwd
 
 USER daemon
 
-CMD ["/var/cpm/bin/start-cpmnodeagent.sh"]
+CMD ["/var/cpm/bin/start-cpmcontainerapi.sh"]

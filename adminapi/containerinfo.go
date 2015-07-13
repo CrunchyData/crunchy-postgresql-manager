@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmnodeagent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	_ "github.com/lib/pq"
@@ -112,7 +112,6 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 
 func MonitorContainerControldata(w rest.ResponseWriter, r *rest.Request) {
 	var err error
-	var output string
 	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("MonitorContainerControldata: authorize error " + err.Error())
@@ -136,15 +135,16 @@ func MonitorContainerControldata(w rest.ResponseWriter, r *rest.Request) {
 	settings := make([]PostgresControldata, 0)
 
 	//send the container a pg_controldata command
-	output, err = cpmnodeagent.PostgresCommand("pg_controldata", "/pgdata", node.Name)
+	var cdout cpmcontainerapi.ControldataResponse
+	cdout, err = cpmcontainerapi.ControldataClient(node.Name)
 	if err != nil {
 		logit.Error.Println("MonitorContainerControldata:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	logit.Info.Println(output)
+	logit.Info.Println(cdout.Output)
 
-	lines := strings.Split(output, "\n")
+	lines := strings.Split(cdout.Output, "\n")
 	//fmt.Println(len(lines))
 	for i := range lines {
 		//fmt.Println(len(lines[i]))

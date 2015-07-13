@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmnodeagent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/kubeclient"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
@@ -622,20 +622,6 @@ func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 		}
 		logit.Info.Println(response.Output)
 
-		//sleep for a few seconds to give the container time to start
-		//time.Sleep(3000 * time.Millisecond)
-
-		//send the start command
-		//var cmd = "startpg.sh"
-		//if containers[i].Role == "pgpool" {
-		//cmd = "startpgpool.sh"
-		//}
-		//output, err = cpmnodeagent.AgentCommand(cmd, "", containers[i].Name)
-		//if err != nil {
-		//	logit.Error.Println("AdminStartServerContainers:" + err.Error())
-		//}
-		//logit.Info.Println("AdminStartServerContainers:" + output)
-
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -680,18 +666,20 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 		}
 
 		//send stop command before stopping container
-		var output string
-		var cmd = "stoppg.sh"
 		if containers[i].Role == "pgpool" {
-			cmd = "stop-pgpool.sh"
+			var stoppoolResp cpmcontainerapi.StopPgpoolResponse
+			stoppoolResp, err = cpmcontainerapi.StopPgpoolClient(containers[i].Name)
+			logit.Info.Println("AdminStoppg:" + stoppoolResp.Output)
+		} else {
+			var stopResp cpmcontainerapi.StopPGResponse
+			stopResp, err = cpmcontainerapi.StopPGClient(containers[i].Name)
+			logit.Info.Println("AdminStoppg:" + stopResp.Output)
 		}
-		output, err = cpmnodeagent.AgentCommand(cmd, "", containers[i].Name)
 		if err != nil {
 			logit.Error.Println("AdminStopServerContainers:" + err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		logit.Info.Println("AdminStoppg:" + output)
 
 		time.Sleep(2000 * time.Millisecond)
 		//stop container
@@ -702,7 +690,6 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 		if err != nil {
 			logit.Error.Println("AdminStopServerContainers: error when trying to start container " + err.Error())
 		}
-		logit.Info.Println(output)
 	}
 
 	w.WriteHeader(http.StatusOK)

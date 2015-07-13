@@ -98,7 +98,7 @@ pushImages () {
 	sudo docker tag -f cpm-node crunchydata/cpm-node:latest
 	sudo docker push -f crunchydata/cpm-node:$VERSION
 	sudo docker push -f crunchydata/cpm-node:latest
-
+}
 
 saveImages () {
 
@@ -129,5 +129,3 @@ saveImages () {
 }
 
 createArchive
-#saveImages
-pushImages

@@ -6,8 +6,8 @@ gendeps:
 		github.com/crunchydata/crunchy-postgresql-manager/logit \
 		github.com/crunchydata/crunchy-postgresql-manager/adminapi \
 		github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi \
+		github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi \
 		github.com/crunchydata/crunchy-postgresql-manager/backup \
-		github.com/crunchydata/crunchy-postgresql-manager/cpmnodeagent \
 		github.com/crunchydata/crunchy-postgresql-manager/dummy \
 		github.com/crunchydata/crunchy-postgresql-manager/kubeclient \
 		github.com/crunchydata/crunchy-postgresql-manager/sec \
@@ -17,7 +17,7 @@ gendeps:
 build:
 		godep go install cmd/adminapi.go
 		godep go install cmd/cpmserverapi.go
-		godep go install cmd/cpmnodeagent.go
+		godep go install cmd/cpmcontainerapi.go
 		godep go install cmd/backupcommand.go
 		godep go install cmd/backupserver.go
 		godep go install cmd/dummyserver.go

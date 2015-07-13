@@ -1,3 +1,3 @@
 all:
-	        cp ./conf/prometheus.yml /tmp
+	        sudo cp ./conf/prometheus.yml /var/cpm/config
 

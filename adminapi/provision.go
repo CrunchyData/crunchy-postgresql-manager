@@ -20,14 +20,12 @@ import (
 	"errors"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmnodeagent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/kubeclient"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/template"
-	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
-	"net/rpc"
 	"strconv"
 	"time"
 )
@@ -385,6 +383,7 @@ func provisionImplInit(params *cpmserverapi.DockerRunRequest, PROFILE string, st
 		logit.Error.Println("Provision:" + err.Error())
 		return err
 	}
+	logit.Info.Println("checkpt 1")
 
 	if standby {
 		logit.Info.Println("standby node being created, will not initdb")
@@ -392,14 +391,16 @@ func provisionImplInit(params *cpmserverapi.DockerRunRequest, PROFILE string, st
 		//initdb on the new node
 
 		logit.Info.Println("PROFILE running initdb on the node")
-		var output string
+		var resp cpmcontainerapi.InitdbResponse
 
-		output, err = PGCommand("initdb.sh", fqdn)
+		logit.Info.Println("checkpt 2")
+		resp, err = cpmcontainerapi.InitdbClient(fqdn)
 		if err != nil {
 			logit.Error.Println("Provision:" + err.Error())
 			return err
 		}
-		logit.Info.Println("initdb output was" + output)
+		logit.Info.Println("checkpt 3")
+		logit.Info.Println("initdb output was" + resp.Output)
 		logit.Info.Println("PROFILE initdb completed")
 		//create postgresql.conf
 		var data string
@@ -408,7 +409,7 @@ func provisionImplInit(params *cpmserverapi.DockerRunRequest, PROFILE string, st
 		data, err = template.Postgresql(mode, pgport.Value, "")
 
 		//place postgresql.conf on new node
-		err = RemoteWritefile("/pgdata/postgresql.conf", data, fqdn)
+		_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/postgresql.conf", data, fqdn)
 		if err != nil {
 			logit.Error.Println("Provision:" + err.Error())
 			return err
@@ -420,96 +421,50 @@ func provisionImplInit(params *cpmserverapi.DockerRunRequest, PROFILE string, st
 			return err
 		}
 		//place pg_hba.conf on new node
-		err = RemoteWritefile("/pgdata/pg_hba.conf", data, fqdn)
+		_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/pg_hba.conf", data, fqdn)
 		if err != nil {
 			logit.Error.Println("Provision:" + err.Error())
 			return err
 		}
 		logit.Info.Println("PROFILE templates all built and copied to node")
 		//start pg on new node
-		output, err = PGCommand("startpg.sh", fqdn)
+		var startResp cpmcontainerapi.StartPGResponse
+		startResp, err = cpmcontainerapi.StartPGClient(fqdn)
 		if err != nil {
 			logit.Error.Println("Provision:" + err.Error())
 			return err
 		}
-		logit.Info.Println("startpg output was" + output)
+		logit.Info.Println("startpg output was" + startResp.Output)
 
 		//seed database with initial objects
-		output, err = PGCommand("seed.sh", fqdn)
+		var seedResp cpmcontainerapi.SeedResponse
+		seedResp, err = cpmcontainerapi.SeedClient(fqdn)
 		if err != nil {
 			logit.Error.Println("Provision:" + err.Error())
 			return err
 		}
-		logit.Info.Println("seed output was" + output)
+		logit.Info.Println("seed output was" + seedResp.Output)
 	}
 	logit.Info.Println("PROFILE node provisioning completed")
 
 	return nil
 }
 
-func RemoteWritefile(path string, filecontents string, ipaddress string) error {
-	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
-	if err != nil {
-		logit.Error.Println("RemoteWritefile: dialing:" + err.Error())
-		return err
-	}
-	if client == nil {
-		logit.Error.Println("RemoteWritefile: dialing:" + err.Error())
-		return errors.New("client was null on rpc call to " + ipaddress)
-	}
-
-	var command cpmnodeagent.Command
-
-	args := &cpmnodeagent.Args{}
-	args.A = filecontents
-	args.B = path
-	err = client.Call("Command.Writefile", args, &command)
-	if err != nil {
-		logit.Error.Println("RemoteWritefile:  Command Writefile " + args.B + " error:" + err.Error())
-		return err
-	}
-	logit.Info.Println("RemoteWritefile: Writefile output " + command.Output)
-	return nil
-}
-
-func PGCommand(pgcommand string, ipaddress string) (string, error) {
-	client, err := rpc.DialHTTP("tcp", ipaddress+":13000")
-	if err != nil {
-		logit.Error.Println("PGCommand: dialing:" + err.Error())
-		return "", err
-	}
-	if client == nil {
-		logit.Error.Println("PGCommand: dialing:" + err.Error())
-		return "", errors.New("client was null on pgcommand rpc to " + ipaddress)
-	}
-
-	var command cpmnodeagent.Command
-
-	args := &cpmnodeagent.Args{}
-	args.A = util.GetBase() + "/bin/" + pgcommand
-	err = client.Call("Command.PGCommand", args, &command)
-	if err != nil {
-		logit.Error.Println("PGCommand:  Command PGCommand " + args.A + " error:" + err.Error())
-		return "", err
-	}
-	return command.Output, nil
-}
-
 func waitTillReady(container string) error {
 
 	var err error
 	for i := 0; i < 40; i++ {
-		err = RemoteWritefile("/tmp/waitTest", "waitTillReady was here", container)
+		_, err = cpmcontainerapi.RemoteWritefileClient("/tmp/waitTest", "waitTillReady was here", container)
 		if err != nil {
-			logit.Error.Println("waitTillReady:waited for cpmnodeagent on " + container)
+			logit.Error.Println("waitTillReady:waited for cpmcontainerapi on " + container)
 			time.Sleep(2000 * time.Millisecond)
 		} else {
-			logit.Info.Println("waitTillReady:connected to cpmnodeagent on " + container)
+			logit.Info.Println("waitTillReady:connected to cpmcontainerapi on " + container)
 			return nil
 		}
 	}
-	logit.Info.Println("waitTillReady: could not connect to cpmnodeagent on " + container)
-	return errors.New("could not connect to cpmnodeagent on " + container)
+	logit.Info.Println("waitTillReady: could not connect to cpmcontainerapi on " + container)
+	return errors.New("could not connect to cpmcontainerapi on " + container)
 
 }
 

@@ -18,7 +18,7 @@ package adminapi
 import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmnodeagent"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"net/http"
 	"time"
@@ -46,18 +46,21 @@ func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var output string
-	var cmd = "startpg.sh"
 	if dbNode.Role == "pgpool" {
-		cmd = "startpgpool.sh"
+		var spgresp cpmcontainerapi.StartPgpoolResponse
+		spgresp, err = cpmcontainerapi.StartPgpoolClient(dbNode.Name)
+		logit.Info.Println("AdminStartpg:" + spgresp.Output)
+	} else {
+		var srep cpmcontainerapi.StartPGResponse
+		srep, err = cpmcontainerapi.StartPGClient(dbNode.Name)
+		logit.Info.Println("AdminStartpg:" + srep.Output)
 	}
-	output, err = cpmnodeagent.AgentCommand(cmd, "", dbNode.Name)
+
 	if err != nil {
 		logit.Error.Println("AdminStartpg:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	logit.Info.Println("AdminStartpg:" + output)
 
 	//give the UI a chance to see the start
 	time.Sleep(3000 * time.Millisecond)
@@ -93,18 +96,20 @@ func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 	}
 	logit.Info.Println("AdminStoppg: in stop with dbnode")
 
-	var output string
-	var cmd = "stoppg.sh"
 	if dbNode.Role == "pgpool" {
-		cmd = "stop-pgpool.sh"
+		var stoppoolResp cpmcontainerapi.StopPgpoolResponse
+		stoppoolResp, err = cpmcontainerapi.StopPgpoolClient(dbNode.Name)
+		logit.Info.Println("AdminStoppg:" + stoppoolResp.Output)
+	} else {
+		var stoppgResp cpmcontainerapi.StopPGResponse
+		stoppgResp, err = cpmcontainerapi.StopPGClient(dbNode.Name)
+		logit.Info.Println("AdminStoppg:" + stoppgResp.Output)
 	}
-	output, err = cpmnodeagent.AgentCommand(cmd, "", dbNode.Name)
 	if err != nil {
 		logit.Error.Println("AdminStoppg:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	logit.Info.Println("AdminStoppg:" + output)
 
 	//give the UI a chance to see the stop
 	time.Sleep(3000 * time.Millisecond)
