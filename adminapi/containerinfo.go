@@ -587,3 +587,117 @@ func loadtest(nodename string, host string, writes int) ([]Loadtestresults, erro
 
 	return results, nil
 }
+
+func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
+	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	if err != nil {
+		logit.Error.Println("MonitorStatements: authorize error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	ID := r.PathParam("ID")
+	if ID == "" {
+		rest.Error(w, "ID required", http.StatusBadRequest)
+		return
+	}
+
+	container, err := admindb.GetContainer(ID)
+	if err != nil {
+		logit.Error.Println("MonitorStatements:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var host = container.Name
+	if KubeEnv {
+		host = container.Name + "-db"
+	}
+
+	//fetch cpmtest user credentials
+	var nodeuser admindb.ContainerUser
+	nodeuser, err = admindb.GetContainerUser(container.Name, CPMTEST_USER)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//get port
+	var pgport admindb.Setting
+	pgport, err = admindb.GetSetting("PG-PORT")
+
+	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+	defer dbConn.Close()
+
+	//get the list of databases
+	databases := make([]string, 0)
+	var rows *sql.Rows
+
+	rows, err = dbConn.Query(
+		"SELECT datname from pg_database where datname not in ('template1', 'template0') order by datname")
+	if err != nil {
+		logit.Error.Println("MonitorStatements:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	var datname string
+	for rows.Next() {
+		if err = rows.Scan(
+			&datname,
+		); err != nil {
+			logit.Error.Println("MonitorContainerSettings:" + err.Error())
+			rest.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		databases = append(databases, datname)
+	}
+	if err = rows.Err(); err != nil {
+		logit.Error.Println("MonitorStatements:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	rows.Close()
+
+	statements := make([]PostgresStatement, 0)
+
+	for i := range databases {
+		//get a database connection to a specific database
+		dbConn, err := util.GetMonitoringConnection(host, databases[i], pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+		defer dbConn.Close()
+
+		rows, err = dbConn.Query(
+			"SELECT query, calls, total_time, rows, to_char(coalesce(100.0 * shared_blks_hit / nullif(shared_blks_hit + shared_blks_read, 0), -1), '999D99') AS hit_percent FROM pg_stat_statements ORDER BY total_time DESC LIMIT 5")
+		if err != nil {
+			logit.Error.Println("MonitorStatements:" + err.Error())
+			rest.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		defer rows.Close()
+		for rows.Next() {
+			stat := PostgresStatement{}
+			stat.Database = databases[i]
+			if err = rows.Scan(
+				&stat.Query,
+				&stat.Calls,
+				&stat.TotalTime,
+				&stat.Rows,
+				&stat.HitPercent,
+			); err != nil {
+				logit.Error.Println("MonitorContainerSettings:" + err.Error())
+				rest.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			statements = append(statements, stat)
+		}
+		if err = rows.Err(); err != nil {
+			logit.Error.Println("MonitorStatements:" + err.Error())
+			rest.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.WriteJson(&statements)
+}

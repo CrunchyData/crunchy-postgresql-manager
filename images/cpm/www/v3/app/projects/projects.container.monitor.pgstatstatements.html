@@ -1,0 +1,29 @@
+<div style="border:0px" id="viewstatdb">
+	<p style="font-family: Arial, Helvetica, sans-serif;">This page shows pg_stat_statement values, sorted by database name and total time.</p>
+	<h1>{{container.Name}}</h1>
+	<div class="datagrid">
+
+		<table class="table">
+			<thead>
+				<th>Database</th>
+				<th>Calls</th>
+				<th>Total Time</th>
+				<th>Rows</th>
+				<th>Hit Percent</th>
+				<th>Query</th>
+			</thead>
+			<tbody>
+
+				<tr ng-repeat="x in statementresults">
+					<td>{{x.Database}}</td>
+					<td>{{x.Calls}}</td>
+					<td>{{x.TotalTime}}</td>
+					<td>{{x.Rows}}</td>
+					<td>{{x.HitPercent}}</td>
+					<td>{{x.Query}}</td>
+				</tr>
+
+			</tbody>
+		</table>
+	</div>
+	<a class="btn btn-primary" ng-click="refresh()" ><i class="fa fa-refresh fa-lg"></i>Refresh</a>

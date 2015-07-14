@@ -468,6 +468,18 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
+            .state('projects.container.monitor.pgstatstatements', {
+                url: '/monitor/pgstatements/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.monitor.pgstatstatements.html',
+                        controller: ContainerMonitorpgstatstatementsController
+                    },
+                }
+            })
+
+
             .state('projects.container.monitor.pgcontroldata', {
                 url: '/monitor/pgcontroldata/:itemId',
                 views: {

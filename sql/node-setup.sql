@@ -1,4 +1,6 @@
 
+create extension pg_stat_statements;
+
 create user cpmtest login superuser password 'cpmtest';
 
 create user pgpool login superuser password 'pgpool';
@@ -11,6 +13,7 @@ grant all privileges on database cpmtest to cpmtest;
 \c cpmtest;
 
 create extension adminpack;
+create extension pg_stat_statements;
 
 
 DROP TABLE IF EXISTS loadtest;

@@ -201,6 +201,25 @@ var ContainerMonitorpgsettingsController = function($scope, $stateParams, $state
     $scope.refresh();
 };
 
+var ContainerMonitorpgstatstatementsController = function($scope, $stateParams, $state, containersFactory, utils) {
+    $scope.refresh = function() {
+        containersFactory.pgstatstatements($stateParams.containerId)
+            .success(function(data) {
+                $scope.statementresults = data;
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+            });
+    };
+
+    $scope.refresh();
+};
+
+
 
 var ContainerMonitorpgcontroldataController = function($scope, $stateParams, $state, containersFactory, utils) {
     $scope.refresh = function() {

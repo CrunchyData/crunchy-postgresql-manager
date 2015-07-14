@@ -122,6 +122,7 @@ func main() {
 		&rest.Route{"GET", "/deletenode/:ID.:Token", adminapi.DeleteNode},
 		&rest.Route{"GET", "/monitor/server-getinfo/:ServerID.:Metric.:Token", adminapi.MonitorServerGetInfo},
 		&rest.Route{"GET", "/monitor/container/settings/:ID.:Token", adminapi.MonitorContainerSettings},
+		&rest.Route{"GET", "/monitor/container/statements/:ID.:Token", adminapi.MonitorStatements},
 		&rest.Route{"GET", "/monitor/container/repl/:ID.:Token", adminapi.ContainerInfoStatrepl},
 		&rest.Route{"GET", "/monitor/container/database/:ID.:Token", adminapi.ContainerInfoStatdatabase},
 		&rest.Route{"GET", "/monitor/container/bgwriter/:ID.:Token", adminapi.ContainerInfoBgwriter},

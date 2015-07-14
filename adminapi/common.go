@@ -130,6 +130,15 @@ type KubeResponse struct {
 	URL string
 }
 
+type PostgresStatement struct {
+	Database   string
+	Query      string
+	Calls      string
+	TotalTime  string
+	Rows       string
+	HitPercent string
+}
+
 type PostgresSetting struct {
 	Name           string
 	CurrentSetting string
