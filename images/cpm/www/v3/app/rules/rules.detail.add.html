@@ -1,0 +1,68 @@
+<form class="form-horizontal">
+
+    <div class="form-group">
+        <label for="inputName" class="control-label col-xs-2">Name</label>
+        <div class="col-xs-5">
+
+            <input type="text" class="form-control" id="inputName" ng-model="rule.Name">
+
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputDesc" class="control-label col-xs-2">Description</label>
+        <div class="col-xs-5">
+
+            <input type="text" class="form-control" id="inputDesc" ng-model="rule.Description">
+
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputType" class="control-label col-xs-2">Type</label>
+        <div class="col-xs-5">
+            <select class="form-control" ng-model="rule.Type">
+                <option value="host" selected>host</option>
+                <option value="local" >local</option>
+                <option value="hostssl" >hostssl</option>
+                <option value="hostnossl" >hostnossl</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputDatabase" class="control-label col-xs-2">Database</label>
+        <div class="col-xs-5">
+
+            <input type="text" class="form-control" id="inputDatabase" ng-model="rule.Database" placeholder="all">
+
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputUser" class="control-label col-xs-2">User</label>
+        <div class="col-xs-5">
+
+            <input type="text" class="form-control" id="inputUser" ng-model="rule.User" placeholder="all">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputAddress" class="control-label col-xs-2">Address</label>
+        <div class="col-xs-5">
+
+            <input type="text" class="form-control" id="inputAddress" ng-model="rule.Address" placeholder="127.0.0.1/32">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputMethod" class="control-label col-xs-2">Method</label>
+        <div class="col-xs-5">
+            <select class="form-control" ng-model="rule.Method">
+                <option value="md5" selected>md5</option>
+                <option value="trust">trust</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-xs-offset-2 col-xs-10">
+            <button type="submit" ng-click="add()" class="btn btn-primary">Create</button>
+        </div>
+    </div>
+
+</form>

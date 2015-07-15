@@ -11,6 +11,8 @@ angular.module('uiRouterSample', [
     'uiRouterSample.settings.service',
     'uiRouterSample.users',
     'uiRouterSample.users.service',
+    'uiRouterSample.rules',
+    'uiRouterSample.rules.service',
     'uiRouterSample.home',
     'uiRouterSample.home.service',
     'uiRouterSample.roles',

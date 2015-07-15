@@ -174,6 +174,11 @@ func main() {
 		&rest.Route{"GET", "/project/get/:ID.:Token", adminapi.GetProject},
 		&rest.Route{"GET", "/project/getall/:Token", adminapi.GetAllProjects},
 		&rest.Route{"GET", "/project/delete/:ID.:Token", adminapi.DeleteProject},
+		&rest.Route{"GET", "/rules/get/:ID.:Token", adminapi.RulesGet},
+		&rest.Route{"GET", "/rules/getall/:Token", adminapi.RulesGetAll},
+		&rest.Route{"GET", "/rules/delete/:ID.:Token", adminapi.RulesDelete},
+		&rest.Route{"POST", "/rules/update", adminapi.RulesUpdate},
+		&rest.Route{"POST", "/rules/insert", adminapi.RulesInsert},
 	)
 	if err != nil {
 		log.Fatal(err)

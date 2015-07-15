@@ -246,3 +246,15 @@ create table healthcheck (
 	updatedt timestamp not null
 );
 
+create table accessrule (
+	id serial primary key,
+	name varchar(30) unique not null,
+	ruletype varchar(20),
+	database varchar(20),
+	ruleuser varchar(20),
+	address varchar(20),
+	method varchar(20),
+	description varchar(230),
+	createdt timestamp not null,
+	updatedt timestamp not null
+);
