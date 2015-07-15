@@ -1,0 +1,10 @@
+<div id="viewbadger">
+	<p style="font-family: Arial, Helvetica, sans-serif;">pgbadger</p>
+		</p>
+		<h4>pgbadger report for {{container.Name}}</h4>
+		<iframe height="500px" width="100%" ng-src="{{badgerreportlink}}" name="{{Date.now()}}">
+		</iframe>
+
+		<a class="btn btn-primary" ng-click="refresh()"><i class="fa fa-refresh fa-lg"></i>Generate</a>
+</div>
+

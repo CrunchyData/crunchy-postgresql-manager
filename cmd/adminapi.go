@@ -126,6 +126,7 @@ func main() {
 		&rest.Route{"GET", "/monitor/container/repl/:ID.:Token", adminapi.ContainerInfoStatrepl},
 		&rest.Route{"GET", "/monitor/container/database/:ID.:Token", adminapi.ContainerInfoStatdatabase},
 		&rest.Route{"GET", "/monitor/container/bgwriter/:ID.:Token", adminapi.ContainerInfoBgwriter},
+		&rest.Route{"GET", "/monitor/container/badger/:ID.:Token", adminapi.BadgerGenerate},
 		&rest.Route{"GET", "/monitor/container/controldata/:ID.:Token", adminapi.MonitorContainerControldata},
 		&rest.Route{"GET", "/monitor/container/loadtest/:ID.:Writes.:Token", adminapi.ContainerLoadTest},
 		&rest.Route{"GET", "/admin/startall/:ID.:Token", adminapi.AdminStartServerContainers},

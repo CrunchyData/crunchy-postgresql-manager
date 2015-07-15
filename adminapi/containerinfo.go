@@ -701,3 +701,43 @@ func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&statements)
 }
+
+func BadgerGenerate(w rest.ResponseWriter, r *rest.Request) {
+	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	if err != nil {
+		logit.Error.Println("BadgerGenerate: authorize error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	ID := r.PathParam("ID")
+	if ID == "" {
+		rest.Error(w, "ID required", http.StatusBadRequest)
+		return
+	}
+
+	container, err := admindb.GetContainer(ID)
+	if err != nil {
+		logit.Error.Println("BadgerGenerate:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var host = container.Name
+	if KubeEnv {
+		host = container.Name + "-db"
+	}
+
+	//send the container a pg_controldata command
+	var cdout cpmcontainerapi.BadgerGenerateResponse
+	cdout, err = cpmcontainerapi.BadgerGenerateClient(host)
+	if err != nil {
+		logit.Error.Println("BadgerGenerate:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	logit.Info.Println(cdout.Output)
+
+	w.WriteHeader(http.StatusOK)
+	w.WriteJson(&cdout)
+}

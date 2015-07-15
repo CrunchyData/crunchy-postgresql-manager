@@ -411,7 +411,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.monitor', {
-                url: '/monitor/:itemId',
+                url: '/monitor',
                 views: {
 
                     '': {
@@ -425,7 +425,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.monitor.pgstatdatabase', {
-                url: '/monitor/pgstatdatabase/:itemId',
+                url: '/pgstatdatabase/:itemId',
                 views: {
 
                     '': {
@@ -436,7 +436,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.monitor.bgwriter', {
-                url: '/monitor/bgwriter/:itemId',
+                url: '/bgwriter/:itemId',
                 views: {
 
                     '': {
@@ -446,8 +446,19 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
+            .state('projects.container.monitor.badger', {
+                url: '/badger/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.monitor.badger.html',
+                        controller: ContainerMonitorbadgerController
+                    },
+                }
+            })
+
             .state('projects.container.monitor.pgstatreplication', {
-                url: '/monitor/pgstatreplication/:itemId',
+                url: '/pgstatreplication/:itemId',
                 views: {
 
                     '': {
@@ -458,7 +469,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.monitor.pgsettings', {
-                url: '/monitor/pgsettings/:itemId',
+                url: '/pgsettings/:itemId',
                 views: {
 
                     '': {
@@ -469,7 +480,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.monitor.pgstatstatements', {
-                url: '/monitor/pgstatements/:itemId',
+                url: '/pgstatements/:itemId',
                 views: {
 
                     '': {
@@ -481,7 +492,7 @@ angular.module('uiRouterSample.projects', [
 
 
             .state('projects.container.monitor.pgcontroldata', {
-                url: '/monitor/pgcontroldata/:itemId',
+                url: '/pgcontroldata/:itemId',
                 views: {
 
                     '': {
@@ -493,7 +504,7 @@ angular.module('uiRouterSample.projects', [
 
 
             .state('projects.container.monitor.loadtest', {
-                url: '/monitor/loadtest/:itemId',
+                url: '/loadtest/:itemId',
                 views: {
 
                     '': {
@@ -504,7 +515,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.monitor.databasesize', {
-                url: '/monitor/databasesize/:itemId',
+                url: '/databasesize/:itemId',
                 views: {
 
                     '': {

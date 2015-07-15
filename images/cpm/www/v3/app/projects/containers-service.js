@@ -91,6 +91,14 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
         return $http.get(url);
     };
 
+    containersFactory.badger = function(id) {
+
+        var url = $cookieStore.get('AdminURL') + '/monitor/container/badger/' + id + '.' + $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
 
     containersFactory.pgsettings = function(id) {
 

@@ -6,7 +6,7 @@ var ContainerDetailController = function($scope, $state, $cookieStore, $statePar
         });
     }
 
-	//$state.go('projects.container.details', $stateParams);
+    //$state.go('projects.container.details', $stateParams);
 
 };
 
@@ -182,6 +182,35 @@ var ContainerMonitorbgwriterController = function($scope, $stateParams, $state, 
 };
 
 
+var ContainerMonitorbadgerController = function($sce, $scope, $stateParams, $state, containersFactory, utils, usSpinnerService) {
+    $scope.badgerreportlink = $sce.trustAsResourceUrl(
+        'http://' + $scope.container.Name + ':10001/static/badger.html');
+    $scope.refresh = function() {
+        usSpinnerService.spin('spinner-1');
+        containersFactory.badger($stateParams.containerId)
+            .success(function(data) {
+                console.log('successful get with data=' + data);
+                usSpinnerService.stop('spinner-1');
+                $state.go('projects.container.monitor.badger', $stateParams, {
+                    reload: false,
+                    inherit: true
+                });
+
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+            });
+        usSpinnerService.stop('spinner-1');
+    };
+
+    //$scope.refresh();
+};
+
+
 var ContainerMonitorpgsettingsController = function($scope, $stateParams, $state, containersFactory, utils) {
     $scope.refresh = function() {
         containersFactory.pgsettings($stateParams.containerId)
@@ -268,9 +297,9 @@ var ContainerMonitorloadtestController = function($scope, $stateParams, $state, 
 
 var ContainerMonitordatabasesizeController = function($sce, $scope, $stateParams, $state, containersFactory, utils) {
 
-	console.log('dbsize called with container Name ' + $scope.container.Name);
-	console.log('dbsize called with container ID ' + $stateParams.containerId);
-	$scope.dbsizegraphlink=$sce.trustAsResourceUrl('http://cpm-promdash:3000/embed/dbsizedashboard#!?var.container=' + $scope.container.Name);
+    console.log('dbsize called with container Name ' + $scope.container.Name);
+    console.log('dbsize called with container ID ' + $stateParams.containerId);
+    $scope.dbsizegraphlink = $sce.trustAsResourceUrl('http://cpm-promdash:3000/embed/dbsizedashboard#!?var.container=' + $scope.container.Name);
 
 
 };
@@ -767,7 +796,7 @@ var ContainerAddController = function($scope, $stateParams, $state, serversFacto
 
     var newcontainer = {};
 
-	console.log('in ContainerAddController with projectId = ' + $stateParams.projectId);
+    console.log('in ContainerAddController with projectId = ' + $stateParams.projectId);
     serversFactory.all()
         .success(function(data) {
             console.log('got servers' + data.length);
@@ -793,7 +822,7 @@ var ContainerAddController = function($scope, $stateParams, $state, serversFacto
         $scope.container.ServerID = $scope.selectedServer.ID;
         $scope.container.ProjectID = $stateParams.projectId;
 
-	console.log('in add database with projectID = ' + $stateParams.projectId);
+        console.log('in add database with projectID = ' + $stateParams.projectId);
         $scope.container.ID = 0; //0 means to do an insert
         console.log('standalone is ' + $scope.standalone);
 

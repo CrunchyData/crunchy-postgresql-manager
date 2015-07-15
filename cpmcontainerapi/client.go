@@ -203,3 +203,19 @@ func ControldataClient(host string) (ControldataResponse, error) {
 	//fmt.Println(string(rawresponse))
 	return response, err
 }
+
+func BadgerGenerateClient(host string) (BadgerGenerateResponse, error) {
+	var err error
+	req := BadgerGenerateRequest{}
+	req.ContainerName = host
+	buf, _ := json.Marshal(req)
+	body := bytes.NewBuffer(buf)
+	url := "http://" + host + PORT + "/api/badgergenerate"
+	logit.Info.Println("badgergenerate client about to post to " + url)
+	r, _ := http.Post(url, "application/json", body)
+	rawresponse, _ := ioutil.ReadAll(r.Body)
+	response := BadgerGenerateResponse{}
+	err = json.Unmarshal(rawresponse, &response)
+	//fmt.Println(string(rawresponse))
+	return response, err
+}
