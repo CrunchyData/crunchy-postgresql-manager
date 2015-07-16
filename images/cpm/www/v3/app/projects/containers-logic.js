@@ -357,9 +357,62 @@ var ContainerFailoverController = function($scope, $stateParams, $state, contain
 };
 
 
-var ContainerAccessRulesController = function($scope, $stateParams, $state, utils) {
-    $scope.done = function() {
-        $state.go('^', $stateParams);
+var ContainerAccessRulesController = function($cookieStore, $scope, $stateParams, $state, utils, containersFactory) {
+                $scope.cars = [
+		{
+                    ID: 1,
+                    Selected: 'true',
+                    AccessRuleName: 'rule 1',
+                    ContainerID: 1,
+                    AccessRuleID: 1,
+                },
+		{
+                    ID: 2,
+                    Selected: 'false',
+                    AccessRuleName: 'rule 2',
+                    ContainerID: 2,
+                    AccessRuleID: 2,
+                }
+		];
+		console.log('in access rules controller');
+		console.log('containerid=' + $stateParams.containerId);
+
+        containersFactory.getaccessrules($stateParams.containerId)
+            .success(function(data) {
+                console.log('successful getaccessrules');
+                $scope.cars = data;
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+            });
+
+
+    $scope.save = function() {
+        console.log('save called cars=' + $scope.cars);
+            angular.forEach($scope.cars, function(car) {
+	    	car.Token = $cookieStore.get('cpm_token');
+		car.ContainerID = $stateParams.containerId;
+            });
+        containersFactory.updateaccessrules($scope.cars)
+            .success(function(data) {
+                console.log('successful updateaccessrules');
+                $scope.alerts = [{
+                    type: 'success',
+                    msg: 'successfully saved access rules'
+                }];
+
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+            });
     };
 };
 

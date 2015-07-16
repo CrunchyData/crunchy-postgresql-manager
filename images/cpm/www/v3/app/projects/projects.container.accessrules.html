@@ -1,7 +1,12 @@
 <p><strong>Access Rules</strong></p>
-<ul>
-	<li><a ui-sref="containers.detail.accessrules.edit()">host1</a></li>
-	<li><a ui-sref="containers.detail.accessrules.edit()">host2</a></li>
-</ul>
+<form class="form-horizontal">
+		<div ng-repeat="car in cars">
+			<input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="car.Selected">&nbsp;<a ui-sref="rules.detail({ruleId:car.AccessRuleName})">{{car.AccessRuleName}}</a>
+		</div>
+		<p></p>
+<button type="submit" ng-click="save()" class="btn btn-primary">Save</button>
+</form>
+
+<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
 
 <div ui-view class="slide"></div>

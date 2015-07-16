@@ -156,8 +156,8 @@ angular.module('uiRouterSample.rules', [
                         templateUrl: 'app/rules/rules.detail.details.html',
                         controller: ['$scope', '$stateParams', '$cookieStore', '$state', 'rulesFactory', 'utils',
                             function($scope, $stateParams, $cookieStore, $state, rulesFactory, utils) {
-                                console.log('in details with rule = ' + $scope.rule.Name);
-                                console.log('in details with rule roles = ' + $scope.rule.Roles);
+                                console.log('in details with rule itemId = ' + $stateParams.itemId);
+                                //console.log('in details with rule = ' + $scope.rule.Name);
                                 $scope.save = function() {
                                     console.log('save called');
                                     $scope.rule.Token = $cookieStore.get('cpm_token');

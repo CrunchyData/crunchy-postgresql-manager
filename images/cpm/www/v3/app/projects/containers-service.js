@@ -209,5 +209,25 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
 	});
     };
 
+    containersFactory.getaccessrules = function(containerid) {
+    	console.log('in containers getaccessrules with containerid=' + containerid);
+        var url = $cookieStore.get('AdminURL') + '/containerrules/getall/' + containerid + '.' + $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
+    containersFactory.updateaccessrules = function(cars) {
+
+	angular.forEach(cars, function(car) {
+		car.Token = $cookieStore.get('cpm_token');
+	});
+
+        var url = $cookieStore.get('AdminURL') + '/containerrules/update';
+        console.log(url);
+
+        return $http.post(url,  cars);
+    };
+
     return containersFactory;
 }]);

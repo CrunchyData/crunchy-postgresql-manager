@@ -43,11 +43,13 @@ type Rule struct {
 }
 
 type ContainerAccessRule struct {
-	ID           string
-	Token        string
-	ContainerID  string
-	AccessRuleID string
-	CreateDate   string
+	ID             string
+	Token          string
+	ContainerID    string
+	AccessRuleID   string
+	AccessRuleName string
+	Selected       string
+	CreateDate     string
 }
 
 func RulesGet(w rest.ResponseWriter, r *rest.Request) {
@@ -368,6 +370,7 @@ func GetAllRules() ([]Rule, error) {
 // containeraccessrules logic
 //
 
+/*
 func ContainerAccessRuleGet(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
@@ -392,6 +395,7 @@ func ContainerAccessRuleGet(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&car)
 }
+*/
 
 func ContainerAccessRuleGetAll(w rest.ResponseWriter, r *rest.Request) {
 	var err error
@@ -419,6 +423,7 @@ func ContainerAccessRuleGetAll(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&cars)
 }
 
+/*
 func ContainerAccessRuleDelete(w rest.ResponseWriter, r *rest.Request) {
 	var err error
 	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
@@ -469,6 +474,62 @@ func ContainerAccessRuleInsert(w rest.ResponseWriter, r *rest.Request) {
 		logit.Error.Println("ContainerAccessRuleUpdate: error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
+	}
+
+	status := SimpleStatus{}
+	status.Status = "OK"
+	w.WriteHeader(http.StatusOK)
+	w.WriteJson(&status)
+}
+*/
+func ContainerAccessRuleUpdate(w rest.ResponseWriter, r *rest.Request) {
+	logit.Info.Println("ContainerAccessRuleInsert")
+	cars := make([]ContainerAccessRule, 0)
+	err := r.DecodeJsonPayload(&cars)
+	if err != nil {
+		logit.Error.Println("ContainerAccessRuleInsert: error in decode" + err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if len(cars) > 0 {
+		err = secimpl.Authorize(cars[0].Token, "perm-container")
+		if err != nil {
+			logit.Error.Println("ContainerAccessRuleInsert: authorize error " + err.Error())
+			rest.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+	}
+
+	for i := range cars {
+		if cars[i].Selected == "true" {
+			if cars[i].ID != "-1" {
+				//do nothing
+				logit.Info.Println("doing nothing on " + cars[i].ContainerID + " " + cars[i].AccessRuleID + " " + cars[i].AccessRuleName)
+			} else {
+				//insert
+				logit.Info.Println("doing insert on " + cars[i].ContainerID + " " + cars[i].AccessRuleID + " " + cars[i].AccessRuleName)
+				err = InsertContainerAccessRule(cars[i])
+				if err != nil {
+					logit.Error.Println("error doing insert on " + cars[i].ContainerID + " " + cars[i].AccessRuleID + " " + cars[i].AccessRuleName)
+					logit.Error.Println(err.Error())
+					rest.Error(w, err.Error(), 400)
+					return
+				}
+			}
+		} else {
+			if cars[i].ID != "-1" {
+				//delete
+				logit.Info.Println("doing delete on " + cars[i].ContainerID + " " + cars[i].AccessRuleID + " " + cars[i].AccessRuleName)
+				err = DeleteContainerAccessRule(cars[i].ID)
+				if err != nil {
+					logit.Error.Println("error doing delete on " + cars[i].ContainerID + " " + cars[i].AccessRuleID + " " + cars[i].AccessRuleName)
+					logit.Error.Println(err.Error())
+					rest.Error(w, err.Error(), 400)
+					return
+				}
+			}
+		}
 	}
 
 	status := SimpleStatus{}
@@ -543,7 +604,7 @@ func GetAllContainerAccessRule(containerID string) ([]ContainerAccessRule, error
 		return cars, err
 	}
 	rows, err = dbConn.Query(
-		"select id, containerid, accessruleid, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from containeraccessrule where id = " + containerID)
+		"select coalesce(car.id, -1), coalesce(car.containerid, -1), ar.id, ar.name, to_char(coalesce(ar.createdt, now()), 'MM-DD-YYYY HH24:MI:SS') from accessrule ar left outer join containeraccessrule car on (car.accessruleid = ar.id and car.containerid = " + containerID + ")")
 	if err != nil {
 		return cars, err
 	}
@@ -555,9 +616,15 @@ func GetAllContainerAccessRule(containerID string) ([]ContainerAccessRule, error
 			&car.ID,
 			&car.ContainerID,
 			&car.AccessRuleID,
+			&car.AccessRuleName,
 			&car.CreateDate,
 		); err != nil {
 			return cars, err
+		}
+		if car.ID == "-1" {
+			car.Selected = "false"
+		} else {
+			car.Selected = "true"
 		}
 		cars = append(cars, car)
 	}

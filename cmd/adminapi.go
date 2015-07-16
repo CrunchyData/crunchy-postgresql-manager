@@ -179,10 +179,8 @@ func main() {
 		&rest.Route{"GET", "/rules/delete/:ID.:Token", adminapi.RulesDelete},
 		&rest.Route{"POST", "/rules/update", adminapi.RulesUpdate},
 		&rest.Route{"POST", "/rules/insert", adminapi.RulesInsert},
-		&rest.Route{"GET", "/containerrules/get/:ID.:Token", adminapi.ContainerAccessRuleGet},
 		&rest.Route{"GET", "/containerrules/getall/:ID.:Token", adminapi.ContainerAccessRuleGetAll},
-		&rest.Route{"GET", "/containerrules/delete/:ID.:Token", adminapi.ContainerAccessRuleDelete},
-		&rest.Route{"POST", "/containerrules/insert", adminapi.ContainerAccessRuleInsert},
+		&rest.Route{"POST", "/containerrules/update", adminapi.ContainerAccessRuleUpdate},
 	)
 	if err != nil {
 		log.Fatal(err)
