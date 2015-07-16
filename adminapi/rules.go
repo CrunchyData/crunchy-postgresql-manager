@@ -42,6 +42,14 @@ type Rule struct {
 	UpdateDate  string
 }
 
+type ContainerAccessRule struct {
+	ID           string
+	Token        string
+	ContainerID  string
+	AccessRuleID string
+	CreateDate   string
+}
+
 func RulesGet(w rest.ResponseWriter, r *rest.Request) {
 	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
 	if err != nil {
@@ -354,4 +362,237 @@ func GetAllRules() ([]Rule, error) {
 		return rules, err
 	}
 	return rules, nil
+}
+
+//
+// containeraccessrules logic
+//
+
+func ContainerAccessRuleGet(w rest.ResponseWriter, r *rest.Request) {
+	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	if err != nil {
+		logit.Error.Println("ContainerRulesGet: authorize error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	ID := r.PathParam("ID")
+	if ID == "" {
+		rest.Error(w, "ID required", http.StatusBadRequest)
+		return
+	}
+
+	car, err := GetContainerAccessRule(ID)
+	if err != nil {
+		logit.Error.Println("ContainerRulesGet:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.WriteJson(&car)
+}
+
+func ContainerAccessRuleGetAll(w rest.ResponseWriter, r *rest.Request) {
+	var err error
+	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	if err != nil {
+		logit.Error.Println("ContainerRulesGetAll: authorize error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	ContainerID := r.PathParam("ID")
+	if ContainerID == "" {
+		rest.Error(w, "ID required", http.StatusBadRequest)
+		return
+	}
+
+	cars, err := GetAllContainerAccessRule(ContainerID)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.WriteJson(&cars)
+}
+
+func ContainerAccessRuleDelete(w rest.ResponseWriter, r *rest.Request) {
+	var err error
+	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	if err != nil {
+		logit.Error.Println("ContainerRuleDelete: authorize error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	containerRuleID := r.PathParam("ID")
+	if containerRuleID == "" {
+		rest.Error(w, "ID required", http.StatusBadRequest)
+		return
+	}
+
+	err = DeleteContainerAccessRule(containerRuleID)
+	if err != nil {
+		logit.Error.Println("ContainerRuleDelete:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	status := SimpleStatus{}
+	status.Status = "OK"
+	w.WriteHeader(http.StatusOK)
+	w.WriteJson(&status)
+}
+
+func ContainerAccessRuleInsert(w rest.ResponseWriter, r *rest.Request) {
+	logit.Info.Println("ContainerAccessRuleInsert")
+	car := ContainerAccessRule{}
+	err := r.DecodeJsonPayload(&car)
+	if err != nil {
+		logit.Error.Println("ContainerAccessRuleInsert: error in decode" + err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = secimpl.Authorize(car.Token, "perm-container")
+	if err != nil {
+		logit.Error.Println("ContainerAccessRuleInsert: authorize error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	err = InsertContainerAccessRule(car)
+	if err != nil {
+		logit.Error.Println("ContainerAccessRuleUpdate: error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	status := SimpleStatus{}
+	status.Status = "OK"
+	w.WriteHeader(http.StatusOK)
+	w.WriteJson(&status)
+}
+
+//
+// database logic for containeraccessrules
+//
+
+func DeleteContainerAccessRule(ID string) error {
+	queryStr := fmt.Sprintf("delete from containeraccessrule where id=%s returning id", ID)
+	logit.Info.Println(queryStr)
+
+	var id int
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	defer dbConn.Close()
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
+	err = dbConn.QueryRow(queryStr).Scan(&id)
+	switch {
+	case err != nil:
+		logit.Error.Println(err)
+		return err
+	default:
+		logit.Info.Println("deleted containeraccessrule id " + ID)
+	}
+	return nil
+
+}
+
+func InsertContainerAccessRule(car ContainerAccessRule) error {
+	queryStr := fmt.Sprintf(
+		"insert into containeraccessrule ( containerid, accessruleid, createdt ) values ( %s, %s, now()) returning id",
+		car.ContainerID,
+		car.AccessRuleID)
+
+	logit.Info.Println(queryStr)
+	var id int
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	defer dbConn.Close()
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
+	err = dbConn.QueryRow(queryStr).Scan(&id)
+	switch {
+	case err != nil:
+		logit.Error.Println(err.Error())
+		return err
+	default:
+		logit.Info.Println("containeraccessrule inserted id " + strconv.Itoa(id))
+	}
+
+	return nil
+
+}
+
+func GetAllContainerAccessRule(containerID string) ([]ContainerAccessRule, error) {
+
+	var cars []ContainerAccessRule
+	var rows *sql.Rows
+	var err error
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	defer dbConn.Close()
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return cars, err
+	}
+	rows, err = dbConn.Query(
+		"select id, containerid, accessruleid, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from containeraccessrule where id = " + containerID)
+	if err != nil {
+		return cars, err
+	}
+	defer rows.Close()
+	cars = make([]ContainerAccessRule, 0)
+	for rows.Next() {
+		car := ContainerAccessRule{}
+		if err = rows.Scan(
+			&car.ID,
+			&car.ContainerID,
+			&car.AccessRuleID,
+			&car.CreateDate,
+		); err != nil {
+			return cars, err
+		}
+		cars = append(cars, car)
+	}
+	if err = rows.Err(); err != nil {
+		return cars, err
+	}
+	return cars, nil
+}
+
+func GetContainerAccessRule(ID string) (ContainerAccessRule, error) {
+	car := ContainerAccessRule{}
+
+	queryStr := fmt.Sprintf("select ID, CONTAINERID, ACCESSRULEID, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from containeraccessrule where id = %s", ID)
+
+	logit.Info.Println(queryStr)
+
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	defer dbConn.Close()
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return car, err
+	}
+	err = dbConn.QueryRow(queryStr).Scan(
+		&car.ID,
+		&car.ContainerID,
+		&car.AccessRuleID,
+		&car.CreateDate)
+	switch {
+	case err == sql.ErrNoRows:
+		logit.Info.Println("no containeraccessrule found id " + ID)
+		return car, err
+	case err != nil:
+		return car, err
+	}
+
+	return car, nil
+
 }

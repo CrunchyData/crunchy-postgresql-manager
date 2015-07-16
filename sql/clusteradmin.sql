@@ -258,3 +258,13 @@ create table accessrule (
 	createdt timestamp not null,
 	updatedt timestamp not null
 );
+
+create table containeraccessrule (
+	id serial primary key,
+	containerid int references container (id) on delete cascade,
+	accessruleid int references accessrule (id) on delete cascade,
+	createdt timestamp not null,
+	unique (containerid, accessruleid)
+);
+
+
