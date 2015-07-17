@@ -34,7 +34,17 @@ var CPMTEST_DB = "cpmtest"
 var CPMTEST_USER = "cpmtest"
 
 func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("MonitorContainerSettings: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -47,7 +57,7 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	node, err := admindb.GetContainer(ID)
+	node, err := admindb.GetContainer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("MonitorContainerGetInfo:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -61,7 +71,7 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 
 	//fetch cpmtest user credentials
 	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
+	nodeuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -72,15 +82,15 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 
 	//get port
 	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting("PG-PORT")
+	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 
-	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
-	defer dbConn.Close()
+	dbConn2, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+	defer dbConn2.Close()
 
 	settings := make([]PostgresSetting, 0)
 	var rows *sql.Rows
 
-	rows, err = dbConn.Query("select name, current_setting(name), source from pg_settings where source not in ('default','override')")
+	rows, err = dbConn2.Query("select name, current_setting(name), source from pg_settings where source not in ('default','override')")
 	if err != nil {
 		logit.Error.Println("MonitorContainerSettings:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -111,8 +121,16 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func MonitorContainerControldata(w rest.ResponseWriter, r *rest.Request) {
-	var err error
-	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("MonitorContainerControldata: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -125,7 +143,7 @@ func MonitorContainerControldata(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	node, err := admindb.GetContainer(ID)
+	node, err := admindb.GetContainer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("MonitorContainerControldata:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -172,7 +190,16 @@ type Bgwriter struct {
 }
 
 func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("ContainerBgwriter: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -185,7 +212,7 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	node, err := admindb.GetContainer(ID)
+	node, err := admindb.GetContainer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("ContainerBgwriter:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -199,7 +226,7 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 
 	//get password
 	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
+	nodeuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println("ContainerBgwriter:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -208,14 +235,14 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 
 	//get port
 	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting("PG-PORT")
+	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 
-	var dbConn *sql.DB
-	dbConn, err = util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
-	defer dbConn.Close()
+	var dbConn2 *sql.DB
+	dbConn2, err = util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+	defer dbConn2.Close()
 
 	info := Bgwriter{}
-	err = dbConn.QueryRow("SELECT to_char(now(), 'mm/dd/yy HH12:MI:SS') now, to_char(block_size::numeric * buffers_alloc / (1024 * 1024 * seconds), 'FM999999999999D9999') AS alloc_mbps, to_char(block_size::numeric * buffers_checkpoint / (1024 * 1024 * seconds), 'FM999999999999D9999') AS checkpoint_mbps, to_char(block_size::numeric * buffers_clean / (1024 * 1024 * seconds), 'FM999999999999D9999') AS clean_mbps, to_char(block_size::numeric * buffers_backend/ (1024 * 1024 * seconds), 'FM999999999999D9999') AS backend_mbps, to_char(block_size::numeric * (buffers_checkpoint + buffers_clean + buffers_backend) / (1024 * 1024 * seconds), 'FM999999999999D9999') AS write_mbps FROM ( SELECT now() AS sample,now() - stats_reset AS uptime,EXTRACT(EPOCH FROM now()) - extract(EPOCH FROM stats_reset) AS seconds, b.*,p.setting::integer AS block_size FROM pg_stat_bgwriter b,pg_settings p WHERE p.name='block_size') bgw").Scan(&info.Now, &info.AllocMbps, &info.CheckpointMbps, &info.CleanMbps, &info.BackendMbps, &info.WriteMbps)
+	err = dbConn2.QueryRow("SELECT to_char(now(), 'mm/dd/yy HH12:MI:SS') now, to_char(block_size::numeric * buffers_alloc / (1024 * 1024 * seconds), 'FM999999999999D9999') AS alloc_mbps, to_char(block_size::numeric * buffers_checkpoint / (1024 * 1024 * seconds), 'FM999999999999D9999') AS checkpoint_mbps, to_char(block_size::numeric * buffers_clean / (1024 * 1024 * seconds), 'FM999999999999D9999') AS clean_mbps, to_char(block_size::numeric * buffers_backend/ (1024 * 1024 * seconds), 'FM999999999999D9999') AS backend_mbps, to_char(block_size::numeric * (buffers_checkpoint + buffers_clean + buffers_backend) / (1024 * 1024 * seconds), 'FM999999999999D9999') AS write_mbps FROM ( SELECT now() AS sample,now() - stats_reset AS uptime,EXTRACT(EPOCH FROM now()) - extract(EPOCH FROM stats_reset) AS seconds, b.*,p.setting::integer AS block_size FROM pg_stat_bgwriter b,pg_settings p WHERE p.name='block_size') bgw").Scan(&info.Now, &info.AllocMbps, &info.CheckpointMbps, &info.CleanMbps, &info.BackendMbps, &info.WriteMbps)
 	switch {
 	case err == sql.ErrNoRows:
 		logit.Error.Println("ContainerBgwriter:" + err.Error())
@@ -243,7 +270,16 @@ type Statdatabase struct {
 }
 
 func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("ContainerStatdatabase: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -256,7 +292,7 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	node, err := admindb.GetContainer(ID)
+	node, err := admindb.GetContainer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("ContainerStatdatabase:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -270,7 +306,7 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 
 	//get password
 	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
+	nodeuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -279,15 +315,15 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 
 	//get port
 	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting("PG-PORT")
+	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 
-	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
-	defer dbConn.Close()
+	dbConn2, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+	defer dbConn2.Close()
 
 	stats := make([]Statdatabase, 0)
 	var rows *sql.Rows
 
-	rows, err = dbConn.Query("SELECT datname, blks_read::text, tup_returned::text, tup_fetched::text, tup_inserted::text, tup_updated::text, tup_deleted::text, coalesce(to_char(stats_reset, 'YYYY-MM-DD HH24:MI:SS'), ' ') as stats_reset from pg_stat_database")
+	rows, err = dbConn2.Query("SELECT datname, blks_read::text, tup_returned::text, tup_fetched::text, tup_inserted::text, tup_updated::text, tup_deleted::text, coalesce(to_char(stats_reset, 'YYYY-MM-DD HH24:MI:SS'), ' ') as stats_reset from pg_stat_database")
 	if err != nil {
 		logit.Error.Println("ContainerStatdatabase:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -347,7 +383,16 @@ type Statrepl struct {
 }
 
 func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("ContainerStatrepl: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -360,7 +405,7 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	node, err := admindb.GetContainer(ID)
+	node, err := admindb.GetContainer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("ContainerStatrepl:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -374,7 +419,7 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 
 	//fetch cpmtest user credentials
 	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
+	nodeuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -383,15 +428,15 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 
 	//get port
 	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting("PG-PORT")
+	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 
-	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
-	defer dbConn.Close()
+	dbConn2, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+	defer dbConn2.Close()
 
 	stats := make([]Statrepl, 0)
 	var rows *sql.Rows
 
-	rows, err = dbConn.Query("SELECT pid , usesysid , usename , application_name , client_addr , coalesce(client_hostname, ' ') , client_port , to_char(backend_start, 'YYYY-MM-DD HH24:MI-SS') as backend_start , state , sent_location , write_location , flush_location , replay_location , sync_priority , sync_state from pg_stat_replication")
+	rows, err = dbConn2.Query("SELECT pid , usesysid , usename , application_name , client_addr , coalesce(client_hostname, ' ') , client_port , to_char(backend_start, 'YYYY-MM-DD HH24:MI-SS') as backend_start , state , sent_location , write_location , flush_location , replay_location , sync_priority , sync_state from pg_stat_replication")
 	if err != nil {
 		logit.Error.Println("ContainerStatrepl:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -434,9 +479,16 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
-	var err error
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
 
-	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("ContainerLoadTest: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -464,7 +516,7 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	node, err := admindb.GetContainer(ID)
+	node, err := admindb.GetContainer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("ContainerLoadTest:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -476,7 +528,7 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 		host = node.Name + "-db"
 	}
 
-	results, err2 := loadtest(node.Name, host, writes)
+	results, err2 := loadtest(dbConn, node.Name, host, writes)
 	if err2 != nil {
 		logit.Error.Println("ContainerLoadTest:" + err2.Error())
 		rest.Error(w, err2.Error(), http.StatusBadRequest)
@@ -487,34 +539,34 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&results)
 }
 
-func loadtest(nodename string, host string, writes int) ([]Loadtestresults, error) {
+func loadtest(dbConn *sql.DB, nodename string, host string, writes int) ([]Loadtestresults, error) {
 	var err error
 	var name string
 	var query string
 	var id int
 	var i int
-	var dbConn *sql.DB
+	var dbConn2 *sql.DB
 	var results = make([]Loadtestresults, 4)
 
 	//get port
 	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting("PG-PORT")
+	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 
 	//fetch cpmtest user credentials
 	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(nodename, CPMTEST_USER)
+	nodeuser, err = admindb.GetContainerUser(dbConn, nodename, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return results, err
 	}
 
 	//get db connection
-	dbConn, err = util.GetMonitoringConnection(host, CPMTEST_USER, pgport.Value, CPMTEST_DB, nodeuser.Passwd)
+	dbConn2, err = util.GetMonitoringConnection(host, CPMTEST_USER, pgport.Value, CPMTEST_DB, nodeuser.Passwd)
 	if err != nil {
 		logit.Error.Println("loadtest connection error:" + err.Error())
 		return results, err
 	}
-	defer dbConn.Close()
+	defer dbConn2.Close()
 
 	start := time.Now()
 
@@ -523,7 +575,7 @@ func loadtest(nodename string, host string, writes int) ([]Loadtestresults, erro
 	results[0].Count = writes
 	for i = 0; i < writes; i++ {
 		query = fmt.Sprintf("insert into loadtest ( id, name ) values ( %d, 'this is a row for load test') returning id ", i)
-		err = dbConn.QueryRow(query).Scan(&id)
+		err = dbConn2.QueryRow(query).Scan(&id)
 		switch {
 		case err != nil:
 			logit.Error.Println("loadtest insert error:" + err.Error())
@@ -539,7 +591,7 @@ func loadtest(nodename string, host string, writes int) ([]Loadtestresults, erro
 	results[1].Operation = "selects"
 	results[1].Count = writes
 	for i = 0; i < writes; i++ {
-		err = dbConn.QueryRow(fmt.Sprintf("select name from loadtest where id=%d", i)).Scan(&name)
+		err = dbConn2.QueryRow(fmt.Sprintf("select name from loadtest where id=%d", i)).Scan(&name)
 		switch {
 		case err == sql.ErrNoRows:
 			logit.Error.Println("no row with that id")
@@ -559,7 +611,7 @@ func loadtest(nodename string, host string, writes int) ([]Loadtestresults, erro
 	results[2].Count = writes
 	for i = 0; i < writes; i++ {
 		query = fmt.Sprintf("update loadtest set ( name ) = ('howdy' ) where id = %d returning id", i)
-		err = dbConn.QueryRow(query).Scan(&id)
+		err = dbConn2.QueryRow(query).Scan(&id)
 		switch {
 		case err != nil:
 			return results, err
@@ -575,7 +627,7 @@ func loadtest(nodename string, host string, writes int) ([]Loadtestresults, erro
 	results[3].Count = writes
 	for i = 0; i < writes; i++ {
 		query = fmt.Sprintf("delete from loadtest where id=%d returning id", i)
-		err := dbConn.QueryRow(query).Scan(&id)
+		err := dbConn2.QueryRow(query).Scan(&id)
 		switch {
 		case err != nil:
 			return results, err
@@ -589,7 +641,16 @@ func loadtest(nodename string, host string, writes int) ([]Loadtestresults, erro
 }
 
 func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("MonitorStatements: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -602,7 +663,7 @@ func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	container, err := admindb.GetContainer(ID)
+	container, err := admindb.GetContainer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("MonitorStatements:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -616,7 +677,7 @@ func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 
 	//fetch cpmtest user credentials
 	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(container.Name, CPMTEST_USER)
+	nodeuser, err = admindb.GetContainerUser(dbConn, container.Name, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -625,16 +686,16 @@ func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 
 	//get port
 	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting("PG-PORT")
+	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 
-	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
-	defer dbConn.Close()
+	dbConn2, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+	defer dbConn2.Close()
 
 	//get the list of databases
 	databases := make([]string, 0)
 	var rows *sql.Rows
 
-	rows, err = dbConn.Query(
+	rows, err = dbConn2.Query(
 		"SELECT datname from pg_database where datname not in ('template1', 'template0') order by datname")
 	if err != nil {
 		logit.Error.Println("MonitorStatements:" + err.Error())
@@ -664,10 +725,10 @@ func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 
 	for i := range databases {
 		//get a database connection to a specific database
-		dbConn, err := util.GetMonitoringConnection(host, databases[i], pgport.Value, CPMTEST_USER, nodeuser.Passwd)
-		defer dbConn.Close()
+		dbConn3, err := util.GetMonitoringConnection(host, databases[i], pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+		defer dbConn3.Close()
 
-		rows, err = dbConn.Query(
+		rows, err = dbConn3.Query(
 			"SELECT query, calls, total_time, rows, to_char(coalesce(100.0 * shared_blks_hit / nullif(shared_blks_hit + shared_blks_read, 0), -1), '999D99') AS hit_percent FROM pg_stat_statements ORDER BY total_time DESC LIMIT 5")
 		if err != nil {
 			logit.Error.Println("MonitorStatements:" + err.Error())
@@ -703,7 +764,16 @@ func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func BadgerGenerate(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("BadgerGenerate: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -716,7 +786,7 @@ func BadgerGenerate(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	container, err := admindb.GetContainer(ID)
+	container, err := admindb.GetContainer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("BadgerGenerate:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)

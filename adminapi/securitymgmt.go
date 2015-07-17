@@ -19,6 +19,7 @@ import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/sec"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 )
 
@@ -39,6 +40,14 @@ type ChgPassword struct {
 }
 
 func Login(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
 	ID := r.PathParam("ID")
 	PSW := r.PathParam("PSW")
 	if ID == "" || PSW == "" {
@@ -47,7 +56,8 @@ func Login(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	logit.Info.Println("Login: called")
-	tokenContents, err := secimpl.Login(ID, PSW)
+
+	tokenContents, err := secimpl.Login(dbConn, ID, PSW)
 	if err != nil {
 		logit.Error.Println("Login: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -61,13 +71,22 @@ func Login(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func Logout(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
 	token := r.PathParam("Token")
 	if token == "" {
 		logit.Error.Println("Logout: Token not supplied")
 		rest.Error(w, "Token not supplied", http.StatusBadRequest)
 	}
 
-	err := secimpl.Logout(token)
+	err = secimpl.Logout(dbConn, token)
 	if err != nil {
 		logit.Error.Println("Logout: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -81,9 +100,18 @@ func Logout(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func UpdateUser(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
 	logit.Info.Println("UpdateUser: in UpdateUser")
 	user := sec.User{}
-	err := r.DecodeJsonPayload(&user)
+	err = r.DecodeJsonPayload(&user)
 	if err != nil {
 		logit.Error.Println("UpdateUser: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -92,14 +120,14 @@ func UpdateUser(w rest.ResponseWriter, r *rest.Request) {
 
 	logit.Info.Println("UpdateUser: Name=" + user.Name)
 	logit.Info.Println("UpdateUser: token=" + user.Token)
-	err = secimpl.Authorize(user.Token, "perm-user")
+	err = secimpl.Authorize(dbConn, user.Token, "perm-user")
 	if err != nil {
 		logit.Error.Println("UpdateUser: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	err = secimpl.UpdateUser(user)
+	err = secimpl.UpdateUser(dbConn, user)
 	if err != nil {
 		logit.Error.Println("UpdateUser: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -113,23 +141,32 @@ func UpdateUser(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func AddUser(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
 	logit.Info.Println("AddUser: in AddUser")
 	user := sec.User{}
-	err := r.DecodeJsonPayload(&user)
+	err = r.DecodeJsonPayload(&user)
 	if err != nil {
 		logit.Error.Println("AddUser: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = secimpl.Authorize(user.Token, "perm-user")
+	err = secimpl.Authorize(dbConn, user.Token, "perm-user")
 	if err != nil {
 		logit.Error.Println("UpdateUser: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	err = secimpl.AddUser(user)
+	err = secimpl.AddUser(dbConn, user)
 	if err != nil {
 		logit.Error.Println("AddUser: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -143,7 +180,16 @@ func AddUser(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func GetUser(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("GetUser: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -164,14 +210,23 @@ func GetUser(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func GetAllUsers(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("GetAllUsers: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	usersList, err := secimpl.GetAllUsers()
+	usersList, err := secimpl.GetAllUsers(dbConn)
 	if err != nil {
 		logit.Error.Println("GetAllUsers: error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -187,8 +242,16 @@ func GetAllUsers(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func DeleteUser(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
 
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-user")
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-user")
 	if err != nil {
 		logit.Error.Println("DeleteUser: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -201,7 +264,7 @@ func DeleteUser(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, "ID required", http.StatusBadRequest)
 		return
 	}
-	err = secimpl.DeleteUser(ID)
+	err = secimpl.DeleteUser(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("DeleteUser: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -215,23 +278,32 @@ func DeleteUser(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func UpdateRole(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
 	logit.Info.Println("UpdateRole: in UpdateRole")
 	role := sec.Role{}
-	err := r.DecodeJsonPayload(&role)
+	err = r.DecodeJsonPayload(&role)
 	if err != nil {
 		logit.Error.Println("UpdateRole: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = secimpl.Authorize(role.Token, "perm-user")
+	err = secimpl.Authorize(dbConn, role.Token, "perm-user")
 	if err != nil {
 		logit.Error.Println("GetAllRoles: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	err = secimpl.UpdateRole(role)
+	err = secimpl.UpdateRole(dbConn, role)
 	if err != nil {
 		logit.Error.Println("UpdateRole: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -245,23 +317,32 @@ func UpdateRole(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func AddRole(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
 	logit.Info.Println("AddRole: in AddRole")
 	role := sec.Role{}
-	err := r.DecodeJsonPayload(&role)
+	err = r.DecodeJsonPayload(&role)
 	if err != nil {
 		logit.Error.Println("AddRole: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = secimpl.Authorize(role.Token, "perm-user")
+	err = secimpl.Authorize(dbConn, role.Token, "perm-user")
 	if err != nil {
 		logit.Error.Println("GetAllRoles: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	err = secimpl.AddRole(role)
+	err = secimpl.AddRole(dbConn, role)
 	if err != nil {
 		logit.Error.Println("AddRole: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -275,8 +356,16 @@ func AddRole(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func DeleteRole(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
 
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-user")
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-user")
 	if err != nil {
 		logit.Error.Println("GetAllRoles: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -289,7 +378,7 @@ func DeleteRole(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	err = secimpl.DeleteRole(r.PathParam("ID"))
+	err = secimpl.DeleteRole(dbConn, r.PathParam("ID"))
 	if err != nil {
 		logit.Error.Println("DeleteRole: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -303,15 +392,23 @@ func DeleteRole(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func GetAllRoles(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
 
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("GetAllRoles: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 	var roles []sec.Role
-	roles, err = secimpl.GetAllRoles()
+	roles, err = secimpl.GetAllRoles(dbConn)
 	if err != nil {
 		logit.Error.Println("GetAllRoles: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -323,8 +420,16 @@ func GetAllRoles(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func GetRole(w rest.ResponseWriter, r *rest.Request) {
-	var err error
-	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("GetRole: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -339,7 +444,7 @@ func GetRole(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var role sec.Role
-	role, err = secimpl.GetRole(Name)
+	role, err = secimpl.GetRole(dbConn, Name)
 	if err != nil {
 		logit.Error.Println("GetRole: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -350,16 +455,25 @@ func GetRole(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func ChangePassword(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
 	logit.Info.Println("ChangePassword: in ChangePassword")
 	changePass := ChgPassword{}
-	err := r.DecodeJsonPayload(&changePass)
+	err = r.DecodeJsonPayload(&changePass)
 	if err != nil {
 		logit.Error.Println("ChangePassword: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = secimpl.Authorize(changePass.Token, "perm-read")
+	err = secimpl.Authorize(dbConn, changePass.Token, "perm-read")
 	if err != nil {
 		logit.Error.Println("ChangePassword: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -367,7 +481,7 @@ func ChangePassword(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var sameUser bool
-	sameUser, err = secimpl.CompareUserToToken(changePass.Username, changePass.Token)
+	sameUser, err = secimpl.CompareUserToToken(dbConn, changePass.Username, changePass.Token)
 	if err != nil {
 		logit.Error.Println("ChangePassword: compare UserToToken error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -377,7 +491,7 @@ func ChangePassword(w rest.ResponseWriter, r *rest.Request) {
 	//enforce perm-user if the username is not the same as the token's
 	//username (e.g. bob tries to change larry's password)
 	if !sameUser {
-		err = secimpl.Authorize(changePass.Token, "perm-user")
+		err = secimpl.Authorize(dbConn, changePass.Token, "perm-user")
 		if err != nil {
 			logit.Error.Println("ChangePassword: authorize error " + err.Error())
 			rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -385,7 +499,7 @@ func ChangePassword(w rest.ResponseWriter, r *rest.Request) {
 		}
 	}
 
-	err = secimpl.ChangePassword(changePass.Username, changePass.Password)
+	err = secimpl.ChangePassword(dbConn, changePass.Username, changePass.Password)
 	if err != nil {
 		logit.Error.Println("ChangePassword: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)

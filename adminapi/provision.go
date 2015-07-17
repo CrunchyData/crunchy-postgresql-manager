@@ -25,6 +25,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/kubeclient"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/template"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 	"strconv"
 	"time"
@@ -33,8 +34,16 @@ import (
 //docker run
 //TODO:  convert this to POST
 func Provision(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
 
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-container")
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-container")
 	if err != nil {
 		logit.Error.Println("Provision: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -94,13 +103,13 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("params.ContainerName=" + params.ContainerName)
 	logit.Info.Println("params.Standalone=" + params.Standalone)
 
-	err = provisionImpl(params, PROFILE, false)
+	err = provisionImpl(dbConn, params, PROFILE, false)
 	if err != nil {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = provisionImplInit(params, PROFILE, false)
+	err = provisionImplInit(dbConn, params, PROFILE, false)
 	if err != nil {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -113,12 +122,12 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
-func provisionImpl(params *cpmserverapi.DockerRunRequest, PROFILE string, standby bool) error {
+func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFILE string, standby bool) error {
 	logit.Info.Println("PROFILE: provisionImpl starts 1")
 
 	var errorStr string
 	//make sure the container name is not already taken
-	_, err2 := admindb.GetContainerByName(params.ContainerName)
+	_, err2 := admindb.GetContainerByName(dbConn, params.ContainerName)
 	if err2 != nil {
 		if err2 != sql.ErrNoRows {
 			return err2
@@ -130,7 +139,7 @@ func provisionImpl(params *cpmserverapi.DockerRunRequest, PROFILE string, standb
 	}
 
 	//go get the IPAddress
-	server, err := admindb.GetServer(params.ServerID)
+	server, err := admindb.GetServer(dbConn, params.ServerID)
 	if err != nil {
 		logit.Error.Println("Provision:" + err.Error())
 		return err
@@ -163,13 +172,13 @@ func provisionImpl(params *cpmserverapi.DockerRunRequest, PROFILE string, standb
 
 	//run docker run to create the container
 
-	params.CPU, params.MEM, err = getDockerResourceSettings(PROFILE)
+	params.CPU, params.MEM, err = getDockerResourceSettings(dbConn, PROFILE)
 	if err != nil {
 		logit.Error.Println("Provision: problem in getting profiles call" + err.Error())
 		return err
 	}
 	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting("PG-PORT")
+	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 	if err != nil {
 		logit.Error.Println("Provision:PG-PORT setting error " + err.Error())
 		return err
@@ -279,7 +288,7 @@ func provisionImpl(params *cpmserverapi.DockerRunRequest, PROFILE string, standb
 	}
 
 	var strid int
-	strid, err = admindb.InsertContainer(dbnode)
+	strid, err = admindb.InsertContainer(dbConn, dbnode)
 	newid := strconv.Itoa(strid)
 	if err != nil {
 		logit.Error.Println("Provision:" + err.Error())
@@ -288,7 +297,7 @@ func provisionImpl(params *cpmserverapi.DockerRunRequest, PROFILE string, standb
 	dbnode.ID = newid
 
 	//register default db users on the new node
-	err = createDBUsers(dbnode)
+	err = createDBUsers(dbConn, dbnode)
 
 	return err
 
@@ -296,12 +305,12 @@ func provisionImpl(params *cpmserverapi.DockerRunRequest, PROFILE string, standb
 
 //currently we define default DB users (postgres, cpmtest, pgpool)
 //for all database containers
-func createDBUsers(dbnode admindb.Container) error {
+func createDBUsers(dbConn *sql.DB, dbnode admindb.Container) error {
 	var err error
 	var password admindb.Setting
 
 	//get the postgres password
-	password, err = admindb.GetSetting("POSTGRESPSW")
+	password, err = admindb.GetSetting(dbConn, "POSTGRESPSW")
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return err
@@ -311,7 +320,7 @@ func createDBUsers(dbnode admindb.Container) error {
 	user.Containername = dbnode.Name
 	user.Rolname = "postgres"
 	user.Passwd = password.Value
-	_, err = admindb.AddContainerUser(user)
+	_, err = admindb.AddContainerUser(dbConn, user)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return err
@@ -321,7 +330,7 @@ func createDBUsers(dbnode admindb.Container) error {
 	//here, we just register them when we create a new node
 
 	//get the cpmtest password
-	password, err = admindb.GetSetting("CPMTESTPSW")
+	password, err = admindb.GetSetting(dbConn, "CPMTESTPSW")
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return err
@@ -330,14 +339,14 @@ func createDBUsers(dbnode admindb.Container) error {
 	user.Containername = dbnode.Name
 	user.Rolname = "cpmtest"
 	user.Passwd = password.Value
-	_, err = admindb.AddContainerUser(user)
+	_, err = admindb.AddContainerUser(dbConn, user)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return err
 	}
 
 	//get the pgpool password
-	password, err = admindb.GetSetting("PGPOOLPSW")
+	password, err = admindb.GetSetting(dbConn, "PGPOOLPSW")
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return err
@@ -346,7 +355,7 @@ func createDBUsers(dbnode admindb.Container) error {
 	user.Rolname = "pgpool"
 	user.Passwd = password.Value
 	//register pgpool user
-	_, err = admindb.AddContainerUser(user)
+	_, err = admindb.AddContainerUser(dbConn, user)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return err
@@ -355,18 +364,18 @@ func createDBUsers(dbnode admindb.Container) error {
 	return err
 }
 
-func provisionImplInit(params *cpmserverapi.DockerRunRequest, PROFILE string, standby bool) error {
+func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFILE string, standby bool) error {
 	//go get the domain name from the settings
 	var domainname admindb.Setting
 	var pgport admindb.Setting
 	var err error
 
-	domainname, err = admindb.GetSetting("DOMAIN-NAME")
+	domainname, err = admindb.GetSetting(dbConn, "DOMAIN-NAME")
 	if err != nil {
 		logit.Error.Println("Provision:DOMAIN-NAME setting error " + err.Error())
 		return err
 	}
-	pgport, err = admindb.GetSetting("PG-PORT")
+	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 	if err != nil {
 		logit.Error.Println("Provision:PG-PORT setting error " + err.Error())
 		return err
@@ -415,7 +424,7 @@ func provisionImplInit(params *cpmserverapi.DockerRunRequest, PROFILE string, st
 			return err
 		}
 		//create pg_hba.conf
-		data, err = template.Hba(KubeEnv, mode, params.ContainerName, pgport.Value, "", domainname.Value)
+		data, err = template.Hba(dbConn, KubeEnv, mode, params.ContainerName, pgport.Value, "", domainname.Value)
 		if err != nil {
 			logit.Error.Println("Provision:" + err.Error())
 			return err
@@ -469,26 +478,26 @@ func waitTillReady(container string) error {
 }
 
 //return the CPU MEM settings
-func getDockerResourceSettings(size string) (string, string, error) {
+func getDockerResourceSettings(dbConn *sql.DB, size string) (string, string, error) {
 	var CPU, MEM string
 	var setting admindb.Setting
 	var err error
 
 	switch size {
 	case "SM":
-		setting, err = admindb.GetSetting("S-DOCKER-PROFILE-CPU")
+		setting, err = admindb.GetSetting(dbConn, "S-DOCKER-PROFILE-CPU")
 		CPU = setting.Value
-		setting, err = admindb.GetSetting("S-DOCKER-PROFILE-MEM")
+		setting, err = admindb.GetSetting(dbConn, "S-DOCKER-PROFILE-MEM")
 		MEM = setting.Value
 	case "MED":
-		setting, err = admindb.GetSetting("M-DOCKER-PROFILE-CPU")
+		setting, err = admindb.GetSetting(dbConn, "M-DOCKER-PROFILE-CPU")
 		CPU = setting.Value
-		setting, err = admindb.GetSetting("M-DOCKER-PROFILE-MEM")
+		setting, err = admindb.GetSetting(dbConn, "M-DOCKER-PROFILE-MEM")
 		MEM = setting.Value
 	default:
-		setting, err = admindb.GetSetting("L-DOCKER-PROFILE-CPU")
+		setting, err = admindb.GetSetting(dbConn, "L-DOCKER-PROFILE-CPU")
 		CPU = setting.Value
-		setting, err = admindb.GetSetting("L-DOCKER-PROFILE-MEM")
+		setting, err = admindb.GetSetting(dbConn, "L-DOCKER-PROFILE-MEM")
 		MEM = setting.Value
 	}
 

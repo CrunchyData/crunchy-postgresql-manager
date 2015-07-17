@@ -16,11 +16,8 @@
 package main
 
 import (
-	"database/sql"
-	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/backup"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
-	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net"
 	"net/http"
 	"net/rpc"
@@ -31,29 +28,6 @@ func main() {
 
 	logit.Info.Println("sleeping during startup to give DNS a chance")
 	time.Sleep(time.Millisecond * 7000)
-
-	found := false
-	var dbConn *sql.DB
-	var err error
-	for i := 0; i < 10; i++ {
-		dbConn, err = util.GetConnection("clusteradmin")
-		if err != nil {
-			logit.Error.Println(err.Error())
-			logit.Error.Println("could not get initial database connection, will retry in 5 seconds")
-			time.Sleep(time.Millisecond * 5000)
-		} else {
-			logit.Info.Println("got db connection")
-			found = true
-			break
-		}
-	}
-
-	if !found {
-		panic("could not connect to clusteradmin db")
-	}
-
-	backup.SetConnection(dbConn)
-	admindb.SetConnection(dbConn)
 
 	backup.LoadSchedules()
 

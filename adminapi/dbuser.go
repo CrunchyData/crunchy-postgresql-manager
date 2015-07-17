@@ -34,8 +34,17 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	var dbConn *sql.DB
+	dbConn, err = util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
 
-	err = secimpl.Authorize(postMsg.Token, "perm-user")
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, postMsg.Token, "perm-user")
 	if err != nil {
 		logit.Error.Println("AddSchedule: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -61,7 +70,7 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//create user on the container
 	//get container info
-	node, err := admindb.GetContainer(postMsg.ID)
+	node, err := admindb.GetContainer(dbConn, postMsg.ID)
 	if err != nil {
 		logit.Error.Println("AddContainUser: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -76,7 +85,7 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//fetch cpmtest user credentials
 	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
+	nodeuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -87,10 +96,10 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//get port
 	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting("PG-PORT")
+	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 
-	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
-	defer dbConn.Close()
+	dbConn2, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+	defer dbConn2.Close()
 
 	var SUPERUSER = ""
 	var INHERIT = ""
@@ -129,7 +138,7 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	logit.Info.Println(query)
 
-	_, err = dbConn.Query(query)
+	_, err = dbConn2.Query(query)
 	if err != nil {
 		logit.Error.Println("AddContainerUser:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -142,7 +151,7 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	dbuser.Passwd = postMsg.Passwd
 	dbuser.Rolname = postMsg.Rolname
 
-	result, err := admindb.AddContainerUser(dbuser)
+	result, err := admindb.AddContainerUser(dbConn, dbuser)
 	if err != nil {
 		logit.Error.Println("AddContainerUser: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -158,7 +167,16 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func DeleteContainerUser(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-backup")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-backup")
 	if err != nil {
 		logit.Error.Println("DeleteContainerUser: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -178,14 +196,14 @@ func DeleteContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//get node info
-	node, err := admindb.GetContainer(ContainerID)
+	node, err := admindb.GetContainer(dbConn, ContainerID)
 	if err != nil {
 		logit.Error.Println("AddContainUser: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = admindb.DeleteContainerUser(node.Name, rolname)
+	err = admindb.DeleteContainerUser(dbConn, node.Name, rolname)
 	if err != nil {
 		logit.Error.Println("DeleteContainerUser: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -200,7 +218,7 @@ func DeleteContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//fetch cpmtest user credentials
 	var cpmuser admindb.ContainerUser
-	cpmuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
+	cpmuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -209,16 +227,16 @@ func DeleteContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//get port
 	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting("PG-PORT")
+	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 
-	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, cpmuser.Passwd)
-	defer dbConn.Close()
+	dbConn2, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, cpmuser.Passwd)
+	defer dbConn2.Close()
 
 	query := "drop role " + rolname
 
 	logit.Info.Println(query)
 
-	_, err = dbConn.Query(query)
+	_, err = dbConn2.Query(query)
 	if err != nil {
 		logit.Error.Println("DeleteContainerUser:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -233,7 +251,16 @@ func DeleteContainerUser(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("GetContainerUser: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -252,7 +279,7 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//get container info
-	node, err := admindb.GetContainer(ContainerID)
+	node, err := admindb.GetContainer(dbConn, ContainerID)
 	if err != nil {
 		logit.Error.Println("AddContainUser: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -267,7 +294,7 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//fetch  user credentials
 	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(node.Name, Rolname)
+	nodeuser, err = admindb.GetContainerUser(dbConn, node.Name, Rolname)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -276,7 +303,7 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//fetch cpmtest user credentials
 	var cpmuser admindb.ContainerUser
-	cpmuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
+	cpmuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -285,16 +312,16 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//get port
 	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting("PG-PORT")
+	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 
-	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, cpmuser.Passwd)
-	defer dbConn.Close()
+	dbConn2, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, cpmuser.Passwd)
+	defer dbConn2.Close()
 
 	query := "select rolname::text, rolsuper::text, rolinherit::text, rolcreaterole::text, rolcreatedb::text, rolcatupdate::text, rolcanlogin::text, rolreplication::text from pg_roles where rolname = '" + Rolname + "' order by rolname"
 
 	logit.Info.Println(query)
 
-	err = dbConn.QueryRow(query).Scan(
+	err = dbConn2.QueryRow(query).Scan(
 		&nodeuser.Rolname,
 		&nodeuser.Rolsuper,
 		&nodeuser.Rolinherit,
@@ -314,7 +341,16 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("GetAllUsersForContainer: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -328,7 +364,8 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//get container info
-	node, err := admindb.GetContainer(ID)
+	var node admindb.Container
+	node, err = admindb.GetContainer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("GetAllUsersForContainer: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -343,7 +380,7 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 
 	//fetch cpmtest user credentials
 	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
+	nodeuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -354,17 +391,17 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 
 	//get port
 	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting("PG-PORT")
-
-	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
-	defer dbConn.Close()
+	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
+	var dbConn2 *sql.DB
+	dbConn2, err = util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+	defer dbConn2.Close()
 
 	users := make([]admindb.ContainerUser, 0)
 
 	//query results
 	var rows *sql.Rows
 
-	rows, err = dbConn.Query("select rolname::text, rolsuper::text, rolinherit::text, rolcreaterole::text, rolcreatedb::text, rolcatupdate::text, rolcanlogin::text, rolreplication::text from pg_roles order by rolname")
+	rows, err = dbConn2.Query("select rolname::text, rolsuper::text, rolinherit::text, rolcreaterole::text, rolcreatedb::text, rolcatupdate::text, rolcanlogin::text, rolreplication::text from pg_roles order by rolname")
 	if err != nil {
 		logit.Error.Println("GetAllUsersForContainer:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -404,15 +441,24 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
 	postMsg := NodeUser{}
-	err := r.DecodeJsonPayload(&postMsg)
+	err = r.DecodeJsonPayload(&postMsg)
 	if err != nil {
 		logit.Error.Println("UpdateContainerUser: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = secimpl.Authorize(postMsg.Token, "perm-user")
+	err = secimpl.Authorize(dbConn, postMsg.Token, "perm-user")
 	if err != nil {
 		logit.Error.Println("UpdateContainerUser: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -433,7 +479,8 @@ func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//create user on the container
 	//get container info
-	node, err := admindb.GetContainer(postMsg.ID)
+	var node admindb.Container
+	node, err = admindb.GetContainer(dbConn, postMsg.ID)
 	if err != nil {
 		logit.Error.Println("AddContainUser: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -453,7 +500,7 @@ func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//fetch cpmtest user credentials
 	var cpmuser admindb.ContainerUser
-	cpmuser, err = admindb.GetContainerUser(node.Name, CPMTEST_USER)
+	cpmuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -462,10 +509,11 @@ func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//get port
 	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting("PG-PORT")
+	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
+	var dbConn2 *sql.DB
 
-	dbConn, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, cpmuser.Passwd)
-	defer dbConn.Close()
+	dbConn2, err = util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, cpmuser.Passwd)
+	defer dbConn2.Close()
 
 	var SUPERUSER = "SUPERUSER"
 	var INHERIT = "INHERIT"
@@ -511,7 +559,7 @@ func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	logit.Info.Println(query)
 
-	_, err = dbConn.Query(query)
+	_, err = dbConn2.Query(query)
 	if err != nil {
 		logit.Error.Println("UpdateContainerUser:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -525,7 +573,7 @@ func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		dbuser.Passwd = postMsg.Passwd
 		dbuser.Rolname = postMsg.Rolname
 
-		err = admindb.UpdateContainerUser(dbuser)
+		err = admindb.UpdateContainerUser(dbConn, dbuser)
 		if err != nil {
 			logit.Error.Println("UpdateContainerUser: " + err.Error())
 			rest.Error(w, err.Error(), 400)

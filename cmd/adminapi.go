@@ -16,19 +16,14 @@
 package main
 
 import (
-	"database/sql"
 	"flag"
 	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/adminapi"
-	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/backup"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
-	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"log"
 	"net/http"
 	"os"
-	"time"
 )
 
 func init() {
@@ -51,29 +46,7 @@ func main() {
 
 	fmt.Println("at top of adminapi main")
 
-	var dbConn *sql.DB
-	found := false
 	var err error
-
-	for i := 0; i < 10; i++ {
-		dbConn, err = util.GetConnection("clusteradmin")
-		if err != nil {
-			logit.Error.Println(err.Error())
-			logit.Error.Println("could not get initial database connection, will retry in 5 seconds")
-			time.Sleep(time.Millisecond * 5000)
-		} else {
-			//logit.Info.Println("got db connection")
-			found = true
-			break
-		}
-	}
-
-	admindb.SetConnection(dbConn)
-	backup.SetConnection(dbConn)
-
-	if !found {
-		panic("could not connect to clusteradmin db")
-	}
 
 	handler := rest.ResourceHandler{
 		PreRoutingMiddlewares: []rest.Middleware{

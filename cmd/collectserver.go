@@ -1,18 +1,18 @@
 package main
 
 import (
-	"database/sql"
-	"net/http"
-	"os"
-	"strconv"
-	"time"
-
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/collect"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"github.com/prometheus/client_golang/prometheus"
+	"net/http"
+	"os"
+	"strconv"
+	"time"
 )
+
+const CLUSTERADMIN_DB = "clusteradmin"
 
 //var gauges = make([]prometheus.Gauge, 3)
 var (
@@ -78,15 +78,12 @@ func main() {
 		prometheus.MustRegister(gaugeMem)
 
 		//get servers
-		var dbConn *sql.DB
-		var err error
-		dbConn, err = util.GetConnection("clusteradmin")
-		if err != nil {
-			logit.Error.Println(err.Error())
+		dbConn, err2 := util.GetConnection(CLUSTERADMIN_DB)
+		if err2 != nil {
+			logit.Error.Println(err2.Error())
 		}
 		var servers []admindb.Server
-		admindb.SetConnection(dbConn)
-		servers, err = admindb.GetAllServers()
+		servers, err = admindb.GetAllServers(dbConn)
 		if err != nil {
 			logit.Error.Println(err.Error())
 		}

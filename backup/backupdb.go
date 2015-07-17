@@ -23,13 +23,7 @@ import (
 	"strconv"
 )
 
-var dbConn *sql.DB
-
-func SetConnection(conn *sql.DB) {
-	dbConn = conn
-}
-
-func AddStatus(status BackupStatus) (string, error) {
+func AddStatus(dbConn *sql.DB, status BackupStatus) (string, error) {
 
 	logit.Info.Println("AddStatus called")
 	//logit.Info.Println("AddStatus called")
@@ -61,7 +55,7 @@ func AddStatus(status BackupStatus) (string, error) {
 	return strvalue, nil
 }
 
-func UpdateStatus(status BackupStatus) error {
+func UpdateStatus(dbConn *sql.DB, status BackupStatus) error {
 
 	logit.Info.Println("backup.UpdateStatus called")
 
@@ -84,7 +78,7 @@ func UpdateStatus(status BackupStatus) error {
 	return nil
 }
 
-func AddSchedule(s BackupSchedule) (string, error) {
+func AddSchedule(dbConn *sql.DB, s BackupSchedule) (string, error) {
 
 	logit.Info.Println("AddSchedule called")
 
@@ -119,7 +113,7 @@ func AddSchedule(s BackupSchedule) (string, error) {
 	return theID, nil
 }
 
-func UpdateSchedule(s BackupSchedule) error {
+func UpdateSchedule(dbConn *sql.DB, s BackupSchedule) error {
 
 	logit.Info.Println("backup.UpdateSchedule called")
 
@@ -147,7 +141,7 @@ func UpdateSchedule(s BackupSchedule) error {
 	return nil
 }
 
-func DeleteSchedule(id string) error {
+func DeleteSchedule(dbConn *sql.DB, id string) error {
 	queryStr := fmt.Sprintf("delete from backupschedule where id=%s returning id", id)
 	logit.Info.Println("backup:DeleteSchedule:" + queryStr)
 
@@ -162,7 +156,7 @@ func DeleteSchedule(id string) error {
 	return nil
 }
 
-func GetSchedule(id string) (BackupSchedule, error) {
+func GetSchedule(dbConn *sql.DB, id string) (BackupSchedule, error) {
 	logit.Info.Println("GetSchedule called with id=" + id)
 	s := BackupSchedule{}
 
@@ -180,7 +174,7 @@ func GetSchedule(id string) (BackupSchedule, error) {
 	return s, nil
 }
 
-func GetAllSchedules(containerid string) ([]BackupSchedule, error) {
+func GetAllSchedules(dbConn *sql.DB, containerid string) ([]BackupSchedule, error) {
 	logit.Info.Println("GetAllSchedules called with id=" + containerid)
 	var rows *sql.Rows
 	var err error
@@ -220,7 +214,7 @@ func GetAllSchedules(containerid string) ([]BackupSchedule, error) {
 	return schedules, nil
 }
 
-func GetAllStatus(scheduleid string) ([]BackupStatus, error) {
+func GetAllStatus(dbConn *sql.DB, scheduleid string) ([]BackupStatus, error) {
 	logit.Info.Println("GetAllStatus called with scheduleid=" + scheduleid)
 	var rows *sql.Rows
 	var err error
@@ -257,7 +251,7 @@ func GetAllStatus(scheduleid string) ([]BackupStatus, error) {
 	return stats, nil
 }
 
-func GetStatus(id string) (BackupStatus, error) {
+func GetStatus(dbConn *sql.DB, id string) (BackupStatus, error) {
 	logit.Info.Println("GetStatus called with id=" + id)
 	s := BackupStatus{}
 
@@ -275,7 +269,7 @@ func GetStatus(id string) (BackupStatus, error) {
 	return s, nil
 }
 
-func GetSchedules() ([]BackupSchedule, error) {
+func GetSchedules(dbConn *sql.DB) ([]BackupSchedule, error) {
 	logit.Info.Println("GetSchedules called")
 	var rows *sql.Rows
 	var err error

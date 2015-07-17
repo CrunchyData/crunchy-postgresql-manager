@@ -155,12 +155,13 @@ angular.module('uiRouterSample.rules', [
                     '': {
                         templateUrl: 'app/rules/rules.detail.details.html',
                         controller: ['$scope', '$stateParams', '$cookieStore', '$state', 'rulesFactory', 'utils',
-                            function($scope, $stateParams, $cookieStore, $state, rulesFactory, utils) {
+                            function($scope, $stateParams, $cookieStore, $state, rulesFactory, utils, usSpinnerService) {
                                 console.log('in details with rule itemId = ' + $stateParams.itemId);
                                 //console.log('in details with rule = ' + $scope.rule.Name);
                                 $scope.save = function() {
                                     console.log('save called');
                                     $scope.rule.Token = $cookieStore.get('cpm_token');
+				     usSpinnerService.spin('spinner-1'); 
                                     rulesFactory.update($scope.rule)
                                         .success(function(data) {
                                             console.log('success with save');
@@ -168,6 +169,7 @@ angular.module('uiRouterSample.rules', [
                                                 type: 'success',
                                                 msg: 'successfully updated'
                                             }];
+				     		usSpinnerService.stop('spinner-1');
                                         })
                                         .error(function(error) {
                                             $scope.alerts = [{
@@ -175,6 +177,7 @@ angular.module('uiRouterSample.rules', [
                                                 msg: error.message
                                             }];
                                             console.log('here is an error ' + error.message);
+				     		usSpinnerService.stop('spinner-1');
                                         });
 
                                 };

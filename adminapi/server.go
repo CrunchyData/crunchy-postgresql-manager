@@ -20,13 +20,22 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 	"strconv"
 	"strings"
 )
 
 func GetServer(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("GetServer: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -34,7 +43,8 @@ func GetServer(w rest.ResponseWriter, r *rest.Request) {
 	}
 	ID := r.PathParam("ID")
 	logit.Info.Println("in GetServer with ID=" + ID)
-	results, err := admindb.GetServer(ID)
+
+	results, err := admindb.GetServer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("GetServer:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -50,8 +60,16 @@ func GetServer(w rest.ResponseWriter, r *rest.Request) {
 
 //we use AddServer for both updating and inserting based on the ID passed in
 func AddServer(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
 
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-server")
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-server")
 	if err != nil {
 		logit.Error.Println("AddServer: authorize token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -84,7 +102,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 	dbserver := admindb.Server{server.ID, server.Name, server.IPAddress,
 		server.DockerBridgeIP, server.PGDataPath, server.ServerClass, CreateDate, ""}
 	if dbserver.ID == "0" {
-		strid, err := admindb.InsertServer(dbserver)
+		strid, err := admindb.InsertServer(dbConn, dbserver)
 		newid := strconv.Itoa(strid)
 		if err != nil {
 			logit.Error.Println("AddServer:" + err.Error())
@@ -93,7 +111,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 		}
 		server.ID = newid
 	} else {
-		admindb.UpdateServer(dbserver)
+		admindb.UpdateServer(dbConn, dbserver)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -102,7 +120,15 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 
 //monitor server - get info
 func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("MonitorServerGetInfo: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -123,7 +149,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//go get the IPAddress
-	server, err := admindb.GetServer(ServerID)
+	server, err := admindb.GetServer(dbConn, ServerID)
 	if err != nil {
 		logit.Error.Println("MonitorServerGetInfo:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -164,14 +190,22 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("GetAllServers: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	results, err := admindb.GetAllServers()
+	results, err := admindb.GetAllServers(dbConn)
 	if err != nil {
 		logit.Error.Println("GetAllServers: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -193,8 +227,16 @@ func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func DeleteServer(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
 
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-server")
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-server")
 	if err != nil {
 		logit.Error.Println("DeleteServer: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -208,7 +250,7 @@ func DeleteServer(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	err = admindb.DeleteServer(ID)
+	err = admindb.DeleteServer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("DeleteServer: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)

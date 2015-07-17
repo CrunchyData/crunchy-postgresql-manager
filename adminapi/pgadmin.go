@@ -20,12 +20,22 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 	"time"
 )
 
 func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-cluster")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-cluster")
 	if err != nil {
 		logit.Error.Println("AdminStartpg: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -39,7 +49,7 @@ func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbNode, err := admindb.GetContainer(ID)
+	dbNode, err := admindb.GetContainer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("AdminStartpg: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -72,8 +82,16 @@ func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
 
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-cluster")
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-cluster")
 	if err != nil {
 		logit.Error.Println("AdminStoppg: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -88,7 +106,8 @@ func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbNode, err := admindb.GetContainer(ID)
+	var dbNode admindb.Container
+	dbNode, err = admindb.GetContainer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("AdminStartpg: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)

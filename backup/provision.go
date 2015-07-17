@@ -16,6 +16,7 @@
 package backup
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
@@ -25,7 +26,7 @@ import (
 	"time"
 )
 
-func ProvisionBackupJob(args *BackupRequest) error {
+func ProvisionBackupJob(dbConn *sql.DB, args *BackupRequest) error {
 
 	logit.Info.Println("backup.Provision called")
 	logit.Info.Println("with scheduleid=" + args.ScheduleID)
@@ -43,7 +44,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	params.Standalone = "false"
 
 	//get server info
-	server, err := admindb.GetServer(params.ServerID)
+	server, err := admindb.GetServer(dbConn, params.ServerID)
 	if err != nil {
 		logit.Error.Println("Provision:" + err.Error())
 		return err
@@ -53,14 +54,14 @@ func ProvisionBackupJob(args *BackupRequest) error {
 
 	//get the docker profile settings
 	var setting admindb.Setting
-	setting, err = admindb.GetSetting("S-DOCKER-PROFILE-CPU")
+	setting, err = admindb.GetSetting(dbConn, "S-DOCKER-PROFILE-CPU")
 	params.CPU = setting.Value
-	setting, err = admindb.GetSetting("S-DOCKER-PROFILE-MEM")
+	setting, err = admindb.GetSetting(dbConn, "S-DOCKER-PROFILE-MEM")
 	params.MEM = setting.Value
 
 	params.EnvVars = make(map[string]string)
 
-	setting, err = admindb.GetSetting("DOMAIN-NAME")
+	setting, err = admindb.GetSetting(dbConn, "DOMAIN-NAME")
 	if err != nil {
 		logit.Error.Println("Provision:" + err.Error())
 		return err
@@ -76,7 +77,7 @@ func ProvisionBackupJob(args *BackupRequest) error {
 	params.EnvVars["BACKUP_PATH"] = params.PGDataPath
 	params.EnvVars["BACKUP_HOST"] = args.ContainerName + "." + setting.Value
 
-	setting, err = admindb.GetSetting("PG-PORT")
+	setting, err = admindb.GetSetting(dbConn, "PG-PORT")
 	if err != nil {
 		logit.Error.Println("Provision:" + err.Error())
 		return err

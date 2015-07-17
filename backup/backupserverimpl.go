@@ -17,6 +17,7 @@ package backup
 
 import (
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"github.com/robfig/cron"
 	"os"
 )
@@ -75,6 +76,8 @@ type BackupSchedule struct {
 //global cron instance that gets started, stopped, restarted
 var CRONInstance *cron.Cron
 
+const CLUSTERADMIN_DB = "clusteradmin"
+
 var kubeEnv = false
 var kubeURL = ""
 
@@ -93,8 +96,15 @@ func init() {
 func (t *Command) AddStatus(status *BackupStatus, reply *Command) error {
 
 	logit.Info.Println("AddStatus called")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		return err
 
-	id, err := AddStatus(*status)
+	}
+	defer dbConn.Close()
+	var id string
+	id, err = AddStatus(dbConn, *status)
 	if err != nil {
 		logit.Error.Println("AddStatus error " + err.Error())
 	}
@@ -104,12 +114,20 @@ func (t *Command) AddStatus(status *BackupStatus, reply *Command) error {
 
 //called by backup jobs as they execute
 func (t *Command) UpdateStatus(status *BackupStatus, reply *Command) error {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		return err
+
+	}
+	defer dbConn.Close()
 
 	logit.Info.Println("UpdateStatus called")
 
-	err := UpdateStatus(*status)
+	err = UpdateStatus(dbConn, *status)
 	if err != nil {
 		logit.Error.Println("UpdateStatus error " + err.Error())
+		return err
 	}
 	return err
 }
@@ -117,10 +135,19 @@ func (t *Command) UpdateStatus(status *BackupStatus, reply *Command) error {
 //called by admin do perform an adhoc backup job
 func (t *Command) BackupNow(args *BackupRequest, reply *Command) error {
 
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		return err
+
+	}
+	defer dbConn.Close()
 	logit.Info.Println("BackupNow.impl called")
-	err := ProvisionBackupJob(args)
+
+	err = ProvisionBackupJob(dbConn, args)
 	if err != nil {
 		logit.Error.Println("BackupNow.impl error:" + err.Error())
+		return err
 	}
 	logit.Info.Println("BackupNow.impl completed")
 	return err
@@ -134,6 +161,7 @@ func (t *Command) Reload(schedule *BackupSchedule, reply *Command) error {
 	err := LoadSchedules()
 	if err != nil {
 		logit.Error.Println("Reload error " + err.Error())
+		return err
 	}
 
 	return err
@@ -141,12 +169,21 @@ func (t *Command) Reload(schedule *BackupSchedule, reply *Command) error {
 
 func LoadSchedules() error {
 
-	var err error
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		return err
+
+	}
+	defer dbConn.Close()
+
 	logit.Info.Println("LoadSchedules called")
 
-	schedules, err := GetSchedules()
+	var schedules []BackupSchedule
+	schedules, err = GetSchedules(dbConn)
 	if err != nil {
 		logit.Error.Println("LoadSchedules error " + err.Error())
+		return err
 	}
 
 	if CRONInstance != nil {

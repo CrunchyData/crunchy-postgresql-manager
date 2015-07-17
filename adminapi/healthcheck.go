@@ -17,16 +17,23 @@ package adminapi
 
 import (
 	"github.com/ant0ine/go-json-rest/rest"
-	"database/sql"
-	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/collect"
+	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 )
 
 func GetHealthCheck(w rest.ResponseWriter, r *rest.Request) {
 
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection("clusteradmin")
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -35,22 +42,12 @@ func GetHealthCheck(w rest.ResponseWriter, r *rest.Request) {
 
 	var results []collect.HealthCheck
 
-	var dbConn *sql.DB
-	dbConn, err = util.GetConnection("clusteradmin")
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	defer dbConn.Close()
-
 	results, err = collect.GetHealthCheck(dbConn)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		w.WriteJson(&results)
 		return
 	}
-
 
 	w.WriteJson(&results)
 

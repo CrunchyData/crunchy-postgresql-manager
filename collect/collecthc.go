@@ -8,13 +8,15 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const CLUSTERADMIN_DB = "clusteradmin"
+
 func Collecthc() error {
 	var err error
 
 	logit.Info.Println("Collecthc called")
 
 	var dbConn *sql.DB
-	dbConn, err = util.GetConnection("clusteradmin")
+	dbConn, err = util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
 		logit.Error.Println(err.Error())
 	}
@@ -27,8 +29,7 @@ func Collecthc() error {
 
 	//get all containers
 	var containers []admindb.Container
-	admindb.SetConnection(dbConn)
-	containers, err = admindb.GetAllContainers()
+	containers, err = admindb.GetAllContainers(dbConn)
 	if err != nil {
 		logit.Error.Println(err.Error())
 	}
@@ -110,8 +111,7 @@ func getDomain(dbConn *sql.DB) (string, error) {
 	var err error
 	var domain string
 
-	admindb.SetConnection(dbConn)
-	domain, err = admindb.GetDomain()
+	domain, err = admindb.GetDomain(dbConn)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return domain, err
@@ -123,8 +123,7 @@ func getPort(dbConn *sql.DB) (string, error) {
 	var err error
 	var port admindb.Setting
 
-	admindb.SetConnection(dbConn)
-	port, err = admindb.GetSetting("PG-PORT")
+	port, err = admindb.GetSetting(dbConn, "PG-PORT")
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return port.Value, err
@@ -148,8 +147,7 @@ func getCredential(dbConn *sql.DB, containerName string, containerRole string) (
 	}
 
 	var nodeuser admindb.ContainerUser
-	admindb.SetConnection(dbConn)
-	nodeuser, err = admindb.GetContainerUser(containerName, userID)
+	nodeuser, err = admindb.GetContainerUser(dbConn, containerName, userID)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return userID, password, database, err

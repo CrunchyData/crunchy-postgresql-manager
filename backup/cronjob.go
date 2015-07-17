@@ -17,6 +17,7 @@ package backup
 
 import (
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
 )
 
 type DefaultJob struct {
@@ -26,5 +27,11 @@ type DefaultJob struct {
 //this is the func that implements the cron Job interface
 func (t DefaultJob) Run() {
 	logit.Info.Println("running ScheduleID:" + t.request.ScheduleID)
-	ProvisionBackupJob(&t.request)
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+	}
+	defer dbConn.Close()
+
+	ProvisionBackupJob(dbConn, &t.request)
 }

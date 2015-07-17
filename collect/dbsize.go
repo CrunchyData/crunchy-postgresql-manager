@@ -48,8 +48,7 @@ func CollectDBSize(gauge *prometheus.GaugeVec) error {
 
 	//get all containers
 	var containers []admindb.Container
-	admindb.SetConnection(dbConn)
-	containers, err = admindb.GetAllContainers()
+	containers, err = admindb.GetAllContainers(dbConn)
 	if err != nil {
 		logit.Error.Println(err.Error())
 	}

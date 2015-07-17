@@ -19,6 +19,7 @@ import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 )
 
@@ -54,9 +55,18 @@ type Project2 struct {
 }
 
 func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
 	logit.Info.Println("UpdateProject: in UpdateProject")
 	project := Project{}
-	err := r.DecodeJsonPayload(&project)
+	err = r.DecodeJsonPayload(&project)
 	if err != nil {
 		logit.Error.Println("UpdateProject: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -68,7 +78,7 @@ func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("UpdateProject: Desc=" + project.Desc)
 	logit.Info.Println("UpdateProject: token=" + project.Token)
 
-	err = secimpl.Authorize(project.Token, "perm-container")
+	err = secimpl.Authorize(dbConn, project.Token, "perm-container")
 	if err != nil {
 		logit.Error.Println("UpdateProject: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -83,7 +93,7 @@ func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
 		Containers: project.Containers,
 		Clusters:   project.Clusters}
 
-	err = admindb.UpdateProject(dbproject)
+	err = admindb.UpdateProject(dbConn, dbproject)
 	if err != nil {
 		logit.Error.Println("UpdateProject: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -97,16 +107,25 @@ func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func AddProject(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
 	logit.Info.Println("AddProject: in AddProject")
 	project := Project{}
-	err := r.DecodeJsonPayload(&project)
+	err = r.DecodeJsonPayload(&project)
 	if err != nil {
 		logit.Error.Println("AddProject: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = secimpl.Authorize(project.Token, "perm-container")
+	err = secimpl.Authorize(dbConn, project.Token, "perm-container")
 	if err != nil {
 		logit.Error.Println("UpdateProject: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -120,7 +139,7 @@ func AddProject(w rest.ResponseWriter, r *rest.Request) {
 		UpdateDate: project.UpdateDate,
 		Containers: project.Containers}
 	var newid int
-	newid, err = admindb.InsertProject(dbproject)
+	newid, err = admindb.InsertProject(dbConn, dbproject)
 	if err != nil {
 		logit.Error.Println("AddProject: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -136,7 +155,16 @@ func AddProject(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func GetProject(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("GetProject: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -150,7 +178,7 @@ func GetProject(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	results, err := admindb.GetProject(ID)
+	results, err := admindb.GetProject(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("GetProject:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -162,14 +190,23 @@ func GetProject(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func GetAllProjects(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("GetAllProjects: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	projectsList, err := admindb.GetAllProjects()
+	projectsList, err := admindb.GetAllProjects(dbConn)
 	if err != nil {
 		logit.Error.Println("GetAllProjects: error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -229,8 +266,16 @@ func GetAllProjects(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func DeleteProject(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
 
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-container")
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-container")
 	if err != nil {
 		logit.Error.Println("DeleteProject: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -243,7 +288,7 @@ func DeleteProject(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, "ID required", http.StatusBadRequest)
 		return
 	}
-	err = admindb.DeleteProject(ID)
+	err = admindb.DeleteProject(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("DeleteProject: error secimpl call" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)

@@ -19,14 +19,15 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
+	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	_ "github.com/lib/pq"
 	"net/http"
 	"strconv"
+	"time"
 )
-
-const CLUSTERADMIN_DB = "clusteradmin"
 
 type Rule struct {
 	ID          string
@@ -53,7 +54,15 @@ type ContainerAccessRule struct {
 }
 
 func RulesGet(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("RulesGet: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -66,7 +75,7 @@ func RulesGet(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	rule, err := GetAccessRule(ID)
+	rule, err := GetAccessRule(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("RulesGet:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -78,15 +87,23 @@ func RulesGet(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func RulesGetAll(w rest.ResponseWriter, r *rest.Request) {
-	var err error
-	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("RulesGetAll: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	rules, err := GetAllRules()
+	rules, err := GetAllRules(dbConn)
 	if err != nil {
 		logit.Error.Println("RulesGetAll:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -98,8 +115,16 @@ func RulesGetAll(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func RulesDelete(w rest.ResponseWriter, r *rest.Request) {
-	var err error
-	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("RulesDelete: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -112,7 +137,7 @@ func RulesDelete(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	err = DeleteRule(ID)
+	err = DeleteRule(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("RulesGetAll:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -126,16 +151,25 @@ func RulesDelete(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func RulesUpdate(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
 	logit.Info.Println("RulesUpdate: in RulesUpdate")
 	rule := Rule{}
-	err := r.DecodeJsonPayload(&rule)
+	err = r.DecodeJsonPayload(&rule)
 	if err != nil {
 		logit.Error.Println("RulesUpdate: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = secimpl.Authorize(rule.Token, "perm-container")
+	err = secimpl.Authorize(dbConn, rule.Token, "perm-container")
 	if err != nil {
 		logit.Error.Println("RulesUpdate: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -154,7 +188,7 @@ func RulesUpdate(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	err = UpdateRule(rule)
+	err = UpdateRule(dbConn, rule)
 	if err != nil {
 		logit.Error.Println("RulesUpdate: error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -167,16 +201,25 @@ func RulesUpdate(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 func RulesInsert(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
 	logit.Info.Println("RulesInsert: in RulesInsert")
 	rule := Rule{}
-	err := r.DecodeJsonPayload(&rule)
+	err = r.DecodeJsonPayload(&rule)
 	if err != nil {
 		logit.Error.Println("RulesInsert: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = secimpl.Authorize(rule.Token, "perm-container")
+	err = secimpl.Authorize(dbConn, rule.Token, "perm-container")
 	if err != nil {
 		logit.Error.Println("RulesInsert: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -189,7 +232,7 @@ func RulesInsert(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	err = InsertRule(rule)
+	err = InsertRule(dbConn, rule)
 	if err != nil {
 		logit.Error.Println("RulesUpdate: error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -202,7 +245,7 @@ func RulesInsert(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
-func UpdateRule(rule Rule) error {
+func UpdateRule(dbConn *sql.DB, rule Rule) error {
 	queryStr := fmt.Sprintf(
 		"update accessrule set ( name, ruletype, database, ruleuser, address, method, description, updatedt) = ('%s', '%s', '%s', '%s', '%s', '%s', '%s', now()) where id = %s returning id",
 		rule.Name,
@@ -216,14 +259,8 @@ func UpdateRule(rule Rule) error {
 	logit.Info.Println(queryStr)
 
 	var ruleid int
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-	defer dbConn.Close()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return err
-	}
 
-	err = dbConn.QueryRow(queryStr).Scan(&ruleid)
+	err := dbConn.QueryRow(queryStr).Scan(&ruleid)
 	switch {
 	case err != nil:
 		return err
@@ -234,7 +271,7 @@ func UpdateRule(rule Rule) error {
 
 }
 
-func InsertRule(rule Rule) error {
+func InsertRule(dbConn *sql.DB, rule Rule) error {
 	queryStr := fmt.Sprintf(
 		"insert into accessrule ( name, ruletype, database, ruleuser, address, method, description, createdt, updatedt) values ( '%s', '%s', '%s', '%s', '%s', '%s', '%s', now(), now()) returning id",
 		rule.Name,
@@ -247,13 +284,7 @@ func InsertRule(rule Rule) error {
 
 	logit.Info.Println(queryStr)
 	var ruleid int
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-	defer dbConn.Close()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return err
-	}
-	err = dbConn.QueryRow(queryStr).Scan(&ruleid)
+	err := dbConn.QueryRow(queryStr).Scan(&ruleid)
 	switch {
 	case err != nil:
 		logit.Error.Println(err.Error())
@@ -266,18 +297,12 @@ func InsertRule(rule Rule) error {
 
 }
 
-func DeleteRule(ID string) error {
+func DeleteRule(dbConn *sql.DB, ID string) error {
 	queryStr := fmt.Sprintf("delete from accessrule where  id=%s returning id", ID)
 	logit.Info.Println(queryStr)
 
 	var ruleid int
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-	defer dbConn.Close()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return err
-	}
-	err = dbConn.QueryRow(queryStr).Scan(&ruleid)
+	err := dbConn.QueryRow(queryStr).Scan(&ruleid)
 	switch {
 	case err != nil:
 		logit.Error.Println(err)
@@ -289,20 +314,14 @@ func DeleteRule(ID string) error {
 
 }
 
-func GetAccessRule(ID string) (Rule, error) {
+func GetAccessRule(dbConn *sql.DB, ID string) (Rule, error) {
 	rule := Rule{}
 
 	queryStr := fmt.Sprintf("select ID, NAME, RULETYPE, DATABASE, RULEUSER, ADDRESS, METHOD, DESCRIPTION, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS'),  to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from accessrule where id = %s", ID)
 
 	logit.Info.Println(queryStr)
 
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-	defer dbConn.Close()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return rule, err
-	}
-	err = dbConn.QueryRow(queryStr).Scan(
+	err := dbConn.QueryRow(queryStr).Scan(
 		&rule.ID,
 		&rule.Type,
 		&rule.Database,
@@ -324,18 +343,10 @@ func GetAccessRule(ID string) (Rule, error) {
 
 }
 
-func GetAllRules() ([]Rule, error) {
+func GetAllRules(dbConn *sql.DB) ([]Rule, error) {
 
 	var rules []Rule
-	var rows *sql.Rows
-	var err error
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-	defer dbConn.Close()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return rules, err
-	}
-	rows, err = dbConn.Query(
+	rows, err := dbConn.Query(
 		"select id, name, ruletype, database, ruleuser, address, method, description, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS'), to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from accessrule order by name")
 	if err != nil {
 		return rules, err
@@ -398,8 +409,16 @@ func ContainerAccessRuleGet(w rest.ResponseWriter, r *rest.Request) {
 */
 
 func ContainerAccessRuleGetAll(w rest.ResponseWriter, r *rest.Request) {
-	var err error
-	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("ContainerRulesGetAll: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -412,7 +431,7 @@ func ContainerAccessRuleGetAll(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	cars, err := GetAllContainerAccessRule(ContainerID)
+	cars, err := GetAllContainerAccessRule(dbConn, ContainerID)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -483,9 +502,18 @@ func ContainerAccessRuleInsert(w rest.ResponseWriter, r *rest.Request) {
 }
 */
 func ContainerAccessRuleUpdate(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
 	logit.Info.Println("ContainerAccessRuleInsert")
 	cars := make([]ContainerAccessRule, 0)
-	err := r.DecodeJsonPayload(&cars)
+	err = r.DecodeJsonPayload(&cars)
 	if err != nil {
 		logit.Error.Println("ContainerAccessRuleInsert: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -493,13 +521,16 @@ func ContainerAccessRuleUpdate(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	if len(cars) > 0 {
-		err = secimpl.Authorize(cars[0].Token, "perm-container")
+		err = secimpl.Authorize(dbConn, cars[0].Token, "perm-container")
 		if err != nil {
 			logit.Error.Println("ContainerAccessRuleInsert: authorize error " + err.Error())
 			rest.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
 	}
+
+	var updatesRequired = false
+	var ContainerID string
 
 	for i := range cars {
 		if cars[i].Selected == "true" {
@@ -508,8 +539,10 @@ func ContainerAccessRuleUpdate(w rest.ResponseWriter, r *rest.Request) {
 				logit.Info.Println("doing nothing on " + cars[i].ContainerID + " " + cars[i].AccessRuleID + " " + cars[i].AccessRuleName)
 			} else {
 				//insert
+				updatesRequired = true
+				ContainerID = cars[i].ContainerID
 				logit.Info.Println("doing insert on " + cars[i].ContainerID + " " + cars[i].AccessRuleID + " " + cars[i].AccessRuleName)
-				err = InsertContainerAccessRule(cars[i])
+				err = InsertContainerAccessRule(dbConn, cars[i])
 				if err != nil {
 					logit.Error.Println("error doing insert on " + cars[i].ContainerID + " " + cars[i].AccessRuleID + " " + cars[i].AccessRuleName)
 					logit.Error.Println(err.Error())
@@ -519,9 +552,11 @@ func ContainerAccessRuleUpdate(w rest.ResponseWriter, r *rest.Request) {
 			}
 		} else {
 			if cars[i].ID != "-1" {
+				updatesRequired = true
+				ContainerID = cars[i].ContainerID
 				//delete
 				logit.Info.Println("doing delete on " + cars[i].ContainerID + " " + cars[i].AccessRuleID + " " + cars[i].AccessRuleName)
-				err = DeleteContainerAccessRule(cars[i].ID)
+				err = DeleteContainerAccessRule(dbConn, cars[i].ID)
 				if err != nil {
 					logit.Error.Println("error doing delete on " + cars[i].ContainerID + " " + cars[i].AccessRuleID + " " + cars[i].AccessRuleName)
 					logit.Error.Println(err.Error())
@@ -529,6 +564,16 @@ func ContainerAccessRuleUpdate(w rest.ResponseWriter, r *rest.Request) {
 					return
 				}
 			}
+		}
+	}
+
+	if updatesRequired {
+		err = performConfigUpdate(dbConn, ContainerID)
+		if err != nil {
+			logit.Error.Println("error on config update ContainerID=" + ContainerID)
+			logit.Error.Println(err.Error())
+			rest.Error(w, err.Error(), 400)
+			return
 		}
 	}
 
@@ -542,18 +587,12 @@ func ContainerAccessRuleUpdate(w rest.ResponseWriter, r *rest.Request) {
 // database logic for containeraccessrules
 //
 
-func DeleteContainerAccessRule(ID string) error {
+func DeleteContainerAccessRule(dbConn *sql.DB, ID string) error {
 	queryStr := fmt.Sprintf("delete from containeraccessrule where id=%s returning id", ID)
 	logit.Info.Println(queryStr)
 
 	var id int
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-	defer dbConn.Close()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return err
-	}
-	err = dbConn.QueryRow(queryStr).Scan(&id)
+	err := dbConn.QueryRow(queryStr).Scan(&id)
 	switch {
 	case err != nil:
 		logit.Error.Println(err)
@@ -565,7 +604,7 @@ func DeleteContainerAccessRule(ID string) error {
 
 }
 
-func InsertContainerAccessRule(car ContainerAccessRule) error {
+func InsertContainerAccessRule(dbConn *sql.DB, car ContainerAccessRule) error {
 	queryStr := fmt.Sprintf(
 		"insert into containeraccessrule ( containerid, accessruleid, createdt ) values ( %s, %s, now()) returning id",
 		car.ContainerID,
@@ -573,13 +612,7 @@ func InsertContainerAccessRule(car ContainerAccessRule) error {
 
 	logit.Info.Println(queryStr)
 	var id int
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-	defer dbConn.Close()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return err
-	}
-	err = dbConn.QueryRow(queryStr).Scan(&id)
+	err := dbConn.QueryRow(queryStr).Scan(&id)
 	switch {
 	case err != nil:
 		logit.Error.Println(err.Error())
@@ -592,18 +625,11 @@ func InsertContainerAccessRule(car ContainerAccessRule) error {
 
 }
 
-func GetAllContainerAccessRule(containerID string) ([]ContainerAccessRule, error) {
+func GetAllContainerAccessRule(dbConn *sql.DB, containerID string) ([]ContainerAccessRule, error) {
 
 	var cars []ContainerAccessRule
 	var rows *sql.Rows
-	var err error
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-	defer dbConn.Close()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return cars, err
-	}
-	rows, err = dbConn.Query(
+	rows, err := dbConn.Query(
 		"select coalesce(car.id, -1), coalesce(car.containerid, -1), ar.id, ar.name, to_char(coalesce(ar.createdt, now()), 'MM-DD-YYYY HH24:MI:SS') from accessrule ar left outer join containeraccessrule car on (car.accessruleid = ar.id and car.containerid = " + containerID + ")")
 	if err != nil {
 		return cars, err
@@ -634,20 +660,14 @@ func GetAllContainerAccessRule(containerID string) ([]ContainerAccessRule, error
 	return cars, nil
 }
 
-func GetContainerAccessRule(ID string) (ContainerAccessRule, error) {
+func GetContainerAccessRule(dbConn *sql.DB, ID string) (ContainerAccessRule, error) {
 	car := ContainerAccessRule{}
 
 	queryStr := fmt.Sprintf("select ID, CONTAINERID, ACCESSRULEID, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from containeraccessrule where id = %s", ID)
 
 	logit.Info.Println(queryStr)
 
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-	defer dbConn.Close()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return car, err
-	}
-	err = dbConn.QueryRow(queryStr).Scan(
+	err := dbConn.QueryRow(queryStr).Scan(
 		&car.ID,
 		&car.ContainerID,
 		&car.AccessRuleID,
@@ -661,5 +681,93 @@ func GetContainerAccessRule(ID string) (ContainerAccessRule, error) {
 	}
 
 	return car, nil
+
+}
+
+func performConfigUpdate(dbConn *sql.DB, ContainerID string) error {
+	logit.Info.Println("performConfigUpdate....")
+
+	//cars, err := GetAllContainerAccessRule(ContainerID)
+	_, err := GetAllContainerAccessRule(dbConn, ContainerID)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
+
+	container, err := admindb.GetContainer(dbConn, ContainerID)
+	if err != nil {
+		logit.Error.Println("GetNode: " + err.Error())
+		return err
+	}
+
+	var currentStatus string
+	currentStatus, err = GetPGStatus2(dbConn, container.Name, container.Name)
+	if err != nil {
+		logit.Error.Println("GetNode:" + err.Error())
+		return err
+	}
+
+	if currentStatus != "RUNNING" {
+		logit.Info.Println("performConfigUpdate....starting postgres")
+		if container.Role == "pgpool" {
+			var spgresp cpmcontainerapi.StartPgpoolResponse
+			spgresp, err = cpmcontainerapi.StartPgpoolClient(container.Name)
+			logit.Info.Println("AdminStartpg:" + spgresp.Output)
+		} else {
+			var srep cpmcontainerapi.StartPGResponse
+			srep, err = cpmcontainerapi.StartPGClient(container.Name)
+			logit.Info.Println("AdminStartpg:" + srep.Output)
+		}
+
+		if err != nil {
+			logit.Error.Println("AdminStartpg:" + err.Error())
+			return err
+		}
+
+		//give the UI a chance to see the start
+		time.Sleep(5000 * time.Millisecond)
+
+	}
+
+	//make template changes here
+	logit.Info.Println("performConfigUpdate....making template changes")
+
+	//restart postgres
+
+	logit.Info.Println("performConfigUpdate....stopping postgres")
+	if container.Role == "pgpool" {
+		var stoppoolResp cpmcontainerapi.StopPgpoolResponse
+		stoppoolResp, err = cpmcontainerapi.StopPgpoolClient(container.Name)
+		logit.Info.Println("AdminStoppg:" + stoppoolResp.Output)
+	} else {
+		var stoppgResp cpmcontainerapi.StopPGResponse
+		stoppgResp, err = cpmcontainerapi.StopPGClient(container.Name)
+		logit.Info.Println("AdminStoppg:" + stoppgResp.Output)
+	}
+	if err != nil {
+		logit.Error.Println("AdminStoppg:" + err.Error())
+		return err
+	}
+
+	//give the UI a chance to see the stop
+	time.Sleep(5000 * time.Millisecond)
+
+	logit.Info.Println("performConfigUpdate....starting postgres")
+	if container.Role == "pgpool" {
+		var spgresp cpmcontainerapi.StartPgpoolResponse
+		spgresp, err = cpmcontainerapi.StartPgpoolClient(container.Name)
+		logit.Info.Println("AdminStartpg:" + spgresp.Output)
+	} else {
+		var srep cpmcontainerapi.StartPGResponse
+		srep, err = cpmcontainerapi.StartPGClient(container.Name)
+		logit.Info.Println("AdminStartpg:" + srep.Output)
+	}
+
+	if err != nil {
+		logit.Error.Println("AdminStartpg:" + err.Error())
+		return err
+	}
+
+	return err
 
 }

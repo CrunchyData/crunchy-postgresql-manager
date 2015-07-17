@@ -15,6 +15,10 @@
 
 package sec
 
+import (
+	"database/sql"
+)
+
 type Permission struct {
 	Name        string
 	Description string
@@ -44,21 +48,21 @@ type Session struct {
 }
 
 type SecInterface interface {
-	Authorize(string, string) error
-	Login(string, string) (string, error)
-	Logout(string) error
-	ChangePassword(string, string) error
-	CompareUserToToken(string, string) (bool, error)
-	UpdateUser(User) error
-	AddUser(User) error
-	GetUser(string) (User, error)
-	GetAllUsers() ([]User, error)
-	DeleteUser(string) error
-	UpdateRole(Role) error
-	AddRole(Role) error
-	DeleteRole(string) error
-	GetAllRoles() ([]Role, error)
-	GetRole(string) (Role, error)
+	Authorize(*sql.DB, string, string) error
+	Login(*sql.DB, string, string) (string, error)
+	Logout(*sql.DB, string) error
+	ChangePassword(*sql.DB, string, string) error
+	CompareUserToToken(*sql.DB, string, string) (bool, error)
+	UpdateUser(*sql.DB, User) error
+	AddUser(*sql.DB, User) error
+	GetUser(*sql.DB, string) (User, error)
+	GetAllUsers(*sql.DB) ([]User, error)
+	DeleteUser(*sql.DB, string) error
+	UpdateRole(*sql.DB, Role) error
+	AddRole(*sql.DB, Role) error
+	DeleteRole(*sql.DB, string) error
+	GetAllRoles(*sql.DB) ([]Role, error)
+	GetRole(*sql.DB, string) (Role, error)
 	LogRole(Role)
 	LogUser(User)
 }

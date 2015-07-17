@@ -17,6 +17,7 @@ package template
 
 import (
 	"bytes"
+	"database/sql"
 	"errors"
 	"flag"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
@@ -114,7 +115,7 @@ func Postgresql(mode string, port string, clusterType string) (string, error) {
 	return buff.String(), nil
 }
 
-func Hba(kubeEnv bool, mode string, hostname string, port string, clusterid string, domainname string) (string, error) {
+func Hba(dbConn *sql.DB, kubeEnv bool, mode string, hostname string, port string, clusterid string, domainname string) (string, error) {
 
 	var hbaInfo HBAParameters
 
@@ -130,7 +131,7 @@ func Hba(kubeEnv bool, mode string, hostname string, port string, clusterid stri
 		hbaInfo.ADMIN_HOST = "cpm-admin." + domainname
 	}
 
-	servers, err := admindb.GetAllServers()
+	servers, err := admindb.GetAllServers(dbConn)
 	if err != nil {
 		logit.Error.Println("Hba:" + err.Error())
 		return "", err
@@ -162,7 +163,7 @@ func Hba(kubeEnv bool, mode string, hostname string, port string, clusterid stri
 	}
 
 	if mode == "standby" || mode == "master" {
-		_, pgpoolNode, standbyList, err := getMasterValues(kubeEnv, clusterid, domainname)
+		_, pgpoolNode, standbyList, err := getMasterValues(dbConn, kubeEnv, clusterid, domainname)
 		if err != nil {
 			return "", err
 		}
@@ -197,13 +198,13 @@ func Hba(kubeEnv bool, mode string, hostname string, port string, clusterid stri
 //
 // getMasterValues returns a master node, pgpool node, and list of standby nodes
 //
-func getMasterValues(kubeEnv bool, clusterID string, domainname string) (admindb.Container, admindb.Container, []string, error) {
+func getMasterValues(dbConn *sql.DB, kubeEnv bool, clusterID string, domainname string) (admindb.Container, admindb.Container, []string, error) {
 	master := admindb.Container{}
 	pgpool := admindb.Container{}
 	//we pass in a list of containers in this cluster
 	//that will be added to the pg_hba.conf of the master
 	//for allowing replication
-	nodes, err1 := admindb.GetAllContainersForCluster(clusterID)
+	nodes, err1 := admindb.GetAllContainersForCluster(dbConn, clusterID)
 	if err1 != nil {
 		return master, pgpool, make([]string, 1), err1
 	}

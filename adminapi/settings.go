@@ -16,22 +16,32 @@
 package adminapi
 
 import (
+	"database/sql"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 )
 
 func GetAllGeneralSettings(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
 
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("GetAllGeneralSettings: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	results, err := admindb.GetAllGeneralSettings()
+	results, err := admindb.GetAllGeneralSettings(dbConn)
 	if err != nil {
 		logit.Error.Println("GetAllGeneralSettings: error-" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -49,15 +59,23 @@ func GetAllGeneralSettings(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func GetAllSettings(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
 
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
 		logit.Error.Println("GetAllSettings: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	results, err := admindb.GetAllSettings()
+	results, err := admindb.GetAllSettings(dbConn)
 	if err != nil {
 		logit.Error.Println("GetAllSettings: error-" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -75,15 +93,23 @@ func GetAllSettings(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func SaveSetting(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
 	logit.Info.Println("SaveSetting:")
 	setting := Setting{}
-	err := r.DecodeJsonPayload(&setting)
+	err = r.DecodeJsonPayload(&setting)
 	if err != nil {
 		logit.Error.Println("SaveSetting: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = secimpl.Authorize(setting.Token, "perm-setting")
+	err = secimpl.Authorize(dbConn, setting.Token, "perm-setting")
 	if err != nil {
 		logit.Error.Println("SaveSetting: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -94,7 +120,7 @@ func SaveSetting(w rest.ResponseWriter, r *rest.Request) {
 	dbSetting.Name = setting.Name
 	dbSetting.Value = setting.Value
 
-	err2 := admindb.UpdateSetting(dbSetting)
+	err2 := admindb.UpdateSetting(dbConn, dbSetting)
 	if err2 != nil {
 		logit.Error.Println("SaveSetting: error in UpdateSetting " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -108,15 +134,23 @@ func SaveSetting(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func SaveSettings(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
 	logit.Info.Println("SaveSettings:")
 	settings := Settings{}
-	err := r.DecodeJsonPayload(&settings)
+	err = r.DecodeJsonPayload(&settings)
 	if err != nil {
 		logit.Error.Println("SaveSettings: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = secimpl.Authorize(settings.Token, "perm-setting")
+	err = secimpl.Authorize(dbConn, settings.Token, "perm-setting")
 	if err != nil {
 		logit.Error.Println("SaveSettings: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -128,11 +162,11 @@ func SaveSettings(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("SaveSettings: DomainName=" + settings.DomainName)
 
 	dbsetting := admindb.Setting{"DOCKER-REGISTRY", settings.DockerRegistry, ""}
-	err2 := admindb.UpdateSetting(dbsetting)
+	err2 := admindb.UpdateSetting(dbConn, dbsetting)
 	dbsetting = admindb.Setting{"PG-PORT", settings.PGPort, ""}
-	err2 = admindb.UpdateSetting(dbsetting)
+	err2 = admindb.UpdateSetting(dbConn, dbsetting)
 	dbsetting = admindb.Setting{"DOMAIN-NAME", settings.DomainName, ""}
-	err2 = admindb.UpdateSetting(dbsetting)
+	err2 = admindb.UpdateSetting(dbConn, dbsetting)
 	if err2 != nil {
 		logit.Error.Println("SaveSettings: error in UpdateSetting " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -146,16 +180,25 @@ func SaveSettings(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func SaveProfiles(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
 	logit.Info.Println("SaveProfiles:")
 	profiles := Profiles{}
-	err := r.DecodeJsonPayload(&profiles)
+	err = r.DecodeJsonPayload(&profiles)
 	if err != nil {
 		logit.Error.Println("SaveProfiles: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = secimpl.Authorize(profiles.Token, "perm-setting")
+	err = secimpl.Authorize(dbConn, profiles.Token, "perm-setting")
 	if err != nil {
 		logit.Error.Println("SaveProfiles: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -167,17 +210,17 @@ func SaveProfiles(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("SaveProfiles: largeCPU=" + profiles.LargeCPU + " largeMEM=" + profiles.LargeMEM)
 
 	dbsetting := admindb.Setting{"S-DOCKER-PROFILE-CPU", profiles.SmallCPU, ""}
-	err2 := admindb.UpdateSetting(dbsetting)
+	err2 := admindb.UpdateSetting(dbConn, dbsetting)
 	dbsetting = admindb.Setting{"S-DOCKER-PROFILE-MEM", profiles.SmallMEM, ""}
-	err2 = admindb.UpdateSetting(dbsetting)
+	err2 = admindb.UpdateSetting(dbConn, dbsetting)
 	dbsetting = admindb.Setting{"M-DOCKER-PROFILE-CPU", profiles.MediumCPU, ""}
-	err2 = admindb.UpdateSetting(dbsetting)
+	err2 = admindb.UpdateSetting(dbConn, dbsetting)
 	dbsetting = admindb.Setting{"M-DOCKER-PROFILE-MEM", profiles.MediumMEM, ""}
-	err2 = admindb.UpdateSetting(dbsetting)
+	err2 = admindb.UpdateSetting(dbConn, dbsetting)
 	dbsetting = admindb.Setting{"L-DOCKER-PROFILE-CPU", profiles.LargeCPU, ""}
-	err2 = admindb.UpdateSetting(dbsetting)
+	err2 = admindb.UpdateSetting(dbConn, dbsetting)
 	dbsetting = admindb.Setting{"L-DOCKER-PROFILE-MEM", profiles.LargeMEM, ""}
-	err2 = admindb.UpdateSetting(dbsetting)
+	err2 = admindb.UpdateSetting(dbConn, dbsetting)
 	if err2 != nil {
 		logit.Error.Println("SaveProfiles: sql error " + err2.Error())
 		rest.Error(w, err2.Error(), http.StatusBadRequest)
@@ -192,9 +235,16 @@ func SaveProfiles(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func SaveClusterProfiles(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("BackupNow: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
 	logit.Info.Println("SaveProfiles:")
 	profiles := ClusterProfiles{}
-	var err error
 	err = r.DecodeJsonPayload(&profiles)
 	if err != nil {
 		logit.Error.Println("SaveProfiles: error in decode" + err.Error())
@@ -202,7 +252,7 @@ func SaveClusterProfiles(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	err = secimpl.Authorize(profiles.Token, "perm-setting")
+	err = secimpl.Authorize(dbConn, profiles.Token, "perm-setting")
 	if err != nil {
 		logit.Error.Println("SaveProfiles: authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
@@ -212,17 +262,17 @@ func SaveClusterProfiles(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("SaveClusterProfiles: size=" + profiles.Size)
 
 	dbsetting := admindb.Setting{"CP-" + profiles.Size + "-COUNT", profiles.Count, ""}
-	err = admindb.UpdateSetting(dbsetting)
+	err = admindb.UpdateSetting(dbConn, dbsetting)
 	dbsetting = admindb.Setting{"CP-" + profiles.Size + "-ALGO", profiles.Algo, ""}
-	err = admindb.UpdateSetting(dbsetting)
+	err = admindb.UpdateSetting(dbConn, dbsetting)
 	dbsetting = admindb.Setting{"CP-" + profiles.Size + "-M-PROFILE", profiles.MasterProfile, ""}
-	err = admindb.UpdateSetting(dbsetting)
+	err = admindb.UpdateSetting(dbConn, dbsetting)
 	dbsetting = admindb.Setting{"CP-" + profiles.Size + "-S-PROFILE", profiles.StandbyProfile, ""}
-	err = admindb.UpdateSetting(dbsetting)
+	err = admindb.UpdateSetting(dbConn, dbsetting)
 	dbsetting = admindb.Setting{"CP-" + profiles.Size + "-M-SERVER", profiles.MasterServer, ""}
-	err = admindb.UpdateSetting(dbsetting)
+	err = admindb.UpdateSetting(dbConn, dbsetting)
 	dbsetting = admindb.Setting{"CP-" + profiles.Size + "-S-SERVER", profiles.StandbyServer, ""}
-	err = admindb.UpdateSetting(dbsetting)
+	err = admindb.UpdateSetting(dbConn, dbsetting)
 
 	if err != nil {
 		logit.Error.Println("SaveClusterProfiles: sql error " + err.Error())
@@ -237,10 +287,11 @@ func SaveClusterProfiles(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
-func getClusterProfileInfo(sz string) (ClusterProfiles, error) {
+func getClusterProfileInfo(dbConn *sql.DB, sz string) (ClusterProfiles, error) {
+
 	prof := ClusterProfiles{}
 
-	results, err := admindb.GetAllSettingsMap()
+	results, err := admindb.GetAllSettingsMap(dbConn)
 	if err != nil {
 		logit.Error.Println("GetAllSettings: error-" + err.Error())
 		return prof, err
