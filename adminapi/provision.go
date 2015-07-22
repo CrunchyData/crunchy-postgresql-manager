@@ -318,7 +318,7 @@ func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PR
 	fqdn := params.ContainerName + "." + domainname.Value
 
 	//we are depending on a DNS entry being created shortly after
-	//creating the node either in Docker or Kube!
+	//creating the node in Docker
 	//you might need to wait here until you can reach the new node's agent
 	logit.Info.Println("PROFILE waiting till DNS ready")
 	err = waitTillReady(fqdn)
@@ -358,7 +358,7 @@ func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PR
 			return err
 		}
 		//create pg_hba.conf
-		data, err = template.Hba(dbConn, KubeEnv, mode, params.ContainerName, pgport.Value, "", domainname.Value)
+		data, err = template.Hba(dbConn, mode, params.ContainerName, pgport.Value, "", domainname.Value)
 		if err != nil {
 			logit.Error.Println("Provision:" + err.Error())
 			return err

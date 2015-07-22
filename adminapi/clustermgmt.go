@@ -264,7 +264,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	}
 
 	//configure master pg_hba.conf file
-	data, err = template.Hba(dbConn, KubeEnv, "master", master.Name, pgport.Value, cluster.ID, domainname.Value)
+	data, err = template.Hba(dbConn, "master", master.Name, pgport.Value, cluster.ID, domainname.Value)
 	if err != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
 		return err
@@ -302,9 +302,6 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	var found = false
 	var currentStatus string
 	var masterhost = master.Name
-	if KubeEnv {
-		masterhost = master.Name + "-db"
-	}
 	for i := 0; i < 20; i++ {
 		currentStatus, err = GetPGStatus2(dbConn, master.Name, masterhost)
 		if currentStatus == "RUNNING" {
@@ -381,7 +378,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 			logit.Info.Println("configureCluster:standby postgresql.conf copied remotely")
 
 			//configure standby pg_hba.conf file
-			data, err = template.Hba(dbConn, KubeEnv, STANDBY, standbynodes[i].Name, pgport.Value, cluster.ID, domainname.Value)
+			data, err = template.Hba(dbConn, STANDBY, standbynodes[i].Name, pgport.Value, cluster.ID, domainname.Value)
 			if err != nil {
 				logit.Error.Println("configureCluster:" + err.Error())
 				return err

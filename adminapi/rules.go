@@ -731,6 +731,7 @@ func performConfigUpdate(dbConn *sql.DB, ContainerID string) error {
 
 	//make template changes here
 	logit.Info.Println("performConfigUpdate....making template changes")
+	templateChange()
 
 	//restart postgres
 
@@ -770,4 +771,9 @@ func performConfigUpdate(dbConn *sql.DB, ContainerID string) error {
 
 	return err
 
+}
+
+func templateChange() error {
+	var err error
+	return err
 }

@@ -38,27 +38,6 @@ var pgUserFlag = flag.String("pguserid", "", "pg user ID")
 
 var outputFile *os.File
 
-type KubePodParams struct {
-	ID                   string
-	PODID                string
-	CPU                  string
-	MEM                  string
-	IMAGE                string
-	VOLUME               string
-	PORT                 string
-	BACKUP_NAME          string
-	BACKUP_SERVERNAME    string
-	BACKUP_SERVERIP      string
-	BACKUP_SCHEDULEID    string
-	BACKUP_PROFILENAME   string
-	BACKUP_CONTAINERNAME string
-	BACKUP_PATH          string
-	BACKUP_HOST          string
-	BACKUP_PORT          string
-	BACKUP_USER          string
-	BACKUP_SERVER_URL    string
-}
-
 type HBAParameters struct {
 	ADMIN_HOST     string
 	MONITOR_HOST   string
@@ -115,21 +94,14 @@ func Postgresql(mode string, port string, clusterType string) (string, error) {
 	return buff.String(), nil
 }
 
-func Hba(dbConn *sql.DB, kubeEnv bool, mode string, hostname string, port string, clusterid string, domainname string) (string, error) {
+func Hba(dbConn *sql.DB, mode string, hostname string, port string, clusterid string, domainname string) (string, error) {
 
 	var hbaInfo HBAParameters
 
-	if kubeEnv {
-		hbaInfo.PG_HOST_IP = hostname + "-db" + "." + domainname
-		hbaInfo.BACKUP_HOST = hostname + "-db" + "-backup." + domainname
-		hbaInfo.MONITOR_HOST = "cpm-mon" + "-db" + "." + domainname
-		hbaInfo.ADMIN_HOST = "cpm-admin" + "-db" + "." + domainname
-	} else {
-		hbaInfo.PG_HOST_IP = hostname + "." + domainname
-		hbaInfo.BACKUP_HOST = hostname + "-backup." + domainname
-		hbaInfo.MONITOR_HOST = "cpm-mon." + domainname
-		hbaInfo.ADMIN_HOST = "cpm-admin." + domainname
-	}
+	hbaInfo.PG_HOST_IP = hostname + "." + domainname
+	hbaInfo.BACKUP_HOST = hostname + "-backup." + domainname
+	hbaInfo.MONITOR_HOST = "cpm-mon." + domainname
+	hbaInfo.ADMIN_HOST = "cpm-admin." + domainname
 
 	servers, err := admindb.GetAllServers(dbConn)
 	if err != nil {
@@ -163,16 +135,12 @@ func Hba(dbConn *sql.DB, kubeEnv bool, mode string, hostname string, port string
 	}
 
 	if mode == "standby" || mode == "master" {
-		_, pgpoolNode, standbyList, err := getMasterValues(dbConn, kubeEnv, clusterid, domainname)
+		_, pgpoolNode, standbyList, err := getMasterValues(dbConn, clusterid, domainname)
 		if err != nil {
 			return "", err
 		}
 
-		if kubeEnv {
-			hbaInfo.PGPOOL_HOST = pgpoolNode.Name + "-db" + "." + domainname
-		} else {
-			hbaInfo.PGPOOL_HOST = pgpoolNode.Name + "." + domainname
-		}
+		hbaInfo.PGPOOL_HOST = pgpoolNode.Name + "." + domainname
 		hbaInfo.STANDBY_LIST = standbyList
 	}
 
@@ -198,7 +166,7 @@ func Hba(dbConn *sql.DB, kubeEnv bool, mode string, hostname string, port string
 //
 // getMasterValues returns a master node, pgpool node, and list of standby nodes
 //
-func getMasterValues(dbConn *sql.DB, kubeEnv bool, clusterID string, domainname string) (admindb.Container, admindb.Container, []string, error) {
+func getMasterValues(dbConn *sql.DB, clusterID string, domainname string) (admindb.Container, admindb.Container, []string, error) {
 	master := admindb.Container{}
 	pgpool := admindb.Container{}
 	//we pass in a list of containers in this cluster
@@ -220,21 +188,13 @@ func getMasterValues(dbConn *sql.DB, kubeEnv bool, clusterID string, domainname 
 		if nodes[i].Role == "master" {
 			master = nodes[i]
 			masterFound = true
-			if kubeEnv {
-				nodeslice[nodecount] = nodes[i].Name + "-db" + "." + domainname
-			} else {
-				nodeslice[nodecount] = nodes[i].Name + "." + domainname
-			}
+			nodeslice[nodecount] = nodes[i].Name + "." + domainname
 			nodecount++
 		} else if nodes[i].Role == "pgpool" {
 			pgpool = nodes[i]
 			pgpoolFound = true
 		} else if nodes[i].Role == "standby" {
-			if kubeEnv {
-				nodeslice[nodecount] = nodes[i].Name + "-db" + "." + domainname
-			} else {
-				nodeslice[nodecount] = nodes[i].Name + "." + domainname
-			}
+			nodeslice[nodecount] = nodes[i].Name + "." + domainname
 			nodecount++
 		}
 		i++
@@ -376,44 +336,4 @@ func Poolconf(poolnames []string) (string, error) {
 	logit.Info.Println("Poolconf:" + buff.String())
 
 	return buff.String(), nil
-}
-
-func KubeNodePod(info KubePodParams) ([]byte, error) {
-
-	var path string
-	path = util.GetBase() + "/conf/" + "kube.node.pod.template"
-
-	contents, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	tmpl, err := template.New("kube").Parse(string(contents))
-	if err != nil {
-		return nil, err
-	}
-	buff := bytes.NewBufferString("")
-	err = tmpl.Execute(buff, info)
-
-	return buff.Bytes(), nil
-}
-
-func KubeNodeService(info KubePodParams) ([]byte, error) {
-
-	var path string
-	path = util.GetBase() + "/conf/" + "kube.node.service.template"
-
-	contents, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	tmpl, err := template.New("kube").Parse(string(contents))
-	if err != nil {
-		return nil, err
-	}
-	buff := bytes.NewBufferString("")
-	err = tmpl.Execute(buff, info)
-
-	return buff.Bytes(), nil
 }
