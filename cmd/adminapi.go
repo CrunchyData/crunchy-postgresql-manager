@@ -20,22 +20,13 @@ import (
 	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/adminapi"
-	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"log"
 	"net/http"
-	"os"
 )
 
 func init() {
 	fmt.Println("before parsing in init")
 	flag.Parse()
-
-	adminapi.KubeURL = os.Getenv("KUBE_URL")
-	logit.Info.Println("KUBE_URL=[" + adminapi.KubeURL + "]")
-	if adminapi.KubeURL != "" {
-		logit.Info.Println("KUBE_URL value set, assume Kube environment")
-		adminapi.KubeEnv = true
-	}
 
 }
 
@@ -91,7 +82,6 @@ func main() {
 		&rest.Route{"GET", "/nodes/forserver/:ServerID.:Token", adminapi.GetAllNodesForServer},
 		&rest.Route{"GET", "/provision/:Profile.:Image.:ServerID.:ProjectID.:ContainerName.:Standalone.:Token", adminapi.Provision},
 		&rest.Route{"GET", "/node/:ID.:Token", adminapi.GetNode},
-		&rest.Route{"GET", "/kube/:Token", adminapi.Kube},
 		&rest.Route{"GET", "/deletenode/:ID.:Token", adminapi.DeleteNode},
 		&rest.Route{"GET", "/monitor/server-getinfo/:ServerID.:Metric.:Token", adminapi.MonitorServerGetInfo},
 		&rest.Route{"GET", "/monitor/container/settings/:ID.:Token", adminapi.MonitorContainerSettings},

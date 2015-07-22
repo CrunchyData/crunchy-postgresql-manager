@@ -22,7 +22,6 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
-	"github.com/crunchydata/crunchy-postgresql-manager/kubeclient"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/template"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
@@ -177,101 +176,36 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 		logit.Error.Println("Provision: problem in getting profiles call" + err.Error())
 		return err
 	}
-	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
-	if err != nil {
-		logit.Error.Println("Provision:PG-PORT setting error " + err.Error())
-		return err
-	}
+	/*
+		var pgport admindb.Setting
+		pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
+		if err != nil {
+			logit.Error.Println("Provision:PG-PORT setting error " + err.Error())
+			return err
+		}
+	*/
 
 	var output string
 
-	if !KubeEnv {
-		//remove any existing docker containers with this name
-		logit.Info.Println("PROFILE provisionImpl remove old container start")
-		rreq := &cpmserverapi.DockerRemoveRequest{}
-		rreq.ContainerName = params.ContainerName
-		var url = "http://" + server.IPAddress + ":10001"
-		_, err = cpmserverapi.DockerRemoveClient(url, rreq)
-		if err != nil {
-			logit.Error.Println("Provision:" + err.Error())
-			return err
-		}
-		logit.Info.Println("PROFILE provisionImpl remove old container end")
-		params.CommandPath = "docker-run.sh"
-		_, err = cpmserverapi.DockerRunClient(url, params)
-		if err != nil {
-			logit.Error.Println("Provision: " + output)
-			return err
-		}
-		logit.Info.Println("docker-run.sh output=" + output)
-		logit.Info.Println("PROFILE provisionImpl end of docker-run")
-	} else {
-		//delete the kube pod with this name
-		//we only log an error, this is ok because
-		//we can get a 'not found' as an error
-		err = kubeclient.DeletePod(KubeURL, params.ContainerName)
-		logit.Info.Println("after delete pod")
-		if err != nil {
-			logit.Info.Println("Provision:" + err.Error())
-		}
-
-		err = kubeclient.DeleteService(KubeURL, params.ContainerName)
-		if err != nil {
-			logit.Info.Println("Provision:" + err.Error())
-		}
-
-		err = kubeclient.DeleteService(KubeURL, params.ContainerName+"-db")
-		if err != nil {
-			logit.Info.Println("Provision:" + err.Error())
-		}
-
-		podInfo := template.KubePodParams{
-			ID:                   params.ContainerName,
-			PODID:                params.ContainerName,
-			CPU:                  params.CPU,
-			MEM:                  params.MEM,
-			IMAGE:                params.Image,
-			VOLUME:               params.PGDataPath,
-			PORT:                 "13000",
-			BACKUP_NAME:          "",
-			BACKUP_SERVERNAME:    "",
-			BACKUP_SERVERIP:      "",
-			BACKUP_SCHEDULEID:    "",
-			BACKUP_PROFILENAME:   "",
-			BACKUP_CONTAINERNAME: "",
-			BACKUP_PATH:          "",
-			BACKUP_HOST:          "",
-			BACKUP_PORT:          "",
-			BACKUP_USER:          "",
-			BACKUP_SERVER_URL:    "",
-		}
-		err = kubeclient.CreatePod(KubeURL, podInfo)
-		if err != nil {
-			logit.Error.Println("Provision:" + err.Error())
-			return err
-		}
-
-		//create the service to the admin port 13000
-		err = kubeclient.CreateService(KubeURL, podInfo)
-		if err != nil {
-			logit.Error.Println("Provision:" + err.Error())
-			return err
-		}
-
-		//create the service to the PG port
-		podInfo.PORT = pgport.Value
-		podInfo.ID = podInfo.ID + "-db"
-		err = kubeclient.CreateService(KubeURL, podInfo)
-		if err != nil {
-			logit.Error.Println("Provision:" + err.Error())
-			return err
-		}
-		//we have to wait here since the Kube sometimes
-		//is not that fast in setting up the service
-		//for a pod..choosing 15 seconds to wait
-		time.Sleep(15000 * time.Millisecond)
+	//remove any existing docker containers with this name
+	logit.Info.Println("PROFILE provisionImpl remove old container start")
+	rreq := &cpmserverapi.DockerRemoveRequest{}
+	rreq.ContainerName = params.ContainerName
+	var url = "http://" + server.IPAddress + ":10001"
+	_, err = cpmserverapi.DockerRemoveClient(url, rreq)
+	if err != nil {
+		logit.Error.Println("Provision:" + err.Error())
+		return err
 	}
+	logit.Info.Println("PROFILE provisionImpl remove old container end")
+	params.CommandPath = "docker-run.sh"
+	_, err = cpmserverapi.DockerRunClient(url, params)
+	if err != nil {
+		logit.Error.Println("Provision: " + output)
+		return err
+	}
+	logit.Info.Println("docker-run.sh output=" + output)
+	logit.Info.Println("PROFILE provisionImpl end of docker-run")
 
 	dbnode := admindb.Container{}
 	dbnode.ID = ""

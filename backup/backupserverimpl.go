@@ -19,7 +19,6 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"github.com/robfig/cron"
-	"os"
 )
 
 type Command struct {
@@ -77,20 +76,6 @@ type BackupSchedule struct {
 var CRONInstance *cron.Cron
 
 const CLUSTERADMIN_DB = "clusteradmin"
-
-var kubeEnv = false
-var kubeURL = ""
-
-func init() {
-
-	kubeURL = os.Getenv("KUBE_URL")
-	if kubeURL != "" {
-		logit.Info.Println("KUBE_URL value set, assume Kube environment")
-		kubeEnv = true
-	} else {
-		logit.Info.Println("KUBE_URL=[" + kubeURL + "]")
-	}
-}
 
 //called by backup jobs as they execute
 func (t *Command) AddStatus(status *BackupStatus, reply *Command) error {

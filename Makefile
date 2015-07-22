@@ -9,7 +9,6 @@ gendeps:
 		github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi \
 		github.com/crunchydata/crunchy-postgresql-manager/backup \
 		github.com/crunchydata/crunchy-postgresql-manager/dummy \
-		github.com/crunchydata/crunchy-postgresql-manager/kubeclient \
 		github.com/crunchydata/crunchy-postgresql-manager/sec \
 		github.com/crunchydata/crunchy-postgresql-manager/template \
 		github.com/crunchydata/crunchy-postgresql-manager/admindb 

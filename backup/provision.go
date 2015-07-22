@@ -20,9 +20,7 @@ import (
 	"fmt"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
-	"github.com/crunchydata/crunchy-postgresql-manager/kubeclient"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
-	"github.com/crunchydata/crunchy-postgresql-manager/template"
 	"time"
 )
 
@@ -97,47 +95,15 @@ func ProvisionBackupJob(dbConn *sql.DB, args *BackupRequest) error {
 	}
 
 	//run the container
-	if kubeEnv {
-		//create a pod template to run the cpm-backup-job
-		//create the pod
-		err = kubeclient.DeletePod(kubeURL, backupcontainername)
-		var podInfo = template.KubePodParams{
-			ID:                   backupcontainername,
-			PODID:                "",
-			CPU:                  "0",
-			MEM:                  "0",
-			IMAGE:                params.Image,
-			VOLUME:               params.EnvVars["BACKUP_PATH"],
-			PORT:                 params.EnvVars["BACKUP_PORT"],
-			BACKUP_NAME:          params.EnvVars["BACKUP_NAME"],
-			BACKUP_SERVERNAME:    params.EnvVars["BACKUP_SERVERNAME"],
-			BACKUP_SERVERIP:      params.EnvVars["BACKUP_SERVERIP"],
-			BACKUP_SCHEDULEID:    params.EnvVars["BACKUP_SCHEDULEID"],
-			BACKUP_PROFILENAME:   params.EnvVars["BACKUP_PROFILENAME"],
-			BACKUP_CONTAINERNAME: params.EnvVars["BACKUP_CONTAINERNAME"],
-			BACKUP_PATH:          params.EnvVars["BACKUP_PATH"],
-			BACKUP_HOST:          params.EnvVars["BACKUP_HOST"],
-			BACKUP_PORT:          params.EnvVars["BACKUP_PORT"],
-			BACKUP_USER:          params.EnvVars["BACKUP_USER"],
-			BACKUP_SERVER_URL:    params.EnvVars["BACKUP_SERVER_URL"],
-		}
-
-		err = kubeclient.CreatePod(kubeURL, podInfo)
-		if err != nil {
-			logit.Error.Println(err.Error())
-			return err
-		}
-	} else {
-		params.CommandPath = "docker-run-backup.sh"
-		var response cpmserverapi.DockerRunResponse
-		var url = "http://" + server.IPAddress + ":10001"
-		response, err = cpmserverapi.DockerRunClient(url, params)
-		if err != nil {
-			logit.Error.Println("Provision: " + response.Output)
-			return err
-		}
-		logit.Info.Println("docker-run-backup.sh output=" + response.Output)
+	params.CommandPath = "docker-run-backup.sh"
+	var response cpmserverapi.DockerRunResponse
+	url = "http://" + server.IPAddress + ":10001"
+	response, err = cpmserverapi.DockerRunClient(url, params)
+	if err != nil {
+		logit.Error.Println("Provision: " + response.Output)
+		return err
 	}
+	logit.Info.Println("docker-run-backup.sh output=" + response.Output)
 
 	return nil
 }

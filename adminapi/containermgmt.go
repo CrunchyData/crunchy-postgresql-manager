@@ -22,7 +22,6 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
-	"github.com/crunchydata/crunchy-postgresql-manager/kubeclient"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
@@ -85,26 +84,13 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	if KubeEnv {
-		var podInfo kubeclient.MyPod
-		podInfo, err = kubeclient.GetPod(KubeURL, results.Name)
-		if err != nil {
-			currentStatus = CONTAINER_NOT_FOUND
-		}
-		logit.Info.Println("pod info status is " + podInfo.CurrentState.Status)
-		if podInfo.CurrentState.Status != "Running" {
-			currentStatus = CONTAINER_NOT_FOUND
-		}
-	} else {
-		request := &cpmserverapi.DockerInspectRequest{}
-		request.ContainerName = results.Name
-		var url = "http://" + server.IPAddress + ":10001"
-		_, err = cpmserverapi.DockerInspectClient(url, request)
-		if err != nil {
-			logit.Error.Println("GetNode: " + err.Error())
-			currentStatus = CONTAINER_NOT_FOUND
-		}
-
+	request := &cpmserverapi.DockerInspectRequest{}
+	request.ContainerName = results.Name
+	var url = "http://" + server.IPAddress + ":10001"
+	_, err = cpmserverapi.DockerInspectClient(url, request)
+	if err != nil {
+		logit.Error.Println("GetNode: " + err.Error())
+		currentStatus = CONTAINER_NOT_FOUND
 	}
 
 	if currentStatus != "CONTAINER NOT FOUND" {
@@ -377,41 +363,17 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	//outside of us, so we let it pass that we can't remove
 	//it
 
-	if KubeEnv {
-		//delete the kube pod with this name
-		err = kubeclient.DeletePod(KubeURL, dbNode.Name)
-		if err != nil {
-			logit.Error.Println("DeleteNode:" + err.Error())
-			rest.Error(w, "error in deleting pod", http.StatusBadRequest)
-			return
-		}
-		//delete the kube service with this name
-		err = kubeclient.DeleteService(KubeURL, dbNode.Name)
-		if err != nil {
-			logit.Error.Println("DeleteNode:" + err.Error())
-			rest.Error(w, "error in deleting service 1", http.StatusBadRequest)
-			return
-		}
-		//delete the kube service with this name
-		err = kubeclient.DeleteService(KubeURL, dbNode.Name+"-db")
-		if err != nil {
-			logit.Error.Println("DeleteNode:" + err.Error())
-			rest.Error(w, "error in deleting service 2", http.StatusBadRequest)
-			return
-		}
-	} else {
-		request := &cpmserverapi.DockerRemoveRequest{}
-		request.ContainerName = dbNode.Name
-		_, err = cpmserverapi.DockerRemoveClient(url, request)
-		if err != nil {
-			logit.Error.Println("DeleteNode: error when trying to remove container " + err.Error())
-		}
+	request := &cpmserverapi.DockerRemoveRequest{}
+	request.ContainerName = dbNode.Name
+	_, err = cpmserverapi.DockerRemoveClient(url, request)
+	if err != nil {
+		logit.Error.Println("DeleteNode: error when trying to remove container " + err.Error())
 	}
 
 	//send the server a deletevolume command
-	request := &cpmserverapi.DiskDeleteRequest{}
-	request.Path = server.PGDataPath + "/" + dbNode.Name
-	_, err = cpmserverapi.DiskDeleteClient(url, request)
+	request2 := &cpmserverapi.DiskDeleteRequest{}
+	request2.Path = server.PGDataPath + "/" + dbNode.Name
+	_, err = cpmserverapi.DiskDeleteClient(url, request2)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

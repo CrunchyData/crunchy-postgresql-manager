@@ -23,7 +23,6 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
-	"github.com/crunchydata/crunchy-postgresql-manager/kubeclient"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/template"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
@@ -699,42 +698,17 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		//outside of us, so we let it pass that we can't remove
 		//it
 		//err = removeContainer(server.IPAddress, containers[i].Name)
-		if KubeEnv {
-			//delete the kube pod with this name
-			err = kubeclient.DeletePod(KubeURL, containers[i].Name)
-			if err != nil {
-				logit.Error.Println("DeleteCluster:" + err.Error())
-				rest.Error(w, "error in deleting pod", http.StatusBadRequest)
-				return
-			}
-			//delete the kube service with this name 13000
-			err = kubeclient.DeleteService(KubeURL, containers[i].Name)
-			if err != nil {
-				logit.Error.Println("DeleteCluster:" + err.Error())
-				rest.Error(w, "error in deleting service 1", http.StatusBadRequest)
-				return
-			}
-			//delete the kube service with this name
-			err = kubeclient.DeleteService(KubeURL, containers[i].Name+"-db")
-			if err != nil {
-				logit.Error.Println("DeleteCluster:" + err.Error())
-				rest.Error(w, "error in deleting service 1", http.StatusBadRequest)
-				return
-			}
-
-		} else {
-			dremreq := &cpmserverapi.DockerRemoveRequest{}
-			dremreq.ContainerName = containers[i].Name
-			logit.Info.Println("will attempt to delete container " + dremreq.ContainerName)
-			var url = "http://" + server.IPAddress + ":10001"
-			_, err = cpmserverapi.DockerRemoveClient(url, dremreq)
-			if err != nil {
-				logit.Error.Println("DeleteCluster: error when trying to remove container" + err.Error())
-			}
+		dremreq := &cpmserverapi.DockerRemoveRequest{}
+		dremreq.ContainerName = containers[i].Name
+		logit.Info.Println("will attempt to delete container " + dremreq.ContainerName)
+		var url = "http://" + server.IPAddress + ":10001"
+		_, err = cpmserverapi.DockerRemoveClient(url, dremreq)
+		if err != nil {
+			logit.Error.Println("DeleteCluster: error when trying to remove container" + err.Error())
 		}
 
 		//send the server a deletevolume command
-		var url = "http://" + server.IPAddress + ":10001"
+		url = "http://" + server.IPAddress + ":10001"
 		ddreq := &cpmserverapi.DiskDeleteRequest{}
 		ddreq.Path = server.PGDataPath + "/" + containers[i].Name
 		_, err = cpmserverapi.DiskDeleteClient(url, ddreq)
