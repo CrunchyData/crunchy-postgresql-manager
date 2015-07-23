@@ -22,6 +22,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/template"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	_ "github.com/lib/pq"
 	"net/http"
@@ -323,6 +324,7 @@ func GetAccessRule(dbConn *sql.DB, ID string) (Rule, error) {
 
 	err := dbConn.QueryRow(queryStr).Scan(
 		&rule.ID,
+		&rule.Name,
 		&rule.Type,
 		&rule.Database,
 		&rule.User,
@@ -687,8 +689,7 @@ func GetContainerAccessRule(dbConn *sql.DB, ID string) (ContainerAccessRule, err
 func performConfigUpdate(dbConn *sql.DB, ContainerID string) error {
 	logit.Info.Println("performConfigUpdate....")
 
-	//cars, err := GetAllContainerAccessRule(ContainerID)
-	_, err := GetAllContainerAccessRule(dbConn, ContainerID)
+	cars, err := GetAllContainerAccessRule(dbConn, ContainerID)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return err
@@ -731,7 +732,7 @@ func performConfigUpdate(dbConn *sql.DB, ContainerID string) error {
 
 	//make template changes here
 	logit.Info.Println("performConfigUpdate....making template changes")
-	templateChange()
+	templateChange(dbConn, container.Name, cars, container.Role)
 
 	//restart postgres
 
@@ -773,7 +774,58 @@ func performConfigUpdate(dbConn *sql.DB, ContainerID string) error {
 
 }
 
-func templateChange() error {
+func templateChange(dbConn *sql.DB, containerName string, cars []ContainerAccessRule, containerRole string) error {
 	var err error
+
+	logit.Info.Println("templateChange called")
+	//create pg_hba.conf
+	var mode = containerRole
+
+	domainname, err := admindb.GetSetting(dbConn, "DOMAIN-NAME")
+	if err != nil {
+		logit.Error.Println("templateChange:DOMAIN-NAME error " + err.Error())
+		return err
+	}
+
+	rules := make([]template.Rule, 0)
+	var ar Rule
+	for i := range cars {
+		logit.Info.Println("templateChange cars found")
+		if cars[i].Selected == "true" {
+			logit.Info.Println("templateChange cars found to be true")
+			rule := template.Rule{}
+			ar, err = GetAccessRule(dbConn, cars[i].AccessRuleID)
+			if err != nil {
+				logit.Error.Println("templateChange:get access rule error " + err.Error())
+				return err
+			}
+			rule.Type = ar.Type
+			rule.Database = ar.Database
+			rule.User = ar.User
+			rule.Address = ar.Address
+			rule.Method = ar.Method
+			rules = append(rules, rule)
+		}
+	}
+
+	logit.Info.Printf("templateChange rules going to template %d\n", len(rules))
+	var data string
+
+	data, err = template.Hba(dbConn, mode, containerName, "", "", domainname.Value, rules)
+
+	if err != nil {
+		logit.Error.Println("templateChange:" + err.Error())
+		return err
+	}
+
+	fqdn := containerName + "." + domainname.Value
+
+	//place pg_hba.conf on node
+	_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/pg_hba.conf", data, fqdn)
+	if err != nil {
+		logit.Error.Println("templateChange:" + err.Error())
+		return err
+	}
+
 	return err
 }

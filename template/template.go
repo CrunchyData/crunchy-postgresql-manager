@@ -38,6 +38,14 @@ var pgUserFlag = flag.String("pguserid", "", "pg user ID")
 
 var outputFile *os.File
 
+type Rule struct {
+	Type     string
+	Database string
+	User     string
+	Address  string
+	Method   string
+}
+
 type HBAParameters struct {
 	ADMIN_HOST     string
 	MONITOR_HOST   string
@@ -49,6 +57,7 @@ type HBAParameters struct {
 	STANDBY_LIST   []string
 	BRIDGE_IP_LIST []string
 	SERVER_IP_LIST []string
+	RULES_LIST     []Rule
 }
 
 type PostgresqlParameters struct {
@@ -94,7 +103,7 @@ func Postgresql(mode string, port string, clusterType string) (string, error) {
 	return buff.String(), nil
 }
 
-func Hba(dbConn *sql.DB, mode string, hostname string, port string, clusterid string, domainname string) (string, error) {
+func Hba(dbConn *sql.DB, mode string, hostname string, port string, clusterid string, domainname string, cars []Rule) (string, error) {
 
 	var hbaInfo HBAParameters
 
@@ -102,6 +111,7 @@ func Hba(dbConn *sql.DB, mode string, hostname string, port string, clusterid st
 	hbaInfo.BACKUP_HOST = hostname + "-backup." + domainname
 	hbaInfo.MONITOR_HOST = "cpm-mon." + domainname
 	hbaInfo.ADMIN_HOST = "cpm-admin." + domainname
+	hbaInfo.RULES_LIST = cars
 
 	servers, err := admindb.GetAllServers(dbConn)
 	if err != nil {
@@ -128,6 +138,8 @@ func Hba(dbConn *sql.DB, mode string, hostname string, port string, clusterid st
 
 	var path string
 	switch mode {
+	case "unassigned":
+		path = util.GetBase() + "/conf/standalone/pg_hba.conf.template"
 	case "standalone", "master", "standby":
 		path = util.GetBase() + "/conf/" + mode + "/pg_hba.conf.template"
 	default:

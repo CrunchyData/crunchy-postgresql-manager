@@ -18,6 +18,11 @@ host    cpmtest      	cpmtest       {{.}}/16                   md5
 host    all      	all       {{.}}/32                   md5
 {{end}}
 
+{{range .RULES_LIST}}
+{{.Type}}       {{.Database}}   {{.User}}       {{.Address}}    {{.Method}}
+{{end}}
+
+
 host    all             all             {{.MONITOR_HOST}}           trust
 host    all             all             {{.ADMIN_HOST}}           trust
 

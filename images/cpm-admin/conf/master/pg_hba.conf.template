@@ -26,6 +26,10 @@ host    replication     postgres	{{.}}/32            trust
 host    replication     postgres	{{.}}            trust
 {{end}}
 
+{{range .RULES_LIST}}
+{{.Type}}	{{.Database}}	{{.User}}	{{.Address}}	{{.Method}}
+{{end}}
+
 host    replication     postgres	{{.BACKUP_HOST}}            trust
 host    all     	all 		{{.MONITOR_HOST}}           trust
 host    all     	all 		{{.ADMIN_HOST}}           trust

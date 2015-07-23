@@ -357,23 +357,7 @@ var ContainerFailoverController = function($scope, $stateParams, $state, contain
 };
 
 
-var ContainerAccessRulesController = function($cookieStore, $scope, $stateParams, $state, utils, containersFactory) {
-                $scope.cars = [
-		{
-                    ID: 1,
-                    Selected: 'true',
-                    AccessRuleName: 'rule 1',
-                    ContainerID: 1,
-                    AccessRuleID: 1,
-                },
-		{
-                    ID: 2,
-                    Selected: 'false',
-                    AccessRuleName: 'rule 2',
-                    ContainerID: 2,
-                    AccessRuleID: 2,
-                }
-		];
+var ContainerAccessRulesController = function($cookieStore, $scope, $stateParams, $state, utils, containersFactory, usSpinnerService) {
 		console.log('in access rules controller');
 		console.log('containerid=' + $stateParams.containerId);
 
@@ -392,6 +376,7 @@ var ContainerAccessRulesController = function($cookieStore, $scope, $stateParams
 
 
     $scope.save = function() {
+    	usSpinnerService.spin('spinner-1');
         console.log('save called cars=' + $scope.cars);
             angular.forEach($scope.cars, function(car) {
 	    	car.Token = $cookieStore.get('cpm_token');
@@ -404,6 +389,7 @@ var ContainerAccessRulesController = function($cookieStore, $scope, $stateParams
                     type: 'success',
                     msg: 'successfully saved access rules'
                 }];
+            	usSpinnerService.stop('spinner-1');
 
             })
             .error(function(error) {
@@ -412,7 +398,9 @@ var ContainerAccessRulesController = function($cookieStore, $scope, $stateParams
                     msg: error.Error
                 }];
                 console.log('here is an error ' + error.Error);
+            	usSpinnerService.stop('spinner-1');
             });
+
     };
 };
 

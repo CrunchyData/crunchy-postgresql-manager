@@ -1,6 +1,5 @@
 <form class="form-horizontal">
 
-	<span us-spinner spinner-key="spinner-1"></span>
 
     <div class="form-group">
         <label for="inputName" class="control-label col-xs-2">Name</label>
@@ -19,64 +18,48 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="inputType" class="control-label col-xs-2">Type</label>
-        <div class="col-xs-5">
-            <div class="col-xs-5">
-                <select class="form-control" ng-model="rule.Type">
-                    <option value="host" selected>host</option>
-                    <option value="local">local</option>
-                    <option value="hostssl">hostssl</option>
-                    <option value="hostnossl">hostnossl</option>
-                </select>
-            </div>
-
-
-
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="inputDatabase" class="control-label col-xs-2">Database</label>
-        <div class="col-xs-5">
-
-            <input type="text" class="form-control" id="inputDatabase" ng-model="rule.Database">
-
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="inputUser" class="control-label col-xs-2">User</label>
-        <div class="col-xs-5">
-
-            <input type="text" class="form-control" id="inputUser" ng-model="rule.User">
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="inputAddress" class="control-label col-xs-2">Address</label>
-        <div class="col-xs-5">
-
-            <input type="text" class="form-control" id="inputAddress" ng-model="rule.Address">
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="inputMethod" class="control-label col-xs-2">Method</label>
-        <div class="col-xs-5">
-            <div class="col-xs-5">
+        <table>
+            <th>Type</th>
+            <th>Database</th>
+            <th>User</th>
+            <th>Address</th>
+            <th>Method</th>
+            <tr>
+                <td>
+                        <select class="form-control" ng-model="rule.Type">
+                            <option value="host" selected>host</option>
+                            <option value="local">local</option>
+                            <option value="hostssl">hostssl</option>
+                            <option value="hostnossl">hostnossl</option>
+                        </select>
+                </td>
+                <td>
+            		<input type="text" class="form-control" id="inputDatabase" ng-model="rule.Database">
+                </td>
+                <td>
+            		<input type="text" class="form-control" id="inputUser" ng-model="rule.User">
+                </td>
+                <td>
+            		<input type="text" class="form-control" id="inputAddress" ng-model="rule.Address">
+                </td>
+                <td>
                 <select class="form-control" ng-model="rule.Method">
                     <option value="md5">md5</option>
                     <option value="trust">trust</option>
                 </select>
-            </div>
-
-        </div>
+                </td>
+            </tr>
+        </table>
     </div>
-
     <div class="form-group">
+        <span us-spinner spinner-key="spinner-1"></span>
         <div class="col-xs-offset-2 col-xs-10">
             <button type="submit" ng-click="save()" class="btn btn-primary">Save</button>
         </div>
-</div>
+    </div>
 
-<div>
-	<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
-</div>
+    <div>
+        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+    </div>
 
 </form>

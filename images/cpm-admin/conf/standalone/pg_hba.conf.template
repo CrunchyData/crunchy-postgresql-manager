@@ -21,6 +21,12 @@ host    all             all       {{.}}/32                   md5
 
 host    all         all           ::1/128               md5
 
+# next lines are access rules list
+{{range .RULES_LIST}}
+{{.Type}}       {{.Database}}   {{.User}}       {{.Address}}    {{.Method}}
+{{end}}
+# end of access rules list
+
 # next line required for standalone docker mode 
 host    replication     postgres        {{.BACKUP_HOST}}            trust
 

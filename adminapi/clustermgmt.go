@@ -264,7 +264,8 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	}
 
 	//configure master pg_hba.conf file
-	data, err = template.Hba(dbConn, "master", master.Name, pgport.Value, cluster.ID, domainname.Value)
+	rules := make([]template.Rule, 0)
+	data, err = template.Hba(dbConn, "master", master.Name, pgport.Value, cluster.ID, domainname.Value, rules)
 	if err != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
 		return err
@@ -378,7 +379,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 			logit.Info.Println("configureCluster:standby postgresql.conf copied remotely")
 
 			//configure standby pg_hba.conf file
-			data, err = template.Hba(dbConn, STANDBY, standbynodes[i].Name, pgport.Value, cluster.ID, domainname.Value)
+			data, err = template.Hba(dbConn, STANDBY, standbynodes[i].Name, pgport.Value, cluster.ID, domainname.Value, rules)
 			if err != nil {
 				logit.Error.Println("configureCluster:" + err.Error())
 				return err

@@ -154,7 +154,7 @@ angular.module('uiRouterSample.rules', [
                 views: {
                     '': {
                         templateUrl: 'app/rules/rules.detail.details.html',
-                        controller: ['$scope', '$stateParams', '$cookieStore', '$state', 'rulesFactory', 'utils',
+                        controller: ['$scope', '$stateParams', '$cookieStore', '$state', 'rulesFactory', 'utils', 'usSpinnerService',
                             function($scope, $stateParams, $cookieStore, $state, rulesFactory, utils, usSpinnerService) {
                                 console.log('in details with rule itemId = ' + $stateParams.itemId);
                                 //console.log('in details with rule = ' + $scope.rule.Name);

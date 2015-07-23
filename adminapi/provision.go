@@ -358,7 +358,8 @@ func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PR
 			return err
 		}
 		//create pg_hba.conf
-		data, err = template.Hba(dbConn, mode, params.ContainerName, pgport.Value, "", domainname.Value)
+		rules := make([]template.Rule, 0)
+		data, err = template.Hba(dbConn, mode, params.ContainerName, pgport.Value, "", domainname.Value, rules)
 		if err != nil {
 			logit.Error.Println("Provision:" + err.Error())
 			return err
