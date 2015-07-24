@@ -1,5 +1,5 @@
 ##Login Page
-(/login.png)
+![Login Page](./login.png)
 login1.png
 homepage.png
 projects.png
