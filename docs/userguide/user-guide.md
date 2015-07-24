@@ -14,7 +14,7 @@ The Login Prompt is where you will enter your CPM user credentials.
 By default, the user ID is cpm, the password is cpm, and the
 Admin URL is http://cpm-admin:13001
 
-![CPM Login Prompt](./login1.png
+![CPM Login Prompt](./login1.png)
 
 ##CPM Home 
 The CPM Home page is where you can see a HealthCheck of current
