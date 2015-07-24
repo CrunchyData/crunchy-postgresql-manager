@@ -529,7 +529,7 @@ var ContainerUsersAddController = function($scope, $stateParams, $state, contain
 var ContainerScheduleExecuteController = function($scope, $stateParams, $state, tasksFactory, utils, usSpinnerService) {
 
     console.log('in schedule execute' + $stateParams.scheduleID);
-    usSpinnerService.spin('spinner-2');
+    usSpinnerService.spin('spinner-1');
 
     tasksFactory.execute($scope.schedule)
         .success(function(data) {
@@ -539,16 +539,16 @@ var ContainerScheduleExecuteController = function($scope, $stateParams, $state, 
                 msg: 'success'
             }];
             console.log(JSON.stringify(data));
+    		usSpinnerService.stop('spinner-1');
         })
         .error(function(error) {
             $scope.alerts = [{
                 type: 'danger',
                 msg: error.Error
             }];
-            usSpinnerService.stop('spinner-2');
+            usSpinnerService.stop('spinner-1');
             console.log('here is an error ' + error.Error);
         });
-    usSpinnerService.stop('spinner-2');
 };
 
 var ContainerScheduleHistoryController = function($scope, $stateParams, $state, tasksFactory, utils) {
