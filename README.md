@@ -14,7 +14,7 @@ been provisioned by CPM.
 ![CPM Web UI](./docs/cpm.png)
 
 A user guide is available at:
-(./docs/userguide/user-guide.md)
+[docs/userguide/user-guide.md](docs/userguide/user-guide.md)
 
 Installation
 ------------
