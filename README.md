@@ -1,4 +1,4 @@
-Crunchy Postgresql Manager (Beta v0.9.4)
+Crunchy Postgresql Manager (Beta v0.9.5)
 ==========================
 
 Crunchy Postgresql Manager (CPM) is a Docker-based solution which
@@ -14,7 +14,7 @@ been provisioned by CPM.
 ![CPM Web UI](./docs/cpm.png)
 
 A user guide is available at:
-https://s3.amazonaws.com/crunchydata/cpm/cpm-user-guide.pdf
+![CPM User Guide](./docs/userguide/user-guide.md)
 
 Installation
 ------------
@@ -26,7 +26,7 @@ The user install allows you to get CPM up and running quickly by
 downloading pre-built binaries and Docker images.
 
 The user installation archive can be downloaded from:
-[https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.4-linux-amd64.tar.gz](https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.4-linux-amd64.tar.gz)
+[https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.5-linux-amd64.tar.gz](https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.5-linux-amd64.tar.gz)
 
 See docs/user-install.md for details on the user installation 
 requirements.
