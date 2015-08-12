@@ -5,6 +5,7 @@ build:
 	        cp ../../sql/clusteradmin.sql  ./bin/setup.sql
 	        cp ../../sql/*  ./bin
 	        cp ../../sbin/startadmin.sh ./bin
+	        cp ../../sbin/badger-generate.sh ./bin
 	        cp ../../../../../../bin/adminapi  ./bin
 	        cp ../../../../../../bin/dummyserver  ./bin
 	        sudo docker build -t cpm-admin .

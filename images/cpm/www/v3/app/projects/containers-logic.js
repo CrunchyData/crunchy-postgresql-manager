@@ -32,6 +32,7 @@ var ContainerTaskSchedulesController = function($scope, $stateParams, $state, co
 };
 
 var ContainerUsersController = function($scope, $stateParams, $state, containersFactory, utils) {
+    $scope.refresh = function() {
     containersFactory.getallusers($stateParams.containerId)
         .success(function(data) {
             console.log('successful get with data=' + data);
@@ -44,6 +45,9 @@ var ContainerUsersController = function($scope, $stateParams, $state, containers
             }];
             console.log('here is an error ' + error.Error);
         });
+	}
+
+	$scope.refresh();
 
     $scope.edit = function() {
         $state.go('.edit', $stateParams);
@@ -509,7 +513,7 @@ var ContainerUsersAddController = function($scope, $stateParams, $state, contain
             .success(function(data) {
                 console.log('successful adduser with data=' + data);
                 $state.go('projects.container.users', $stateParams, {
-                    reload: false,
+                    reload: true,
                     inherit: false
                 });
 
