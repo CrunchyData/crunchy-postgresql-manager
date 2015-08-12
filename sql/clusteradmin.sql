@@ -267,4 +267,10 @@ create table containeraccessrule (
 	unique (containerid, accessruleid)
 );
 
+insert into  accessrule (
+name , ruletype, database, ruleuser, address, method, description,
+createdt, updatedt) values (
+'samplerule' , 'host', 'all', 'all', '192.168.10.100/32', 'md5', 'sample rule',
+now(), now());
+
 

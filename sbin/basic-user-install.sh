@@ -25,7 +25,7 @@ set -e
 # set the install directory
 export INSTALLDIR=/var/cpm
 # set the development directory
-export DEVDIR=/home/jeffmc/crunchy-postgresql-manager
+export DEVDIR=/home/jeffmc/devproject/github.com/crunchydata/crunchy-postgresql-manager
 
 sudo mkdir -p $INSTALLDIR/bin
 sudo mkdir -p $INSTALLDIR/config
@@ -66,18 +66,10 @@ sudo yum install -y postgresql94 postgresql94-contrib postgresql94-server libxsl
 
 set -e
 
-# make sure docker is started and enabled
-sudo systemctl enable docker.service
-sudo systemctl start docker.service
-
 # move the CPM media to the /var/cpm installation directory
-sudo cp -r $DEVDIR/bin/* $INSTALLDIR/bin
+sudo cp -r /home/jeffmc/devproject/bin/* $INSTALLDIR/bin
 sudo cp -r $DEVDIR/config/* $INSTALLDIR/config
 sudo cp -r $DEVDIR/www/* $INSTALLDIR/www
-
-echo "SECURITY WARNING- turning off and disabling your firewall!"
-sudo systemctl stop firewalld.service
-sudo systemctl disable firewalld.service
 
 # start up local cpmserverapi
 echo "starting cpmserverapi...."
@@ -85,20 +77,7 @@ sudo cp $INSTALLDIR/config/cpmserverapi.service /etc/systemd/system
 sudo systemctl enable cpmserverapi.service
 sudo systemctl start cpmserverapi.service
 
-
 sed -i "s/crunchy.lab/$DOMAIN/g" ./bu-init-cpm.sh
-
-# pull down CPM Docker images from dockerhub
-echo "pulling down cpm docker images...."
-sudo docker pull crunchydata/cpm:latest
-sudo docker pull crunchydata/cpm-pgpool:latest
-sudo docker pull crunchydata/cpm-admin:latest
-sudo docker pull crunchydata/cpm-base:latest
-sudo docker pull crunchydata/cpm-mon:latest
-sudo docker pull crunchydata/cpm-backup:latest
-sudo docker pull crunchydata/cpm-backup-job:latest
-sudo docker pull crunchydata/cpm-node:latest
-sudo docker pull crunchydata/cpm-dashboard:latest
 
 # generate keys for cpm and cpm-admin
 echo "generating keys for cpm and cpm-admin containers..."
