@@ -80,21 +80,18 @@ angular.module('uiRouterSample.projects', [
                                     });
                                 }
                             };
-/**
-                            $scope.goToFirst = function() {
-			    	console.log('in projects (abstract) going to first');
-                                //console.log('projects=' + JSON.stringify($scope.projects));
-                                //var randId = $scope.projects.data[0].ID;
-                                var randId = $scope.projects[0].id;
 
-                                $state.go('projects.detail', {
-                                    projectId: randId
-                                });
+                            $scope.goToFirst = function() {
+                                    console.log('jeff projects.data00=' + JSON.stringify(projects.data[0]));
+                                    console.log('jeff projects.name=' + projects.data[0].name);
+                                    console.log('jeff projects.id=' + projects.data[0].id);
+                                    var randId = projects.data[0].id;
+
+                                    $state.go('projects.detail', {
+                                        projectId: randId
+                                    });
                             };
                             $scope.goToFirst();
-			    */
-
-
                         }
                     ]
                 })
@@ -118,7 +115,7 @@ angular.module('uiRouterSample.projects', [
 
                         $scope.goToFirst = function() {
 				console.log('projects.list called going to first project by default');
-                            var randId = $scope.projects.data[0].ID;
+                            var randId = $scope.projects.data[0].id;
                             $state.go('projects.detail', {
                                 projectId: randId
                             });
@@ -614,6 +611,7 @@ angular.module('uiRouterSample.projects', [
                                     });
                                 }
 
+                                console.log('projects.details with stateparams=' + JSON.stringify($stateParams));
                                 console.log('projects.details with projectId=' + $stateParams.projectId);
                                 projectsFactory.get($stateParams.projectId)
                                     .success(function(data) {
@@ -651,7 +649,7 @@ angular.module('uiRouterSample.projects', [
                 views: {
                     '': {
                         templateUrl: 'app/projects/projects.detail.details.html',
-                        controller: ['$scope', '$stateParams', '$state', 'utils',
+                        controller: ['$scope', '$stateParams', '$state', 'utils', 'projectId',
                             function($scope, $stateParams, $state, utils) {
                                 console.log('in detail.details');
 
