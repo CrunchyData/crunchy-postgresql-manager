@@ -70,6 +70,10 @@ angular.module('uiRouterSample.projects', [
                                     $state.go('projects.cluster.details', {
                                         clusterId: node.id
                                     });
+                                } else if (node.type == 'proxy') {
+                                    $state.go('projects.container.details', {
+                                        containerId: node.id
+                                    });
                                 } else if (node.type == 'project') {
                                     $state.go('projects.detail.edit', {
                                         projectId: node.id

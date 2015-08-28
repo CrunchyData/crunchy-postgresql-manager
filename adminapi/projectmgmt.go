@@ -220,7 +220,7 @@ func GetAllProjects(w rest.ResponseWriter, r *rest.Request) {
 		projects[i].Name = projectsList[i].Name
 		projects[i].Type = "project"
 
-		projectchildren := make([]Child, 2)
+		projectchildren := make([]Child, 3)
 		projects[i].Children = projectchildren
 
 		projects[i].Children[0].Name = "Clusters"
@@ -258,6 +258,24 @@ func GetAllProjects(w rest.ResponseWriter, r *rest.Request) {
 			k++
 		}
 		projects[i].Children[1].Children = dbchilds
+
+		projects[i].Children[2].Name = "Proxies"
+		projects[i].Children[2].Type = "label"
+		projects[i].Children[2].ProjectID = projects[i].ID
+		proxychilds := make([]Child, len(projectsList[i].Proxies))
+		//projects[i].Children[2].Children := make([]Child, len(projectsList[i].Proxies))
+		k = 0
+		for kk, kv := range projectsList[i].Proxies {
+			ch := Child{
+				Name: kv,
+				Type: "proxy",
+				ID:   kk,
+			}
+			ch.ProjectID = projects[i].ID
+			proxychilds[k] = ch
+			k++
+		}
+		projects[i].Children[2].Children = proxychilds
 
 		i++
 	}

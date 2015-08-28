@@ -47,6 +47,7 @@ type Project struct {
 	Desc       string
 	Containers map[string]string
 	Clusters   map[string]string
+	Proxies   map[string]string
 	UpdateDate string
 }
 
@@ -1085,6 +1086,7 @@ func GetAllProjects(dbConn *sql.DB) ([]Project, error) {
 	projects := make([]Project, 0)
 	var containers []Container
 	var clusters []Cluster
+	var proxies []Proxy
 
 	for rows.Next() {
 		project := Project{}
@@ -1095,6 +1097,19 @@ func GetAllProjects(dbConn *sql.DB) ([]Project, error) {
 			&project.UpdateDate); err != nil {
 			return nil, err
 		}
+
+		project.Proxies = make(map[string]string)
+
+		proxies, err = GetAllProxiesForProject(dbConn, project.ID)
+		if err != nil {
+			logit.Info.Println("admindb:GetAllProjects:" + err.Error())
+			return projects, err
+		}
+
+		for i := range proxies {
+			project.Proxies[proxies[i].ContainerID] = proxies[i].Containername
+		}
+
 		project.Containers = make(map[string]string)
 
 		containers, err = GetAllContainersForProject(dbConn, project.ID)
@@ -1106,6 +1121,7 @@ func GetAllProjects(dbConn *sql.DB) ([]Project, error) {
 		for i := range containers {
 			project.Containers[containers[i].ID] = containers[i].Name
 		}
+
 		project.Clusters = make(map[string]string)
 
 		clusters, err = GetAllClustersForProject(dbConn, project.ID)
@@ -1174,3 +1190,28 @@ func InsertProject(dbConn *sql.DB, project Project) (int, error) {
 
 	return projectid, nil
 }
+
+func GetAllProxiesForProject(dbConn *sql.DB, projectID string) ([]Proxy, error) {
+	var rows *sql.Rows
+	var err error
+	queryStr := fmt.Sprintf("select p.containerid, c.name from proxy p, container c where p.containerid = c.id and p.projectid = %s order by c.name", projectID)
+	logit.Info.Println("admindb:GetAllproxiesForProject:" + queryStr)
+	rows, err = dbConn.Query(queryStr)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	proxies := make([]Proxy, 0)
+	for rows.Next() {
+		proxy := Proxy{}
+		if err = rows.Scan(&proxy.ContainerID, &proxy.Containername); err != nil {
+			return nil, err
+		}
+		proxies = append(proxies, proxy)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return proxies, nil
+}
+
