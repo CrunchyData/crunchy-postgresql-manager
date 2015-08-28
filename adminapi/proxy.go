@@ -16,18 +16,21 @@
 package adminapi
 
 import (
-	//"database/sql"
+	"database/sql"
 	//"errors"
+	"strconv"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	//"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
+	"github.com/crunchydata/crunchy-postgresql-manager/sec"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	//"github.com/crunchydata/crunchy-postgresql-manager/template"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 	//"strconv"
 	//"time"
+	"fmt"
 )
 
 type ProxyRequest struct {
@@ -101,6 +104,13 @@ func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, errorStr, http.StatusBadRequest)
 		return
 	}
+	if proxyrequest.DatabaseHost == "" {
+		logit.Error.Println("ProvisionProxy error DatabaseHost required")
+		errorStr = "DatabaseHost required"
+		rest.Error(w, errorStr, http.StatusBadRequest)
+		return
+	}
+
 
 	logit.Info.Println("Image=" + proxyrequest.Image)
 	logit.Info.Println("Profile=" + proxyrequest.Profile)
@@ -170,12 +180,58 @@ func insertProxy(request *ProxyRequest) (error) {
         }
 
 	proxy := Proxy{}
-        proxy.ContainerUserID = string(containerUserID)
+        proxy.ContainerUserID = strconv.Itoa(containerUserID)
         proxy.ContainerID = container.ID
+        proxy.Host = request.DatabaseHost
         proxy.ProjectID = request.ProjectID
-        proxy.ServerID = request.ServerID
         proxy.Port = request.DatabasePort
+
+ 	queryStr := fmt.Sprintf("insert into proxy ( containeruserid, containerid, projectid, port, host, updatedt) values ( %s, %s, %s, '%s', '%s', now()) returning id", 
+	proxy.ContainerUserID, proxy.ContainerID, proxy.ProjectID, proxy.Port, proxy.Host) 
+ 
+        logit.Info.Println("insertProxy:" + queryStr) 
+        var proxyid int 
+        err = dbConn.QueryRow(queryStr).Scan(&proxyid) 
+        switch { 
+        case err != nil: 
+                logit.Info.Println("insertProxy:" + err.Error()) 
+                return err 
+        default: 
+                logit.Info.Println("insertProxy: inserted returned is " + strconv.Itoa(proxyid)) 
+        }
 
 	return err
 }
+
+func GetProxy(dbConn *sql.DB, containername string ) (Proxy, error) {
+        var rows *sql.Rows
+        proxy := Proxy{}
+        var err error
+
+	queryStr := fmt.Sprintf("select u.usename , u.passwd, c.name , p.port, p.host from proxy p, container c, containeruser u where p.containerid = c.id and p.containeruserid = u.id and c.name = '%s'", containername )
+
+        logit.Info.Println("GetProxy:" + queryStr)
+        rows, err = dbConn.Query(queryStr)
+        if err != nil {
+                return proxy, err
+        }
+        defer rows.Close()
+        for rows.Next() {
+                if err = rows.Scan(&proxy.Usename, &proxy.Passwd, 
+			&proxy.ContainerName, &proxy.Port, &proxy.Host); err != nil {
+  			return proxy, err
+                }
+        }
+        if err = rows.Err(); err != nil {
+                return proxy, err
+        }
+        var unencrypted string
+        unencrypted, err = sec.DecryptPassword(proxy.Passwd)
+        if err != nil {
+                return proxy, err
+        }
+        proxy.Passwd = unencrypted
+        return proxy, nil
+}
+
 

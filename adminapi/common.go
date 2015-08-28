@@ -51,8 +51,11 @@ type Server struct {
 type Proxy struct {
 	ID             string
 	ContainerUserID           string
+	Host           string
+	Usename           string
+	Passwd           string
 	ContainerID      string
-	ServerID      string
+	ContainerName      string
 	ProjectID string
 	Port     string
 	UpdateDate     string
@@ -176,4 +179,12 @@ type NodeUser struct {
 func GetVersion(w rest.ResponseWriter, r *rest.Request) {
 
 	w.(http.ResponseWriter).Write([]byte("0.9.3"))
+}
+
+type Credential struct {
+	Host  string
+	Database  string
+	Username        string
+	Password        string
+	Port        string
 }

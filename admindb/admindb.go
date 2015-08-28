@@ -90,6 +90,17 @@ type ContainerUser struct {
 	UpdateDate     string
 }
 
+type Proxy struct {
+	ID             string
+	Containername  string
+	ContainerID    string
+	ProjectID         string
+	ProjectName         string
+	Port         string
+	Passwd         string
+	Rolname        string
+}
+
 type LinuxStats struct {
 	ID        string
 	ClusterID string

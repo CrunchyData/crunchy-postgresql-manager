@@ -237,8 +237,10 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 	}
 	dbnode.ID = newid
 
-	//register default db users on the new node
-	err = createDBUsers(dbConn, dbnode)
+	if params.Image != "cpm-node-proxy" {
+		//register default db users on the new node
+		err = createDBUsers(dbConn, dbnode)
+	}
 
 	return err
 

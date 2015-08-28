@@ -64,12 +64,17 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var host = node.Name
-	if KubeEnv {
-		host = node.Name + "-db"
+//return database, user, password, error
+	var credential Credential
+	credential, err = getUserCredentials(dbConn, &node)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	//fetch cpmtest user credentials
+/**
 	var nodeuser admindb.ContainerUser
 	nodeuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
 	if err != nil {
@@ -77,14 +82,12 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
 	logit.Info.Println("cpmtest password is " + nodeuser.Passwd)
+*/
 
-	//get port
-	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 
-	dbConn2, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+
+	dbConn2, err := util.GetMonitoringConnection(credential.Host, credential.Username, credential.Port, credential.Database,  credential.Password)
 	defer dbConn2.Close()
 
 	settings := make([]PostgresSetting, 0)
@@ -297,9 +300,6 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var host = node.Name
-	if KubeEnv {
-		host = node.Name + "-db"
-	}
 
 	//get password
 	var nodeuser admindb.ContainerUser
@@ -410,9 +410,6 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var host = node.Name
-	if KubeEnv {
-		host = node.Name + "-db"
-	}
 
 	//fetch cpmtest user credentials
 	var nodeuser admindb.ContainerUser
@@ -521,9 +518,6 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var host = node.Name
-	if KubeEnv {
-		host = node.Name + "-db"
-	}
 
 	results, err2 := loadtest(dbConn, node.Name, host, writes)
 	if err2 != nil {
@@ -668,9 +662,6 @@ func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var host = container.Name
-	if KubeEnv {
-		host = container.Name + "-db"
-	}
 
 	//fetch cpmtest user credentials
 	var nodeuser admindb.ContainerUser
@@ -791,9 +782,6 @@ func BadgerGenerate(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var host = container.Name
-	if KubeEnv {
-		host = container.Name + "-db"
-	}
 
 	//send the container a pg_controldata command
 	var cdout cpmcontainerapi.BadgerGenerateResponse
@@ -807,4 +795,42 @@ func BadgerGenerate(w rest.ResponseWriter, r *rest.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&cdout)
+}
+
+func getUserCredentials(dbConn *sql.DB, node *admindb.Container) (Credential, error) {
+	var err error
+	cred := Credential{}
+
+	if node.Image != "cpm-node-proxy" {
+		//get port
+		var pgport admindb.Setting
+		pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
+		nodeuser, err := admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
+		if err != nil {
+			logit.Error.Println(err.Error())
+			return cred, err
+		}
+		cred.Host = node.Name
+		cred.Database = CPMTEST_DB
+		cred.Username = nodeuser.Rolname
+		cred.Password = nodeuser.Passwd
+		cred.Port = pgport.Value
+		return cred, err
+	}
+
+	//return proxy credentials
+	var proxy Proxy
+	proxy, err = GetProxy(dbConn, node.Name)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return cred, err
+	}
+
+	cred.Database = "postgres"
+	cred.Host = proxy.Host
+	cred.Username = proxy.Usename
+	cred.Password = proxy.Passwd
+	cred.Port = "5432"
+	return cred, err
+
 }
