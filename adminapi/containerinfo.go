@@ -220,9 +220,6 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var host = node.Name
-	if KubeEnv {
-		host = node.Name + "-db"
-	}
 
 	//get password
 	var nodeuser admindb.ContainerUser

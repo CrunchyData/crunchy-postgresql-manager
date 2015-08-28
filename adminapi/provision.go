@@ -27,6 +27,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -108,11 +109,11 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	err = provisionImplInit(dbConn, params, PROFILE, false)
-	if err != nil {
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+		err = provisionImplInit(dbConn, params, PROFILE, false)
+		if err != nil {
+			rest.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}
@@ -185,8 +186,6 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 		}
 	*/
 
-	var output string
-
 	//remove any existing docker containers with this name
 	logit.Info.Println("PROFILE provisionImpl remove old container start")
 	rreq := &cpmserverapi.DockerRemoveRequest{}
@@ -199,13 +198,21 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 	}
 	logit.Info.Println("PROFILE provisionImpl remove old container end")
 	params.CommandPath = "docker-run.sh"
-	_, err = cpmserverapi.DockerRunClient(url, params)
+	var resp cpmserverapi.DockerRunResponse
+	resp, err = cpmserverapi.DockerRunClient(url, params)
 	if err != nil {
-		logit.Error.Println("Provision: " + output)
+		logit.Error.Println("Provision: error " + err.Error())
+		logit.Error.Println("Provision: " + resp.Output)
 		return err
 	}
-	logit.Info.Println("docker-run.sh output=" + output)
+	logit.Info.Println("docker-run.sh output=[" + resp.Output + "]")
+	logit.Info.Println("docker-run.sh trimmed output=[" + strings.TrimSpace(resp.Output) + "]")
 	logit.Info.Println("PROFILE provisionImpl end of docker-run")
+	if strings.TrimSpace(resp.Output) != "0" {
+		err = errors.New("bad return code from docker-run.sh")
+		logit.Error.Println("Provision: error " + err.Error())
+		return err
+	}
 
 	dbnode := admindb.Container{}
 	dbnode.ID = ""

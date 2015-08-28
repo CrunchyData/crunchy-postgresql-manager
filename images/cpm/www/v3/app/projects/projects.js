@@ -592,6 +592,56 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
+            .state('projects.proxy', {
+
+                url: '/{projectId}/proxy/{proxyId}',
+
+                views: {
+
+                    '': {
+                        templateUrl: 'app/proxy/proxy.html',
+                        controller: ['$scope', '$state', '$cookieStore', '$stateParams', 'utils', 'containersFactory',
+                            function($scope, $state, $cookieStore, $stateParams, utils, containersFactory) {
+                                console.log('in projects.proxy with proxyId ' + JSON.stringify($stateParams));
+                                if (!$cookieStore.get('cpm_token')) {
+                                    console.log('cpm_token not defined in projects');
+                                    $state.go('login', {
+                                        userId: 'hi'
+                                    });
+                                }
+
+                                if ($stateParams.proxyId != "") {
+                                    proxyFactory.get($stateParams.proxyId)
+                                        .success(function(data) {
+                                            $scope.proxy = data;
+                                            console.log('success with proxy get');
+                                            console.log('proxy ' + JSON.stringify($scope.container));
+                                        }).error(function(error) {
+                                            $scope.alerts = [{
+                                                type: 'danger',
+                                                msg: error.message
+                                            }];
+                                            console.log('here is an error ' + error.message);
+                                        });
+                                }
+
+                            }
+                        ]
+                    },
+
+                }
+            })
+
+            .state('projects.addproxy', {
+                url: '/addproxy/:projectId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/proxy/proxy.add.html',
+                        controller: ProxyAddController
+                    },
+                }
+            })
 
             .state('projects.detail', {
 

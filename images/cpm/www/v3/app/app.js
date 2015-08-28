@@ -3,6 +3,7 @@ angular.module('uiRouterSample', [
     'uiRouterSample.projects',
     'uiRouterSample.projects.service',
     'uiRouterSample.containers.service',
+    'uiRouterSample.proxy.service',
     'uiRouterSample.tasks.service',
     'uiRouterSample.clusters.service',
     'uiRouterSample.servers',

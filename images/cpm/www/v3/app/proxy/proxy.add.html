@@ -1,0 +1,62 @@
+<p><strong>Create DB Proxy</strong></p>
+<div>
+	<form class="form-horizontal">
+		<div class="form-group">
+			<label for="inputName" class="control-label col-xs-2">Name</label>
+			<div class="col-xs-5">
+				<input type="text" class="form-control" id="inputName" ng-model="container.Name">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="inputUserID" class="control-label col-xs-2">Database User ID</label>
+			<div class="col-xs-5">
+				<input type="text" class="form-control" id="inputUserID" ng-model="proxy.UserID">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="inputUserPassword" class="control-label col-xs-2">Database User Password</label>
+			<div class="col-xs-5">
+				<input type="password" class="form-control" id="inputUserPassword" ng-model="proxy.UserPassword">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="inputDatabaseHost" class="control-label col-xs-2">Database Host</label>
+			<div class="col-xs-5">
+				<input type="text" class="form-control" id="inputDatabaseHost" ng-model="proxy.DatabaseHost">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="inputDatabasePort" class="control-label col-xs-2">Database Port</label>
+			<div class="col-xs-5">
+				<input type="text" class="form-control" id="inputDatabasePort" ng-model="proxy.DatabasePort">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="inputServer" class="control-label col-xs-2">Server</label>
+			<div class="col-xs-5">
+				<select class="form-control" id="server" name="server" type="text" ng-model="selectedServer" ng-options="server.Name for server in servers"> 
+				</select>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="inputDockerProfile" class="control-label col-xs-2">DockerProfile</label>
+			<div class="col-xs-5">
+				<select class="form-control" id="inputDockerProfile" ng-model="dockerprofile">
+					<option value="SM" selected>small</option>
+					<option value="MED">medium</option>
+					<option value="LG">large</option>
+				</select>
+			</div>
+		</div>
+		<span us-spinner spinner-key="spinner-1"></span>
+		<div class="form-group">
+			<div class="col-xs-offset-2 col-xs-5">
+				<button type="submit" ng-click="add()" class="btn btn-primary">Create</button>
+			</div>
+		</div>
+
+	</form>
+
+	<div ui-view class="slide">
+	</div>
+</div>

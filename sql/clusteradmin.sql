@@ -229,6 +229,15 @@ create table containeruser (
 	unique (containername, usename)
 );
 
+create table proxy (
+	id serial primary key,
+	containeruserid int references containeruser (id) on delete cascade not null,
+	containerid int references container (id) on delete cascade not null,
+	projectid int references project (id) on delete cascade not null,
+	port varchar(30) not null,
+	updatedt timestamp not null
+);
+
 insert into settings (name, value, updatedt) values ('POSTGRESPSW', '', now());
 insert into settings (name, value, updatedt) values ('CPMTESTPSW', 'cpmtest', now());
 insert into settings (name, value, updatedt) values ('PGPOOLPSW', 'pgpool', now());

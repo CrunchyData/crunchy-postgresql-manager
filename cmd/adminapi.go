@@ -144,6 +144,7 @@ func main() {
 		&rest.Route{"POST", "/rules/insert", adminapi.RulesInsert},
 		&rest.Route{"GET", "/containerrules/getall/:ID.:Token", adminapi.ContainerAccessRuleGetAll},
 		&rest.Route{"POST", "/containerrules/update", adminapi.ContainerAccessRuleUpdate},
+		&rest.Route{"POST", "/provisionproxy", adminapi.ProvisionProxy},
 	)
 	if err != nil {
 		log.Fatal(err)

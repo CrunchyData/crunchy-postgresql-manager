@@ -48,6 +48,16 @@ type Server struct {
 	CreateDate     string
 }
 
+type Proxy struct {
+	ID             string
+	ContainerUserID           string
+	ContainerID      string
+	ServerID      string
+	ProjectID string
+	Port     string
+	UpdateDate     string
+}
+
 type ClusterProfiles struct {
 	Size           string
 	Count          string
