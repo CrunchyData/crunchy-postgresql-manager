@@ -826,7 +826,7 @@ func getUserCredentials(dbConn *sql.DB, node *admindb.Container) (Credential, er
 		return cred, err
 	}
 
-	cred.Database = "postgres"
+	cred.Database = proxy.Database
 	cred.Host = proxy.Host
 	cred.Username = proxy.Usename
 	cred.Password = proxy.Passwd

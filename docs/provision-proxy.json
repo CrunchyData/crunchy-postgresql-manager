@@ -1,0 +1,12 @@
+{ "Token":"32633813-3af9-430a-9e5e-4b5cdebb4125", 
+ 	"Profile":"SM",
+        "Image":"cpm-node-proxy",
+        "ServerID":"1",
+        "ProjectID":"1",
+        "ContainerName":"goob8",
+        "Standalone":"false",
+        "DatabaseHost":"192.168.10.100",
+        "DatabaseUserID":"cpm",
+        "DatabaseUserPassword":"cpm",
+        "Database":"postgres",
+        "DatabasePort":"5432" }  

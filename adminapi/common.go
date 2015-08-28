@@ -51,6 +51,7 @@ type Server struct {
 type Proxy struct {
 	ID             string
 	ContainerUserID           string
+	Database           string
 	Host           string
 	Usename           string
 	Passwd           string

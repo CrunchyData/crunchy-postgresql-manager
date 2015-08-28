@@ -236,6 +236,7 @@ create table proxy (
 	projectid int references project (id) on delete cascade not null,
 	port varchar(30) not null,
 	host varchar(30) not null,
+	databasename varchar(30) not null,
 	updatedt timestamp not null
 );
 

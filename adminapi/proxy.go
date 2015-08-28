@@ -45,6 +45,7 @@ type ProxyRequest struct {
 	DatabaseUserID string
 	DatabaseUserPassword string
 	DatabasePort string
+	Database string
 }
 
 func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
@@ -107,6 +108,12 @@ func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 	if proxyrequest.DatabaseHost == "" {
 		logit.Error.Println("ProvisionProxy error DatabaseHost required")
 		errorStr = "DatabaseHost required"
+		rest.Error(w, errorStr, http.StatusBadRequest)
+		return
+	}
+	if proxyrequest.Database == "" {
+		logit.Error.Println("ProvisionProxy error Database required")
+		errorStr = "Database required"
 		rest.Error(w, errorStr, http.StatusBadRequest)
 		return
 	}
@@ -183,11 +190,12 @@ func insertProxy(request *ProxyRequest) (error) {
         proxy.ContainerUserID = strconv.Itoa(containerUserID)
         proxy.ContainerID = container.ID
         proxy.Host = request.DatabaseHost
+        proxy.Database = request.Database
         proxy.ProjectID = request.ProjectID
         proxy.Port = request.DatabasePort
 
- 	queryStr := fmt.Sprintf("insert into proxy ( containeruserid, containerid, projectid, port, host, updatedt) values ( %s, %s, %s, '%s', '%s', now()) returning id", 
-	proxy.ContainerUserID, proxy.ContainerID, proxy.ProjectID, proxy.Port, proxy.Host) 
+ 	queryStr := fmt.Sprintf("insert into proxy ( containeruserid, containerid, projectid, port, host, databasename, updatedt) values ( %s, %s, %s, '%s', '%s', '%s', now()) returning id", 
+	proxy.ContainerUserID, proxy.ContainerID, proxy.ProjectID, proxy.Port, proxy.Host, proxy.Database) 
  
         logit.Info.Println("insertProxy:" + queryStr) 
         var proxyid int 
@@ -208,7 +216,7 @@ func GetProxy(dbConn *sql.DB, containername string ) (Proxy, error) {
         proxy := Proxy{}
         var err error
 
-	queryStr := fmt.Sprintf("select u.usename , u.passwd, c.name , p.port, p.host from proxy p, container c, containeruser u where p.containerid = c.id and p.containeruserid = u.id and c.name = '%s'", containername )
+	queryStr := fmt.Sprintf("select u.usename , u.passwd, c.name , p.port, p.host, p.databasename from proxy p, container c, containeruser u where p.containerid = c.id and p.containeruserid = u.id and c.name = '%s'", containername )
 
         logit.Info.Println("GetProxy:" + queryStr)
         rows, err = dbConn.Query(queryStr)
@@ -218,7 +226,7 @@ func GetProxy(dbConn *sql.DB, containername string ) (Proxy, error) {
         defer rows.Close()
         for rows.Next() {
                 if err = rows.Scan(&proxy.Usename, &proxy.Passwd, 
-			&proxy.ContainerName, &proxy.Port, &proxy.Host); err != nil {
+			&proxy.ContainerName, &proxy.Port, &proxy.Host, &proxy.Database); err != nil {
   			return proxy, err
                 }
         }
