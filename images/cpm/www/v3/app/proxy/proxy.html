@@ -8,11 +8,13 @@
 				<li>
 				<a ui-sref="projects.container.users()"><i class="fa fa-user fa-fw"></i>Users</a>
 				</li>
+<!--
 				<li>
 				<a ui-sref="projects.container.accessrules()"><i class="fa fa-edit fa-fw"></i>Access Rules</a>
 				</li>
+-->
 				<li>
-				<a ui-sref="projects.container.delete()"><i class="fa fa-trash fa-fw"></i>Delete</a>
+				<a ui-sref="projects.proxy.delete()"><i class="fa fa-trash fa-fw"></i>Delete</a>
 				</li>
 				<li ng-show="container.Role == 'standby'">
 				<a ui-sref="projects.container.failover()"><i class="fa fa-fire-extinguisher fa-fw"></i>Failover</a>

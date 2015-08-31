@@ -281,7 +281,7 @@ func getProxyByContainerID(dbConn *sql.DB, containerID string ) (Proxy, error) {
         proxy := Proxy{}
         var err error
 
-	queryStr := fmt.Sprintf("select s.name, u.usename , u.passwd, c.name , p.port, p.host, p.databasename from proxy p, server s, container c, containeruser u where p.containerid = c.id and p.containeruserid = u.id and c.id = %s and c.serverid = s.id", containerID )
+	queryStr := fmt.Sprintf("select p.projectid, p.id, p.containeruserid, p.containerid, s.name, u.usename , u.passwd, c.name , p.port, p.host, p.databasename from proxy p, server s, container c, containeruser u where p.containerid = c.id and p.containeruserid = u.id and c.id = %s and c.serverid = s.id", containerID )
 
         logit.Info.Println("GetProxyByContainerID:" + queryStr)
         rows, err = dbConn.Query(queryStr)
@@ -290,7 +290,10 @@ func getProxyByContainerID(dbConn *sql.DB, containerID string ) (Proxy, error) {
         }
         defer rows.Close()
         for rows.Next() {
-                if err = rows.Scan(&proxy.ServerName, &proxy.Usename, 
+                if err = rows.Scan(
+			&proxy.ProjectID,
+			&proxy.ID, &proxy.ContainerUserID, &proxy.ContainerID,
+			&proxy.ServerName, &proxy.Usename, 
 			&proxy.Passwd, 
 			&proxy.ContainerName, &proxy.Port, &proxy.Host, &proxy.Database); err != nil {
   			return proxy, err
@@ -305,6 +308,12 @@ func getProxyByContainerID(dbConn *sql.DB, containerID string ) (Proxy, error) {
                 return proxy, err
         }
         proxy.Passwd = unencrypted
+
+	proxy.Status, err = getDatabaseStatus(dbConn, containerID)
+	if err != nil {
+		return proxy, err
+	}
+
         return proxy, nil
 }
 

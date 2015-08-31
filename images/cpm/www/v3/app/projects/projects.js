@@ -650,6 +650,17 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
+            .state('projects.proxy.delete', {
+                url: '/delete/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/proxy/proxy.delete.html',
+                        controller: ProxyDeleteController
+                    },
+                }
+            })
+
             .state('projects.addproxy', {
                 url: '/addproxy/:projectId',
                 views: {

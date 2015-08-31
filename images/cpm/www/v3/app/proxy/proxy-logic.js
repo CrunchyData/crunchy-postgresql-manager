@@ -73,12 +73,14 @@ var ProxyAddController = function($scope, $stateParams, $state, serversFactory, 
             });
     };
 };
-var ProxyDeleteController = function($scope, $stateParams, $state, proxyFactory, utils, usSpinnerService) {
-    var container = $scope.container;
+var ProxyDeleteController = function($scope, $stateParams, $state, containersFactory, utils, usSpinnerService) {
+    var proxy = $scope.proxy;
+	console.log('in delete ctlr with proxy=' + JSON.stringify(proxy));
 
     $scope.delete = function() {
         usSpinnerService.spin('spinner-1');
-        proxyFactory.delete($stateParams.containerId)
+	console.log("deleting proxy with containerId=" + proxy.ContainerID);
+        containersFactory.delete(proxy.ContainerID)
             .success(function(data) {
                 console.log('successful delete with data=' + data);
                 usSpinnerService.stop('spinner-1');

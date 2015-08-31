@@ -834,3 +834,39 @@ func getUserCredentials(dbConn *sql.DB, node *admindb.Container) (Credential, er
 	return cred, err
 
 }
+
+func getDatabaseStatus(dbConn *sql.DB, containerid string) (string, error) {
+	node, err := admindb.GetContainer(dbConn, containerid)
+	if err != nil {
+		logit.Error.Println("MonitorContainerGetInfo:" + err.Error())
+		return "", err
+	}
+
+	var credential Credential
+	credential, err = getUserCredentials(dbConn, &node)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return "", err
+	}
+
+	var dbConn2 *sql.DB
+	dbConn2, err = util.GetMonitoringConnection(credential.Host, credential.Username, credential.Port, credential.Database,  credential.Password)
+	defer dbConn2.Close()
+
+ 	var value string
+
+        err = dbConn2.QueryRow(fmt.Sprintf("select now()::text")).Scan(&value)
+        switch {
+        case err == sql.ErrNoRows:
+                logit.Info.Println("getProxyStatus  no rows returned")
+                return "OFFLINE", nil
+        case err != nil:
+                logit.Info.Println("getProxyStatus error " + err.Error())
+                return "OFFLINE", nil
+        default:
+                logit.Info.Println("getProxyStatus returned " + value)
+        }
+
+        return "RUNNING", nil
+
+}
