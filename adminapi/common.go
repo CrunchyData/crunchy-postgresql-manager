@@ -20,8 +20,6 @@ import (
 	"net/http"
 )
 
-var KubeEnv = false
-var KubeURL = ""
 
 type MonitorServerParam struct {
 	ServerID string
@@ -57,6 +55,8 @@ type Proxy struct {
 	Passwd           string
 	ContainerID      string
 	ContainerName      string
+	ServerName      string
+	Status      string
 	ProjectID string
 	Port     string
 	UpdateDate     string
@@ -138,9 +138,6 @@ type SimpleStatus struct {
 	Status string
 }
 
-type KubeResponse struct {
-	URL string
-}
 
 type PostgresStatement struct {
 	Database   string

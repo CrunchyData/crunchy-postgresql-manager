@@ -71,8 +71,10 @@ angular.module('uiRouterSample.projects', [
                                         clusterId: node.id
                                     });
                                 } else if (node.type == 'proxy') {
-                                    $state.go('projects.container.details', {
-                                        containerId: node.id
+                                    $state.go('projects.proxy.details', {
+                                        containerId: node.id,
+                                        containerName: node.name,
+                                        projectId: node.projectid
                                     });
                                 } else if (node.type == 'project') {
                                     $state.go('projects.detail.edit', {
@@ -596,17 +598,18 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
+
             .state('projects.proxy', {
 
-                url: '/{projectId}/proxy/{proxyId}',
+                url: '/{projectId}/proxy/{containerId}',
 
                 views: {
 
                     '': {
                         templateUrl: 'app/proxy/proxy.html',
-                        controller: ['$scope', '$state', '$cookieStore', '$stateParams', 'utils', 'containersFactory',
-                            function($scope, $state, $cookieStore, $stateParams, utils, containersFactory) {
-                                console.log('in projects.proxy with proxyId ' + JSON.stringify($stateParams));
+                        controller: ['$scope', '$state', '$cookieStore', '$stateParams', 'utils', 'proxyFactory',
+                            function($scope, $state, $cookieStore, $stateParams, utils, proxyFactory) {
+                                console.log('in projects.proxy 2 with proxyId ' + JSON.stringify($stateParams));
                                 if (!$cookieStore.get('cpm_token')) {
                                     console.log('cpm_token not defined in projects');
                                     $state.go('login', {
@@ -615,11 +618,11 @@ angular.module('uiRouterSample.projects', [
                                 }
 
                                 if ($stateParams.proxyId != "") {
-                                    proxyFactory.get($stateParams.proxyId)
+                                    proxyFactory.getbycontainerid($stateParams.containerId)
                                         .success(function(data) {
                                             $scope.proxy = data;
                                             console.log('success with proxy get');
-                                            console.log('proxy ' + JSON.stringify($scope.container));
+                                            console.log('proxy ' + JSON.stringify($scope.proxy));
                                         }).error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
@@ -633,6 +636,17 @@ angular.module('uiRouterSample.projects', [
                         ]
                     },
 
+                }
+            })
+
+            .state('projects.proxy.details', {
+                url: '/details/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/proxy/proxy.detail.html',
+                        controller: ProxyDetailController
+                    },
                 }
             })
 

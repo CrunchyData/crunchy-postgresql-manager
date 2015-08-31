@@ -96,9 +96,6 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	if currentStatus != "CONTAINER NOT FOUND" {
 		//ping the db on that node to get current status
 		var pinghost = results.Name
-		if KubeEnv {
-			pinghost = results.Name + "-db"
-		}
 		logit.Info.Println("pinging db on " + pinghost + "." + domain)
 		currentStatus, err = GetPGStatus2(dbConn, results.Name, pinghost+"."+domain)
 		if err != nil {

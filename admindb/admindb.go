@@ -557,7 +557,7 @@ func GetAllContainersForCluster(dbConn *sql.DB, clusterID string) ([]Container, 
 func GetAllContainersForProject(dbConn *sql.DB, projectID string) ([]Container, error) {
 	var rows *sql.Rows
 	var err error
-	queryStr := fmt.Sprintf("select id, name from container where projectid = %s order by name", projectID)
+	queryStr := fmt.Sprintf("select c.id, c.name, coalesce(nullif(p.id, null), 0) from container c left outer join proxy p on c.id = p.containerid and c.projectid = %s order by c.name", projectID)
 	logit.Info.Println("admindb:GetAllContainersForProject:" + queryStr)
 	rows, err = dbConn.Query(queryStr)
 	if err != nil {
@@ -565,12 +565,16 @@ func GetAllContainersForProject(dbConn *sql.DB, projectID string) ([]Container, 
 	}
 	defer rows.Close()
 	containers := make([]Container, 0)
+	var pid int
 	for rows.Next() {
 		container := Container{}
-		if err = rows.Scan(&container.ID, &container.Name); err != nil {
+		if err = rows.Scan(&container.ID, &container.Name, &pid); err != nil {
 			return nil, err
 		}
+
+		if pid == 0 {
 		containers = append(containers, container)
+		}
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err

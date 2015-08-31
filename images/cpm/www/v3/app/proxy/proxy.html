@@ -1,18 +1,47 @@
 <div>
+	<h2>Proxy {{proxy.ContainerName}}</h2> 
+	<div class="navbar-inner"><div class="container">
+			<ul class="nav navbar-nav navbar-left">
+				<li>
+				<a ui-sref="projects.container.taskschedules()"><i class="fa fa-cogs fa-fw"></i>Schedules</a>
+				</li>
+				<li>
+				<a ui-sref="projects.container.users()"><i class="fa fa-user fa-fw"></i>Users</a>
+				</li>
+				<li>
+				<a ui-sref="projects.container.accessrules()"><i class="fa fa-edit fa-fw"></i>Access Rules</a>
+				</li>
+				<li>
+				<a ui-sref="projects.container.delete()"><i class="fa fa-trash fa-fw"></i>Delete</a>
+				</li>
+				<li ng-show="container.Role == 'standby'">
+				<a ui-sref="projects.container.failover()"><i class="fa fa-fire-extinguisher fa-fw"></i>Failover</a>
+				</li>
+				<li ng-show="container.Status != 'RUNNING'">
+				<a ui-sref="projects.container.start()"><i class="fa fa-play fa-fw"></i>Start</a>
+				</li>
+				<li ng-show="container.Status == 'RUNNING'">
+				<a ui-sref="projects.container.stop()"><i class="fa fa-power-off fa-fw"></i>Stop</a>
+				</li>
+				<li class="dropdown" dropdown on-toggle="toggled(open)">
+				<a href class="dropdown-toggle" dropdown-toggle><i class="fa fa-bar-chart fa-fw"></i>Monitor</a>
+				<ul class="dropdown-menu">
+					<li><a ui-sref="projects.container.monitor.bgwriter()">bgwriter</a></li>
+					<li><a ui-sref="projects.container.monitor.databasesize()">databasesize</a></li>
+					<li><a ui-sref="projects.container.monitor.loadtest()">loadtest</a></li>
+						<li ng-show="container.Role == 'master'"><a ui-sref="projects.container.monitor.pgstatreplication()">pgstatreplication</a></li>
+					<li><a ui-sref="projects.container.monitor.pgcontroldata()">pgcontroldata</a></li>
+					<li><a ui-sref="projects.container.monitor.pgsettings()">pg_settings</a></li>
+					<li><a ui-sref="projects.container.monitor.pgstatdatabase()">pg_stat_database</a></li>
+					<li><a ui-sref="projects.container.monitor.pgstatstatements()">pg_stat_statements</a></li>
+					<li><a ui-sref="projects.container.monitor.badger()">pgbadger</a></li>
+				</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<hr>
 
-	<h2>Proxy {{proxy.Name}}</h2>
-
-    <div class="navbar-inner">
-        <div class="container">
-            <ul class="nav navbar-nav navbar-left">
-                <a ui-sref="projects.detail.delete()"><i class="fa fa-trash fa-fw"></i>Delete Proxy&nbsp;</a>
-            </ul>
-        </div>
-</div>
-<hr>
-    <div ui-view class="slide">
-        <!-- Example of default content. This content will be replace as soon as
-		this ui-view is populate with a template -->
-    </div>
-
+	<div ui-view class="slide">
+	</div>
 </div>

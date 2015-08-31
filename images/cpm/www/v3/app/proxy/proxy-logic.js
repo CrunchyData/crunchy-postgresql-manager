@@ -1,12 +1,23 @@
-var ProxyDetailController = function($scope, $state, $cookieStore, $stateParams, utils) {
+var ProxyDetailController = function($scope, $state, $cookieStore, $stateParams, utils, proxyFactory) {
     if (!$cookieStore.get('cpm_token')) {
         console.log('cpm_token not defined in projects');
         $state.go('login', {
             userId: 'hi'
         });
     }
-
-    //$state.go('projects.container.details', $stateParams);
+	console.log("in proxy detail controller with containerId=" + $stateParams.containerId);
+        proxyFactory.getbycontainerid($stateParams.containerId)
+            .success(function(data) {
+                console.log('successful getbycontainerid with data=' + data);
+		$scope.proxy = data;
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+            });
 
 };
 

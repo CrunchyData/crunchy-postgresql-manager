@@ -79,9 +79,6 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//get connection to container's database
 	var host = node.Name
-	if KubeEnv {
-		host = node.Name + "-db"
-	}
 
 	//fetch cpmtest user credentials
 	var nodeuser admindb.ContainerUser
@@ -212,9 +209,6 @@ func DeleteContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//get connection to container's database
 	var host = node.Name
-	if KubeEnv {
-		host = node.Name + "-db"
-	}
 
 	//fetch cpmtest user credentials
 	var cpmuser admindb.ContainerUser
@@ -288,9 +282,6 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//get connection to container's database
 	var host = node.Name
-	if KubeEnv {
-		host = node.Name + "-db"
-	}
 
 	//fetch  user credentials
 	var nodeuser admindb.ContainerUser
@@ -374,9 +365,6 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 
 	//get connection to container's database
 	var host = node.Name
-	if KubeEnv {
-		host = node.Name + "-db"
-	}
 
 	//fetch cpmtest user credentials
 	var nodeuser admindb.ContainerUser
@@ -494,9 +482,6 @@ func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//get connection to container's database
 	var host = node.Name
-	if KubeEnv {
-		host = node.Name + "-db"
-	}
 
 	//fetch cpmtest user credentials
 	var cpmuser admindb.ContainerUser

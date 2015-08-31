@@ -13,9 +13,9 @@ angular.module('uiRouterSample.proxy.service', ['ngCookies'])
     };
 
 
-    proxyFactory.get = function(id) {
+    proxyFactory.getbycontainerid = function(containerid) {
 
-        var url = $cookieStore.get('AdminURL') + '/proxy/' + id + '.' + $cookieStore.get('cpm_token');
+        var url = $cookieStore.get('AdminURL') + '/proxy/getbycontainerid/' + containerid + '.' + $cookieStore.get('cpm_token');
         console.log(url);
 
         return $http.get(url);
@@ -45,5 +45,7 @@ angular.module('uiRouterSample.proxy.service', ['ngCookies'])
 
         return $http.get(url);
     };
+
+ 	return proxyFactory;
 
 }]);

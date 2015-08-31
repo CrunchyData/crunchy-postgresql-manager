@@ -1,0 +1,60 @@
+<div>
+	<form class="form-horizontal">
+		<div class="form-group">
+			<label for="inputName" class="control-label col-xs-3">Name</label>
+			<div class="col-xs-5">
+				<input type="text" class="form-control" id="inputName" ng-model="proxy.ContainerName">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="inputDatabase" class="control-label col-xs-3">Database Name</label>
+			<div class="col-xs-5">
+				<input type="text" class="form-control" id="inputDatabase" ng-model="proxy.Database">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="inputUserID" class="control-label col-xs-3">Database User ID</label>
+			<div class="col-xs-5">
+				<input type="text" class="form-control" id="inputUserID" ng-model="proxy.Usename">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="inputUserPassword" class="control-label col-xs-3">Database User Password</label>
+			<div class="col-xs-5">
+				<input type="password" class="form-control" id="inputUserPassword" ng-model="proxy.Passwd">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="inputDatabaseHost" class="control-label col-xs-3">Database Host</label>
+			<div class="col-xs-5">
+				<input type="text" class="form-control" id="inputDatabaseHost" ng-model="proxy.Host">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="inputDatabasePort" class="control-label col-xs-3">Database Port</label>
+			<div class="col-xs-5">
+				<input type="text" class="form-control" id="inputDatabasePort" ng-model="proxy.Port">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="inputServer" class="control-label col-xs-3">Server</label>
+			<div class="col-xs-5">
+				<input disabled type="text" class="form-control" id="inputServer" ng-model="proxy.ServerName">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="inputStatus" class="control-label col-xs-3">Database Status</label>
+			<div class="col-xs-5">
+				<input disabled type="text" class="form-control" id="inputStatus" ng-model="proxy.Status">
+			</div>
+		</div>
+		<span us-spinner spinner-key="spinner-1"></span>
+		<div class="form-group">
+			<div class="col-xs-offset-2 col-xs-5">
+				<button type="submit" ng-click="save()" class="btn btn-primary">Save</button>
+			</div>
+		</div>
+
+	</form>
+
+</div>

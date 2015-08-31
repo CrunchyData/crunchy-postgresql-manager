@@ -211,6 +211,40 @@ func insertProxy(request *ProxyRequest) (error) {
 	return err
 }
 
+func GetProxyByContainerID(w rest.ResponseWriter, r *rest.Request) {
+        dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+        if err != nil {
+                logit.Error.Println("GetProxyByContainerID: error " + err.Error())
+                rest.Error(w, err.Error(), 400)
+                return
+
+        }
+        defer dbConn.Close()
+        err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
+        if err != nil {
+                logit.Error.Println("GetProxyByContainerID: authorize error " + err.Error())
+                rest.Error(w, err.Error(), http.StatusUnauthorized)
+                return
+        }
+
+        ContainerID := r.PathParam("ContainerID")
+        if ContainerID == "" {
+                logit.Error.Println("GetProxyByContainerID: ContainerID is required")
+                rest.Error(w, err.Error(), http.StatusBadRequest)
+                return
+        }
+
+ 	proxy, err := getProxyByContainerID(dbConn, ContainerID)
+        if err != nil {
+                logit.Error.Println("GetProxyByContainerID:" + err.Error())
+                rest.Error(w, err.Error(), http.StatusBadRequest)
+                return
+        }
+
+        w.WriteJson(&proxy)
+}
+
+
 func GetProxy(dbConn *sql.DB, containername string ) (Proxy, error) {
         var rows *sql.Rows
         proxy := Proxy{}
@@ -242,4 +276,35 @@ func GetProxy(dbConn *sql.DB, containername string ) (Proxy, error) {
         return proxy, nil
 }
 
+func getProxyByContainerID(dbConn *sql.DB, containerID string ) (Proxy, error) {
+        var rows *sql.Rows
+        proxy := Proxy{}
+        var err error
+
+	queryStr := fmt.Sprintf("select s.name, u.usename , u.passwd, c.name , p.port, p.host, p.databasename from proxy p, server s, container c, containeruser u where p.containerid = c.id and p.containeruserid = u.id and c.id = %s and c.serverid = s.id", containerID )
+
+        logit.Info.Println("GetProxyByContainerID:" + queryStr)
+        rows, err = dbConn.Query(queryStr)
+        if err != nil {
+                return proxy, err
+        }
+        defer rows.Close()
+        for rows.Next() {
+                if err = rows.Scan(&proxy.ServerName, &proxy.Usename, 
+			&proxy.Passwd, 
+			&proxy.ContainerName, &proxy.Port, &proxy.Host, &proxy.Database); err != nil {
+  			return proxy, err
+                }
+        }
+        if err = rows.Err(); err != nil {
+                return proxy, err
+        }
+        var unencrypted string
+        unencrypted, err = sec.DecryptPassword(proxy.Passwd)
+        if err != nil {
+                return proxy, err
+        }
+        proxy.Passwd = unencrypted
+        return proxy, nil
+}
 
