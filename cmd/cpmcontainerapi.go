@@ -40,6 +40,7 @@ func main() {
 	api := rest.NewApi()
 	api.Use(rest.DefaultDevStack...)
 	router, err := rest.MakeRouter(
+		&rest.Route{"GET", "/status", cpmcontainerapi.Status},
 		&rest.Route{"POST", "/remotewritefile", cpmcontainerapi.RemoteWritefile},
 		&rest.Route{"POST", "/seed", cpmcontainerapi.Seed},
 		&rest.Route{"POST", "/startpg", cpmcontainerapi.StartPG},

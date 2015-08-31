@@ -39,6 +39,13 @@ type InitdbResponse struct {
 	Output string
 	Status string
 }
+
+type StatusRequest struct {
+}
+
+type StatusResponse struct {
+	Status string
+}
 type StartPGRequest struct {
 	ContainerName string
 }
@@ -368,3 +375,12 @@ func Controldata(w rest.ResponseWriter, r *rest.Request) {
 	response.Status = "OK"
 	w.WriteJson(&response)
 }
+
+func Status(w rest.ResponseWriter, r *rest.Request) {
+	response := StatusResponse{}
+	response.Status = "RUNNING"
+        w.WriteHeader(http.StatusOK)
+        w.WriteJson(&response)
+}
+
+

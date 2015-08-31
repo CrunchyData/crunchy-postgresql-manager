@@ -24,6 +24,10 @@ var ProxyDetailController = function($scope, $state, $cookieStore, $stateParams,
 var ProxyAddController = function($scope, $stateParams, $state, serversFactory, proxyFactory, utils, usSpinnerService) {
 
     var newcontainer = {};
+    var newproxy = {};
+	newproxy.DatabaseName = "postgres";
+	newproxy.DatabasePort = "5432";
+	$scope.proxy = newproxy;
 
     console.log('in ProxyAddController with projectId = ' + $stateParams.projectId);
     serversFactory.all()
@@ -31,8 +35,8 @@ var ProxyAddController = function($scope, $stateParams, $state, serversFactory, 
             console.log('got servers' + data.length);
             $scope.servers = data;
             newcontainer.ID = 0;
-            newcontainer.Name = 'newcontainer';
-            newcontainer.Image = 'cpm-node';
+            newcontainer.Name = 'newproxy';
+            newcontainer.Image = 'cpm-node-proxy';
             newcontainer.ServerID = $scope.servers[0].ID;
             $scope.selectedServer = $scope.servers[0];
             $scope.dockerprofile = 'SM';

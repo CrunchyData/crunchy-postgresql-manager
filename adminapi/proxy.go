@@ -21,7 +21,7 @@ import (
 	"strconv"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	//"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/sec"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
@@ -314,6 +314,15 @@ func getProxyByContainerID(dbConn *sql.DB, containerID string ) (Proxy, error) {
 		return proxy, err
 	}
 
+	var resp cpmcontainerapi.StatusResponse 
+	resp, err = cpmcontainerapi.StatusClient(proxy.ContainerName)
+	proxy.ContainerStatus = resp.Status
+	if err != nil {
+		return proxy, err
+	}
+
         return proxy, nil
 }
+
+
 

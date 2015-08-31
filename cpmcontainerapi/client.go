@@ -219,3 +219,15 @@ func BadgerGenerateClient(host string) (BadgerGenerateResponse, error) {
 	//fmt.Println(string(rawresponse))
 	return response, err
 }
+
+func StatusClient(host string) (StatusResponse, error) {
+	var err error
+	url := "http://" + host + PORT + "/api/status"
+	logit.Info.Println("status client about to post to " + url)
+	r, _ := http.Get(url)
+	rawresponse, _ := ioutil.ReadAll(r.Body)
+	response := StatusResponse{}
+	err = json.Unmarshal(rawresponse, &response)
+	//fmt.Println(string(rawresponse))
+	return response, err
+}

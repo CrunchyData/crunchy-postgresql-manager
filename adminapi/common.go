@@ -57,6 +57,7 @@ type Proxy struct {
 	ContainerName      string
 	ServerName      string
 	Status      string
+	ContainerStatus      string
 	ProjectID string
 	Port     string
 	UpdateDate     string

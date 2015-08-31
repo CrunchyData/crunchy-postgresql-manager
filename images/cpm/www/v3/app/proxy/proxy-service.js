@@ -31,19 +31,30 @@ angular.module('uiRouterSample.proxy.service', ['ngCookies'])
 
     proxyFactory.add = function(proxy, container, standalone, dockerprofile) {
 
-	console.log('here with proxy host=' + proxy.DatabaseHost);
+	console.log('here in proxy add with proxy...' + JSON.stringify(proxy));
+	console.log('here in proxy add with container...' + JSON.stringify(container));
+	console.log('here in proxy add with dockerprofile...' + dockerprofile);
 
-        var url = $cookieStore.get('AdminURL') + '/provisionproxy/' +
-            'SM' + '.' +
-            'cpm-node-proxy' + '.' +
-            container.ServerID + '.' +
-            container.ProjectID + '.' +
-            container.Name + '.' +
-            'true' + '.' +
-            $cookieStore.get('cpm_token');
+        var url = $cookieStore.get('AdminURL') + '/provisionproxy';
         console.log(url);
 
-        return $http.get(url);
+ 	return $http.post(url, {
+            'Profile': dockerprofile,
+            'Image': 'cpm-node-proxy',
+            'ServerID': container.ServerID,
+            'ProjectID': container.ProjectID,
+            'ContainerName': container.Name,
+            'Standalone': 'false',
+            'DatabaseHost': proxy.DatabaseHost,
+            'DatabaseUserID': proxy.UserID,
+            'DatabaseUserPassword': proxy.UserPassword,
+            'Database': proxy.DatabaseName,
+            'DatabasePort': proxy.DatabasePort,
+            'Token': $cookieStore.get('cpm_token')
+
+        });
+
+
     };
 
  	return proxyFactory;
