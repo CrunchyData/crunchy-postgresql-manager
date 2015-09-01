@@ -36,13 +36,13 @@ func Collecthc() error {
 
 	//for each container, do a health check
 	i := 0
-	var checks []HealthCheck
-	checks = make([]HealthCheck, 0)
+	var checks []admindb.HealthCheck
+	checks = make([]admindb.HealthCheck, 0)
 
 	var status string
 
 	for i = range containers {
-		hc := HealthCheck{}
+		hc := admindb.HealthCheck{}
 		hc.ProjectID = containers[i].ProjectID
 		hc.ProjectName = containers[i].ProjectName
 		hc.ContainerName = containers[i].Name
@@ -58,7 +58,7 @@ func Collecthc() error {
 	}
 
 	//delete current health checks
-	err = DeleteHealthCheck(dbConn)
+	err = admindb.DeleteHealthCheck(dbConn)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return err
@@ -67,7 +67,7 @@ func Collecthc() error {
 	//persist health checks
 	i = 0
 	for i = range checks {
-		_, err = InsertHealthCheck(dbConn, checks[i])
+		_, err = admindb.InsertHealthCheck(dbConn, checks[i])
 		if err != nil {
 			logit.Error.Println(err.Error())
 		}

@@ -17,7 +17,7 @@ package adminapi
 
 import (
 	"github.com/ant0ine/go-json-rest/rest"
-	"github.com/crunchydata/crunchy-postgresql-manager/collect"
+	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
@@ -40,9 +40,9 @@ func GetHealthCheck(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var results []collect.HealthCheck
+	var results []admindb.HealthCheck
 
-	results, err = collect.GetHealthCheck(dbConn)
+	results, err = admindb.GetHealthCheck(dbConn)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		w.WriteJson(&results)

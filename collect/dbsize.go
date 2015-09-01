@@ -18,6 +18,7 @@ package collect
 import (
 	"database/sql"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
+	"github.com/crunchydata/crunchy-postgresql-manager/adminapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"github.com/prometheus/client_golang/prometheus"
@@ -41,10 +42,8 @@ func CollectDBSize(gauge *prometheus.GaugeVec) error {
 	}
 	defer dbConn.Close()
 
-	var domain string
-	domain, err = getDomain(dbConn)
-	var pgport string
-	pgport, err = getPort(dbConn)
+	//var domain string
+	//domain, err = getDomain(dbConn)
 
 	//get all containers
 	var containers []admindb.Container
@@ -55,6 +54,7 @@ func CollectDBSize(gauge *prometheus.GaugeVec) error {
 
 	//for each container, collect db size metrics
 	i := 0
+	var credential adminapi.Credential
 
 	for i = range containers {
 		//containers[i].ProjectID
@@ -64,7 +64,11 @@ func CollectDBSize(gauge *prometheus.GaugeVec) error {
 		//containers[i].Role
 		//containers[i].Image
 		logit.Info.Println("dbsize processing " + containers[i].Name)
-		err = process(gauge, dbConn, pgport, containers[i].Name, domain, containers[i].Role)
+		credential, err = adminapi.GetUserCredentials(dbConn, &containers[i])
+		if err != nil {
+			logit.Error.Println(err.Error())
+		}
+		err = process(&containers[i], &credential, gauge)
 		if err != nil {
 			logit.Error.Println(err.Error())
 		}
@@ -75,29 +79,29 @@ func CollectDBSize(gauge *prometheus.GaugeVec) error {
 	return nil
 }
 
-func process(gauge *prometheus.GaugeVec, dbConn *sql.DB, port string, containerName string, domain string, containerRole string) error {
+func process(node *admindb.Container, credential *adminapi.Credential, gauge *prometheus.GaugeVec) error {
 	var err error
-	var userid, password, database string
+	//var userid, password, database string
 
 	//get node credentials
-	userid, password, database, err = getCredential(dbConn, containerName, containerRole)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return err
-	}
+	//userid, password, database, err = getCredential(dbConn, containerName, containerRole)
+//	if err != nil {
+//		logit.Error.Println(err.Error())
+//		return err
+//	}
 
-	logit.Info.Println("dbsize credentials userid:" + userid + " password:" + password + " database:" + database)
+	logit.Info.Println("dbsize node=" + node.Name + " credentials Username:" + credential.Username + " Password:" + credential.Password + " Database:" + credential.Database + " Host:" + credential.Host)
 	var db *sql.DB
-	db, err = util.GetMonitoringConnection(containerName,
-		userid, port, database, password)
+	db, err = util.GetMonitoringConnection(credential.Host,
+		credential.Username, credential.Port, credential.Database, credential.Password)
 	defer db.Close()
 	if err != nil {
-		logit.Error.Println("error in getting connectionto " + containerName)
+		logit.Error.Println("error in getting connectionto " + credential.Host)
 		return err
 	}
 
 	var metrics []DBMetric
-	logit.Info.Println("dbsize running pg2 on " + containerName)
+	logit.Info.Println("dbsize running pg2 on " + node.Name)
 	metrics, err = pg2(db)
 
 	//write metrcs to prometheus
@@ -105,7 +109,7 @@ func process(gauge *prometheus.GaugeVec, dbConn *sql.DB, port string, containerN
 	i := 0
 	for i = range metrics {
 		logit.Info.Println("dbsize setting dbsize metric")
-		gauge.WithLabelValues(containerName, metrics[i].Name).Set(metrics[i].Value)
+		gauge.WithLabelValues(node.Name, metrics[i].Name).Set(metrics[i].Value)
 		i++
 	}
 

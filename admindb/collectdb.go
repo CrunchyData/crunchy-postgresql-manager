@@ -13,7 +13,7 @@
  limitations under the License.
 */
 
-package collect
+package admindb
 
 import (
 	"database/sql"

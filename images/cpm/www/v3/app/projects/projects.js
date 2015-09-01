@@ -661,6 +661,17 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
+            .state('projects.proxy.databasesize', {
+                url: '/databasesize/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.monitor.databasesize.html',
+                        controller: ProxyDatabasesizeController
+                    },
+                }
+            })
+
             .state('projects.proxy.bgwriter', {
                 url: '/bgwriter/:itemId',
                 views: {

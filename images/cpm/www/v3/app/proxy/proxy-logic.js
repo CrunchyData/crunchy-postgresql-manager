@@ -125,6 +125,17 @@ var ProxyStopController = function($scope, $stateParams, $state, containersFacto
 };
 
 
+var ProxyDatabasesizeController = function($sce, 
+		$scope, $stateParams, $state, containersFactory, utils) {
+
+		$scope.container = {}
+		$scope.container.Name = $scope.proxy.ContainerName;
+
+    		console.log('dbsize called with container Name ' + $scope.proxy.ContainerName);
+    		$scope.dbsizegraphlink = $sce.trustAsResourceUrl('http://cpm-promdash:3000/embed/dbsizedashboard#!?var.container=' + $scope.proxy.ContainerName);
+
+};
+
 var ProxyDeleteController = function($scope, $stateParams, $state, containersFactory, utils, usSpinnerService) {
     var proxy = $scope.proxy;
 	console.log('in delete ctlr with proxy=' + JSON.stringify(proxy));
@@ -150,5 +161,6 @@ var ProxyDeleteController = function($scope, $stateParams, $state, containersFac
                 usSpinnerService.stop('spinner-1');
             });
     };
+
 
 };

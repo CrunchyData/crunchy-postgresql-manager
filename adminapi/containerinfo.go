@@ -66,7 +66,7 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 
 //return database, user, password, error
 	var credential Credential
-	credential, err = getUserCredentials(dbConn, &node)
+	credential, err = GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -223,7 +223,7 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var credential Credential
-	credential, err = getUserCredentials(dbConn, &node)
+	credential, err = GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -307,7 +307,7 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var credential Credential
-	credential, err = getUserCredentials(dbConn, &node)
+	credential, err = GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -521,7 +521,7 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 	//var host = node.Name
 
 	var credential Credential
-	credential, err = getUserCredentials(dbConn, &node)
+	credential, err = GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -674,7 +674,7 @@ func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var credential Credential
-	credential, err = getUserCredentials(dbConn, &container)
+	credential, err = GetUserCredentials(dbConn, &container)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -803,44 +803,6 @@ func BadgerGenerate(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&cdout)
 }
 
-func getUserCredentials(dbConn *sql.DB, node *admindb.Container) (Credential, error) {
-	var err error
-	cred := Credential{}
-
-	if node.Image != "cpm-node-proxy" {
-		//get port
-		var pgport admindb.Setting
-		pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
-		nodeuser, err := admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
-		if err != nil {
-			logit.Error.Println(err.Error())
-			return cred, err
-		}
-		cred.Host = node.Name
-		cred.Database = CPMTEST_DB
-		cred.Username = nodeuser.Rolname
-		cred.Password = nodeuser.Passwd
-		cred.Port = pgport.Value
-		return cred, err
-	}
-
-	//return proxy credentials
-	var proxy Proxy
-	proxy, err = GetProxy(dbConn, node.Name)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return cred, err
-	}
-
-	cred.Database = proxy.Database
-	cred.Host = proxy.Host
-	cred.Username = proxy.Usename
-	cred.Password = proxy.Passwd
-	cred.Port = "5432"
-	return cred, err
-
-}
-
 func getDatabaseStatus(dbConn *sql.DB, containerid string) (string, error) {
 	node, err := admindb.GetContainer(dbConn, containerid)
 	if err != nil {
@@ -849,7 +811,7 @@ func getDatabaseStatus(dbConn *sql.DB, containerid string) (string, error) {
 	}
 
 	var credential Credential
-	credential, err = getUserCredentials(dbConn, &node)
+	credential, err = GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return "", err
