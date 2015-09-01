@@ -222,6 +222,15 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	var credential Credential
+	credential, err = getUserCredentials(dbConn, &node)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+/**
 	var host = node.Name
 
 	//get password
@@ -232,13 +241,11 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	//get port
-	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
+*/
 
 	var dbConn2 *sql.DB
-	dbConn2, err = util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+	dbConn2, err = util.GetMonitoringConnection(credential.Host, credential.Username, credential.Port, credential.Database,  credential.Password)
+	//dbConn2, err = util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
 	defer dbConn2.Close()
 
 	info := Bgwriter{}
@@ -299,22 +306,16 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var host = node.Name
-
-	//get password
-	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
+	var credential Credential
+	credential, err = getUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	//get port
-	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
-
-	dbConn2, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+	var dbConn2 *sql.DB
+	dbConn2, err = util.GetMonitoringConnection(credential.Host, credential.Username, credential.Port, credential.Database,  credential.Password)
 	defer dbConn2.Close()
 
 	stats := make([]Statdatabase, 0)
@@ -517,9 +518,17 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var host = node.Name
+	//var host = node.Name
 
-	results, err2 := loadtest(dbConn, node.Name, host, writes)
+	var credential Credential
+	credential, err = getUserCredentials(dbConn, &node)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	results, err2 := loadtest(dbConn, &credential, writes)
 	if err2 != nil {
 		logit.Error.Println("ContainerLoadTest:" + err2.Error())
 		rest.Error(w, err2.Error(), http.StatusBadRequest)
@@ -530,7 +539,7 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&results)
 }
 
-func loadtest(dbConn *sql.DB, nodename string, host string, writes int) ([]Loadtestresults, error) {
+func loadtest(dbConn *sql.DB, credential *Credential, writes int) ([]Loadtestresults, error) {
 	var err error
 	var name string
 	var query string
@@ -539,6 +548,7 @@ func loadtest(dbConn *sql.DB, nodename string, host string, writes int) ([]Loadt
 	var dbConn2 *sql.DB
 	var results = make([]Loadtestresults, 4)
 
+/**
 	//get port
 	var pgport admindb.Setting
 	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
@@ -550,9 +560,11 @@ func loadtest(dbConn *sql.DB, nodename string, host string, writes int) ([]Loadt
 		logit.Error.Println(err.Error())
 		return results, err
 	}
+*/
 
 	//get db connection
-	dbConn2, err = util.GetMonitoringConnection(host, CPMTEST_USER, pgport.Value, CPMTEST_DB, nodeuser.Passwd)
+	dbConn2, err = util.GetMonitoringConnection(credential.Host, credential.Username, credential.Port, credential.Database,  credential.Password)
+	//dbConn2, err = util.GetMonitoringConnection(host, CPMTEST_USER, pgport.Value, CPMTEST_DB, nodeuser.Passwd)
 	if err != nil {
 		logit.Error.Println("loadtest connection error:" + err.Error())
 		return results, err
@@ -661,22 +673,17 @@ func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var host = container.Name
-
-	//fetch cpmtest user credentials
-	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(dbConn, container.Name, CPMTEST_USER)
+	var credential Credential
+	credential, err = getUserCredentials(dbConn, &container)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	//get port
-	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
+	var dbConn2 *sql.DB
+	dbConn2, err = util.GetMonitoringConnection(credential.Host, credential.Username, credential.Port, credential.Database,  credential.Password)
 
-	dbConn2, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
 	defer dbConn2.Close()
 
 	//get the list of databases
@@ -713,7 +720,7 @@ func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 
 	for i := range databases {
 		//get a database connection to a specific database
-		dbConn3, err := util.GetMonitoringConnection(host, databases[i], pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+		dbConn3, err := util.GetMonitoringConnection(credential.Host, credential.Username, credential.Port, databases[i], credential.Password)
 		defer dbConn3.Close()
 
 		rows, err = dbConn3.Query(

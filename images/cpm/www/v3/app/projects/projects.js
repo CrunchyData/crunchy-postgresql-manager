@@ -661,6 +661,57 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
+            .state('projects.proxy.bgwriter', {
+                url: '/bgwriter/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.monitor.bgwriter.html',
+                        controller: ContainerMonitorbgwriterController
+                    },
+                }
+            })
+            .state('projects.proxy.loadtest', {
+                url: '/loadtest/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.monitor.loadtest.html',
+                        controller: ContainerMonitorloadtestController
+                    },
+                }
+            })
+            .state('projects.proxy.pgsettings', {
+                url: '/pgsettings/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.monitor.pgsettings.html',
+                        controller: ContainerMonitorpgsettingsController
+                    },
+                }
+            })
+            .state('projects.proxy.pgstatdatabase', {
+                url: '/pgstatdatabase/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.monitor.pgstatdatabase.html',
+                        controller: ContainerMonitorpgstatdatabaseController
+                    },
+                }
+            })
+            .state('projects.proxy.pgstatstatements', {
+                url: '/pgstatements/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.monitor.pgstatstatements.html',
+                        controller: ContainerMonitorpgstatstatementsController
+                    },
+                }
+            })
+
             .state('projects.proxy.start', {
                 url: '/start/:itemId',
                 views: {
