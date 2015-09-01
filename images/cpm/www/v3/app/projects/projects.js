@@ -661,6 +661,29 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
+            .state('projects.proxy.start', {
+                url: '/start/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/proxy/proxy.start.html',
+                        controller: ProxyStartController
+                    },
+                }
+            })
+
+            .state('projects.proxy.stop', {
+                url: '/stop/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/proxy/proxy.stop.html',
+                        controller: ProxyStopController
+                    },
+                }
+            })
+
+
             .state('projects.addproxy', {
                 url: '/addproxy/:projectId',
                 views: {

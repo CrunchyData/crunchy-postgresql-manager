@@ -77,6 +77,54 @@ var ProxyAddController = function($scope, $stateParams, $state, serversFactory, 
             });
     };
 };
+
+
+var ProxyStartController = function($scope, $stateParams, $state, containersFactory, utils, usSpinnerService) {
+    var proxy = $scope.proxy;
+    console.log('here in start top');
+
+    $scope.start = function() {
+        usSpinnerService.spin('spinner-1');
+        containersFactory.start($stateParams.containerId)
+            .success(function(data) {
+                console.log('successful start with data=' + data);
+                $state.go('projects.proxy.details', $stateParams);
+                usSpinnerService.stop('spinner-1');
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+                usSpinnerService.stop('spinner-1');
+            });
+    };
+};
+
+var ProxyStopController = function($scope, $stateParams, $state, containersFactory, utils, usSpinnerService) {
+    var proxy = $scope.proxy;
+
+    $scope.stop = function() {
+        usSpinnerService.spin('spinner-1');
+        containersFactory.stop($stateParams.containerId)
+            .success(function(data) {
+                console.log('successful stop with data=' + data);
+                $state.go('projects.container.details', $stateParams);
+                usSpinnerService.stop('spinner-1');
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+                usSpinnerService.stop('spinner-1');
+            });
+    };
+};
+
+
 var ProxyDeleteController = function($scope, $stateParams, $state, containersFactory, utils, usSpinnerService) {
     var proxy = $scope.proxy;
 	console.log('in delete ctlr with proxy=' + JSON.stringify(proxy));
