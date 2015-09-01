@@ -26,4 +26,8 @@
 			</tbody>
 		</table>
 	</div>
+	 <div>
+        	<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+    	</div>
+
 	<a class="btn btn-primary" ng-click="refresh()" ><i class="fa fa-refresh fa-lg"></i>Refresh</a>

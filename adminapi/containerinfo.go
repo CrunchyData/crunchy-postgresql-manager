@@ -790,7 +790,6 @@ func BadgerGenerate(w rest.ResponseWriter, r *rest.Request) {
 
 	var host = container.Name
 
-	//send the container a pg_controldata command
 	var cdout cpmcontainerapi.BadgerGenerateResponse
 	cdout, err = cpmcontainerapi.BadgerGenerateClient(host)
 	if err != nil {
