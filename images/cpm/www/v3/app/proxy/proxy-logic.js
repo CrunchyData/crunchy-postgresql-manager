@@ -110,7 +110,7 @@ var ProxyStopController = function($scope, $stateParams, $state, containersFacto
         containersFactory.stop($stateParams.containerId)
             .success(function(data) {
                 console.log('successful stop with data=' + data);
-                $state.go('projects.container.details', $stateParams);
+                $state.go('projects.proxy.details', $stateParams);
                 usSpinnerService.stop('spinner-1');
             })
             .error(function(error) {

@@ -16,10 +16,10 @@
 				<li>
 				<a ui-sref="projects.proxy.delete()"><i class="fa fa-trash fa-fw"></i>Delete</a>
 				</li>
-				<li ng-show="container.Status != 'RUNNING'">
+				<li ng-show="proxy.ContainerStatus != 'RUNNING'">
 				<a ui-sref="projects.proxy.start()"><i class="fa fa-play fa-fw"></i>Start</a>
 				</li>
-				<li ng-show="container.Status == 'RUNNING'">
+				<li ng-show="proxy.ContainerStatus == 'RUNNING'">
 				<a ui-sref="projects.proxy.stop()"><i class="fa fa-power-off fa-fw"></i>Stop</a>
 				</li>
 				<li class="dropdown" dropdown on-toggle="toggled(open)">
