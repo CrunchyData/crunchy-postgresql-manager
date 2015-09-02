@@ -185,7 +185,7 @@ angular.module('uiRouterSample.projects', [
 
 
             .state('projects.container.details', {
-                url: '/details/:itemId',
+                url: '/details',
                 views: {
 
                     '': {
@@ -794,6 +794,27 @@ angular.module('uiRouterSample.projects', [
                         ]
                     },
 
+                }
+            })
+
+            .state('projects.detail.gotocontainer', {
+
+                url: '/{projectId}/container/{containerId}',
+                views: {
+                    '': {
+                        templateUrl: 'app/projects/projects.detail.html',
+                        controller: GotocontainerController
+                    },
+                }
+            })
+            .state('projects.detail.gotoproxy', {
+
+                url: '/{projectId}/container/{containerId}',
+                views: {
+                    '': {
+                        templateUrl: 'app/proxy/proxy.html',
+                        controller: GotoproxyController
+                    },
                 }
             })
 

@@ -5,8 +5,19 @@ var ContainerDetailController = function($scope, $state, $cookieStore, $statePar
             userId: 'hi'
         });
     }
+	console.log('in ContainerDetailController');
 
     //$state.go('projects.container.details', $stateParams);
+
+};
+
+var GotocontainerController = function($scope, $state, $cookieStore, $stateParams, utils) {
+	console.log('in GotocontainerController');
+ 	$state.go('projects.container.details', {
+       		containerId: $stateParams.containerId,
+               	projectId:  $stateParams.projectId
+	});
+
 
 };
 

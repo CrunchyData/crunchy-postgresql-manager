@@ -136,6 +136,18 @@ var ProxyDatabasesizeController = function($sce,
 
 };
 
+
+var GotoproxyController = function($scope, $stateParams, $state, containersFactory, utils) {
+	console.log('in GotoproxyController');
+  	$state.go('projects.proxy.details', {
+		containerId: $stateParams.containerId,
+               	containerName: $stateParams.containerName,
+               	projectId: $stateParams.projectId
+	});
+};
+
+
+
 var ProxyDeleteController = function($scope, $stateParams, $state, containersFactory, utils, usSpinnerService) {
     var proxy = $scope.proxy;
 	console.log('in delete ctlr with proxy=' + JSON.stringify(proxy));

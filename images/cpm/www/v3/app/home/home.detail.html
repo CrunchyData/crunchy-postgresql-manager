@@ -6,7 +6,10 @@
 	    <th>Status</th>
         <tr ng-repeat="hc in hcdata">
 		<td class="col-md-2"><a ui-sref="projects.detail.edit({projectId:hc.ProjectID})">{{hc.ProjectName}}</a></td>
-		<td class="col-md-2"><a ui-sref="projects.container.details({projectId:hc.ProjectID,containerId:hc.ContainerID})" ui-sref-opts="{inherit:true}">{{hc.ContainerName}}</a></td>
+		<td class="col-md-2">
+			<a ng-if="hc.ContainerImage == 'cpm-node-proxy'" ui-sref="projects.detail.gotoproxy({containerName:hc.ContainerName,projectId:hc.ProjectID,containerId:hc.ContainerID})">{{hc.ContainerName}}</a>
+			<a ng-if="hc.ContainerImage == 'cpm-node'" ui-sref="projects.detail.gotocontainer({projectId:hc.ProjectID,containerId:hc.ContainerID})">{{hc.ContainerName}}</a>
+		</td>
             <td  class="col-md-2"header-class="text-left" data-title="'Status'" width="200">
                 <a tooltip="{{hc.Status}}" style="color:red" ng-if="hc.Status == 'down'" href=""><i class="fa fa-warning"></i></a>
                 <a tooltip="{{hc.Status}}" style="color:green" ng-if="hc.Status == 'up'" href=""><i class="fa fa-check"></i></a>
