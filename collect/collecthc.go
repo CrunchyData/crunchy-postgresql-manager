@@ -2,6 +2,7 @@ package collect
 
 import (
 	"database/sql"
+	"github.com/crunchydata/crunchy-postgresql-manager/adminapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
@@ -22,10 +23,6 @@ func Collecthc() error {
 	}
 	defer dbConn.Close()
 
-	var domain string
-	domain, err = getDomain(dbConn)
-	var pgport string
-	pgport, err = getPort(dbConn)
 
 	//get all containers
 	var containers []admindb.Container
@@ -36,6 +33,7 @@ func Collecthc() error {
 
 	//for each container, do a health check
 	i := 0
+	var credential adminapi.Credential
 	var checks []admindb.HealthCheck
 	checks = make([]admindb.HealthCheck, 0)
 
@@ -50,10 +48,17 @@ func Collecthc() error {
 		hc.ContainerRole = containers[i].Role
 		hc.ContainerImage = containers[i].Image
 
-		status, err = ping(dbConn, pgport, hc.ContainerName+"."+domain, hc.ContainerRole)
-		hc.Status = status
+		credential, err = adminapi.GetUserCredentials(dbConn, &containers[i])
+                if err != nil {
+                        logit.Error.Println(err.Error())
+                } else {
 
-		checks = append(checks, hc)
+
+			status, err = ping(&credential)
+			hc.Status = status
+
+			checks = append(checks, hc)
+		}
 		i++
 	}
 
@@ -77,82 +82,25 @@ func Collecthc() error {
 	return nil
 }
 
-func ping(dbConn *sql.DB, port string, containerName string, containerRole string) (string, error) {
+func ping(credential *adminapi.Credential) (string, error) {
 	var db *sql.DB
 	var err error
-	var userid, password, database string
 
-	//get node credentials
-	userid, password, database, err = getCredential(dbConn, containerName, containerRole)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return "down", err
-	}
-
-	db, err = util.GetMonitoringConnection(containerName,
-		userid, port, database, password)
+	db, err = util.GetMonitoringConnection(credential.Host,
+		credential.Username, credential.Port, credential.Database, 
+		credential.Password)
 	defer db.Close()
 	if err != nil {
-		logit.Error.Println("error in getting connectionto " + containerName)
+		logit.Error.Println("error in getting connectionto " + credential.Host)
 		return "down", err
 	}
 
 	var result string
 	err = db.QueryRow("select now()::text").Scan(&result)
 	if err != nil {
-		logit.Error.Println("could not ping db on " + containerName)
+		logit.Error.Println("could not ping db on " + credential.Host)
 		return "down", err
 	}
 	return "up", nil
 
-}
-
-func getDomain(dbConn *sql.DB) (string, error) {
-	var err error
-	var domain string
-
-	domain, err = admindb.GetDomain(dbConn)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return domain, err
-	}
-	return domain, nil
-}
-
-func getPort(dbConn *sql.DB) (string, error) {
-	var err error
-	var port admindb.Setting
-
-	port, err = admindb.GetSetting(dbConn, "PG-PORT")
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return port.Value, err
-	}
-	return port.Value, nil
-}
-
-//return id, password, database
-func getCredential(dbConn *sql.DB, containerName string, containerRole string) (string, string, string, error) {
-	var err error
-	var userID string
-	var password string
-	var database string
-
-	if containerRole == "pgpool" {
-		userID = "cpmtest"
-		database = "cpmtest"
-	} else {
-		userID = "cpmtest"
-		database = "cpmtest"
-	}
-
-	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(dbConn, containerName, userID)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return userID, password, database, err
-	}
-	logit.Info.Println("got user credentials....containerName= " + containerName + " passwd=" + nodeuser.Passwd)
-
-	return userID, nodeuser.Passwd, database, nil
 }

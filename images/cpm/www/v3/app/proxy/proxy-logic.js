@@ -131,8 +131,8 @@ var ProxyDatabasesizeController = function($sce,
 		$scope.container = {}
 		$scope.container.Name = $scope.proxy.ContainerName;
 
-    		console.log('dbsize called with container Name ' + $scope.proxy.ContainerName);
-    		$scope.dbsizegraphlink = $sce.trustAsResourceUrl('http://cpm-promdash:3000/embed/dbsizedashboard#!?var.container=' + $scope.proxy.ContainerName);
+    		console.log('proxy dbsize called with container Name ' + $scope.proxy.ContainerName);
+    		$scope.proxysizegraphlink = $sce.trustAsResourceUrl('http://cpm-promdash:3000/embed/proxysizedashboard#!?var.containername=' + $scope.proxy.ContainerName);
 
 };
 

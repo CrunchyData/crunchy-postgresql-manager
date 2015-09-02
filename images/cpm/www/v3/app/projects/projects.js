@@ -666,7 +666,7 @@ angular.module('uiRouterSample.projects', [
                 views: {
 
                     '': {
-                        templateUrl: 'app/projects/projects.container.monitor.databasesize.html',
+                        templateUrl: 'app/proxy/proxy.databasesize.html',
                         controller: ProxyDatabasesizeController
                     },
                 }

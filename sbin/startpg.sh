@@ -16,4 +16,7 @@
 
 source /var/cpm/bin/setenv.sh
 
+# clean up any leftover locks that pg might have left
+rm /var/run/postgresql/.s.*
+
 pg_ctl -w -D /pgdata start 2> /tmp/startpg.err > /tmp/startpg.log

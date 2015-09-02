@@ -8,7 +8,9 @@
 
  <ul>
 	 <li ng-repeat="container in containers"> 
-	 <a href="#/containers/{{container.ID}}/details/">{{container.Name}}</a> 
+	<h3>{{container.ProjectID}} ProjectID</h3>
+	<h3>{{container.ID}} ContainerID</h3>
+	 <a ui-sref="projects.container.details( { projectId:container.ProjectID,containerId:container.ID } )">{{container.Name}}</a> 
 	 </li>
 </ul>
 

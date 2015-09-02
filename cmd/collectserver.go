@@ -90,6 +90,7 @@ func main() {
 		dbConn.Close()
 
 		var metric collect.Metric
+
 		for {
 			//get metrics for each server
 			i := 0
@@ -108,14 +109,12 @@ func main() {
 		}
 	}()
 
-/**
 	go func() {
 		for true {
 			collect.Collecthc()
 			time.Sleep(time.Duration(HC_POLL_INT) * time.Minute)
 		}
 	}()
-*/
 
 	go func() {
 		//register a gauge vector
