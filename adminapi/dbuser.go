@@ -530,6 +530,18 @@ func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	var userexists = true
+	_, err = admindb.GetContainerUser(dbConn, node.Name, postMsg.Rolname)
+	if err == sql.ErrNoRows {
+    		// Handle no rows
+		userexists = false
+    	} else if err != nil {
+    		// Handle actual error
+		logit.Error.Println("UpdateContainerUser: " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+	}
+
 	if postMsg.Passwd != "" {
 		//update user's password
 		dbuser := admindb.ContainerUser{}
@@ -537,11 +549,13 @@ func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		dbuser.Passwd = postMsg.Passwd
 		dbuser.Rolname = postMsg.Rolname
 
-		err = admindb.UpdateContainerUser(dbConn, dbuser)
-		if err != nil {
-			logit.Error.Println("UpdateContainerUser: " + err.Error())
-			rest.Error(w, err.Error(), 400)
-			return
+		if userexists {
+			err = admindb.UpdateContainerUser(dbConn, dbuser)
+			if err != nil {
+				logit.Error.Println("UpdateContainerUser: " + err.Error())
+				rest.Error(w, err.Error(), 400)
+				return
+			}
 		}
 	}
 

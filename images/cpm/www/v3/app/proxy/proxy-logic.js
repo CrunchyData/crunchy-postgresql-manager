@@ -201,9 +201,9 @@ var ProxyUsersAddController = function($scope, $stateParams, $state, containersF
         containersFactory.adduser($scope.user)
             .success(function(data) {
                 console.log('successful adduser with data=' + data);
-                $state.go('projects.proxy.users', $stateParams, {
-                    reload: true,
-                    inherit: true
+                $state.go('projects.proxy', $stateParams, {
+                    reload: false,
+                    inherit: false
                 });
 
             })

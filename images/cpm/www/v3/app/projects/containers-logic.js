@@ -75,8 +75,8 @@ var ContainerUsersDeleteController = function($scope, $stateParams, $state, cont
         containersFactory.deleteuser($stateParams.containerId, $scope.rolname)
             .success(function(data) {
                 console.log('successful deleteuser with data=' + data);
-                $state.go('projects.container.users', $stateParams, {
-                    reload: true,
+                $state.go('projects.container', $stateParams, {
+                    reload: false,
                     inherit: false
                 });
 
@@ -450,7 +450,7 @@ var ContainerUsersEditController = function($scope, $stateParams, $state, contai
         containersFactory.updateuser($scope.user)
             .success(function(data) {
                 console.log('successful updateuser with data=' + data);
-                $state.go('projects.container.users', $stateParams, {
+                $state.go('projects.container', $stateParams, {
                     reload: false,
                     inherit: false
                 });
@@ -477,8 +477,8 @@ var ContainerUsersDeleteController = function($scope, $stateParams, $state, cont
         containersFactory.deleteuser($stateParams.containerId, $scope.rolname)
             .success(function(data) {
                 console.log('successful deleteuser with data=' + data);
-                $state.go('projects.container.users', $stateParams, {
-                    reload: true,
+                $state.go('projects.container', $stateParams, {
+                    reload: false,
                     inherit: false
                 });
 
@@ -502,7 +502,6 @@ var ContainerUsersAddController = function($scope, $stateParams, $state, contain
     $scope.user.Rolinherit = false;
     $scope.user.Rolcreaterole = false;
     $scope.user.Rolcreatedb = false;
-    $scope.user.Rolcatupdate = false;
     $scope.user.Rollogin = false;
     $scope.user.Rolreplication = false;
 
@@ -523,8 +522,8 @@ var ContainerUsersAddController = function($scope, $stateParams, $state, contain
         containersFactory.adduser($scope.user)
             .success(function(data) {
                 console.log('successful adduser with data=' + data);
-                $state.go('projects.container.users', $stateParams, {
-                    reload: true,
+                $state.go('projects.container', $stateParams, {
+                    reload: false,
                     inherit: false
                 });
 
