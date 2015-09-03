@@ -650,6 +650,82 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
+            .state('projects.proxy.schedule', {
+                url: '/schedule/:scheduleID',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/proxy/proxy.schedule.html',
+                        controller: ProxyScheduleController
+                    },
+                }
+            })
+
+            .state('projects.proxy.schedule.edit', {
+                url: '',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.schedule.edit.html',
+                        resolve: {
+                            servers: ['serversFactory',
+                                function(serversFactory) {
+                                    console.log('in the resolv of servers');
+                                    serversFactory.all()
+                                        .success(function(data) {
+                                            console.log('successful servers all with data=' + data);
+                                            servers = data;
+                                            return data;
+                                        })
+                                        .error(function(error) {
+                                            $scope.alerts = [{
+                                                type: 'danger',
+                                                msg: error.Error
+                                            }];
+                                            console.log('here is an error ' + error.Error);
+                                        });
+                                }
+                            ]
+                        },
+
+                        controller: ContainerScheduleEditController
+                    },
+                }
+            })
+
+
+            .state('projects.proxy.schedule.history', {
+                url: '/schedule/:scheduleID',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.schedule.history.html',
+                        controller: ContainerScheduleHistoryController
+                    },
+                }
+            })
+
+            .state('projects.proxy.schedule.execute', {
+                url: '/schedule/:scheduleID',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.schedule.execute.html',
+                        controller: ContainerScheduleExecuteController
+                    },
+                }
+            })
+            .state('projects.proxy.schedule.delete', {
+                url: '/schedule/:schedulID',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.schedule.delete.html',
+                        controller: ContainerScheduleDeleteController
+                    },
+                }
+            })
+
             .state('projects.proxy.scheduleadd', {
                 url: '',
                 views: {

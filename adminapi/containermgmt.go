@@ -54,9 +54,9 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	results, err2 := admindb.GetContainer(dbConn, ID)
+	node, err2 := admindb.GetContainer(dbConn, ID)
 
-	if results.ID == "" {
+	if node.ID == "" {
 		rest.NotFound(w, r)
 		return
 	}
@@ -70,14 +70,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 
 	//go get the docker server IPAddress
 	server := admindb.Server{}
-	server, err = admindb.GetServer(dbConn, results.ServerID)
-	if err != nil {
-		logit.Error.Println("GetNode: " + err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	var domain string
-	domain, err = admindb.GetDomain(dbConn)
+	server, err = admindb.GetServer(dbConn, node.ServerID)
 	if err != nil {
 		logit.Error.Println("GetNode: " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -85,7 +78,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	request := &cpmserverapi.DockerInspectRequest{}
-	request.ContainerName = results.Name
+	request.ContainerName = node.Name
 	var url = "http://" + server.IPAddress + ":10001"
 	_, err = cpmserverapi.DockerInspectClient(url, request)
 	if err != nil {
@@ -94,10 +87,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	if currentStatus != "CONTAINER NOT FOUND" {
-		//ping the db on that node to get current status
-		var pinghost = results.Name
-		logit.Info.Println("pinging db on " + pinghost + "." + domain)
-		currentStatus, err = GetPGStatus2(dbConn, results.Name, pinghost+"."+domain)
+		currentStatus, err = PingPG(dbConn, &node)
 		if err != nil {
 			logit.Error.Println("GetNode:" + err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -106,10 +96,10 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 		logit.Info.Println("pinging db finished")
 	}
 
-	node := ClusterNode{results.ID, results.ClusterID, results.ServerID,
-		results.Name, results.Role, results.Image, results.CreateDate, currentStatus, results.ProjectID, results.ProjectName, results.ServerName, results.ClusterName}
+	clusternode := ClusterNode{node.ID, node.ClusterID, node.ServerID,
+		node.Name, node.Role, node.Image, node.CreateDate, currentStatus, node.ProjectID, node.ProjectName, node.ServerName, node.ClusterName}
 
-	w.WriteJson(node)
+	w.WriteJson(clusternode)
 }
 
 func GetAllNodesForProject(w rest.ResponseWriter, r *rest.Request) {
@@ -572,6 +562,42 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 	status.Status = "OK"
 	w.WriteJson(&status)
 
+}
+
+func PingPG(dbConn *sql.DB, node *admindb.Container) (string, error) {
+
+	var status = "OFFLINE"
+	var err error
+
+  	var credential Credential
+        credential, err = GetUserCredentials(dbConn, node)
+        if err != nil {
+                logit.Error.Println(err.Error())
+                return status, err
+        }
+
+        dbConn2, err := util.GetMonitoringConnection(credential.Host, credential.Username, credential.Port, credential.Database,  credential.Password)
+        defer dbConn2.Close()
+
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return status, err
+	}
+
+	var value string
+
+	err = dbConn2.QueryRow(fmt.Sprintf("select now()::text")).Scan(&value)
+	switch {
+	case err == sql.ErrNoRows:
+		logit.Info.Println("PingPG no rows returned")
+		return "OFFLINE", nil
+	case err != nil:
+		logit.Info.Println("PingPG error " + err.Error())
+		return "OFFLINE", nil
+	default:
+	}
+
+	return "RUNNING", nil
 }
 
 func GetPGStatus2(dbConn *sql.DB, nodename string, hostname string) (string, error) {

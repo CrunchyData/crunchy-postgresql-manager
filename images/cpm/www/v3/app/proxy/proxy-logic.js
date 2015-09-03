@@ -21,6 +21,49 @@ var ProxyDetailController = function($scope, $state, $cookieStore, $stateParams,
 
 };
 
+
+var ProxyScheduleController = function($scope, $stateParams, $state, tasksFactory, serversFactory, utils) {
+
+    $scope.edit = function() {
+        $state.go('.edit', $stateParams);
+    };
+    console.log('in schedule controller [' + $stateParams.scheduleID + ']');
+    serversFactory.all()
+        .success(function(data) {
+            console.log('successful get servers with data=' + data);
+            $scope.servers = data;
+            $state.go('projects.proxy.schedule.edit', $stateParams, {
+                reload: false,
+                inherit: true
+            });
+        })
+        .error(function(error) {
+            $scope.alerts = [{
+                type: 'danger',
+                msg: error.Error
+            }];
+            console.log('here is an error ' + error.Error);
+        });
+
+    if ($stateParams.scheduleID != '') {
+        tasksFactory.getschedule($stateParams.scheduleID)
+            .success(function(data) {
+                console.log('successful get schedule with data=' + data);
+                $scope.schedule = data;
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+            });
+    } else {
+        console.log('skipping get schedule on new schedule ');
+    }
+
+};
+
 var ProxyTaskSchedulesController = function($scope, $stateParams, $state, serversFactory, containersFactory ) {
     $scope.refresh = function() {
         containersFactory.schedules($stateParams.containerId)

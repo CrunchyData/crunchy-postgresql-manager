@@ -1,0 +1,16 @@
+<p><strong>Schedule ({{schedule.Name}})</strong></p>
+
+<div class="navbar-inner"><div class="container">
+		<span us-spinner spinner-key="spinner-1"></span>
+		<ul class="nav navbar-nav navbar-left">
+			<li>
+			<a ui-sref="projects.proxy.schedule.history({scheduleID:schedule.ID})"><i class="fa fa-table fa-fw"></i>History</a>
+			</li>
+			<li>
+			<a ui-sref="projects.proxy.schedule.execute({scheduleID:schedule.ID})"><i class="fa fa-cogs fa-fw"></i>Execute Now</a>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<div ui-view class="slide"></div>

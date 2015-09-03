@@ -74,18 +74,6 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//fetch cpmtest user credentials
-/**
-	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	logit.Info.Println("cpmtest password is " + nodeuser.Passwd)
-*/
-
-
 
 	dbConn2, err := util.GetMonitoringConnection(credential.Host, credential.Username, credential.Port, credential.Database,  credential.Password)
 	defer dbConn2.Close()
