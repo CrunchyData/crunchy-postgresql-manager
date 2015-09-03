@@ -650,6 +650,48 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
+            .state('projects.proxy.scheduleadd', {
+                url: '',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.scheduleadd.html',
+                        resolve: {
+                            servers: ['serversFactory',
+                                function(serversFactory) {
+                                    console.log('in the resolv of servers');
+                                    return serversFactory.all();
+                                }
+                            ]
+                        },
+
+                        controller: ProxyScheduleAddController
+                    },
+                }
+            })
+
+
+            .state('projects.proxy.taskschedules', {
+                url: '/taskschedules/:scheduleID',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/proxy/proxy.taskschedules.html',
+                        controller: ProxyTaskSchedulesController
+                    },
+                }
+            })
+            .state('projects.proxy.taskschedules.delete', {
+                url: '/taskschedules/:scheduleID',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/proxy/proxy.taskschedules.delete.html',
+                        controller: ProxyScheduleDeleteController
+                    },
+                }
+            })
+
             .state('projects.proxy.users', {
                 url: '/users/:itemId',
                 views: {

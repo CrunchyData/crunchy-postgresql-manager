@@ -21,6 +21,126 @@ var ProxyDetailController = function($scope, $state, $cookieStore, $stateParams,
 
 };
 
+var ProxyTaskSchedulesController = function($scope, $stateParams, $state, serversFactory, containersFactory ) {
+    $scope.refresh = function() {
+        containersFactory.schedules($stateParams.containerId)
+            .success(function(data) {
+                console.log('successful get schedules with data=' + data);
+                console.log(JSON.stringify(data));
+                $scope.schedules = data;
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+            });
+    };
+
+    $scope.refresh();
+
+}
+
+var ProxyScheduleAddController = function($scope, $filter, $stateParams, $state, tasksFactory, serversFactory, utils, servers) {
+    console.log('proxy schedule add controller XXXX');
+    $scope.profiles = [{
+        name: 'pg_basebackup'
+    }, {
+        name: 'pg_other'
+    }];
+    $scope.currentProfileName = $scope.profiles[0];
+
+    $scope.thething = [{
+        'name': 'thething',
+        'checked': false
+    }];
+    console.log('jeff');
+    //console.log(' servers here is ' + JSON.stringify($scope.servers));
+    console.log(' other servers here is ' + JSON.stringify(servers));
+    $scope.myServer = servers.data[0].ID;
+    console.log('setting myServer to ' + $scope.myServer);
+    $scope.servers = servers.data;
+    console.log('top of scheed add with schedule ID=' + $stateParams.scheduleID);
+    $scope.updateCurrentSchedule = function() {
+
+        if ($scope.thething.checked == true) {
+            $scope.schedule.Enabled = 'YES';
+        } else {
+            $scope.schedule.Enabled = 'NO';
+        }
+
+    };
+
+    $scope.create = function() {
+        console.log('create now called');
+        console.log('with myServer ' + $scope.myServer);
+
+        if ($scope.schedule.Minutes == '') {
+            $scope.schedule.Minutes = '*';
+        }
+        if ($scope.schedule.Hours == '') {
+            $scope.schedule.Hours = '*';
+        }
+        if ($scope.schedule.DayOfMonth == '') {
+            $scope.schedule.DayOfMonth = '*';
+        }
+        if ($scope.schedule.Month == '') {
+            $scope.schedule.Month = '*';
+        }
+        if ($scope.schedule.DayOfWeek == '') {
+            $scope.schedule.DayOfWeek = '*';
+        }
+        console.log($stateParams.scheduleID + 'stateparams');
+        console.log($scope.schedule.ID + 'sched id');
+        $scope.schedule.ServerID = $scope.myServer;
+        console.log('jeff value of profile is...' + $scope.currentProfileName.name);
+        $scope.schedule.ProfileName = $scope.currentProfileName.name;
+        tasksFactory.addschedule($scope.schedule, $scope.proxy.ContainerName)
+            .success(function(data) {
+                console.log('successful add schedule with data=' + data);
+                $state.go('projects.proxy.taskschedules', $stateParams, {
+                    reload: false,
+                    inherit: false
+                });
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+            });
+
+    };
+};
+
+var ProxyScheduleDeleteController = function($scope, $stateParams, $state, serversFactory, proxyFactory, utils, usSpinnerService) {
+  console.log('in delete schedule with scheduleID = ' + $stateParams.scheduleID);
+
+    $scope.delete = function() {
+        console.log('in schedule delete' + $stateParams.scheduleID);
+        tasksFactory.deleteschedule($stateParams.scheduleID)
+            .success(function(data) {
+                console.log('successful deleteschedule with data=' + data);
+                console.log(JSON.stringify(data));
+                $scope.stats = data;
+                $state.go('projects.proxy.taskschedules', $stateParams, {
+                    reload: false,
+                    inherit: false
+                });
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+            });
+    };
+
+}
+
 var ProxyAddController = function($scope, $stateParams, $state, serversFactory, proxyFactory, utils, usSpinnerService) {
 
     var newcontainer = {};
