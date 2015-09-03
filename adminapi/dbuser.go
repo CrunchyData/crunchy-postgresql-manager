@@ -77,25 +77,18 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	//get connection to container's database
-	var host = node.Name
+  	var credential Credential
+        credential, err = GetUserCredentials(dbConn, &node)
+        if err != nil {
+                logit.Error.Println(err.Error())
+                rest.Error(w, err.Error(), http.StatusBadRequest)
+                return
+        }
 
-	//fetch cpmtest user credentials
-	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	logit.Info.Println("cpmtest password is " + nodeuser.Passwd)
-
-	//get port
-	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
-
-	dbConn2, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+	var dbConn2 *sql.DB
+	dbConn2, err = util.GetMonitoringConnection(credential.Host, 
+		credential.Username, 
+		credential.Port, credential.Database, credential.Password)
 	defer dbConn2.Close()
 
 	var SUPERUSER = ""
@@ -200,30 +193,40 @@ func DeleteContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	err = admindb.DeleteContainerUser(dbConn, node.Name, rolname)
-	if err != nil {
+	var userexists = true
+	_, err = admindb.GetContainerUser(dbConn, node.Name, rolname)
+	if err == sql.ErrNoRows {
+    		// Handle no rows
+		userexists = false
+    	} else if err != nil {
+    		// Handle actual error
 		logit.Error.Println("DeleteContainerUser: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
-	//get connection to container's database
-	var host = node.Name
-
-	//fetch cpmtest user credentials
-	var cpmuser admindb.ContainerUser
-	cpmuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	//only delete if there is a container user
+	if userexists {
+		err = admindb.DeleteContainerUser(dbConn, node.Name, rolname)
+		if err != nil {
+			logit.Error.Println("DeleteContainerUser: " + err.Error())
+			rest.Error(w, err.Error(), 400)
+			return
+		}
 	}
 
-	//get port
-	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
+  	var credential Credential
+        credential, err = GetUserCredentials(dbConn, &node)
+        if err != nil {
+                logit.Error.Println(err.Error())
+                rest.Error(w, err.Error(), http.StatusBadRequest)
+                return
+        }
 
-	dbConn2, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, cpmuser.Passwd)
+	var dbConn2 *sql.DB
+	dbConn2, err = util.GetMonitoringConnection(credential.Host, 
+		credential.Username, 
+		credential.Port, credential.Database, credential.Password)
 	defer dbConn2.Close()
 
 	query := "drop role " + rolname
@@ -280,37 +283,27 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	//get connection to container's database
-	var host = node.Name
+  	var credential Credential
+        credential, err = GetUserCredentials(dbConn, &node)
+        if err != nil {
+                logit.Error.Println(err.Error())
+                rest.Error(w, err.Error(), http.StatusBadRequest)
+                return
+        }
 
-	//fetch  user credentials
-	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(dbConn, node.Name, Rolname)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	var dbConn2 *sql.DB
+	dbConn2, err = util.GetMonitoringConnection(credential.Host, 
+		credential.Username, 
+		credential.Port, credential.Database, credential.Password)
 
-	//fetch cpmtest user credentials
-	var cpmuser admindb.ContainerUser
-	cpmuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	//get port
-	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
-
-	dbConn2, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, cpmuser.Passwd)
 	defer dbConn2.Close()
 
-	query := "select rolname::text, rolsuper::text, rolinherit::text, rolcreaterole::text, rolcreatedb::text, rolcatupdate::text, rolcanlogin::text, rolreplication::text from pg_roles where rolname = '" + Rolname + "' order by rolname"
+
+	query := "select rolname::text, rolsuper::text, rolinherit::text, rolcreaterole::text, rolcreatedb::text, rolcanlogin::text, rolreplication::text from pg_roles where rolname = '" + Rolname + "' order by rolname"
 
 	logit.Info.Println(query)
+
+	nodeuser := admindb.ContainerUser{}
 
 	err = dbConn2.QueryRow(query).Scan(
 		&nodeuser.Rolname,
@@ -318,7 +311,6 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		&nodeuser.Rolinherit,
 		&nodeuser.Rolcreaterole,
 		&nodeuser.Rolcreatedb,
-		&nodeuser.Rolcatupdate,
 		&nodeuser.Rolcanlogin,
 		&nodeuser.Rolreplication)
 	if err != nil {
@@ -363,25 +355,18 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	//get connection to container's database
-	var host = node.Name
+  	var credential Credential
+        credential, err = GetUserCredentials(dbConn, &node)
+        if err != nil {
+                logit.Error.Println(err.Error())
+                rest.Error(w, err.Error(), http.StatusBadRequest)
+                return
+        }
 
-	//fetch cpmtest user credentials
-	var nodeuser admindb.ContainerUser
-	nodeuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	logit.Info.Println("cpmtest password is " + nodeuser.Passwd)
-
-	//get port
-	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 	var dbConn2 *sql.DB
-	dbConn2, err = util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
+	dbConn2, err = util.GetMonitoringConnection(credential.Host, 
+		credential.Username, 
+		credential.Port, credential.Database, credential.Password)
 	defer dbConn2.Close()
 
 	users := make([]admindb.ContainerUser, 0)
@@ -389,7 +374,7 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 	//query results
 	var rows *sql.Rows
 
-	rows, err = dbConn2.Query("select rolname::text, rolsuper::text, rolinherit::text, rolcreaterole::text, rolcreatedb::text, rolcatupdate::text, rolcanlogin::text, rolreplication::text from pg_roles order by rolname")
+	rows, err = dbConn2.Query("select rolname::text, rolsuper::text, rolinherit::text, rolcreaterole::text, rolcreatedb::text, rolcanlogin::text, rolreplication::text from pg_roles order by rolname")
 	if err != nil {
 		logit.Error.Println("GetAllUsersForContainer:" + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -405,7 +390,6 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 			&user.Rolinherit,
 			&user.Rolcreaterole,
 			&user.Rolcreatedb,
-			&user.Rolcatupdate,
 			&user.Rolcanlogin,
 			&user.Rolreplication,
 		); err != nil {
@@ -480,24 +464,19 @@ func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		//update the password
 	}
 
-	//get connection to container's database
-	var host = node.Name
+  	var credential Credential
+        credential, err = GetUserCredentials(dbConn, &node)
+        if err != nil {
+                logit.Error.Println(err.Error())
+                rest.Error(w, err.Error(), http.StatusBadRequest)
+                return
+        }
 
-	//fetch cpmtest user credentials
-	var cpmuser admindb.ContainerUser
-	cpmuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	//get port
-	var pgport admindb.Setting
-	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 	var dbConn2 *sql.DB
+	dbConn2, err = util.GetMonitoringConnection(credential.Host, 
+		credential.Username, 
+		credential.Port, credential.Database, credential.Password)
 
-	dbConn2, err = util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, cpmuser.Passwd)
 	defer dbConn2.Close()
 
 	var SUPERUSER = "SUPERUSER"

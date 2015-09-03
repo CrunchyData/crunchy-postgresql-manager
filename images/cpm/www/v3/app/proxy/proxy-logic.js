@@ -146,7 +146,129 @@ var GotoproxyController = function($scope, $stateParams, $state, containersFacto
 	});
 };
 
+var ProxyUsersDeleteController = function($scope, $stateParams, $state, containersFactory, utils) {
+    console.log('before doing delete user id=' + $stateParams.containerId + ' name=' + $stateParams.itemId);
+    $scope.rolname = $stateParams.itemId;
 
+    $scope.delete = function() {
+        console.log('doing delete user id=' + $stateParams.containerId + ' name=' + $scope.rolname);
+        containersFactory.deleteuser($stateParams.containerId, $scope.rolname)
+            .success(function(data) {
+                console.log('successful deleteuser with data=' + data);
+                $state.go('projects.detail.gotoproxy', $stateParams, {
+                    reload: true,
+                    inherit: true
+                });
+
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+                console.log('here is this alerts ' + $scope.alerts);
+            });
+
+    };
+};
+
+var ProxyUsersAddController = function($scope, $stateParams, $state, containersFactory, utils) {
+    $scope.user = {};
+    $scope.user.Password = '';
+    $scope.user.Password2 = '';
+    $scope.user.Rolsuper = false;
+    $scope.user.Rolinherit = false;
+    $scope.user.Rolcreaterole = false;
+    $scope.user.Rolcreatedb = false;
+    $scope.user.Rollogin = false;
+    $scope.user.Rolreplication = false;
+
+    $scope.user.Rolname = '';
+    console.log('doing add user');
+    $scope.create = function() {
+        $scope.user.ContainerID = $stateParams.containerId;
+        console.log($scope.user);
+        if ($scope.user.Password !=
+            $scope.user.Password2) {
+            $scope.alerts = [{
+                type: 'danger',
+                msg: 'passwords do not match'
+            }];
+            return;
+        }
+
+        containersFactory.adduser($scope.user)
+            .success(function(data) {
+                console.log('successful adduser with data=' + data);
+                $state.go('projects.proxy.users', $stateParams, {
+                    reload: true,
+                    inherit: true
+                });
+
+            })
+            .error(function(error) {
+                console.log(JSON.stringify(error));
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+            });
+
+    };
+};
+
+var ProxyUsersEditController = function($scope, $stateParams, $state, containersFactory, utils) {
+    $scope.user = {};
+    $scope.user.ContainerID = $stateParams.containerId;
+
+    containersFactory.getuser($stateParams.containerId, $stateParams.itemId)
+        .success(function(data) {
+            $scope.user = data;
+            console.log('successful get user with Rolname=' + data.Rolname);
+
+            $scope.user.Rolinherit = (data.Rolinherit === "true");
+            $scope.user.Rolsuper = (data.Rolsuper === "true");
+            console.log('fetched Rolsuper 1=' + data.Rolsuper);
+            console.log('fetched Rolsuper=' + $scope.user.Rolsuper);
+            $scope.user.Rolcreatedb = (data.Rolcreatedb === "true");
+            $scope.user.Rolcreaterole = (data.Rolcreaterole === "true");
+            $scope.user.Rollogin = (data.Rollogin === "true");
+            $scope.user.Rolreplication = (data.Rolreplication === "true");
+        })
+        .error(function(error) {
+            $scope.alerts = [{
+                type: 'danger',
+                msg: error.Error
+            }];
+            console.log('here is an error ' + error.Error);
+        });
+    $scope.save = function() {
+        console.log('save called');
+        $scope.user.ContainerID = $stateParams.containerId;
+        console.log('saving Rolsuper is ' + $scope.user.Rolsuper);
+        containersFactory.updateuser($scope.user)
+            .success(function(data) {
+
+                console.log('successful updateuser with data=' + data);
+                $state.go('projects.proxy.users', $stateParams, {
+                    reload: false,
+                    inherit: false
+                });
+
+            })
+            .error(function(error) {
+                console.log(JSON.stringify(error));
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+            });
+
+    };
+};
 
 var ProxyDeleteController = function($scope, $stateParams, $state, containersFactory, utils, usSpinnerService) {
     var proxy = $scope.proxy;

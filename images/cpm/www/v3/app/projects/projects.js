@@ -656,7 +656,39 @@ angular.module('uiRouterSample.projects', [
 
                     '': {
                         templateUrl: 'app/proxy/proxy.users.html',
-                        controller: ProxyUsersController
+                        controller: ContainerUsersController
+                    },
+                }
+            })
+
+            .state('projects.proxy.users.edit', {
+                url: '/users/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.users.edit.html',
+                        controller: ProxyUsersEditController
+                    },
+                }
+            })
+            .state('projects.proxy.users.add', {
+                url: '/users/add/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.users.add.html',
+                        controller: ProxyUsersAddController
+                    },
+                }
+            })
+
+            .state('projects.proxy.users.delete', {
+                url: '/users/delete/:itemId',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.users.delete.html',
+                        controller: ProxyUsersDeleteController
                     },
                 }
             })

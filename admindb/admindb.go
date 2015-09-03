@@ -85,7 +85,6 @@ type ContainerUser struct {
 	Rolinherit     string
 	Rolcreaterole  string
 	Rolcreatedb    string
-	Rolcatupdate   string
 	Rolcanlogin    string
 	Rolreplication string
 	UpdateDate     string
@@ -986,26 +985,21 @@ func DeleteContainerUser(dbConn *sql.DB, containername string, rolname string) e
 }
 
 func GetContainerUser(dbConn *sql.DB, containername string, usename string) (ContainerUser, error) {
-	var rows *sql.Rows
 	var user ContainerUser
 	var err error
 	queryStr := fmt.Sprintf("select id, passwd, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from containeruser where usename = '%s' and containername = '%s'", usename, containername)
 	logit.Info.Println("admindb:GetContainerUser:" + queryStr)
-	rows, err = dbConn.Query(queryStr)
-	if err != nil {
+	err = dbConn.QueryRow(queryStr).Scan(&user.ID, &user.Passwd, &user.UpdateDate); 
+	switch {
+	case err != nil:
 		return user, err
+	default:
+		logit.Info.Println("GetContainerUser got a row back")
 	}
-	defer rows.Close()
-	for rows.Next() {
-		user.Rolname = usename
-		user.Containername = containername
-		if err = rows.Scan(&user.ID, &user.Passwd, &user.UpdateDate); err != nil {
-			return user, err
-		}
-	}
-	if err = rows.Err(); err != nil {
-		return user, err
-	}
+
+	user.Rolname = usename
+	user.Containername = containername
+	
 	var unencrypted string
 	unencrypted, err = sec.DecryptPassword(user.Passwd)
 	if err != nil {

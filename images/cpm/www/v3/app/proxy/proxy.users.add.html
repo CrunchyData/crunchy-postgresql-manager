@@ -1,0 +1,72 @@
+<p><strong>Create User</strong></p>
+
+<form class="form-horizontal">
+    <div class="form-group">
+        <label for="inputName" class="control-label col-xs-2">User Name</label>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" id="inputName" placeholder="UserName"
+            ng-model="user.Rolname">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputPassword" class="control-label col-xs-2">Password</label>
+        <div class="col-xs-5">
+            <input type="password" class="form-control" id="inputPassword" placeholder="Password"
+            ng-model="user.Password">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputPassword2" class="control-label col-xs-2">Confirm Password</label>
+        <div class="col-xs-5">
+            <input type="password" class="form-control" id="inputPassword2"
+            ng-model="user.Password2">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputSuperuser" class="control-label col-xs-2">Superuser</label>
+        <div class="col-xs-1">
+            <input type="checkbox" class="form-control" ng-model="user.Rolsuper">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputInherit" class="control-label col-xs-2">Inherit</label>
+        <div class="col-xs-1">
+            <input type="checkbox" class="form-control" ng-model="user.Rolinherit">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputCreatedb" class="control-label col-xs-2">Create DB</label>
+        <div class="col-xs-1">
+            <input type="checkbox" class="form-control" ng-model="user.Rolcreatedb">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputCreaterole" class="control-label col-xs-2">Create Role</label>
+        <div class="col-xs-1">
+            <input type="checkbox" class="form-control" ng-model="user.Rolcreaterole">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputLogin" class="control-label col-xs-2">Login</label>
+        <div class="col-xs-1">
+            <input type="checkbox" class="form-control" ng-model="user.Rollogin">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputRepl" class="control-label col-xs-2">Replication</label>
+        <div class="col-xs-1">
+            <input type="checkbox" class="form-control" ng-model="user.Rolreplication">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <span us-spinner spinner-key="spinner-1"></span>
+        <div class="col-xs-offset-2 col-xs-5">
+            <button type="submit" ng-click="create()" class="btn btn-primary">Create</button>
+        </div>
+    </div>
+    <div>
+        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+</div>
+
+</form>
