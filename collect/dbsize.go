@@ -18,7 +18,6 @@ package collect
 import (
 	"database/sql"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/adminapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"github.com/prometheus/client_golang/prometheus"
@@ -54,7 +53,7 @@ func CollectDBSize(gauge *prometheus.GaugeVec) error {
 
 	//for each container, collect db size metrics
 	i := 0
-	var credential adminapi.Credential
+	var credential admindb.Credential
 
 	for i = range containers {
 		//containers[i].ProjectID
@@ -64,7 +63,7 @@ func CollectDBSize(gauge *prometheus.GaugeVec) error {
 		//containers[i].Role
 		//containers[i].Image
 		logit.Info.Println("dbsize processing " + containers[i].Name)
-		credential, err = adminapi.GetUserCredentials(dbConn, &containers[i])
+		credential, err = admindb.GetUserCredentials(dbConn, &containers[i])
 		if err != nil {
 			logit.Error.Println(err.Error())
 		}
@@ -79,7 +78,7 @@ func CollectDBSize(gauge *prometheus.GaugeVec) error {
 	return nil
 }
 
-func process(node *admindb.Container, credential *adminapi.Credential, gauge *prometheus.GaugeVec) error {
+func process(node *admindb.Container, credential *admindb.Credential, gauge *prometheus.GaugeVec) error {
 	var err error
 	//var userid, password, database string
 

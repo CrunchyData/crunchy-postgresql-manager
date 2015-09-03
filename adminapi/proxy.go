@@ -16,14 +16,10 @@
 package adminapi
 
 import (
-	"database/sql"
-	//"errors"
 	"strconv"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
-	"github.com/crunchydata/crunchy-postgresql-manager/sec"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	//"github.com/crunchydata/crunchy-postgresql-manager/template"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
@@ -234,7 +230,7 @@ func GetProxyByContainerID(w rest.ResponseWriter, r *rest.Request) {
                 return
         }
 
- 	proxy, err := getProxyByContainerID(dbConn, ContainerID)
+ 	proxy, err := admindb.GetProxyByContainerID(dbConn, ContainerID)
         if err != nil {
                 logit.Error.Println("GetProxyByContainerID:" + err.Error())
                 rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -243,86 +239,5 @@ func GetProxyByContainerID(w rest.ResponseWriter, r *rest.Request) {
 
         w.WriteJson(&proxy)
 }
-
-
-func GetProxy(dbConn *sql.DB, containername string ) (Proxy, error) {
-        var rows *sql.Rows
-        proxy := Proxy{}
-        var err error
-
-	queryStr := fmt.Sprintf("select u.usename , u.passwd, c.name , p.port, p.host, p.databasename from proxy p, container c, containeruser u where p.containerid = c.id and p.containeruserid = u.id and c.name = '%s'", containername )
-
-        logit.Info.Println("GetProxy:" + queryStr)
-        rows, err = dbConn.Query(queryStr)
-        if err != nil {
-                return proxy, err
-        }
-        defer rows.Close()
-        for rows.Next() {
-                if err = rows.Scan(&proxy.Usename, &proxy.Passwd, 
-			&proxy.ContainerName, &proxy.Port, &proxy.Host, &proxy.Database); err != nil {
-  			return proxy, err
-                }
-        }
-        if err = rows.Err(); err != nil {
-                return proxy, err
-        }
-        var unencrypted string
-        unencrypted, err = sec.DecryptPassword(proxy.Passwd)
-        if err != nil {
-                return proxy, err
-        }
-        proxy.Passwd = unencrypted
-        return proxy, nil
-}
-
-func getProxyByContainerID(dbConn *sql.DB, containerID string ) (Proxy, error) {
-        var rows *sql.Rows
-        proxy := Proxy{}
-        var err error
-
-	queryStr := fmt.Sprintf("select p.projectid, p.id, p.containeruserid, p.containerid, s.name, u.usename , u.passwd, c.name , p.port, p.host, p.databasename from proxy p, server s, container c, containeruser u where p.containerid = c.id and p.containeruserid = u.id and c.id = %s and c.serverid = s.id", containerID )
-
-        logit.Info.Println("GetProxyByContainerID:" + queryStr)
-        rows, err = dbConn.Query(queryStr)
-        if err != nil {
-                return proxy, err
-        }
-        defer rows.Close()
-        for rows.Next() {
-                if err = rows.Scan(
-			&proxy.ProjectID,
-			&proxy.ID, &proxy.ContainerUserID, &proxy.ContainerID,
-			&proxy.ServerName, &proxy.Usename, 
-			&proxy.Passwd, 
-			&proxy.ContainerName, &proxy.Port, &proxy.Host, &proxy.Database); err != nil {
-  			return proxy, err
-                }
-        }
-        if err = rows.Err(); err != nil {
-                return proxy, err
-        }
-        var unencrypted string
-        unencrypted, err = sec.DecryptPassword(proxy.Passwd)
-        if err != nil {
-                return proxy, err
-        }
-        proxy.Passwd = unencrypted
-
-	proxy.Status, err = getDatabaseStatus(dbConn, containerID)
-	if err != nil {
-		return proxy, err
-	}
-
-	var resp cpmcontainerapi.StatusResponse 
-	resp, err = cpmcontainerapi.StatusClient(proxy.ContainerName)
-	proxy.ContainerStatus = resp.Status
-	if err != nil {
-		return proxy, err
-	}
-
-        return proxy, nil
-}
-
 
 

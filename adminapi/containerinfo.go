@@ -65,8 +65,8 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 //return database, user, password, error
-	var credential Credential
-	credential, err = GetUserCredentials(dbConn, &node)
+	var credential admindb.Credential
+	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -210,8 +210,8 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var credential Credential
-	credential, err = GetUserCredentials(dbConn, &node)
+	var credential admindb.Credential
+	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -294,8 +294,8 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var credential Credential
-	credential, err = GetUserCredentials(dbConn, &node)
+	var credential admindb.Credential
+	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -508,8 +508,8 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 
 	//var host = node.Name
 
-	var credential Credential
-	credential, err = GetUserCredentials(dbConn, &node)
+	var credential admindb.Credential
+	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -527,7 +527,7 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&results)
 }
 
-func loadtest(dbConn *sql.DB, credential *Credential, writes int) ([]Loadtestresults, error) {
+func loadtest(dbConn *sql.DB, credential *admindb.Credential, writes int) ([]Loadtestresults, error) {
 	var err error
 	var name string
 	var query string
@@ -661,8 +661,8 @@ func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var credential Credential
-	credential, err = GetUserCredentials(dbConn, &container)
+	var credential admindb.Credential
+	credential, err = admindb.GetUserCredentials(dbConn, &container)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -798,8 +798,8 @@ func getDatabaseStatus(dbConn *sql.DB, containerid string) (string, error) {
 		return "", err
 	}
 
-	var credential Credential
-	credential, err = GetUserCredentials(dbConn, &node)
+	var credential admindb.Credential
+	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return "", err

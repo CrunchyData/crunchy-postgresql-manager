@@ -33,7 +33,10 @@ var backupServerName string
 var backupServerIP string
 var backupProfileName string
 var backupPath string
+var backupProxyIP string
 var backupHost string
+var backupUsername string
+var backupPassword string
 var scheduleID string
 var backupPort string
 var backupUser string
@@ -142,8 +145,11 @@ func backupfunc(str string) {
 	io.WriteString(file, "doing backup on "+backupHost+"\n")
 
 	//create base backup from master
-	cmd := exec.Command(CPMBIN+"basebackup.sh",
-		backupHost)
+	if backupProxyIP != "" {
+		backupHost = backupProxyIP
+		io.WriteString(file, "doing proxy backup to " + backupHost + "\n")
+	}
+	cmd := exec.Command(CPMBIN+"basebackup.sh", backupHost, backupUser, backupUsername, backupPassword)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
@@ -195,6 +201,14 @@ func getEnvVars() {
 		io.WriteString(file, "BACKUP_CONTAINERNAME env var not set\n")
 		found = false
 	}
+	backupUsername = os.Getenv("BACKUP_USERNAME")
+	if backupUsername == "" {
+		io.WriteString(file, "BACKUP_USERNAME env var not set\n")
+	}
+	backupPassword = os.Getenv("BACKUP_PASSWORD")
+	if backupPassword == "" {
+		io.WriteString(file, "BACKUP_PASSWORD env var not set\n")
+	}
 	backupPath = os.Getenv("BACKUP_PATH")
 	if backupPath == "" {
 		io.WriteString(file, "BACKUP_PATH env var not set\n")
@@ -205,6 +219,7 @@ func getEnvVars() {
 		io.WriteString(file, "BACKUP_SERVERNAME env var not set\n")
 		found = false
 	}
+	backupProxyIP = os.Getenv("BACKUP_PROXY_IP")
 	backupServerIP = os.Getenv("BACKUP_SERVERIP")
 	if backupServerIP == "" {
 		io.WriteString(file, "BACKUP_SERVERIP env var not set\n")
@@ -220,6 +235,13 @@ func getEnvVars() {
 		io.WriteString(file, "BACKUP_HOST env var not set\n")
 		found = false
 	}
+
+	var proxyHost = os.Getenv("BACKUP_PROXY_HOST")
+	if proxyHost != "" {
+		io.WriteString(file, "BACKUP_PROXY_HOST was set\n")
+		backupHost = proxyHost
+	}	
+
 	scheduleID = os.Getenv("BACKUP_SCHEDULEID")
 	if scheduleID == "" {
 		io.WriteString(file, "BACKUP_SCHEDULEID env var not set\n")

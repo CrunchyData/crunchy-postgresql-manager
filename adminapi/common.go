@@ -180,10 +180,3 @@ func GetVersion(w rest.ResponseWriter, r *rest.Request) {
 	w.(http.ResponseWriter).Write([]byte("0.9.3"))
 }
 
-type Credential struct {
-	Host  string
-	Database  string
-	Username        string
-	Password        string
-	Port        string
-}

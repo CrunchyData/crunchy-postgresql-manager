@@ -26,6 +26,21 @@ import (
 
 func ProvisionBackupJob(dbConn *sql.DB, args *BackupRequest) error {
 
+	//get node
+	node, err := admindb.GetContainerByName(dbConn, args.ContainerName)
+	if err != nil {
+		logit.Error.Println("Provision:" + err.Error())
+		return err
+	}
+
+  	var credential admindb.Credential
+        credential, err = admindb.GetUserCredentials(dbConn, &node)
+        if err != nil {
+                logit.Error.Println(err.Error())
+                return err
+        }
+
+
 	logit.Info.Println("backup.Provision called")
 	logit.Info.Println("with scheduleid=" + args.ScheduleID)
 	logit.Info.Println("with serverid=" + args.ServerID)
@@ -73,7 +88,19 @@ func ProvisionBackupJob(dbConn *sql.DB, args *BackupRequest) error {
 	params.EnvVars["BACKUP_PROFILENAME"] = args.ProfileName
 	params.EnvVars["BACKUP_CONTAINERNAME"] = args.ContainerName
 	params.EnvVars["BACKUP_PATH"] = params.PGDataPath
+	params.EnvVars["BACKUP_USERNAME"] = credential.Username
+	params.EnvVars["BACKUP_PASSWORD"] = credential.Password
 	params.EnvVars["BACKUP_HOST"] = args.ContainerName + "." + setting.Value
+
+	if node.Image == "cpm-node-proxy" {
+		var proxy admindb.Proxy
+		proxy, err = admindb.GetProxy(dbConn, args.ContainerName)
+		if err != nil {
+			logit.Error.Println("Provision:" + err.Error())
+			return err
+		}
+		params.EnvVars["BACKUP_PROXY_HOST"] = proxy.Host
+	}
 
 	setting, err = admindb.GetSetting(dbConn, "PG-PORT")
 	if err != nil {

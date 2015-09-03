@@ -569,8 +569,8 @@ func PingPG(dbConn *sql.DB, node *admindb.Container) (string, error) {
 	var status = "OFFLINE"
 	var err error
 
-  	var credential Credential
-        credential, err = GetUserCredentials(dbConn, node)
+  	var credential admindb.Credential
+        credential, err = admindb.GetUserCredentials(dbConn, node)
         if err != nil {
                 logit.Error.Println(err.Error())
                 return status, err

@@ -2,7 +2,6 @@ package collect
 
 import (
 	"database/sql"
-	"github.com/crunchydata/crunchy-postgresql-manager/adminapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
@@ -33,7 +32,7 @@ func Collecthc() error {
 
 	//for each container, do a health check
 	i := 0
-	var credential adminapi.Credential
+	var credential admindb.Credential
 	var checks []admindb.HealthCheck
 	checks = make([]admindb.HealthCheck, 0)
 
@@ -48,7 +47,7 @@ func Collecthc() error {
 		hc.ContainerRole = containers[i].Role
 		hc.ContainerImage = containers[i].Image
 
-		credential, err = adminapi.GetUserCredentials(dbConn, &containers[i])
+		credential, err = admindb.GetUserCredentials(dbConn, &containers[i])
                 if err != nil {
                         logit.Error.Println(err.Error())
                 } else {
@@ -82,7 +81,7 @@ func Collecthc() error {
 	return nil
 }
 
-func ping(credential *adminapi.Credential) (string, error) {
+func ping(credential *admindb.Credential) (string, error) {
 	var db *sql.DB
 	var err error
 

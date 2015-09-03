@@ -19,11 +19,21 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/sec"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	_ "github.com/lib/pq"
 	"strconv"
 	"strings"
 )
+
+type Credential struct {
+        Host  string
+        Database  string
+        Username        string
+        Password        string
+        Port        string
+}
 
 type Setting struct {
 	Name       string
@@ -91,15 +101,22 @@ type ContainerUser struct {
 }
 
 type Proxy struct {
-	ID             string
-	Containername  string
-	ContainerID    string
-	ProjectID         string
-	ProjectName         string
-	Port         string
-	Passwd         string
-	Rolname        string
+        ID             string
+        ContainerUserID           string
+        Database           string
+        Host           string
+        Usename           string
+        Passwd           string
+        ContainerID      string
+        ContainerName      string
+        ServerName      string
+        Status      string
+        ContainerStatus      string
+        ProjectID string
+        Port     string
+        UpdateDate     string
 }
+
 
 type LinuxStats struct {
 	ID        string
@@ -1102,7 +1119,7 @@ func GetAllProjects(dbConn *sql.DB) ([]Project, error) {
 		}
 
 		for i := range proxies {
-			project.Proxies[proxies[i].ContainerID] = proxies[i].Containername
+			project.Proxies[proxies[i].ContainerID] = proxies[i].ContainerName
 		}
 
 		project.Containers = make(map[string]string)
@@ -1199,7 +1216,7 @@ func GetAllProxiesForProject(dbConn *sql.DB, projectID string) ([]Proxy, error) 
 	proxies := make([]Proxy, 0)
 	for rows.Next() {
 		proxy := Proxy{}
-		if err = rows.Scan(&proxy.ContainerID, &proxy.Containername); err != nil {
+		if err = rows.Scan(&proxy.ContainerID, &proxy.ContainerName); err != nil {
 			return nil, err
 		}
 		proxies = append(proxies, proxy)
@@ -1210,3 +1227,120 @@ func GetAllProxiesForProject(dbConn *sql.DB, projectID string) ([]Proxy, error) 
 	return proxies, nil
 }
 
+
+func GetProxy(dbConn *sql.DB, containername string ) (Proxy, error) {
+        var rows *sql.Rows
+        proxy := Proxy{}
+        var err error
+
+	queryStr := fmt.Sprintf("select u.usename , u.passwd, c.name , p.port, p.host, p.databasename from proxy p, container c, containeruser u where p.containerid = c.id and p.containeruserid = u.id and c.name = '%s'", containername )
+
+        logit.Info.Println("GetProxy:" + queryStr)
+        rows, err = dbConn.Query(queryStr)
+        if err != nil {
+                return proxy, err
+        }
+        defer rows.Close()
+        for rows.Next() {
+                if err = rows.Scan(&proxy.Usename, &proxy.Passwd, 
+			&proxy.ContainerName, &proxy.Port, &proxy.Host, &proxy.Database); err != nil {
+  			return proxy, err
+                }
+        }
+        if err = rows.Err(); err != nil {
+                return proxy, err
+        }
+        var unencrypted string
+        unencrypted, err = sec.DecryptPassword(proxy.Passwd)
+        if err != nil {
+                return proxy, err
+        }
+        proxy.Passwd = unencrypted
+        return proxy, nil
+}
+
+func GetProxyByContainerID(dbConn *sql.DB, containerID string ) (Proxy, error) {
+        var rows *sql.Rows
+        proxy := Proxy{}
+        var err error
+
+	queryStr := fmt.Sprintf("select p.projectid, p.id, p.containeruserid, p.containerid, s.name, u.usename , u.passwd, c.name , p.port, p.host, p.databasename from proxy p, server s, container c, containeruser u where p.containerid = c.id and p.containeruserid = u.id and c.id = %s and c.serverid = s.id", containerID )
+
+        logit.Info.Println("GetProxyByContainerID:" + queryStr)
+        rows, err = dbConn.Query(queryStr)
+        if err != nil {
+                return proxy, err
+        }
+        defer rows.Close()
+        for rows.Next() {
+                if err = rows.Scan(
+			&proxy.ProjectID,
+			&proxy.ID, &proxy.ContainerUserID, &proxy.ContainerID,
+			&proxy.ServerName, &proxy.Usename, 
+			&proxy.Passwd, 
+			&proxy.ContainerName, &proxy.Port, &proxy.Host, &proxy.Database); err != nil {
+  			return proxy, err
+                }
+        }
+        if err = rows.Err(); err != nil {
+                return proxy, err
+        }
+        var unencrypted string
+        unencrypted, err = sec.DecryptPassword(proxy.Passwd)
+        if err != nil {
+                return proxy, err
+        }
+        proxy.Passwd = unencrypted
+
+	proxy.Status, err = GetDatabaseStatus(dbConn, containerID)
+	if err != nil {
+		return proxy, err
+	}
+
+	var resp cpmcontainerapi.StatusResponse 
+	resp, err = cpmcontainerapi.StatusClient(proxy.ContainerName)
+	proxy.ContainerStatus = resp.Status
+	if err != nil {
+		return proxy, err
+	}
+
+        return proxy, nil
+}
+
+
+
+func GetDatabaseStatus(dbConn *sql.DB, containerid string) (string, error) {
+	node, err := GetContainer(dbConn, containerid)
+	if err != nil {
+		logit.Error.Println("MonitorContainerGetInfo:" + err.Error())
+		return "", err
+	}
+
+	var credential Credential
+	credential, err = GetUserCredentials(dbConn, &node)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return "", err
+	}
+
+	var dbConn2 *sql.DB
+	dbConn2, err = util.GetMonitoringConnection(credential.Host, credential.Username, credential.Port, credential.Database,  credential.Password)
+	defer dbConn2.Close()
+
+ 	var value string
+
+        err = dbConn2.QueryRow(fmt.Sprintf("select now()::text")).Scan(&value)
+        switch {
+        case err == sql.ErrNoRows:
+                logit.Info.Println("getProxyStatus  no rows returned")
+                return "OFFLINE", nil
+        case err != nil:
+                logit.Info.Println("getProxyStatus error " + err.Error())
+                return "OFFLINE", nil
+        default:
+                logit.Info.Println("getProxyStatus returned " + value)
+        }
+
+        return "RUNNING", nil
+
+}

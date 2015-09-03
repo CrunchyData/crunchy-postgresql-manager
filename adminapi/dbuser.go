@@ -77,8 +77,8 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-  	var credential Credential
-        credential, err = GetUserCredentials(dbConn, &node)
+  	var credential admindb.Credential
+        credential, err = admindb.GetUserCredentials(dbConn, &node)
         if err != nil {
                 logit.Error.Println(err.Error())
                 rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -215,8 +215,8 @@ func DeleteContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		}
 	}
 
-  	var credential Credential
-        credential, err = GetUserCredentials(dbConn, &node)
+  	var credential admindb.Credential
+        credential, err = admindb.GetUserCredentials(dbConn, &node)
         if err != nil {
                 logit.Error.Println(err.Error())
                 rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -283,8 +283,8 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-  	var credential Credential
-        credential, err = GetUserCredentials(dbConn, &node)
+  	var credential admindb.Credential
+        credential, err = admindb.GetUserCredentials(dbConn, &node)
         if err != nil {
                 logit.Error.Println(err.Error())
                 rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -355,8 +355,8 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-  	var credential Credential
-        credential, err = GetUserCredentials(dbConn, &node)
+  	var credential admindb.Credential
+        credential, err = admindb.GetUserCredentials(dbConn, &node)
         if err != nil {
                 logit.Error.Println(err.Error())
                 rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -464,8 +464,8 @@ func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		//update the password
 	}
 
-  	var credential Credential
-        credential, err = GetUserCredentials(dbConn, &node)
+  	var credential admindb.Credential
+        credential, err = admindb.GetUserCredentials(dbConn, &node)
         if err != nil {
                 logit.Error.Println(err.Error())
                 rest.Error(w, err.Error(), http.StatusBadRequest)

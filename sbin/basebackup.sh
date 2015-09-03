@@ -16,6 +16,8 @@
 
 #
 # $1 is the master host we are going to do the backup from
+# $2 is the username to connect with
+# $3 is the password to connect with
 #
 # destroy whatever data was there....we leave it to the DBA to 
 # have done a backup of this database if they wanted it
@@ -23,4 +25,10 @@ rm -rf /pgdata/*
 
 source /var/cpm/bin/setenv.sh
 
-pg_basebackup -R --pgdata /pgdata --host=$1 --port=5432 -U postgres
+export PGPASSFILE=/tmp/pgpass
+
+echo "*:*:*:"$2":"$3  >> $PGPASSFILE
+
+chmod 600 $PGPASSFILE
+
+pg_basebackup -R --pgdata /pgdata --host=$1 --port=5432 -U $2
