@@ -149,7 +149,9 @@ func backupfunc(str string) {
 		backupHost = backupProxyIP
 		io.WriteString(file, "doing proxy backup to " + backupHost + "\n")
 	}
-	cmd := exec.Command(CPMBIN+"basebackup.sh", backupHost, backupUser, backupUsername, backupPassword)
+
+	
+	cmd := exec.Command(CPMBIN+"basebackup.sh", backupHost, backupUsername, backupPassword)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out

@@ -31,5 +31,6 @@ host    replication     postgres	{{.}}            trust
 {{end}}
 
 host    replication     postgres	{{.BACKUP_HOST}}            trust
+host    replication     cpmtest		{{.BACKUP_HOST}}            md5
 host    all     	all 		{{.MONITOR_HOST}}           trust
 host    all     	all 		{{.ADMIN_HOST}}           trust

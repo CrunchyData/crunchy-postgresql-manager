@@ -16,6 +16,8 @@ env > /tmp/envvars.out
 
 source /var/cpm/bin/setenv.sh
 
+mkdir $PGDATA
+
 backupcommand
 
 #
