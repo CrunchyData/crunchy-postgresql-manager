@@ -17,7 +17,7 @@
 #
 # script to copy docker server related files to destination
 #
-GOPATH=/home/jeffmc/dev2
+GOPATH=/home/jeffmc/devproject
 CPMPATH=$GOPATH/src/github.com/crunchydata/crunchy-postgresql-manager
 adminserver=localhost
 remoteservers=(localhost)
@@ -31,10 +31,10 @@ do
 	$CPMPATH/sql/*  \
 	root@$i:/var/cpm/bin/
 #	scp  ../config/cpm.sh  root@$i:/etc/profile.d/cpm.sh
-	scp  $CPMPATH/config/cpmagent.service  \
+	scp  $CPMPATH/config/cpmserverapi.service  \
 	 root@$i:/usr/lib/systemd/system
 # 	ssh root@$i "systemctl enable docker.service"
-        ssh root@$i "systemctl enable cpmagent.service"
+        ssh root@$i "systemctl enable cpmserverapi.service"
 done
 
 # copy all required admin files to the admin server
@@ -46,8 +46,8 @@ root@$adminserver:/var/cpm/bin
 
 scp $CPMPATH/sbin/cert.pem root@$adminserver:/var/cpm/keys
 scp $CPMPATH/sbin/key root@$adminserver:/var/cpm/keys
-scp $CPMPATH/config/cpmagent.service root@$adminserver:/usr/lib/systemd/system
+scp $CPMPATH/config/cpmserverapi.service root@$adminserver:/usr/lib/systemd/system
 
-ssh root@$adminserver "systemctl enable cpmagent.service"
+ssh root@$adminserver "systemctl enable cpmserverapi.service"
 
 
