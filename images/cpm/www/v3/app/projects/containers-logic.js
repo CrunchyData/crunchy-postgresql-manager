@@ -198,18 +198,24 @@ var ContainerMonitorbgwriterController = function($scope, $stateParams, $state, 
 
 
 var ContainerMonitorbadgerController = function($sce, $scope, $stateParams, $state, containersFactory, utils, usSpinnerService) {
+	console.log('in badger controller stateparams=' + JSON.stringify($stateParams));
     $scope.badgerreportlink = $sce.trustAsResourceUrl(
-        'http://' + $scope.container.Name + ':10001/static/badger.html');
+        'http://' + $stateParams.containerName + ':10001/static/badger.html?rand=' + Math.round(Math.random() * 10000000));
     $scope.refresh = function() {
         usSpinnerService.spin('spinner-1');
         containersFactory.badger($stateParams.containerId)
             .success(function(data) {
                 console.log('successful get with data=' + data);
                 usSpinnerService.stop('spinner-1');
-                $state.go('projects.container.monitor.badger', $stateParams, {
+                //$state.go('projects.container.monitor.badger', $stateParams, {
+                $state.go('^', $stateParams, {
                     reload: false,
                     inherit: true
                 });
+                $scope.alerts = [{
+                    type: 'success',
+                    msg: 'successfully generated report'
+                }];
 
             })
             .error(function(error) {

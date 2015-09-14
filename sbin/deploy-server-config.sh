@@ -30,10 +30,8 @@ do
 	$CPMPATH/sbin/*  \
 	$CPMPATH/sql/*  \
 	root@$i:/var/cpm/bin/
-#	scp  ../config/cpm.sh  root@$i:/etc/profile.d/cpm.sh
 	scp  $CPMPATH/config/cpmserverapi.service  \
 	 root@$i:/usr/lib/systemd/system
-# 	ssh root@$i "systemctl enable docker.service"
         ssh root@$i "systemctl enable cpmserverapi.service"
 done
 
@@ -44,8 +42,7 @@ scp $GOPATH/bin/* \
 $CPMPATH/sbin/* \
 root@$adminserver:/var/cpm/bin
 
-scp $CPMPATH/sbin/cert.pem root@$adminserver:/var/cpm/keys
-scp $CPMPATH/sbin/key root@$adminserver:/var/cpm/keys
+scp $CPMPATH/sbin/*.pem root@$adminserver:/var/cpm/keys
 scp $CPMPATH/config/cpmserverapi.service root@$adminserver:/usr/lib/systemd/system
 
 ssh root@$adminserver "systemctl enable cpmserverapi.service"

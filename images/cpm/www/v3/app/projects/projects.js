@@ -450,7 +450,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.monitor.badger', {
-                url: '/badger/:itemId',
+                url: '/badger/:containerName',
                 views: {
 
                     '': {
