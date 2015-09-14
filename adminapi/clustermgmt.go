@@ -340,9 +340,13 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 				logit.Info.Println("configureCluster:stop output was" + stopPGResp.Output)
 			}
 
+			//
+			var username = "cpmtest"
+			var password = "cpmtest"
+
 			//create base backup from master
 			var backupresp cpmcontainerapi.BasebackupResponse
-			backupresp, err = cpmcontainerapi.BasebackupClient(masterhost+"."+domainname.Value, standbynodes[i].Name)
+			backupresp, err = cpmcontainerapi.BasebackupClient(masterhost+"."+domainname.Value, standbynodes[i].Name, username, password)
 			if err != nil {
 				logit.Error.Println("configureCluster:" + err.Error())
 				return err

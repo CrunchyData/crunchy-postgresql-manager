@@ -140,11 +140,12 @@ func StopPgpoolClient(host string) (StopPgpoolResponse, error) {
 	return response, err
 }
 
-func BasebackupClient(master string, standby string) (BasebackupResponse, error) {
+func BasebackupClient(master string, standby string, username string, password string) (BasebackupResponse, error) {
 	var err error
 	req := BasebackupRequest{}
 	req.MasterHostName = master
-	req.StandbyHostName = standby
+	req.Username = username
+	req.Password = password
 
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)

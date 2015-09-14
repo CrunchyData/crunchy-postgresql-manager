@@ -15,6 +15,7 @@ host    all     postgres	{{.}}            trust
 {{range .BRIDGE_IP_LIST}}
 host    cpmtest     	cpmtest 		{{.}}/16            	md5
 host    replication     postgres	{{.}}/16            trust
+host    replication     cpmtest		{{.}}/16            md5
 {{end}}
 
 {{range .SERVER_IP_LIST}}
@@ -31,6 +32,5 @@ host    replication     postgres	{{.}}            trust
 {{end}}
 
 host    replication     postgres	{{.BACKUP_HOST}}            trust
-host    replication     cpmtest		{{.BACKUP_HOST}}            md5
 host    all     	all 		{{.MONITOR_HOST}}           trust
 host    all     	all 		{{.ADMIN_HOST}}           trust
