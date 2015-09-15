@@ -33,6 +33,10 @@
 </select>
 		</div>
 	</div>
+	<div>
+		<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+	</div>
+
 	<div class="form-group">
 		<div class="col-xs-offset-2 col-xs-5">
 			<button type="submit" ng-click="add()" class="btn btn-primary">Create</button>

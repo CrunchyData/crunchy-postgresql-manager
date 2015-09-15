@@ -285,7 +285,6 @@ angular.module('uiRouterSample.servers', [
                                 $scope.server = newserver;
 
                                 $scope.add = function() {
-                                    console.log('add server is ' + $scope.server.ServerClass);
                                     $scope.server.ID = 0; //0 means to do an insert
 
                                     serversFactory.add($scope.server)
@@ -299,11 +298,9 @@ angular.module('uiRouterSample.servers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
                                         });
-                                    console.log('add called');
                                 };
                             }
                         ]
