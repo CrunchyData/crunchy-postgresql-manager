@@ -11,6 +11,7 @@
 
   	<a ng-if="container.Image == 'cpm-node-proxy'" ui-sref="projects.detail.gotoproxy({containerName:container.Name,projectId:container.ProjectID,containerId:container.ID})">{{container.Name}}</a>
 	<a ng-if="container.Image == 'cpm-node'" ui-sref="projects.detail.gotocontainer({projectId:container.ProjectID,containerId:container.ID})">{{container.Name}}</a>
+	<a ng-if="container.Image == 'cpm-pgpool'" ui-sref="projects.detail.gotocontainer({projectId:container.ProjectID,containerId:container.ID})">{{container.Name}}</a>
 
 	 </li>
 </ul>
