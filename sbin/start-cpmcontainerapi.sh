@@ -25,6 +25,12 @@ if [ -f /pgdata/postgresql.conf ]; then
 	pg_ctl -D /pgdata start
 fi
 
+# when the container starts, see if there is a pgpool instance we can start up
+if [ -f /bin/pgpool ]; then
+	echo "about to run startpgpool.sh"
+	/var/cpm/bin/startpgpool.sh
+fi
+
 cpmcontainerapi 
 
 #dummyserver

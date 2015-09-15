@@ -101,7 +101,10 @@ var ContainerStartController = function($scope, $stateParams, $state, containers
         containersFactory.start($stateParams.containerId)
             .success(function(data) {
                 console.log('successful start with data=' + data);
-                $state.go('projects.container.details', $stateParams);
+                $state.go('projects.container.details', $stateParams, {
+			reload: true,
+			inherit: false
+		});
                 usSpinnerService.stop('spinner-1');
             })
             .error(function(error) {
