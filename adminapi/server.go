@@ -99,6 +99,25 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	var servers []admindb.Server
+	servers, err = admindb.GetAllServers(dbConn)
+	if err != nil {
+		logit.Error.Println("AddServer: get all servers error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	for i := range servers {
+		if servers[i].IPAddress == server.IPAddress {
+			rest.Error(w, "IP Address already used by another server", http.StatusBadRequest)
+			return
+		}
+		if servers[i].DockerBridgeIP == server.DockerBridgeIP {
+			rest.Error(w, "Docker Bridge IP Address already used by another server", http.StatusBadRequest)
+			return
+		}
+	}
+
 	dbserver := admindb.Server{server.ID, server.Name, server.IPAddress,
 		server.DockerBridgeIP, server.PGDataPath, server.ServerClass, CreateDate, ""}
 	if dbserver.ID == "0" {

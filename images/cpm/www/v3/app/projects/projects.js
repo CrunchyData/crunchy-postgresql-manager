@@ -450,7 +450,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.monitor.badger', {
-                url: '/badger/:itemId',
+                url: '/badger/:containerName',
                 views: {
 
                     '': {
@@ -960,7 +960,7 @@ angular.module('uiRouterSample.projects', [
 
             .state('projects.detail.gotocontainer', {
 
-                url: '/{projectId}/container/{containerId}',
+                url: '/container/{containerId}',
                 views: {
                     '': {
                         templateUrl: 'app/projects/projects.detail.html',
@@ -970,7 +970,7 @@ angular.module('uiRouterSample.projects', [
             })
             .state('projects.detail.gotoproxy', {
 
-                url: '/{projectId}/container/{containerId}',
+                url: '/container/{containerId}',
                 views: {
                     '': {
                         templateUrl: 'app/proxy/proxy.html',

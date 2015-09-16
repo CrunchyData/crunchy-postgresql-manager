@@ -68,8 +68,9 @@ type StopPGResponse struct {
 	Status string
 }
 type BasebackupRequest struct {
-	MasterHostName  string
-	StandbyHostName string
+	MasterHostName string
+	Username       string
+	Password       string
 }
 type BasebackupResponse struct {
 	Output string
@@ -231,13 +232,17 @@ func Basebackup(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, "MasterHostName not supplied in request", http.StatusInternalServerError)
 		return
 	}
-	if req.StandbyHostName == "" {
-		rest.Error(w, "StandbyHostName not supplied in request", http.StatusInternalServerError)
+	if req.Username == "" {
+		rest.Error(w, "Username not supplied in request", http.StatusInternalServerError)
+		return
+	}
+	if req.Password == "" {
+		rest.Error(w, "Password not supplied in request", http.StatusInternalServerError)
 		return
 	}
 
 	var cmd *exec.Cmd
-	cmd = exec.Command("basebackup.sh", req.MasterHostName, req.StandbyHostName)
+	cmd = exec.Command("basebackup.sh", req.MasterHostName, req.Username, req.Password)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
@@ -379,8 +384,6 @@ func Controldata(w rest.ResponseWriter, r *rest.Request) {
 func Status(w rest.ResponseWriter, r *rest.Request) {
 	response := StatusResponse{}
 	response.Status = "RUNNING"
-        w.WriteHeader(http.StatusOK)
-        w.WriteJson(&response)
+	w.WriteHeader(http.StatusOK)
+	w.WriteJson(&response)
 }
-
-
