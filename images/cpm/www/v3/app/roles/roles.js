@@ -42,7 +42,6 @@ angular.module('uiRouterSample.roles', [
                         }
 
 
-                        console.log('in roles');
                         $scope.roles = roles;
 
                         $scope.goToFirst = function() {
@@ -85,7 +84,6 @@ angular.module('uiRouterSample.roles', [
                             });
                         }
 
-                        console.log('in roles.list');
                         rolesFactory.all()
                             .success(function(data) {
                                 $scope.roles = data;
@@ -93,13 +91,12 @@ angular.module('uiRouterSample.roles', [
                             .error(function(error) {
                                 $scope.alerts = [{
                                     type: 'danger',
-                                    msg: error.message
+                                    msg: error.Error
                                 }];
-                                console.log('here is an error ' + error.message);
+                                console.log('here is an error ' + error.Error);
                             });
 
                         if ($scope.roles.data.length > 0) {
-                            console.log('here');
                             var randId = $scope.roles.data[0].Name;
                             $state.go('roles.detail.details', {
                                 roleId: randId
@@ -153,11 +150,9 @@ angular.module('uiRouterSample.roles', [
                                     });
                                 }
 
-                                console.log('here in roles.detail');
                                 if ($scope.roles.data.length > 0) {
                                     angular.forEach($scope.roles.data, function(item) {
                                         if (item.Name == $stateParams.roleId) {
-                                            console.log('matched ' + item.Name);
                                             $scope.role = item;
                                             $state.go('roles.detail.details', {
                                                 roleId: item.Name
@@ -193,7 +188,6 @@ angular.module('uiRouterSample.roles', [
                             function($scope, $stateParams, $state, utils) {
                                 $scope.item = utils.findById($scope.role.items, $stateParams.itemId);
 
-                                console.log('in roles.detail.item');
                                 $scope.edit = function() {
                                     // Here we show off go's ability to navigate to a relative state. Using '^' to go upwards
                                     // and '.' to go down, you can navigate to any relative state (ancestor or descendant).
@@ -218,23 +212,22 @@ angular.module('uiRouterSample.roles', [
                         templateUrl: 'app/roles/roles.detail.details.html',
                         controller: ['$scope', '$stateParams', '$state', 'rolesFactory', 'utils',
                             function($scope, $stateParams, $state, rolesFactory, utils) {
-                                console.log('in detail.details');
                                 $scope.save = function() {
-                                    console.log('save called');
-                                    console.log('perms=' + $scope.role.Permissions);
                                     rolesFactory.save($scope.role)
                                         .success(function(data) {
-                                            console.log('successful save with data=' + data);
+                                            $scope.alerts = [{
+                                                type: 'success',
+                                                msg: 'success'
+                                            }];
                                         })
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
 
-                                    console.log('add called');
                                 };
                             }
                         ]
@@ -288,12 +281,9 @@ angular.module('uiRouterSample.roles', [
 		*/
 
                                 $scope.add = function() {
-                                    console.log('add called role=' + $scope.newrole.Name);
-                                    console.log('add called role perms=' + $scope.newrole.Permissions);
 
                                     rolesFactory.add($scope.newrole)
                                         .success(function(data) {
-                                            console.log('successful add with data=' + data);
                                             $state.go('roles.list', $stateParams, {
                                                 reload: true,
                                                 inherit: false
@@ -302,11 +292,10 @@ angular.module('uiRouterSample.roles', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
-                                    console.log('add called');
                                 };
 
                             }
@@ -323,7 +312,6 @@ angular.module('uiRouterSample.roles', [
                         controller: ['$scope', '$stateParams', '$state', 'rolesFactory', 'utils',
                             function($scope, $stateParams, $state, rolesFactory, utils) {
                                 $scope.add = function() {
-                                    console.log('add called role=' + $scope.role.Name);
 
                                     rolesFactory.add($scope.role)
                                         .success(function(data) {
@@ -336,7 +324,6 @@ angular.module('uiRouterSample.roles', [
                                             }];
                                             console.log('here is an error ' + error.message);
                                         });
-                                    console.log('add called');
                                 };
                             }
                         ]
@@ -357,7 +344,6 @@ angular.module('uiRouterSample.roles', [
                                 $scope.delete = function() {
                                     rolesFactory.delete($scope.role.Name)
                                         .success(function(data) {
-                                            console.log('successful delete with data=' + data);
                                             $state.go('roles.list', $stateParams, {
                                                 reload: true,
                                                 inherit: false
@@ -370,7 +356,6 @@ angular.module('uiRouterSample.roles', [
                                             }];
                                             console.log('here is an error ' + error.message);
                                         });
-                                    console.log('delete called');
                                 };
                             }
                         ]
@@ -395,7 +380,6 @@ angular.module('uiRouterSample.roles', [
                         templateUrl: 'app/roles/roles.detail.item.edit.html',
                         controller: ['$scope', '$stateParams', '$state', 'utils',
                             function($scope, $stateParams, $state, utils) {
-                                console.log('in here too');
                                 $scope.item = utils.findById($scope.role.items, $stateParams.itemId);
                                 $scope.done = function() {
                                     // Go back up. '^' means up one. '^.^' would be up twice, to the grandparent.

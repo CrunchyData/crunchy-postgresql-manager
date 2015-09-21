@@ -74,10 +74,6 @@ angular.module('uiRouterSample.tasks.service', ['ngCookies'])
         var url = $cookieStore.get('AdminURL') + '/backup/addschedule';
         console.log(url);
 
-        console.log('serverid ' + schedule.ServerID);
-        console.log('containername ' + containerName);
-        console.log('profile ' + schedule.ProfileName);
-        console.log('schedulename ' + schedule.Name);
         return $http.post(url, {
             'Token': $cookieStore.get('cpm_token'),
             'ServerID': schedule.ServerID,

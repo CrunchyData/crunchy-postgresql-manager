@@ -5,16 +5,6 @@ var MyController = function($scope, $state, $cookieStore, $stateParams, utils) {
             userId: 'hi'
         });
     }
-/**
-    if ($scope.clusters.data.length > 0) {
-        angular.forEach($scope.clusters.data, function(item) {
-            if (item.ID == $stateParams.clusterId) {
-                $scope.cluster = item;
-                console.log(JSON.stringify(item));
-            }
-        });
-    }
-    */
 
 };
 
@@ -23,10 +13,9 @@ var ClusterDeleteController = function($scope, $stateParams, $state, clustersFac
 
     $scope.delete = function() {
         usSpinnerService.spin('spinner-1');
-        console.log('delete cluster called');
+        //console.log('delete cluster called');
         clustersFactory.delete($stateParams.clusterId)
             .success(function(data) {
-                console.log('successful delete with data=' + data);
                 usSpinnerService.stop('spinner-1');
                 $state.go('projects.list', $stateParams, {
                     reload: true,
@@ -50,10 +39,8 @@ var ClusterScaleController = function($scope, $stateParams, $state, clustersFact
 
     $scope.scale = function() {
         usSpinnerService.spin('spinner-1');
-        console.log('scale cluster called');
         clustersFactory.scale($stateParams.clusterId)
             .success(function(data) {
-                console.log('successful scale with data=' + data);
                 usSpinnerService.stop('spinner-1');
                 $state.go('projects.list', $stateParams, {
                     reload: true,
@@ -78,20 +65,12 @@ var ClusterAutoClusterController = function($scope, $stateParams, $state, cluste
     $scope.cluster = [];
     $scope.cluster.Name = 'cluster1';
     $scope.cluster.ClusterType = 'asynchronous';
-    console.log('auto cluster with projectId=' + $stateParams.projectId);
     $scope.cluster.ProjectID = $stateParams.projectId;
-
-    console.log('ClusterProfile=' + $scope.ClusterProfile);
-    console.log('cluster.Name=' + $scope.cluster.Name);
 
     $scope.create = function() {
         usSpinnerService.spin('spinner-1');
-        console.log('ClusterProfile=' + $scope.ClusterProfile);
-        console.log('cluster.Name=' + $scope.cluster.Name);
-        console.log('cluster.ClusterType=' + $scope.cluster.ClusterType);
         clustersFactory.autocluster($scope.cluster, $scope.ClusterProfile)
             .success(function(data) {
-                console.log('successful autocreate with data=' + data);
                 $scope.results = data;
                 usSpinnerService.stop('spinner-1');
                 $state.go('projects.detail.details', $stateParams, {

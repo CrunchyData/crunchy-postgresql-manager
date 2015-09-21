@@ -40,11 +40,10 @@ angular.module('uiRouterSample.rules', [
 
                         $scope.rules = rules;
 
-                        console.log('rule is ' + rules.data[0].Name);
+                        //console.log('rule is ' + rules.data[0].Name);
                         //console.log('roles are ' + JSON.stringify(rules.data[0].Roles['foy']));
                         $scope.goToFirst = function() {
                             var randId = $scope.rules.data[0].Name;
-                            console.log('in first with randId = ' + randId);
 
                             // $state.go() can be used as a high level convenience method
                             // for activating a state programmatically.
@@ -83,7 +82,6 @@ angular.module('uiRouterSample.rules', [
                             });
 
                         if ($scope.rules.data.length > 0) {
-                            console.log('here');
                             var randId = $scope.rules.data[0].Name;
                             $state.go('rules.detail.details', {
                                 ruleId: randId
@@ -156,15 +154,11 @@ angular.module('uiRouterSample.rules', [
                         templateUrl: 'app/rules/rules.detail.details.html',
                         controller: ['$scope', '$stateParams', '$cookieStore', '$state', 'rulesFactory', 'utils', 'usSpinnerService',
                             function($scope, $stateParams, $cookieStore, $state, rulesFactory, utils, usSpinnerService) {
-                                console.log('in details with rule itemId = ' + $stateParams.itemId);
-                                //console.log('in details with rule = ' + $scope.rule.Name);
                                 $scope.save = function() {
-                                    console.log('save called');
                                     $scope.rule.Token = $cookieStore.get('cpm_token');
 				     usSpinnerService.spin('spinner-1'); 
                                     rulesFactory.update($scope.rule)
                                         .success(function(data) {
-                                            console.log('success with save');
                                             $scope.alerts = [{
                                                 type: 'success',
                                                 msg: 'successfully updated'
@@ -201,10 +195,8 @@ angular.module('uiRouterSample.rules', [
                                 $scope.rule = newrule;
 
                                 $scope.add = function() {
-                                    console.log('add called');
                                     rulesFactory.add($scope.rule)
                                         .success(function(data) {
-                                            console.log('success add');
                                             $state.go('rules.list', $stateParams, {
                                                 reload: true,
                                                 inherit: false
@@ -234,10 +226,8 @@ angular.module('uiRouterSample.rules', [
                             function($scope, $stateParams, $state, rulesFactory, utils) {
 
                                 $scope.delete = function() {
-                                    console.log('delete called');
                                     rulesFactory.delete($scope.rule.ID)
                                         .success(function(data) {
-                                            console.log('success delete');
                                             $state.go('rules.list', $stateParams, {
                                                 reload: true,
                                                 inherit: false

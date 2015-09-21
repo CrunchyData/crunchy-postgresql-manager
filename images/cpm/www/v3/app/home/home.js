@@ -62,7 +62,6 @@ angular.module('uiRouterSample.home', [
 
                                 homeFactory.healthcheck()
                                     .success(function(data) {
-                                        console.log('success with get');
                                         $scope.hcdata = data;
                                     }).error(function(error) {
                                         $scope.alerts = [{

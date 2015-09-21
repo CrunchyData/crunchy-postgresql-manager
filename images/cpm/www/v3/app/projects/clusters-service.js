@@ -5,7 +5,6 @@ angular.module('uiRouterSample.clusters.service', ['ngCookies'])
     var clustersFactory = {};
 
     clustersFactory.all = function() {
-    	console.log('in clusters all with projectId = ' + $rootScope.projectId);
         var url = $cookieStore.get('AdminURL') + '/projectclusters/' + $rootScope.projectId + '.' + $cookieStore.get('cpm_token');
         console.log(url);
 

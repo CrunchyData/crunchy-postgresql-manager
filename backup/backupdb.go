@@ -23,7 +23,7 @@ import (
 	"strconv"
 )
 
-func AddStatus(dbConn *sql.DB, status BackupStatus) (string, error) {
+func AddStatus(dbConn *sql.DB, status *BackupStatus) (string, error) {
 
 	logit.Info.Println("AddStatus called")
 	//logit.Info.Println("AddStatus called")
@@ -55,7 +55,7 @@ func AddStatus(dbConn *sql.DB, status BackupStatus) (string, error) {
 	return strvalue, nil
 }
 
-func UpdateStatus(dbConn *sql.DB, status BackupStatus) error {
+func UpdateStatus(dbConn *sql.DB, status *BackupStatus) error {
 
 	logit.Info.Println("backup.UpdateStatus called")
 

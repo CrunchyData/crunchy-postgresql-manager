@@ -33,7 +33,6 @@ angular.module('uiRouterSample.rules.service', ['ngCookies'])
         var url = $cookieStore.get('AdminURL') + '/rules/insert';
         console.log(url);
 
-	console.log('token ' + $cookieStore.get('cpm_token'));
 
         return $http.post(url, {
             'Name': rule.Name,
@@ -50,7 +49,6 @@ angular.module('uiRouterSample.rules.service', ['ngCookies'])
 
     rulesFactory.update = function(rule) {
     	rule.Token = $cookieStore.get('cpm_token');
-        console.log('rule token ' + rule.Token);
         var url = $cookieStore.get('AdminURL') + '/rules/update';
         console.log(url);
 

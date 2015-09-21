@@ -60,7 +60,7 @@ angular.module('uiRouterSample.projects', [
                             //$scope.loadTree(projects.data);
 
                             $scope.showSelected = function(node) {
-                                console.log('tree ' + node.name + ' selected id=' + node.id + ' type=' + node.type + ' projectid=' + node.projectid);
+                                //console.log('tree ' + node.name + ' selected id=' + node.id + ' type=' + node.type + ' projectid=' + node.projectid);
                                 if (node.type == 'database') {
                                     $state.go('projects.container.details', {
                                         containerId: node.id,
@@ -88,9 +88,9 @@ angular.module('uiRouterSample.projects', [
                             };
 
                             $scope.goToFirst = function() {
-                                    console.log('jeff projects.data00=' + JSON.stringify(projects.data[0]));
-                                    console.log('jeff projects.name=' + projects.data[0].name);
-                                    console.log('jeff projects.id=' + projects.data[0].id);
+                                    //console.log('jeff projects.data00=' + JSON.stringify(projects.data[0]));
+                                    //console.log('jeff projects.name=' + projects.data[0].name);
+                                    //console.log('jeff projects.id=' + projects.data[0].id);
                                     var randId = projects.data[0].id;
 
                                     $state.go('projects.detail', {
@@ -120,7 +120,6 @@ angular.module('uiRouterSample.projects', [
                         $scope.projects = projects;
 
                         $scope.goToFirst = function() {
-				console.log('projects.list called going to first project by default');
                             var randId = $scope.projects.data[0].id;
                             $state.go('projects.detail', {
                                 projectId: randId
@@ -142,7 +141,6 @@ angular.module('uiRouterSample.projects', [
                         templateUrl: 'app/projects/projects.container.html',
                         controller: ['$scope', '$state', '$cookieStore', '$stateParams', 'utils', 'containersFactory',
                             function($scope, $state, $cookieStore, $stateParams, utils, containersFactory) {
-                                console.log('in projects.container with containerId ' + JSON.stringify($stateParams));
                                 if (!$cookieStore.get('cpm_token')) {
                                     console.log('cpm_token not defined in projects');
                                     $state.go('login', {
@@ -154,14 +152,12 @@ angular.module('uiRouterSample.projects', [
                                     containersFactory.get($stateParams.containerId)
                                         .success(function(data) {
                                             $scope.container = data;
-                                            console.log('success with container get');
-                                            console.log('container ' + JSON.stringify($scope.container));
                                         }).error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 }
 
@@ -226,10 +222,8 @@ angular.module('uiRouterSample.projects', [
                         resolve: {
                             servers: ['serversFactory',
                                 function(serversFactory) {
-                                    console.log('in the resolv of servers');
                                     serversFactory.all()
                                         .success(function(data) {
-                                            console.log('successful servers all with data=' + data);
                                             servers = data;
                                             return data;
                                         })
@@ -258,7 +252,6 @@ angular.module('uiRouterSample.projects', [
                         resolve: {
                             servers: ['serversFactory',
                                 function(serversFactory) {
-                                    console.log('in the resolv of servers');
                                     return serversFactory.all();
                                 }
                             ]
@@ -538,7 +531,6 @@ angular.module('uiRouterSample.projects', [
                         templateUrl: 'app/projects/projects.cluster.html',
                         controller: ['$scope', '$state', '$cookieStore', '$stateParams', 'utils', 'clustersFactory',
                             function($scope, $state, $cookieStore, $stateParams, utils, clustersFactory) {
-                                console.log('in projects.cluster with clusterId ' + JSON.stringify($stateParams));
                                 if (!$cookieStore.get('cpm_token')) {
                                     console.log('cpm_token not defined in projects');
                                     $state.go('login', {
@@ -549,13 +541,12 @@ angular.module('uiRouterSample.projects', [
                                 clustersFactory.get($stateParams.clusterId)
                                     .success(function(data) {
                                         $scope.cluster = data;
-                                        console.log('success with cluster get');
                                     }).error(function(error) {
                                         $scope.alerts = [{
                                             type: 'danger',
-                                            msg: error.message
+                                            msg: error.Error
                                         }];
-                                        console.log('here is an error ' + error.message);
+                                        console.log('here is an error ' + error.Error);
                                     });
 
                             }
@@ -609,7 +600,6 @@ angular.module('uiRouterSample.projects', [
                         templateUrl: 'app/proxy/proxy.html',
                         controller: ['$scope', '$state', '$cookieStore', '$stateParams', 'utils', 'proxyFactory',
                             function($scope, $state, $cookieStore, $stateParams, utils, proxyFactory) {
-                                console.log('in projects.proxy 2 with proxyId ' + JSON.stringify($stateParams));
                                 if (!$cookieStore.get('cpm_token')) {
                                     console.log('cpm_token not defined in projects');
                                     $state.go('login', {
@@ -621,14 +611,12 @@ angular.module('uiRouterSample.projects', [
                                     proxyFactory.getbycontainerid($stateParams.containerId)
                                         .success(function(data) {
                                             $scope.proxy = data;
-                                            console.log('success with proxy get');
-                                            console.log('proxy ' + JSON.stringify($scope.proxy));
                                         }).error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 }
 
@@ -670,10 +658,8 @@ angular.module('uiRouterSample.projects', [
                         resolve: {
                             servers: ['serversFactory',
                                 function(serversFactory) {
-                                    console.log('in the resolv of servers');
                                     serversFactory.all()
                                         .success(function(data) {
-                                            console.log('successful servers all with data=' + data);
                                             servers = data;
                                             return data;
                                         })
@@ -735,7 +721,6 @@ angular.module('uiRouterSample.projects', [
                         resolve: {
                             servers: ['serversFactory',
                                 function(serversFactory) {
-                                    console.log('in the resolv of servers');
                                     return serversFactory.all();
                                 }
                             ]
@@ -928,7 +913,6 @@ angular.module('uiRouterSample.projects', [
                         templateUrl: 'app/projects/projects.detail.html',
                         controller: ['$scope', '$state', '$cookieStore', '$stateParams', 'utils', 'projectsFactory',
                             function($scope, $state, $cookieStore, $stateParams, utils, projectsFactory) {
-                                console.log('in projects.detail');
                                 if (!$cookieStore.get('cpm_token')) {
                                     console.log('cpm_token not defined in projects');
                                     $state.go('login', {
@@ -936,18 +920,15 @@ angular.module('uiRouterSample.projects', [
                                     });
                                 }
 
-                                console.log('projects.details with stateparams=' + JSON.stringify($stateParams));
-                                console.log('projects.details with projectId=' + $stateParams.projectId);
                                 projectsFactory.get($stateParams.projectId)
                                     .success(function(data) {
-                                        console.log('success with get');
                                         $scope.project = data;
                                     }).error(function(error) {
                                         $scope.alerts = [{
                                             type: 'danger',
-                                            msg: error.message
+                                            msg: error.Error
                                         }];
-                                        console.log('here is an error ' + error.message);
+                                        console.log('here is an error ' + error.Error);
                                     });
 
                             }
@@ -997,8 +978,6 @@ angular.module('uiRouterSample.projects', [
                         templateUrl: 'app/projects/projects.detail.details.html',
                         controller: ['$scope', '$stateParams', '$state', 'utils', 'projectId',
                             function($scope, $stateParams, $state, utils) {
-                                console.log('in detail.details');
-
                                 $scope.edit = function() {
                                     $state.go('.edit', $stateParams);
                                 };
@@ -1028,7 +1007,6 @@ angular.module('uiRouterSample.projects', [
                                     projectsFactory.add($scope.project)
                                         .success(function(data) {
                                             usSpinnerService.stop('spinner-1');
-                                            console.log('success with add');
                                             $state.go('projects.list', $stateParams, {
                                                 reload: true,
                                                 inherit: false
@@ -1036,9 +1014,9 @@ angular.module('uiRouterSample.projects', [
                                         }).error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                             usSpinnerService.stop('spinner-1');
                                         });
 
@@ -1062,7 +1040,6 @@ angular.module('uiRouterSample.projects', [
 
                                     projectsFactory.delete($scope.project.ID)
                                         .success(function(data) {
-                                            console.log('success with delete');
                                             $state.go('projects.list', $stateParams, {
                                                 reload: true,
                                                 inherit: false
@@ -1071,9 +1048,9 @@ angular.module('uiRouterSample.projects', [
                                         }).error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
 
                                 };
@@ -1090,28 +1067,23 @@ angular.module('uiRouterSample.projects', [
                         templateUrl: 'app/projects/projects.detail.edit.html',
                         controller: ['$rootScope', '$scope', '$stateParams', 'projectsFactory', '$state', 'utils',
                             function($rootScope, $scope, $stateParams, projectsFactory, $state, utils) {
-                                console.log('edit controller called');
-                                console.log('projectId=' + $stateParams.projectId);
                                 $rootScope.projectId = $stateParams.projectId;
 
 
                                 projectsFactory.get($stateParams.projectId)
                                     .success(function(data) {
-                                        console.log('success with get');
                                         $scope.project = data;
                                     }).error(function(error) {
                                         $scope.alerts = [{
                                             type: 'danger',
-                                            msg: error.message
+                                            msg: error.Error
                                         }];
-                                        console.log('here is an error ' + error.message);
+                                        console.log('here is an error ' + error.Error);
                                     });
 
-                                console.log('in detail.edit');
                                 $scope.save = function() {
                                     projectsFactory.update($scope.project)
                                         .success(function(data) {
-                                            console.log('success with update');
                                             $scope.alerts = [{
                                                 type: 'success',
                                                 msg: 'success'
@@ -1119,9 +1091,9 @@ angular.module('uiRouterSample.projects', [
                                         }).error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 };
                             }

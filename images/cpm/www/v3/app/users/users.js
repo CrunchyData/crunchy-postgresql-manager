@@ -59,15 +59,13 @@ angular.module('uiRouterSample.users', [
 
                         $scope.users = users;
 
-                        console.log('user is ' + users.data[0].Name);
                         //console.log('roles are ' + JSON.stringify(users.data[0].Roles['foy']));
-                        angular.forEach(users.data[0].Roles, function(role) {
-                            console.log('role is ' + role.Name);
-                        });
+                        //angular.forEach(users.data[0].Roles, function(role) {
+                            //console.log('role is ' + role.Name);
+                        //});
 
                         $scope.goToFirst = function() {
                             var randId = $scope.users.data[0].Name;
-                            console.log('in first with randId = ' + randId);
 
                             // $state.go() can be used as a high level convenience method
                             // for activating a state programmatically.
@@ -120,7 +118,6 @@ angular.module('uiRouterSample.users', [
                             });
 
                         if ($scope.users.data.length > 0) {
-                            console.log('here');
                             var randId = $scope.users.data[0].Name;
                             $state.go('users.detail.details', {
                                 userId: randId
@@ -214,10 +211,7 @@ angular.module('uiRouterSample.users', [
                         templateUrl: 'app/users/users.detail.details.html',
                         controller: ['$scope', '$stateParams', '$cookieStore', '$state', 'usersFactory', 'utils',
                             function($scope, $stateParams, $cookieStore, $state, usersFactory, utils) {
-                                console.log('in details with user = ' + $scope.user.Name);
-                                console.log('in details with user roles = ' + $scope.user.Roles);
                                 $scope.save = function() {
-                                    console.log('save called');
                                     $scope.user.Token = $cookieStore.get('cpm_token');
                                     usersFactory.save($scope.user)
                                         .success(function(data) {
@@ -254,10 +248,8 @@ angular.module('uiRouterSample.users', [
                                 $scope.user = newuser;
 
                                 $scope.add = function() {
-                                    console.log('add called');
                                     usersFactory.add($scope.user)
                                         .success(function(data) {
-                                            console.log('success add');
                                             $state.go('users.list', $stateParams, {
                                                 reload: true,
                                                 inherit: false
@@ -286,9 +278,7 @@ angular.module('uiRouterSample.users', [
                         controller: ['$scope', '$stateParams', '$state', 'usersFactory', 'utils',
                             function($scope, $stateParams, $state, usersFactory, utils) {
                                 $scope.changepsw = function() {
-                                    console.log('change called');
                                     if ($scope.Password != $scope.ConfirmPassword) {
-                                        console.log(' passwords did not match ');
                                         $scope.alerts = [{
                                             type: 'danger',
                                             msg: 'passwords did not match'
@@ -326,10 +316,8 @@ angular.module('uiRouterSample.users', [
                             function($scope, $stateParams, $state, usersFactory, utils) {
 
                                 $scope.delete = function() {
-                                    console.log('delete called');
                                     usersFactory.delete($scope.user.Name)
                                         .success(function(data) {
-                                            console.log('success delete');
                                             $state.go('users.list', $stateParams, {
                                                 reload: true,
                                                 inherit: false

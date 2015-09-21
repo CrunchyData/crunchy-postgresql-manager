@@ -5,7 +5,6 @@ angular.module('uiRouterSample.proxy.service', ['ngCookies'])
     var proxyFactory = {};
 
     proxyFactory.all = function() {
-    	console.log('in proxy all with projectId=' + $rootScope.projectId);
         var url = $cookieStore.get('AdminURL') + '/projectnodes/' + $rootScope.projectId + '.' + $cookieStore.get('cpm_token');
         console.log(url);
 
@@ -30,10 +29,6 @@ angular.module('uiRouterSample.proxy.service', ['ngCookies'])
     };
 
     proxyFactory.add = function(proxy, container, standalone, dockerprofile) {
-
-	console.log('here in proxy add with proxy...' + JSON.stringify(proxy));
-	console.log('here in proxy add with container...' + JSON.stringify(container));
-	console.log('here in proxy add with dockerprofile...' + dockerprofile);
 
         var url = $cookieStore.get('AdminURL') + '/provisionproxy';
         console.log(url);

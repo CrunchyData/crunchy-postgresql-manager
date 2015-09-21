@@ -28,6 +28,7 @@ import (
 )
 
 var startTime time.Time
+var startTimeString string
 var backupContainerName string
 var backupServerName string
 var backupServerIP string
@@ -48,6 +49,7 @@ var file *os.File
 
 func init() {
 	startTime = time.Now()
+	startTimeString = startTime.String()
 	var err error
 	file, err = os.Create(filename)
 	if err != nil {
@@ -67,12 +69,11 @@ func main() {
 	getEnvVars()
 	s := backup.BackupStatus{}
 	eDuration := time.Since(startTime)
-	s.StartTime = startTime.String()
-	s.StartTime = startTime.String()
+	s.StartTime = startTimeString
 	s.ElapsedTime = eDuration.String()
 	s.Status = "initializing"
 	s.BackupSize = du()
-	sendStats(s)
+	sendStats(&s)
 
 	//kick off stats reporting in a separate thread
 	go stats("hi")
@@ -113,12 +114,11 @@ func stats(str string) {
 		time.Sleep(7000 * time.Millisecond)
 		stats := backup.BackupStatus{}
 		eDuration := time.Since(startTime)
-		stats.StartTime = startTime.String()
-		stats.StartTime = startTime.String()
+		stats.StartTime = startTimeString
 		stats.ElapsedTime = eDuration.String()
 		stats.Status = "running"
 		stats.BackupSize = du()
-		sendStats(stats)
+		sendStats(&stats)
 	}
 }
 
@@ -129,12 +129,12 @@ func finalstats(str string) {
 	//send stats to backup
 	stats := backup.BackupStatus{}
 	eDuration := time.Since(startTime)
-	stats.StartTime = startTime.String()
+	stats.StartTime = startTimeString
 	stats.ElapsedTime = eDuration.String()
 	stats.Status = "completed"
 	stats.BackupSize = du()
 
-	sendStats(stats)
+	sendStats(&stats)
 	io.WriteString(file, "final stats here\n")
 }
 
@@ -147,10 +147,9 @@ func backupfunc(str string) {
 	//create base backup from master
 	if backupProxyIP != "" {
 		backupHost = backupProxyIP
-		io.WriteString(file, "doing proxy backup to " + backupHost + "\n")
+		io.WriteString(file, "doing proxy backup to "+backupHost+"\n")
 	}
 
-	
 	cmd := exec.Command(CPMBIN+"basebackup.sh", backupHost, backupUsername, backupPassword)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
@@ -168,7 +167,7 @@ func backupfunc(str string) {
 	io.WriteString(file, " backups is completed\n")
 }
 
-func sendStats(stats backup.BackupStatus) error {
+func sendStats(stats *backup.BackupStatus) error {
 	stats.ContainerName = backupContainerName
 	stats.ServerName = backupServerName
 	stats.ScheduleID = scheduleID
@@ -178,11 +177,14 @@ func sendStats(stats backup.BackupStatus) error {
 	stats.BackupName = backupHost
 	stats.ID = StatusID
 
+	var addResponse backup.StatusAddResponse
 	var err error
+
 	if StatusID != "" {
-		_, err = backup.UpdateStatusClient(backupAgentURL, stats)
+		_, err = backup.StatusUpdateClient(stats)
 	} else {
-		StatusID, err = backup.AddStatusClient(backupAgentURL, stats)
+		addResponse, err = backup.StatusAddClient(stats)
+		StatusID = addResponse.ID
 	}
 	if err != nil {
 		io.WriteString(file, "error in adding status:"+err.Error()+"\n")
@@ -242,7 +244,7 @@ func getEnvVars() {
 	if proxyHost != "" {
 		io.WriteString(file, "BACKUP_PROXY_HOST was set\n")
 		backupHost = proxyHost
-	}	
+	}
 
 	scheduleID = os.Getenv("BACKUP_SCHEDULEID")
 	if scheduleID == "" {

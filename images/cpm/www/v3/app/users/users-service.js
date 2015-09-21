@@ -42,7 +42,6 @@ angular.module('uiRouterSample.users.service', ['ngCookies'])
     };
 
     usersFactory.save = function(thisuser) {
-        console.log('user token ' + thisuser.Token);
         var url = $cookieStore.get('AdminURL') + '/sec/updateuser';
         console.log(url);
 

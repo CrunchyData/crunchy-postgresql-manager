@@ -18,12 +18,12 @@ package backup
 import (
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
-	"github.com/robfig/cron"
-)
 
-type Command struct {
-	Output string
-}
+	"database/sql"
+	"github.com/ant0ine/go-json-rest/rest"
+	"github.com/robfig/cron"
+	"net/http"
+)
 
 type BackupProfile struct {
 	ID   string
@@ -31,6 +31,7 @@ type BackupProfile struct {
 }
 
 type BackupStatus struct {
+	Token         string
 	ID            string
 	ContainerName string
 	StartTime     string
@@ -72,84 +73,149 @@ type BackupSchedule struct {
 	UpdateDt      string
 }
 
+type StatusAddResponse struct {
+	ID string
+}
+type StatusUpdateResponse struct {
+	Output string
+}
+
+type ReloadRequest struct {
+	Name string
+}
+
+type BackupNowResponse struct {
+	Output string
+}
+
+type ReloadResponse struct {
+	Output string
+}
+
 //global cron instance that gets started, stopped, restarted
 var CRONInstance *cron.Cron
 
 const CLUSTERADMIN_DB = "clusteradmin"
 
 //called by backup jobs as they execute
-func (t *Command) AddStatus(status *BackupStatus, reply *Command) error {
+func StatusAdd(w rest.ResponseWriter, r *rest.Request) {
 
-	logit.Info.Println("AddStatus called")
+	logit.Info.Println("StatusAdd called")
+
+	request := BackupStatus{}
+	err := r.DecodeJsonPayload(&request)
+	if err != nil {
+		logit.Error.Println("StatusAdd: error in decode" + err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
-		return err
+		logit.Error.Println("StatusAdd: error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 
 	}
+
 	defer dbConn.Close()
+
 	var id string
-	id, err = AddStatus(dbConn, *status)
+	id, err = AddStatus(dbConn, &request)
 	if err != nil {
 		logit.Error.Println("AddStatus error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	reply.Output = id
-	return err
+
+	response := StatusAddResponse{}
+	response.ID = id
+	w.WriteJson(&response)
 }
 
 //called by backup jobs as they execute
-func (t *Command) UpdateStatus(status *BackupStatus, reply *Command) error {
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+func StatusUpdate(w rest.ResponseWriter, r *rest.Request) {
+
+	request := BackupStatus{}
+	err := r.DecodeJsonPayload(&request)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
-		return err
+		logit.Error.Println("StatusUpdate: error in decode" + err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var dbConn *sql.DB
+	dbConn, err = util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("StatusUpdate: error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 
 	}
 	defer dbConn.Close()
 
-	logit.Info.Println("UpdateStatus called")
+	logit.Info.Println("StatusUpdate called")
 
-	err = UpdateStatus(dbConn, *status)
+	err = UpdateStatus(dbConn, &request)
 	if err != nil {
 		logit.Error.Println("UpdateStatus error " + err.Error())
-		return err
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	return err
+
+	response := StatusUpdateResponse{}
+	response.Output = "ok"
+	w.WriteJson(&response)
 }
 
 //called by admin do perform an adhoc backup job
-func (t *Command) BackupNow(args *BackupRequest, reply *Command) error {
+func BackupNow(w rest.ResponseWriter, r *rest.Request) {
+	request := BackupRequest{}
+	err := r.DecodeJsonPayload(&request)
+	if err != nil {
+		logit.Error.Println("BackupNow: error in decode" + err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	var dbConn *sql.DB
+	dbConn, err = util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
 		logit.Error.Println("BackupNow: error " + err.Error())
-		return err
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 
 	}
 	defer dbConn.Close()
 	logit.Info.Println("BackupNow.impl called")
 
-	err = ProvisionBackupJob(dbConn, args)
+	err = ProvisionBackupJob(dbConn, &request)
 	if err != nil {
 		logit.Error.Println("BackupNow.impl error:" + err.Error())
-		return err
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	logit.Info.Println("BackupNow.impl completed")
-	return err
+
+	response := BackupNowResponse{}
+	response.Output = "ok"
+	w.WriteJson(&response)
 }
 
 //called by admin to cause a reload of the cron jobs
-func (t *Command) Reload(schedule *BackupSchedule, reply *Command) error {
+func Reload(w rest.ResponseWriter, r *rest.Request) {
 
 	logit.Info.Println("Reload called")
 
 	err := LoadSchedules()
 	if err != nil {
 		logit.Error.Println("Reload error " + err.Error())
-		return err
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	return err
+	response := ReloadResponse{}
+	response.Output = "ok"
+	w.WriteJson(&response)
+
 }
 
 func LoadSchedules() error {

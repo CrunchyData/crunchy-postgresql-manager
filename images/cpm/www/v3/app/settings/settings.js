@@ -32,7 +32,6 @@ angular.module('uiRouterSample.settings', [
                 controller: ['$cookieStore', '$scope', '$state', 'settings', 'utils',
                     function($cookieStore, $scope, $state, settings, utils) {
 
-                        console.log('up here with ' + $cookieStore.get('cpm_token'));
                         if (!$cookieStore.get('cpm_token')) {
                             $state.go('login', {
                                 userId: 'hi'
@@ -42,7 +41,6 @@ angular.module('uiRouterSample.settings', [
                         $scope.settings = settings;
 
                         $scope.goToFirst = function() {
-                            console.log($scope.settings.data[0]);
                             var randId = $scope.settings.data[0].Name;
 
                             $state.go('settings.detail', {
@@ -62,7 +60,6 @@ angular.module('uiRouterSample.settings', [
                 controller: ['$cookieStore', '$scope', '$state', 'settings', 'utils',
                     function($cookieStore, $scope, $state, settings, utils) {
 
-                        console.log('up here with ' + $cookieStore.get('cpm_token'));
                         if (!$cookieStore.get('cpm_token')) {
                             $state.go('login', {
                                 userId: 'hi'
@@ -72,7 +69,6 @@ angular.module('uiRouterSample.settings', [
                         $scope.settings = settings;
 
                         $scope.goToFirst = function() {
-                            console.log($scope.settings.data[0]);
                             var randId = $scope.settings.data[0].Name;
 
                             $state.go('settings.detail', {
@@ -103,17 +99,14 @@ angular.module('uiRouterSample.settings', [
                                 if ($scope.settings.data.length > 0) {
                                     angular.forEach($scope.settings.data, function(item) {
                                         if (item.Name == $stateParams.settingId) {
-                                            console.log('found matching setting');
                                             $scope.setting = item;
                                         }
                                     });
                                 }
 
                                 $scope.save = function() {
-                                    console.log('saving setting');
                                     settingsFactory.savesetting($scope.setting)
                                         .success(function(data) {
-                                            console.log('successful save with data=' + data);
                                             $scope.alerts = [{
                                                 type: 'success',
                                                 msg: 'success'

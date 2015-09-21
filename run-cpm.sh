@@ -20,7 +20,7 @@ if [[ $EUID -ne 0 ]]; then
 	      exit 1
 fi
 
-INSTALLDIR=`pwd`
+INSTALLDIR=/home/jeffmc/devproject/src/github.com/crunchydata/crunchy-postgresql-manager
 
 echo "setting up log dir..."
 LOGDIR=/var/cpm/logs

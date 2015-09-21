@@ -43,7 +43,6 @@ angular.module('uiRouterSample.roles.service', ['ngCookies'])
         var url = $cookieStore.get('AdminURL') + '/sec/addrole';
         console.log(url);
         role.Token = $cookieStore.get('cpm_token');
-        console.log('adding with role=' + role.Token);
         return $http.post(url, {
             'Name': role.Name,
             'Token': role.Token

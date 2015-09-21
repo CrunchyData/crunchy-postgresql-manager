@@ -16,11 +16,11 @@
 package main
 
 import (
+	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/backup"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
-	"net"
+	"log"
 	"net/http"
-	"net/rpc"
 	"time"
 )
 
@@ -31,18 +31,23 @@ func main() {
 
 	backup.LoadSchedules()
 
-	logit.Info.Println("starting\n")
-	command := new(backup.Command)
-	rpc.Register(command)
-	logit.Info.Println("Command registered\n")
-	rpc.HandleHTTP()
-	l, e := net.Listen("tcp", ":13000")
-	logit.Info.Println("listening\n")
-	if e != nil {
-		logit.Error.Println(e.Error())
-		panic("could not listen on rpc socker")
+	logit.Info.Println("backupserver starting")
+
+	api := rest.NewApi()
+	api.Use(rest.DefaultDevStack...)
+	router, err := rest.MakeRouter(
+		&rest.Route{"POST", "/status/add", backup.StatusAdd},
+		&rest.Route{"POST", "/status/update", backup.StatusUpdate},
+		&rest.Route{"POST", "/backupnow", backup.BackupNow},
+		&rest.Route{"POST", "/reload", backup.Reload},
+	)
+	if err != nil {
+		log.Fatal(err)
 	}
-	logit.Info.Println("about to serve\n")
-	http.Serve(l, nil)
-	logit.Info.Println("after serve\n")
+	api.SetApp(router)
+
+	http.Handle("/api/", http.StripPrefix("/api", api.MakeHandler()))
+
+	log.Fatal(http.ListenAndServe(":13001", nil))
+
 }

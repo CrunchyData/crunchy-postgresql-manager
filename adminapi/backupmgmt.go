@@ -106,14 +106,6 @@ func BackupNow(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	//get the domain name
-	//get domain name
-	var domainname admindb.Setting
-	domainname, err = admindb.GetSetting(dbConn, "DOMAIN-NAME")
-	if err != nil {
-		logit.Error.Println("BackupNow: DOMAIN-NAME err " + err.Error())
-	}
-
 	request := backup.BackupRequest{}
 	request.ScheduleID = postMsg.ScheduleID
 	request.ServerID = server.ID
@@ -121,14 +113,13 @@ func BackupNow(w rest.ResponseWriter, r *rest.Request) {
 	request.ServerName = server.Name
 	request.ServerIP = server.IPAddress
 	request.ProfileName = postMsg.ProfileName
-	backupServerURL := "cpm-backup." + domainname.Value + ":13000"
-	output, err := backup.BackupNowClient(backupServerURL, request)
+	output, err := backup.BackupNowClient(&request)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	logit.Info.Println("output=" + output)
+	logit.Info.Println("output=" + output.Output)
 
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}
@@ -249,29 +240,15 @@ func DeleteSchedule(w rest.ResponseWriter, r *rest.Request) {
 
 	//notify backup server to reload schedules
 
-	//get the domain name
-	//get domain name
-	var domainname admindb.Setting
-	domainname, err = admindb.GetSetting(dbConn, "DOMAIN-NAME")
-	if err != nil {
-		logit.Error.Println("DeleteSchedule: DOMAIN-NAME err " + err.Error())
-		rest.Error(w, err.Error(), 400)
-		return
-
-	}
-
-	s := backup.BackupSchedule{}
-
-	backupServerURL := "cpm-backup." + domainname.Value + ":13000"
-	var output string
-	output, err = backup.ReloadClient(backupServerURL, s)
+	var output backup.ReloadResponse
+	output, err = backup.ReloadClient()
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
 	}
-	logit.Info.Println("reload output=" + output)
+	logit.Info.Println("reload output=" + output.Output)
 
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}
@@ -516,22 +493,14 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 
 	//notify backup server to reload it's schedules
 
-	//get the domain name
-	//get domain name
-	var domainname admindb.Setting
-	domainname, err = admindb.GetSetting(dbConn, "DOMAIN-NAME")
-	if err != nil {
-		logit.Error.Println("BackupNow: DOMAIN-NAME err " + err.Error())
-	}
-	backupServerURL := "cpm-backup." + domainname.Value + ":13000"
-	output, err := backup.ReloadClient(backupServerURL, s)
+	output, err := backup.ReloadClient()
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
 	}
-	logit.Info.Println("reload output=" + output)
+	logit.Info.Println("reload output=" + output.Output)
 
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}

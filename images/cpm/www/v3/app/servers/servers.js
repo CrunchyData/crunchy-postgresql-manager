@@ -42,7 +42,7 @@ angular.module('uiRouterSample.servers', [
 
                             $scope.goToFirst = function() {
                                 if ($scope.servers.data.length > 0) {
-                                    console.log($scope.servers.data[0].ID);
+                                    //console.log($scope.servers.data[0].ID);
                                     var randId = $scope.servers.data[0].ID;
 
                                     $state.go('servers.detail.details', {
@@ -65,7 +65,7 @@ angular.module('uiRouterSample.servers', [
 
                         serversFactory.all()
                             .success(function(data) {
-                                console.log('successful get in list =' + JSON.stringify(data));
+                                //console.log('successful get in list =' + JSON.stringify(data));
                                 $scope.servers = data;
                             })
                             .error(function(error) {
@@ -77,7 +77,6 @@ angular.module('uiRouterSample.servers', [
                             });
 
 
-                        console.log('servers= ' + JSON.stringify($scope.servers));
                         if ($scope.servers.data.length > 0) {
                         	var randId = $scope.servers.data[0].ID;
                             $state.go('servers.detail.details', {
@@ -97,7 +96,6 @@ angular.module('uiRouterSample.servers', [
                         templateUrl: 'app/servers/servers.monitor.html',
                         controller: ['$scope', '$stateParams', '$state', 'utils',
                             function($scope, $stateParams, $state, utils) {
-			    	console.log('at monitor serverId=' + $stateParams.serverId);
                                 $scope.item = utils.findById($scope.server.items, $stateParams.itemId);
 
                                 $scope.edit = function() {
@@ -121,7 +119,6 @@ angular.module('uiRouterSample.servers', [
                                 $scope.refresh = function() {
                                     serversFactory.iostat($stateParams.serverId)
                                         .success(function(data) {
-                                            console.log('successful get with data=' + data);
                                             $scope.iostatresults = data.iostat;
                                         })
                                         .error(function(error) {
@@ -151,10 +148,8 @@ angular.module('uiRouterSample.servers', [
                             function($scope, $stateParams, $state, serversFactory, utils) {
 
                                 $scope.refresh = function() {
-                                    console.log('refresh called');
                                     serversFactory.df($stateParams.serverId)
                                         .success(function(data) {
-                                            console.log('successful df with data=' + data);
                                             $scope.dfresults = data.df;
                                         })
                                         .error(function(error) {
@@ -182,8 +177,6 @@ angular.module('uiRouterSample.servers', [
                         templateUrl: 'app/servers/servers.detail.monitor.cpu.html',
                         controller: ['$sce', '$scope', '$stateParams', '$state', 'utils',
                             function($sce, $scope, $stateParams, $state, utils) {
-                                console.log('in cpu mon with serverId=' + $stateParams.serverId);
-                                console.log('in cpu mon with servername=' + $scope.server.Name);
 				$scope.servergraphlink=$sce.trustAsResourceUrl('http://cpm-promdash:3000/embed/seconddashboard#!?var.host=' + $scope.server.Name);
 
 
@@ -204,8 +197,6 @@ angular.module('uiRouterSample.servers', [
                         templateUrl: 'app/servers/servers.detail.monitor.mem.html',
                         controller: ['$sce', '$scope', '$stateParams', '$state', 'utils',
                             function($sce, $scope, $stateParams, $state, utils) {
-                                console.log('in mem mon with serverId=' + $stateParams.serverId);
-                                console.log('in mem mon with servername=' + $scope.server.Name);
 				$scope.servergraphlink=$sce.trustAsResourceUrl('http://cpm-promdash:3000/embed/servermemdashboard#!?var.host=' + $scope.server.Name);
 
                             }
@@ -289,7 +280,6 @@ angular.module('uiRouterSample.servers', [
 
                                     serversFactory.add($scope.server)
                                         .success(function(data) {
-                                            console.log('successful add with data=' + data);
                                             $state.go('servers.list', $stateParams, {
                                                 reload: true,
                                                 inherit: false
@@ -316,13 +306,9 @@ angular.module('uiRouterSample.servers', [
                         templateUrl: 'app/servers/servers.detail.details.html',
                         controller: ['$scope', '$stateParams', '$state', 'serversFactory', 'utils',
                             function($scope, $stateParams, $state, serversFactory, utils) {
-                                console.log('server name here is ' + $scope.server.Name);
-                                console.log('server bridge ip is ' + $scope.server.DockerBridgeIP);
                                 $scope.save = function() {
-                                    console.log('saved server is ' + $scope.server.ServerClass);
                                     serversFactory.add($scope.server)
                                         .success(function(data) {
-                                            console.log('successful update with data=' + data);
                                             $scope.alerts = [{
                                                 type: 'success',
                                                 msg: 'saved'
@@ -335,7 +321,6 @@ angular.module('uiRouterSample.servers', [
                                             }];
                                             console.log('here is an error ' + error.message);
                                         });
-                                    console.log('save called');
                                 };
 
                             }
@@ -357,7 +342,6 @@ angular.module('uiRouterSample.servers', [
                                 $scope.delete = function() {
                                     serversFactory.delete($stateParams.serverId)
                                         .success(function(data) {
-                                            console.log('successful delete with data=' + data);
                                             $state.go('servers.list', {});
                                             $state.go('servers.list', $stateParams, {
                                                 reload: true,
@@ -394,7 +378,6 @@ angular.module('uiRouterSample.servers', [
                                     serversFactory.containers($stateParams.serverId)
                                         .success(function(data) {
                                             $scope.containers = data;
-                                            console.log('successful get containers');
                                         })
                                         .error(function(error) {
                                             $scope.alerts = [{
@@ -436,10 +419,9 @@ angular.module('uiRouterSample.servers', [
                             function($scope, $stateParams, $state, serversFactory, utils) {
 
                                 $scope.start = function() {
-                                    console.log('starting server ' + $scope.server.iD);
                                     serversFactory.startall($scope.server.ID)
                                         .success(function(data) {
-                                            console.log('successful get in list =' + JSON.stringify(data));
+                                            //console.log('successful get in list =' + JSON.stringify(data));
                                         })
                                         .error(function(error) {
                                             $scope.alerts = [{
@@ -466,10 +448,9 @@ angular.module('uiRouterSample.servers', [
                             function($scope, $stateParams, $state, serversFactory, utils) {
 
                                 $scope.stop = function() {
-                                    console.log('stopping server ' + $scope.server.iD);
                                     serversFactory.stopall($scope.server.ID)
                                         .success(function(data) {
-                                            console.log('successful get in list =' + JSON.stringify(data));
+                                            //console.log('successful get in list =' + JSON.stringify(data));
                                         })
                                         .error(function(error) {
                                             $scope.alerts = [{

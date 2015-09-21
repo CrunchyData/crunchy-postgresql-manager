@@ -37,11 +37,13 @@ done
 
 # copy all required admin files to the admin server
 
+ssh root@$adminserver "mkdir -p /var/cpm/data/promdash"
 ssh root@$adminserver "mkdir -p /var/cpm/bin"
 scp $GOPATH/bin/* \
 $CPMPATH/sbin/* \
 root@$adminserver:/var/cpm/bin
 
+scp $CPMPATH/config/file.sqlite3 root@$adminserver:/var/cpm/data/promdash/
 scp $CPMPATH/sbin/*.pem root@$adminserver:/var/cpm/keys
 scp $CPMPATH/config/cpmserverapi.service root@$adminserver:/usr/lib/systemd/system
 

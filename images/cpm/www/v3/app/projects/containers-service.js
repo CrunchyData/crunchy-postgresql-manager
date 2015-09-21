@@ -5,7 +5,6 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
     var containersFactory = {};
 
     containersFactory.all = function() {
-    	console.log('in containers all with projectId=' + $rootScope.projectId);
         var url = $cookieStore.get('AdminURL') + '/projectnodes/' + $rootScope.projectId + '.' + $cookieStore.get('cpm_token');
         console.log(url);
 
@@ -170,7 +169,6 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
 
         var url = $cookieStore.get('AdminURL') + '/dbuser/add';
         console.log(url);
-        console.log('id is ' + user.ContainerID);
 	user.Token = $cookieStore.get('cpm_token');
 
         return $http.post(url,  {
@@ -190,7 +188,6 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
 
         var url = $cookieStore.get('AdminURL') + '/dbuser/update';
         console.log(url);
-        console.log('id is ' + user.ContainerID);
 	user.Token = $cookieStore.get('cpm_token');
 
         return $http.post(url,  {
@@ -210,7 +207,6 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
     };
 
     containersFactory.getaccessrules = function(containerid) {
-    	console.log('in containers getaccessrules with containerid=' + containerid);
         var url = $cookieStore.get('AdminURL') + '/containerrules/getall/' + containerid + '.' + $cookieStore.get('cpm_token');
         console.log(url);
 
