@@ -569,32 +569,29 @@ func PingPG(dbConn *sql.DB, node *admindb.Container) (string, error) {
 	var status = "OFFLINE"
 	var err error
 
-  	var credential admindb.Credential
-        credential, err = admindb.GetUserCredentials(dbConn, node)
-        if err != nil {
-                logit.Error.Println(err.Error())
-                return status, err
-        }
+	var credential admindb.Credential
+	credential, err = admindb.GetUserCredentials(dbConn, node)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return status, err
+	}
 
-        dbConn2, err := util.GetMonitoringConnection(credential.Host, credential.Username, credential.Port, credential.Database,  credential.Password)
-        defer dbConn2.Close()
+	dbConn2, err := util.GetMonitoringConnection(credential.Host, credential.Username, credential.Port, credential.Database, credential.Password)
+	defer dbConn2.Close()
 
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return status, err
 	}
 
-	var value string
+	//var value string
 
-	err = dbConn2.QueryRow(fmt.Sprintf("select now()::text")).Scan(&value)
-	switch {
-	case err == sql.ErrNoRows:
-		logit.Info.Println("PingPG no rows returned")
+	//err = dbConn2.QueryRow(fmt.Sprintf("select now()::text")).Scan(&value)
+	err = dbConn2.Ping()
+	if err != nil {
+		logit.Info.Println(err.Error())
+		logit.Info.Println("could not Ping PG")
 		return "OFFLINE", nil
-	case err != nil:
-		logit.Info.Println("PingPG error " + err.Error())
-		return "OFFLINE", nil
-	default:
 	}
 
 	return "RUNNING", nil
