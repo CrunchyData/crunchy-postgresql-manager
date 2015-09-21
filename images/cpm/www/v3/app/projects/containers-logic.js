@@ -488,7 +488,7 @@ var ContainerUsersAddController = function($scope, $stateParams, $state, contain
 
         containersFactory.adduser($scope.user)
             .success(function(data) {
-                $state.go('projects.container', $stateParams, {
+                $state.go('projects.container.users', $stateParams, {
                     reload: false,
                     inherit: false
                 });

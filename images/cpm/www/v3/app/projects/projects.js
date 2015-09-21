@@ -384,7 +384,7 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
-            .state('projects.container.users.add', {
+            .state('projects.container.usersadd', {
                 url: '/users/add/:itemId',
                 views: {
 
