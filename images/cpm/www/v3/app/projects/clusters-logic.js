@@ -8,6 +8,59 @@ var MyController = function($scope, $state, $cookieStore, $stateParams, utils) {
 
 };
 
+
+var ClusterStopController = function($scope, $stateParams, $state, clustersFactory, utils, usSpinnerService) {
+    var cluster = $scope.cluster;
+
+    $scope.stop = function() {
+        usSpinnerService.spin('spinner-1');
+        console.log('stop cluster called');
+        clustersFactory.stop($stateParams.clusterId)
+            .success(function(data) {
+                usSpinnerService.stop('spinner-1');
+                $state.go('projects.list', $stateParams, {
+                    reload: true,
+                    inherit: false
+                });
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.message
+                }];
+                console.log('here is an error ' + error.message);
+                usSpinnerService.stop('spinner-1');
+            });
+    };
+
+};
+
+var ClusterStartController = function($scope, $stateParams, $state, clustersFactory, utils, usSpinnerService) {
+    var cluster = $scope.cluster;
+
+    $scope.start = function() {
+        usSpinnerService.spin('spinner-1');
+        console.log('start cluster called');
+        clustersFactory.start($stateParams.clusterId)
+            .success(function(data) {
+                usSpinnerService.stop('spinner-1');
+                $state.go('projects.list', $stateParams, {
+                    reload: true,
+                    inherit: false
+                });
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.message
+                }];
+                console.log('here is an error ' + error.message);
+                usSpinnerService.stop('spinner-1');
+            });
+    };
+
+};
+
 var ClusterDeleteController = function($scope, $stateParams, $state, clustersFactory, utils, usSpinnerService) {
     var cluster = $scope.cluster;
 

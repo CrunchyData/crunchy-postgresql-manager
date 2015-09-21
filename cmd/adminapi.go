@@ -74,6 +74,8 @@ func main() {
 		&rest.Route{"GET", "/cluster/configure/:ID.:Token", adminapi.ConfigureCluster},
 		&rest.Route{"GET", "/cluster/scale/:ID.:Token", adminapi.ScaleUpCluster},
 		&rest.Route{"GET", "/cluster/delete/:ID.:Token", adminapi.DeleteCluster},
+		&rest.Route{"GET", "/cluster/start/:ID.:Token", adminapi.StartCluster},
+		&rest.Route{"GET", "/cluster/stop/:ID.:Token", adminapi.StopCluster},
 		&rest.Route{"GET", "/deleteserver/:ID.:Token", adminapi.DeleteServer},
 		&rest.Route{"GET", "/projectnodes/:ID.:Token", adminapi.GetAllNodesForProject},
 		&rest.Route{"GET", "/nodes/:Token", adminapi.GetAllNodes},

@@ -37,6 +37,22 @@ angular.module('uiRouterSample.clusters.service', ['ngCookies'])
         return $http.get(url);
     };
 
+    clustersFactory.start = function(id) {
+
+        var url = $cookieStore.get('AdminURL') + '/cluster/start/' + id + '.' + $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
+    clustersFactory.stop = function(id) {
+
+        var url = $cookieStore.get('AdminURL') + '/cluster/stop/' + id + '.' + $cookieStore.get('cpm_token');
+        console.log(url);
+
+        return $http.get(url);
+    };
+
     clustersFactory.scale = function(id) {
 
         var url = $cookieStore.get('AdminURL') + '/cluster/scale/' + id + '.' + $cookieStore.get('cpm_token');

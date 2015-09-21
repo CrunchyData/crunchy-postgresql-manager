@@ -578,6 +578,28 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
+            .state('projects.cluster.start', {
+
+                url: '/start/:itemId',
+                views: {
+                    '': {
+                        templateUrl: 'app/projects/projects.cluster.start.html',
+                        controller: ClusterStartController
+                    },
+                }
+            })
+
+            .state('projects.cluster.stop', {
+
+                url: '/stop/:itemId',
+                views: {
+                    '': {
+                        templateUrl: 'app/projects/projects.cluster.stop.html',
+                        controller: ClusterStopController
+                    },
+                }
+            })
+
             .state('projects.cluster.scale', {
 
                 url: '/scale/:itemId',

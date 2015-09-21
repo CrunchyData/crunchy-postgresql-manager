@@ -1298,3 +1298,149 @@ func waitTillAllReady(dockermaster cpmserverapi.DockerRunRequest, dockerpgpool c
 	return nil
 
 }
+
+func StartCluster(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("StartCluster: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-cluster")
+	if err != nil {
+		logit.Error.Println("StartCluster: authorize error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	ID := r.PathParam("ID")
+	if ID == "" {
+		logit.Error.Println("StartCluster: error cluster ID required")
+		rest.Error(w, "cluster ID required", http.StatusBadRequest)
+		return
+	}
+
+	cluster, err := admindb.GetCluster(dbConn, ID)
+	if err != nil {
+		logit.Error.Println("StartCluster:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	//start docker containers
+	containers, err := admindb.GetAllContainersForCluster(dbConn, cluster.ID)
+	if err != nil {
+		logit.Error.Println("StartCluster:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	i := 0
+
+	i = 0
+	var response cpmserverapi.DockerStartResponse
+	server := admindb.Server{}
+	for i = range containers {
+
+		//go get the docker server IPAddress
+		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
+		if err != nil {
+			logit.Error.Println("StartCluster:" + err.Error())
+			rest.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		logit.Info.Println("StartCluster: got server IP " + server.IPAddress)
+
+		req := &cpmserverapi.DockerStartRequest{}
+		req.ContainerName = containers[i].Name
+		logit.Info.Println("will attempt to start container " + req.ContainerName)
+		var url = "http://" + server.IPAddress + ":10001"
+		response, err = cpmserverapi.DockerStartClient(url, req)
+		if err != nil {
+			logit.Error.Println("StartCluster: error when trying to start container" + err.Error())
+		}
+		logit.Info.Println("StartCluster: started " + response.Output)
+
+		i++
+	}
+
+	status := SimpleStatus{}
+	status.Status = "OK"
+	w.WriteHeader(http.StatusOK)
+	w.WriteJson(&status)
+}
+
+func StopCluster(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println("StopCluster: error " + err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-cluster")
+	if err != nil {
+		logit.Error.Println("StopCluster: authorize error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	ID := r.PathParam("ID")
+	if ID == "" {
+		logit.Error.Println("StopCluster: error cluster ID required")
+		rest.Error(w, "cluster ID required", http.StatusBadRequest)
+		return
+	}
+
+	cluster, err := admindb.GetCluster(dbConn, ID)
+	if err != nil {
+		logit.Error.Println("StopCluster:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	//stop docker containers
+	containers, err := admindb.GetAllContainersForCluster(dbConn, cluster.ID)
+	if err != nil {
+		logit.Error.Println("StopCluster:" + err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	i := 0
+
+	i = 0
+	var response cpmserverapi.DockerStopResponse
+	server := admindb.Server{}
+	for i = range containers {
+
+		//go get the docker server IPAddress
+		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
+		if err != nil {
+			logit.Error.Println("StopCluster:" + err.Error())
+			rest.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		logit.Info.Println("StopCluster: got server IP " + server.IPAddress)
+
+		req := &cpmserverapi.DockerStopRequest{}
+		req.ContainerName = containers[i].Name
+		logit.Info.Println("will attempt to stop container " + req.ContainerName)
+		var url = "http://" + server.IPAddress + ":10001"
+		response, err = cpmserverapi.DockerStopClient(url, req)
+		if err != nil {
+			logit.Error.Println("StopCluster: error when trying to stop container" + err.Error())
+		}
+		logit.Info.Println("StopCluster: started " + response.Output)
+
+		i++
+	}
+
+	status := SimpleStatus{}
+	status.Status = "OK"
+	w.WriteHeader(http.StatusOK)
+	w.WriteJson(&status)
+}
