@@ -20,6 +20,7 @@ angular.module('uiRouterSample.authn', [
 
                         controller: ['$scope', '$cookieStore', '$state', 'authnFactory', 'utils',
                             function($scope, $cookieStore, $state, authnFactory, utils) {
+			    	$scope.admin_url = 'http://cpm-admin:13001';
 
                                 // Add a 'authn' field in this abstract parent's scope, so that all
                                 // child state views can access it in their scopes. Please note: scope
