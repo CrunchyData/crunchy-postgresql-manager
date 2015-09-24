@@ -135,7 +135,7 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
 
     containersFactory.schedules = function(id) {
 
-        var url = $cookieStore.get('AdminURL') + '/backup/getschedules/' + id + '.' + $cookieStore.get('cpm_token');
+        var url = $cookieStore.get('AdminURL') + '/task/getschedules/' + id + '.' + $cookieStore.get('cpm_token');
         console.log(url);
 
         return $http.get(url);

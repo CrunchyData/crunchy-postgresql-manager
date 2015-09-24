@@ -18,8 +18,8 @@ package adminapi
 import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/backup"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/task"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 )
@@ -48,11 +48,11 @@ type AddSchedulePost struct {
 
 const CLUSTERADMIN_DB = "clusteradmin"
 
-func BackupNow(w rest.ResponseWriter, r *rest.Request) {
+func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println("ExecuteNow: error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -61,38 +61,38 @@ func BackupNow(w rest.ResponseWriter, r *rest.Request) {
 	postMsg := BackupNowPost{}
 	err = r.DecodeJsonPayload(&postMsg)
 	if err != nil {
-		logit.Error.Println("BackupNow: error in decode" + err.Error())
+		logit.Error.Println("ExecuteNow: error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = secimpl.Authorize(dbConn, postMsg.Token, "perm-backup")
 	if err != nil {
-		logit.Error.Println("BackupNow: validate token error " + err.Error())
+		logit.Error.Println("ExecuteNow: validate token error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	if postMsg.ServerID == "" {
-		logit.Error.Println("BackupNow: error node ServerID required")
+		logit.Error.Println("ExecuteNow: error node ServerID required")
 		rest.Error(w, "server ID required", 400)
 		return
 	}
 	if postMsg.ProfileName == "" {
-		logit.Error.Println("BackupNow: error node ProfileName required")
+		logit.Error.Println("ExecuteNow: error node ProfileName required")
 		rest.Error(w, "ProfileName required", 400)
 		return
 	}
 
 	if postMsg.ScheduleID == "" {
-		logit.Error.Println("BackupNow: error schedule ID required")
+		logit.Error.Println("ExecutepNow: error schedule ID required")
 		rest.Error(w, "schedule ID required", 400)
 		return
 	}
 
-	schedule, err2 := backup.GetSchedule(dbConn, postMsg.ScheduleID)
+	schedule, err2 := task.GetSchedule(dbConn, postMsg.ScheduleID)
 	if err2 != nil {
-		logit.Error.Println("BackupNow: " + err2.Error())
+		logit.Error.Println("ExecuteNow: " + err2.Error())
 		rest.Error(w, err2.Error(), 400)
 		return
 	}
@@ -101,19 +101,19 @@ func BackupNow(w rest.ResponseWriter, r *rest.Request) {
 	server := admindb.Server{}
 	server, err = admindb.GetServer(dbConn, postMsg.ServerID)
 	if err != nil {
-		logit.Error.Println("BackupNow: " + err.Error())
+		logit.Error.Println("ExecuteNow: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
-	request := backup.BackupRequest{}
+	request := task.TaskRequest{}
 	request.ScheduleID = postMsg.ScheduleID
 	request.ServerID = server.ID
 	request.ContainerName = schedule.ContainerName
 	request.ServerName = server.Name
 	request.ServerIP = server.IPAddress
 	request.ProfileName = postMsg.ProfileName
-	output, err := backup.BackupNowClient(&request)
+	output, err := task.ExecuteNowClient(&request)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -130,7 +130,7 @@ func BackupNow(w rest.ResponseWriter, r *rest.Request) {
 func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println("AddSchedule: error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -173,7 +173,7 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	s := backup.BackupSchedule{}
+	s := task.TaskSchedule{}
 
 	s.ServerID = postMsg.ServerID
 	s.ContainerName = postMsg.ContainerName
@@ -188,7 +188,7 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 	s.Month = "*"
 	s.DayOfWeek = "*"
 
-	result, err := backup.AddSchedule(dbConn, s)
+	result, err := task.AddSchedule(dbConn, s)
 	if err != nil {
 		logit.Error.Println("GetNode: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -197,11 +197,11 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 
 	logit.Info.Println("AddSchedule: new ID " + result)
 
-	//we choose by design to not notify the backup server
+	//we choose by design to not notify the task server
 	//on schedule adds, instead we mark any new schedule
 	//as DISABLED, forcing the user to change the defaults
 	//and use the UpdateSchedule which does force a notify
-	//to the backup server
+	//to the task server
 
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}
@@ -212,7 +212,7 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 func DeleteSchedule(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println("DeleteSchedule: error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -231,17 +231,17 @@ func DeleteSchedule(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	err = backup.DeleteSchedule(dbConn, ID)
+	err = task.DeleteSchedule(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("DeleteSchedule: " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
-	//notify backup server to reload schedules
+	//notify task server to reload schedules
 
-	var output backup.ReloadResponse
-	output, err = backup.ReloadClient()
+	var output task.ReloadResponse
+	output, err = task.ReloadClient()
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -260,7 +260,7 @@ func DeleteSchedule(w rest.ResponseWriter, r *rest.Request) {
 func GetSchedule(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println("GetSchedule: error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -279,7 +279,7 @@ func GetSchedule(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	result, err := backup.GetSchedule(dbConn, ID)
+	result, err := task.GetSchedule(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("GetNode: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -298,7 +298,7 @@ func GetAllSchedules(w rest.ResponseWriter, r *rest.Request) {
 	}
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println("GetAllSchedules: error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -317,7 +317,7 @@ func GetAllSchedules(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	schedules, err := backup.GetAllSchedules(dbConn, ContainerName)
+	schedules, err := task.GetAllSchedules(dbConn, ContainerName)
 	if err != nil {
 		logit.Error.Println("GetAllSchedules: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -336,7 +336,7 @@ func GetStatus(w rest.ResponseWriter, r *rest.Request) {
 	}
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println("GetStatus: error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -353,7 +353,7 @@ func GetStatus(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, "ID required", 400)
 		return
 	}
-	stat, err := backup.GetStatus(dbConn, ID)
+	stat, err := task.GetStatus(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("GetStatus: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -372,7 +372,7 @@ func GetAllStatus(w rest.ResponseWriter, r *rest.Request) {
 	}
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println("GetAllStatus: error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -390,7 +390,7 @@ func GetAllStatus(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	stats, err := backup.GetAllStatus(dbConn, ID)
+	stats, err := task.GetAllStatus(dbConn, ID)
 	if err != nil {
 		logit.Error.Println("GetAllStatus: " + err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -405,7 +405,7 @@ func GetAllStatus(w rest.ResponseWriter, r *rest.Request) {
 func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println("UpdateSchedule: error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -473,7 +473,7 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	s := backup.BackupSchedule{}
+	s := task.TaskSchedule{}
 	s.ID = postMsg.ID
 	s.ServerID = postMsg.ServerID
 	s.Minutes = postMsg.Minutes
@@ -484,16 +484,16 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 	s.DayOfWeek = postMsg.DayOfWeek
 	s.Name = postMsg.Name
 
-	err = backup.UpdateSchedule(dbConn, s)
+	err = task.UpdateSchedule(dbConn, s)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 	}
 
-	//notify backup server to reload it's schedules
+	//notify task server to reload it's schedules
 
-	output, err := backup.ReloadClient()
+	output, err := task.ReloadClient()
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
@@ -511,7 +511,7 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 func GetBackupNodes(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println("GetBackupNodes: error " + err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 

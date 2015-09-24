@@ -59,14 +59,14 @@ docker run -e DB_HOST=127.0.0.1 \
 	-v $KEYSDIR:/cpmkeys \
 	crunchydata/cpm-admin
 
-echo "restarting cpm-backup container..."
+echo "restarting cpm-task container..."
 sleep 2
-docker rm cpm-backup
+docker rm cpm-task
 docker run -e DB_HOST=cpm-admin.$DOMAIN \
 	-v $LOGDIR:/cpmlogs \
 	-e DB_PORT=5432 -e DB_USER=postgres \
-	--name=cpm-backup -d \
-	crunchydata/cpm-backup
+	--name=cpm-task -d \
+	crunchydata/cpm-task
 
 echo "restarting cpm-mon container..."
 sleep 2

@@ -13,7 +13,7 @@
  limitations under the License.
 */
 
-package backup
+package task
 
 import (
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
@@ -21,7 +21,7 @@ import (
 )
 
 type DefaultJob struct {
-	request BackupRequest
+	request TaskRequest
 }
 
 //this is the func that implements the cron Job interface

@@ -17,8 +17,8 @@ package main
 
 import (
 	"bytes"
-	"github.com/crunchydata/crunchy-postgresql-manager/backup"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/task"
 	"io"
 	"log"
 	"os"
@@ -67,12 +67,12 @@ func main() {
 	defer closeLog()
 
 	getEnvVars()
-	s := backup.BackupStatus{}
+	s := task.TaskStatus{}
 	eDuration := time.Since(startTime)
 	s.StartTime = startTimeString
 	s.ElapsedTime = eDuration.String()
 	s.Status = "initializing"
-	s.BackupSize = du()
+	s.TaskSize = du()
 	sendStats(&s)
 
 	//kick off stats reporting in a separate thread
@@ -112,12 +112,12 @@ func stats(str string) {
 		io.WriteString(file, "sending stats...\n")
 		io.WriteString(file, "sleeping for 7 secs\n")
 		time.Sleep(7000 * time.Millisecond)
-		stats := backup.BackupStatus{}
+		stats := task.TaskStatus{}
 		eDuration := time.Since(startTime)
 		stats.StartTime = startTimeString
 		stats.ElapsedTime = eDuration.String()
 		stats.Status = "running"
-		stats.BackupSize = du()
+		stats.TaskSize = du()
 		sendStats(&stats)
 	}
 }
@@ -127,12 +127,12 @@ func finalstats(str string) {
 
 	//connect to backupserver on cpm-admin
 	//send stats to backup
-	stats := backup.BackupStatus{}
+	stats := task.TaskStatus{}
 	eDuration := time.Since(startTime)
 	stats.StartTime = startTimeString
 	stats.ElapsedTime = eDuration.String()
 	stats.Status = "completed"
-	stats.BackupSize = du()
+	stats.TaskSize = du()
 
 	sendStats(&stats)
 	io.WriteString(file, "final stats here\n")
@@ -167,23 +167,23 @@ func backupfunc(str string) {
 	io.WriteString(file, " backups is completed\n")
 }
 
-func sendStats(stats *backup.BackupStatus) error {
+func sendStats(stats *task.TaskStatus) error {
 	stats.ContainerName = backupContainerName
 	stats.ServerName = backupServerName
 	stats.ScheduleID = scheduleID
 	stats.ServerIP = backupServerIP
 	stats.ProfileName = backupProfileName
 	stats.Path = backupPath
-	stats.BackupName = backupHost
+	stats.TaskName = backupHost
 	stats.ID = StatusID
 
-	var addResponse backup.StatusAddResponse
+	var addResponse task.StatusAddResponse
 	var err error
 
 	if StatusID != "" {
-		_, err = backup.StatusUpdateClient(stats)
+		_, err = task.StatusUpdateClient(stats)
 	} else {
-		addResponse, err = backup.StatusAddClient(stats)
+		addResponse, err = task.StatusAddClient(stats)
 		StatusID = addResponse.ID
 	}
 	if err != nil {
@@ -193,7 +193,7 @@ func sendStats(stats *backup.BackupStatus) error {
 
 	//send to backup
 	io.WriteString(file, "elapsed time:"+stats.ElapsedTime+"\n")
-	io.WriteString(file, "backupsize :"+stats.BackupSize+"\n")
+	io.WriteString(file, "tasksize :"+stats.TaskSize+"\n")
 	return nil
 }
 

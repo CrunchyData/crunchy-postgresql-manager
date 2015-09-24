@@ -21,8 +21,8 @@ echo "starting cpm-admin container..."
 docker start cpm-admin
 
 sleep 2
-echo "starting cpm-backup container..."
-docker start cpm-backup
+echo "starting cpm-task container..."
+docker start cpm-task
 
 sleep 2
 echo "starting cpm-mon container..."

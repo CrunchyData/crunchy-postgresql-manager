@@ -148,19 +148,21 @@ insert into settings (name, value, updatedt) values ('CP-SM-ALGO', 'round-robin'
 insert into settings (name, value, updatedt) values ('CP-MED-ALGO', 'round-robin', now());
 insert into settings (name, value, updatedt) values ('CP-LG-ALGO', 'round-robin', now());
 
-create table backupprofile (
+create table taskprofile (
 	id serial primary key,
 	name varchar(30) unique not null
 );
-insert into backupprofile (name) values ('pg_basebackup');
-insert into backupprofile (name) values ('pg_dumpall');
+insert into taskprofile (name) values ('pg_basebackup');
+insert into taskprofile (name) values ('pg_dumpall');
+insert into taskprofile (name) values ('vacuum-analyze');
+insert into taskprofile (name) values ('backrest-backup');
 
 
-create table backupschedule (
+create table taskschedule (
 	id serial primary key,
 	serverid int references server (id) on delete cascade not null,
 	containername varchar(20) references container (name) on delete cascade not null,
-	profilename varchar(30) references backupprofile (name) not null,
+	profilename varchar(30) references taskprofile (name) not null,
 	name varchar(30) not null,
 	enabled varchar(3) not null,
 	minutes varchar(80) not null,
@@ -174,18 +176,18 @@ create table backupschedule (
 	)
 );
 
-create table backupstatus (
+create table taskstatus (
 	id serial primary key,
 	containername varchar(30) not null,
 	profilename varchar(30) not null,
-	scheduleid int references backupschedule (id) on delete cascade not null ,
+	scheduleid int references taskschedule (id) on delete cascade not null ,
 	starttime timestamp not null,
-	backupname varchar(30) not null,
+	taskname varchar(30) not null,
 	servername varchar(20) not null,
 	serverip varchar(20) not null,
 	path varchar(80) not null,
 	elapsedtime varchar(30) not null,
-	backupsize varchar(30) not null,
+	tasksize varchar(30) not null,
 	status varchar(50) not null,
 	updatedt timestamp not null,
 

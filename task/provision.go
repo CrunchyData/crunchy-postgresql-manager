@@ -13,7 +13,7 @@
  limitations under the License.
 */
 
-package backup
+package task
 
 import (
 	"database/sql"
@@ -24,7 +24,7 @@ import (
 	"time"
 )
 
-func ProvisionBackupJob(dbConn *sql.DB, args *BackupRequest) error {
+func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 
 	//get node
 	node, err := admindb.GetContainerByName(dbConn, args.ContainerName)
@@ -33,13 +33,12 @@ func ProvisionBackupJob(dbConn *sql.DB, args *BackupRequest) error {
 		return err
 	}
 
-  	var credential admindb.Credential
-        credential, err = admindb.GetUserCredentials(dbConn, &node)
-        if err != nil {
-                logit.Error.Println(err.Error())
-                return err
-        }
-
+	var credential admindb.Credential
+	credential, err = admindb.GetUserCredentials(dbConn, &node)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
 
 	logit.Info.Println("backup.Provision called")
 	logit.Info.Println("with scheduleid=" + args.ScheduleID)
@@ -74,13 +73,6 @@ func ProvisionBackupJob(dbConn *sql.DB, args *BackupRequest) error {
 
 	params.EnvVars = make(map[string]string)
 
-	setting, err = admindb.GetSetting(dbConn, "DOMAIN-NAME")
-	if err != nil {
-		logit.Error.Println("Provision:" + err.Error())
-		return err
-	}
-	var domain = setting.Value
-
 	params.EnvVars["BACKUP_NAME"] = backupcontainername
 	params.EnvVars["BACKUP_SERVERNAME"] = server.Name
 	params.EnvVars["BACKUP_SERVERIP"] = server.IPAddress
@@ -90,7 +82,7 @@ func ProvisionBackupJob(dbConn *sql.DB, args *BackupRequest) error {
 	params.EnvVars["BACKUP_PATH"] = params.PGDataPath
 	params.EnvVars["BACKUP_USERNAME"] = credential.Username
 	params.EnvVars["BACKUP_PASSWORD"] = credential.Password
-	params.EnvVars["BACKUP_HOST"] = args.ContainerName + "." + setting.Value
+	params.EnvVars["BACKUP_HOST"] = args.ContainerName
 
 	if node.Image == "cpm-node-proxy" {
 		var proxy admindb.Proxy
@@ -109,7 +101,7 @@ func ProvisionBackupJob(dbConn *sql.DB, args *BackupRequest) error {
 	}
 	params.EnvVars["BACKUP_PORT"] = setting.Value
 	params.EnvVars["BACKUP_USER"] = "postgres"
-	params.EnvVars["BACKUP_SERVER_URL"] = "cpm-backup" + "." + domain + ":" + "13000"
+	params.EnvVars["BACKUP_SERVER_URL"] = "cpm-task:13001"
 
 	//provision the volume
 	request := &cpmserverapi.DiskProvisionRequest{"/tmp/foo"}

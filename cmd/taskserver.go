@@ -17,8 +17,8 @@ package main
 
 import (
 	"github.com/ant0ine/go-json-rest/rest"
-	"github.com/crunchydata/crunchy-postgresql-manager/backup"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/task"
 	"log"
 	"net/http"
 	"time"
@@ -29,17 +29,17 @@ func main() {
 	logit.Info.Println("sleeping during startup to give DNS a chance")
 	time.Sleep(time.Millisecond * 7000)
 
-	backup.LoadSchedules()
+	task.LoadSchedules()
 
-	logit.Info.Println("backupserver starting")
+	logit.Info.Println("taskserver starting")
 
 	api := rest.NewApi()
 	api.Use(rest.DefaultDevStack...)
 	router, err := rest.MakeRouter(
-		&rest.Route{"POST", "/status/add", backup.StatusAdd},
-		&rest.Route{"POST", "/status/update", backup.StatusUpdate},
-		&rest.Route{"POST", "/backupnow", backup.BackupNow},
-		&rest.Route{"POST", "/reload", backup.Reload},
+		&rest.Route{"POST", "/status/add", task.StatusAdd},
+		&rest.Route{"POST", "/status/update", task.StatusUpdate},
+		&rest.Route{"POST", "/executenow", task.ExecuteNow},
+		&rest.Route{"POST", "/reload", task.Reload},
 	)
 	if err != nil {
 		log.Fatal(err)

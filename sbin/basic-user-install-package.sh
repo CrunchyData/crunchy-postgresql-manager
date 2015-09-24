@@ -81,11 +81,11 @@ pushImages () {
 	sudo docker push -f crunchydata/cpm-collect:$VERSION
 	sudo docker push -f crunchydata/cpm-collect:latest
 
-	echo "saving cpm-backup image"
-	sudo docker tag -f cpm-backup crunchydata/cpm-backup:$VERSION
-	sudo docker tag -f cpm-backup crunchydata/cpm-backup:latest
-	sudo docker push -f crunchydata/cpm-backup:$VERSION
-	sudo docker push -f crunchydata/cpm-backup:latest
+	echo "saving cpm-task image"
+	sudo docker tag -f cpm-task crunchydata/cpm-task:$VERSION
+	sudo docker tag -f cpm-task crunchydata/cpm-task:latest
+	sudo docker push -f crunchydata/cpm-task:$VERSION
+	sudo docker push -f crunchydata/cpm-task:latest
 
 	echo "saving cpm-backup-job image"
 	sudo docker tag -f cpm-backup-job crunchydata/cpm-backup-job:$VERSION

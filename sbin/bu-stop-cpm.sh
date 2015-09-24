@@ -19,8 +19,8 @@ docker stop cpm
 echo "stopping cpm-admin container..."
 docker stop cpm-admin
 
-echo "stopping cpm-backup container..."
-docker stop cpm-backup
+echo "stopping cpm-task container..."
+docker stop cpm-task
 
 echo "stopping cpm-mon container..."
 docker stop cpm-mon
