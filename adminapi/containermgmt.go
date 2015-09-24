@@ -33,7 +33,7 @@ const CONTAINER_NOT_FOUND = "CONTAINER NOT FOUND"
 func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -42,14 +42,14 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("GetNode: validate token error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	ID := r.PathParam("ID")
 	if ID == "" {
-		logit.Error.Println("GetNode: error node ID required")
+		logit.Error.Println("error node ID required")
 		rest.Error(w, "node ID required", http.StatusBadRequest)
 		return
 	}
@@ -61,7 +61,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 	if err2 != nil {
-		logit.Error.Println("GetNode: " + err2.Error())
+		logit.Error.Println(err2.Error())
 		rest.Error(w, err2.Error(), http.StatusBadRequest)
 		return
 	}
@@ -72,7 +72,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	server := admindb.Server{}
 	server, err = admindb.GetServer(dbConn, node.ServerID)
 	if err != nil {
-		logit.Error.Println("GetNode: " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -82,14 +82,14 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	var url = "http://" + server.IPAddress + ":10001"
 	_, err = cpmserverapi.DockerInspectClient(url, request)
 	if err != nil {
-		logit.Error.Println("GetNode: " + err.Error())
+		logit.Error.Println(err.Error())
 		currentStatus = CONTAINER_NOT_FOUND
 	}
 
 	if currentStatus != "CONTAINER NOT FOUND" {
 		currentStatus, err = PingPG(dbConn, &node)
 		if err != nil {
-			logit.Error.Println("GetNode:" + err.Error())
+			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -105,7 +105,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 func GetAllNodesForProject(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -114,21 +114,21 @@ func GetAllNodesForProject(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("GetAllNodes: validate token error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	ID := r.PathParam("ID")
 	if ID == "" {
-		logit.Error.Println("GetAllNodesForProject: error project ID required")
+		logit.Error.Println("project ID required")
 		rest.Error(w, "project ID required", http.StatusBadRequest)
 		return
 	}
 
 	results, err := admindb.GetAllContainersForProject(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("GetAllNodes: " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 	nodes := make([]ClusterNode, len(results))
@@ -155,7 +155,7 @@ func GetAllNodesForProject(w rest.ResponseWriter, r *rest.Request) {
 func GetAllNodes(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -164,14 +164,14 @@ func GetAllNodes(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("GetAllNodes: validate token error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	results, err := admindb.GetAllContainers(dbConn)
 	if err != nil {
-		logit.Error.Println("GetAllNodes: " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 	nodes := make([]ClusterNode, len(results))
@@ -199,7 +199,7 @@ func GetAllNodes(w rest.ResponseWriter, r *rest.Request) {
 func GetAllNodesNotInCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -208,14 +208,14 @@ func GetAllNodesNotInCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("GetAllNodesNotInCluster: validate token error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	results, err := admindb.GetAllContainersNotInCluster(dbConn)
 	if err != nil {
-		logit.Error.Println("GetAllNodesNotInCluster: " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 	nodes := make([]ClusterNode, len(results))
@@ -243,7 +243,7 @@ func GetAllNodesNotInCluster(w rest.ResponseWriter, r *rest.Request) {
 func GetAllNodesForCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -252,21 +252,21 @@ func GetAllNodesForCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("GetAllForCluster: validate token error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	ClusterID := r.PathParam("ClusterID")
 	if ClusterID == "" {
-		logit.Error.Println("GetAllNodesForCluster: node ClusterID required")
+		logit.Error.Println("ClusterID required")
 		rest.Error(w, "node ClusterID required", http.StatusBadRequest)
 		return
 	}
 
 	results, err := admindb.GetAllContainersForCluster(dbConn, ClusterID)
 	if err != nil {
-		logit.Error.Println("GetAllNodesForCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 	nodes := make([]ClusterNode, len(results))
@@ -297,7 +297,7 @@ func GetAllNodesForCluster(w rest.ResponseWriter, r *rest.Request) {
 func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -306,7 +306,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-container")
 	if err != nil {
-		logit.Error.Println("DeleteNode: validate token error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -322,7 +322,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	var dbNode admindb.Container
 	dbNode, err = admindb.GetContainer(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("DeleteNode: " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -331,7 +331,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	server := admindb.Server{}
 	server, err = admindb.GetServer(dbConn, dbNode.ServerID)
 	if err != nil {
-		logit.Error.Println("DeleteNode: " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -339,7 +339,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 
 	err = admindb.DeleteContainer(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("DeleteNode: " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -354,7 +354,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	request.ContainerName = dbNode.Name
 	_, err = cpmserverapi.DockerRemoveClient(url, request)
 	if err != nil {
-		logit.Error.Println("DeleteNode: error when trying to remove container " + err.Error())
+		logit.Error.Println(err.Error())
 	}
 
 	//send the server a deletevolume command
@@ -378,7 +378,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -387,7 +387,7 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("GetAllNodesForServer: validate token error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -401,16 +401,14 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 
 	results, err := admindb.GetAllContainersForServer(dbConn, serverID)
 	if err != nil {
-		logit.Error.Println("GetAllNodesForServer:" + err.Error())
-		logit.Error.Println("error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	server, err2 := admindb.GetServer(dbConn, serverID)
 	if err2 != nil {
-		logit.Error.Println("GetAllNodesForServer:" + err2.Error())
-		logit.Error.Println("error " + err2.Error())
+		logit.Error.Println(err2.Error())
 		rest.Error(w, err2.Error(), http.StatusBadRequest)
 		return
 	}
@@ -439,7 +437,6 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 		response, e = cpmserverapi.DockerInspectClient(url, request)
 		logit.Info.Println("GetAllNodesForServer:" + results[i].Name + " " + response.IPAddress + " " + response.RunningState)
 		if e != nil {
-			logit.Error.Println("GetAllNodesForServer:" + e.Error())
 			logit.Error.Println(e.Error())
 			nodes[i].Status = "notfound"
 		} else {
@@ -457,7 +454,7 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -466,7 +463,7 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("AdminStartNode: validate token error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -480,7 +477,7 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 
 	node, err := admindb.GetContainer(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("AdminStartNode:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -488,7 +485,7 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 	server := admindb.Server{}
 	server, err = admindb.GetServer(dbConn, node.ServerID)
 	if err != nil {
-		logit.Error.Println("AdminStartNode:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -499,7 +496,7 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 	request.ContainerName = node.Name
 	response, err = cpmserverapi.DockerStartClient(url, request)
 	if err != nil {
-		logit.Error.Println("AdminStartNode: error when trying to start container " + err.Error())
+		logit.Error.Println(err.Error())
 	}
 	logit.Info.Println(response.Output)
 
@@ -513,7 +510,7 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -522,7 +519,7 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("AdminStopNode: validate token error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -536,7 +533,7 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 
 	node, err := admindb.GetContainer(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("AdminStopNode:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -544,7 +541,7 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 	server := admindb.Server{}
 	server, err = admindb.GetServer(dbConn, node.ServerID)
 	if err != nil {
-		logit.Error.Println("AdminStopNode:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -554,7 +551,7 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 	var url = "http://" + server.IPAddress + ":10001"
 	_, err = cpmserverapi.DockerStopClient(url, request)
 	if err != nil {
-		logit.Error.Println("AdminStopNode error when trying to stop container " + err.Error())
+		logit.Error.Println(err.Error())
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -638,7 +635,7 @@ func GetPGStatus2(dbConn *sql.DB, nodename string, hostname string) (string, err
 func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -647,7 +644,7 @@ func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("AdminStartServerContainers: validate token error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -655,14 +652,14 @@ func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	//serverID
 	serverid := r.PathParam("ID")
 	if serverid == "" {
-		logit.Error.Println("AdminStartServerContainers: error ID required")
+		logit.Error.Println(" error ID required")
 		rest.Error(w, "ID required", http.StatusBadRequest)
 		return
 	}
 
 	containers, err := admindb.GetAllContainersForServer(dbConn, serverid)
 	if err != nil {
-		logit.Error.Println("AdminStartServerContainers:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -678,7 +675,7 @@ func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 		server := admindb.Server{}
 		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
 		if err != nil {
-			logit.Error.Println("AdminStartServerContainers:" + err.Error())
+			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -706,7 +703,7 @@ func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -715,7 +712,7 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("AdminStopServerContainers: validate token error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -731,7 +728,7 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	//fetch the server
 	containers, err := admindb.GetAllContainersForServer(dbConn, serverid)
 	if err != nil {
-		logit.Error.Println("AdminStopServerContainers:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -742,7 +739,7 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 		server := admindb.Server{}
 		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
 		if err != nil {
-			logit.Error.Println("AdminStopServerContainers:" + err.Error())
+			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -758,7 +755,7 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 			logit.Info.Println("AdminStoppg:" + stopResp.Output)
 		}
 		if err != nil {
-			logit.Error.Println("AdminStopServerContainers:" + err.Error())
+			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}

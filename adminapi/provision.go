@@ -36,7 +36,7 @@ import (
 func Provision(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -45,7 +45,7 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-container")
 	if err != nil {
-		logit.Error.Println("Provision: validate token error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -109,11 +109,11 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-		err = provisionImplInit(dbConn, params, PROFILE, false)
-		if err != nil {
-			rest.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
+	err = provisionImplInit(dbConn, params, PROFILE, false)
+	if err != nil {
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}
@@ -134,14 +134,14 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 		}
 	} else {
 		errorStr = "container name" + params.ContainerName + " already used can't provision"
-		logit.Error.Println("Provision error" + errorStr)
+		logit.Error.Println(errorStr)
 		return errors.New(errorStr)
 	}
 
 	//go get the IPAddress
 	server, err := admindb.GetServer(dbConn, params.ServerID)
 	if err != nil {
-		logit.Error.Println("Provision:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
@@ -163,7 +163,7 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 		var url = "http://" + server.IPAddress + ":10001"
 		_, err = cpmserverapi.DiskProvisionClient(url, preq)
 		if err != nil {
-			logit.Error.Println("Provision: problem in provisionvolume call" + err.Error())
+			logit.Error.Println(err.Error())
 			return err
 		}
 		logit.Info.Println("Provision: provisionvolume call response=" + responseStr)
@@ -174,17 +174,9 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 
 	params.CPU, params.MEM, err = getDockerResourceSettings(dbConn, PROFILE)
 	if err != nil {
-		logit.Error.Println("Provision: problem in getting profiles call" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
-	/*
-		var pgport admindb.Setting
-		pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
-		if err != nil {
-			logit.Error.Println("Provision:PG-PORT setting error " + err.Error())
-			return err
-		}
-	*/
 
 	//remove any existing docker containers with this name
 	logit.Info.Println("PROFILE provisionImpl remove old container start")
@@ -193,7 +185,7 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 	var url = "http://" + server.IPAddress + ":10001"
 	_, err = cpmserverapi.DockerRemoveClient(url, rreq)
 	if err != nil {
-		logit.Error.Println("Provision:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	logit.Info.Println("PROFILE provisionImpl remove old container end")
@@ -201,8 +193,8 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 	var resp cpmserverapi.DockerRunResponse
 	resp, err = cpmserverapi.DockerRunClient(url, params)
 	if err != nil {
-		logit.Error.Println("Provision: error " + err.Error())
-		logit.Error.Println("Provision: " + resp.Output)
+		logit.Error.Println(err.Error())
+		logit.Error.Println(resp.Output)
 		return err
 	}
 	logit.Info.Println("docker-run.sh output=[" + resp.Output + "]")
@@ -210,7 +202,7 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 	logit.Info.Println("PROFILE provisionImpl end of docker-run")
 	if strings.TrimSpace(resp.Output) != "0" {
 		err = errors.New("bad return code from docker-run.sh")
-		logit.Error.Println("Provision: error " + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
@@ -232,7 +224,7 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 	strid, err = admindb.InsertContainer(dbConn, dbnode)
 	newid := strconv.Itoa(strid)
 	if err != nil {
-		logit.Error.Println("Provision:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	dbnode.ID = newid
@@ -315,12 +307,12 @@ func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PR
 
 	domainname, err = admindb.GetSetting(dbConn, "DOMAIN-NAME")
 	if err != nil {
-		logit.Error.Println("Provision:DOMAIN-NAME setting error " + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 	if err != nil {
-		logit.Error.Println("Provision:PG-PORT setting error " + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
@@ -332,7 +324,7 @@ func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PR
 	logit.Info.Println("PROFILE waiting till DNS ready")
 	err = waitTillReady(fqdn)
 	if err != nil {
-		logit.Error.Println("Provision:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	logit.Info.Println("checkpt 1")
@@ -348,7 +340,7 @@ func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PR
 		logit.Info.Println("checkpt 2")
 		resp, err = cpmcontainerapi.InitdbClient(fqdn)
 		if err != nil {
-			logit.Error.Println("Provision:" + err.Error())
+			logit.Error.Println(err.Error())
 			return err
 		}
 		logit.Info.Println("checkpt 3")
@@ -363,20 +355,20 @@ func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PR
 		//place postgresql.conf on new node
 		_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/postgresql.conf", data, fqdn)
 		if err != nil {
-			logit.Error.Println("Provision:" + err.Error())
+			logit.Error.Println(err.Error())
 			return err
 		}
 		//create pg_hba.conf
 		rules := make([]template.Rule, 0)
 		data, err = template.Hba(dbConn, mode, params.ContainerName, pgport.Value, "", domainname.Value, rules)
 		if err != nil {
-			logit.Error.Println("Provision:" + err.Error())
+			logit.Error.Println(err.Error())
 			return err
 		}
 		//place pg_hba.conf on new node
 		_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/pg_hba.conf", data, fqdn)
 		if err != nil {
-			logit.Error.Println("Provision:" + err.Error())
+			logit.Error.Println(err.Error())
 			return err
 		}
 		logit.Info.Println("PROFILE templates all built and copied to node")
@@ -384,7 +376,7 @@ func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PR
 		var startResp cpmcontainerapi.StartPGResponse
 		startResp, err = cpmcontainerapi.StartPGClient(fqdn)
 		if err != nil {
-			logit.Error.Println("Provision:" + err.Error())
+			logit.Error.Println(err.Error())
 			return err
 		}
 		logit.Info.Println("startpg output was" + startResp.Output)
@@ -393,7 +385,7 @@ func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PR
 		var seedResp cpmcontainerapi.SeedResponse
 		seedResp, err = cpmcontainerapi.SeedClient(fqdn)
 		if err != nil {
-			logit.Error.Println("Provision:" + err.Error())
+			logit.Error.Println(err.Error())
 			return err
 		}
 		logit.Info.Println("seed output was" + seedResp.Output)
@@ -409,7 +401,7 @@ func waitTillReady(container string) error {
 	for i := 0; i < 40; i++ {
 		_, err = cpmcontainerapi.RemoteWritefileClient("/tmp/waitTest", "waitTillReady was here", container)
 		if err != nil {
-			logit.Error.Println("waitTillReady:waited for cpmcontainerapi on " + container)
+			logit.Error.Println("waited for cpmcontainerapi on " + container)
 			time.Sleep(2000 * time.Millisecond)
 		} else {
 			logit.Info.Println("waitTillReady:connected to cpmcontainerapi on " + container)

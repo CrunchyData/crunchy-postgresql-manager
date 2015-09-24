@@ -57,7 +57,7 @@ type ContainerAccessRule struct {
 func RulesGet(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -65,7 +65,7 @@ func RulesGet(w rest.ResponseWriter, r *rest.Request) {
 	defer dbConn.Close()
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("RulesGet: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -78,7 +78,7 @@ func RulesGet(w rest.ResponseWriter, r *rest.Request) {
 
 	rule, err := GetAccessRule(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("RulesGet:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -90,7 +90,7 @@ func RulesGet(w rest.ResponseWriter, r *rest.Request) {
 func RulesGetAll(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -99,14 +99,14 @@ func RulesGetAll(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("RulesGetAll: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	rules, err := GetAllRules(dbConn)
 	if err != nil {
-		logit.Error.Println("RulesGetAll:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -118,7 +118,7 @@ func RulesGetAll(w rest.ResponseWriter, r *rest.Request) {
 func RulesDelete(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -127,7 +127,7 @@ func RulesDelete(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("RulesDelete: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -140,7 +140,7 @@ func RulesDelete(w rest.ResponseWriter, r *rest.Request) {
 
 	err = DeleteRule(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("RulesGetAll:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -154,7 +154,7 @@ func RulesDelete(w rest.ResponseWriter, r *rest.Request) {
 func RulesUpdate(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -165,14 +165,14 @@ func RulesUpdate(w rest.ResponseWriter, r *rest.Request) {
 	rule := Rule{}
 	err = r.DecodeJsonPayload(&rule)
 	if err != nil {
-		logit.Error.Println("RulesUpdate: error in decode" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = secimpl.Authorize(dbConn, rule.Token, "perm-container")
 	if err != nil {
-		logit.Error.Println("RulesUpdate: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -191,7 +191,7 @@ func RulesUpdate(w rest.ResponseWriter, r *rest.Request) {
 
 	err = UpdateRule(dbConn, rule)
 	if err != nil {
-		logit.Error.Println("RulesUpdate: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -204,7 +204,7 @@ func RulesUpdate(w rest.ResponseWriter, r *rest.Request) {
 func RulesInsert(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -215,14 +215,14 @@ func RulesInsert(w rest.ResponseWriter, r *rest.Request) {
 	rule := Rule{}
 	err = r.DecodeJsonPayload(&rule)
 	if err != nil {
-		logit.Error.Println("RulesInsert: error in decode" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = secimpl.Authorize(dbConn, rule.Token, "perm-container")
 	if err != nil {
-		logit.Error.Println("RulesInsert: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -235,7 +235,7 @@ func RulesInsert(w rest.ResponseWriter, r *rest.Request) {
 
 	err = InsertRule(dbConn, rule)
 	if err != nil {
-		logit.Error.Println("RulesUpdate: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

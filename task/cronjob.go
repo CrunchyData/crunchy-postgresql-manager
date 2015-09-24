@@ -29,7 +29,7 @@ func (t DefaultJob) Run() {
 	logit.Info.Println("running ScheduleID:" + t.request.ScheduleID)
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 	}
 	defer dbConn.Close()
 

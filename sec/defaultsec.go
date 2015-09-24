@@ -38,10 +38,10 @@ func (d DefaultSec) Login(dbConn *sql.DB, id string, psw string) (string, error)
 	user, err = DBGetUser(dbConn, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			logit.Error.Println("DefaultSec.login: " + err.Error())
+			logit.Error.Println(err.Error())
 			return "", errors.New("user not found")
 		} else {
-			logit.Error.Println("error in DefaultSec.login: " + err.Error())
+			logit.Error.Println(err.Error())
 			return "", err
 		}
 	}
@@ -60,7 +60,7 @@ func (d DefaultSec) Login(dbConn *sql.DB, id string, psw string) (string, error)
 
 	uuid, err = newUUID()
 	if err != nil {
-		logit.Error.Println("error in DefaultSec.login: " + err.Error())
+		logit.Error.Println(err.Error())
 		return "", err
 	}
 
@@ -68,7 +68,7 @@ func (d DefaultSec) Login(dbConn *sql.DB, id string, psw string) (string, error)
 	//register the session
 	err = DBAddSession(dbConn, uuid, id)
 	if err != nil {
-		logit.Error.Println("error in DefaultSec.login add session: " + err.Error())
+		logit.Error.Println(err.Error())
 		return "", err
 	}
 
@@ -80,7 +80,7 @@ func (d DefaultSec) Logout(dbConn *sql.DB, uuid string) error {
 	logit.Info.Println("DefaultSec.Logout")
 	err := DBDeleteSession(dbConn, uuid)
 	if err != nil {
-		logit.Error.Println("error in DefaultSec.logout session: " + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	logit.Info.Println("DefaultSec.Logout ok for " + uuid)
@@ -91,7 +91,7 @@ func (d DefaultSec) UpdateUser(dbConn *sql.DB, user User) error {
 	logit.Info.Println("DefaultSec.UpdateUser")
 	err := DBUpdateUser(dbConn, user)
 	if err != nil {
-		logit.Error.Println("error in UpdateUser: " + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
@@ -109,7 +109,7 @@ func (d DefaultSec) AddUser(dbConn *sql.DB, user User) error {
 
 	err = DBAddUser(dbConn, user)
 	if err != nil {
-		logit.Error.Println("error in AddUser: " + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	return nil
@@ -123,7 +123,7 @@ func (d DefaultSec) GetUser(dbConn *sql.DB, id string) (User, error) {
 			logit.Error.Println("no user found " + id)
 			return user, err
 		} else {
-			logit.Error.Println("error in GetUser: " + err.Error())
+			logit.Error.Println(err.Error())
 			return user, err
 		}
 	}
@@ -136,7 +136,7 @@ func (d DefaultSec) GetAllUsers(dbConn *sql.DB) ([]User, error) {
 	var err error
 	users, err = DBGetAllUsers(dbConn)
 	if err != nil {
-		logit.Error.Println("error in GetAllUsers: " + err.Error())
+		logit.Error.Println(err.Error())
 		return users, err
 	}
 	return users, err
@@ -146,7 +146,7 @@ func (d DefaultSec) DeleteUser(dbConn *sql.DB, id string) error {
 	logit.Info.Println("DefaultSec.DeleteUser id=" + id)
 	err := DBDeleteUser(dbConn, id)
 	if err != nil {
-		logit.Error.Println("error in DeleteUser: " + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	return nil
@@ -156,7 +156,7 @@ func (d DefaultSec) UpdateRole(dbConn *sql.DB, role Role) error {
 	logit.Info.Println("DefaultSec.UpdateRole")
 	err := DBUpdateRole(dbConn, role)
 	if err != nil {
-		logit.Error.Println("error in UpdateRole: " + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	return nil
@@ -166,7 +166,7 @@ func (d DefaultSec) AddRole(dbConn *sql.DB, role Role) error {
 	logit.Info.Println("DefaultSec.AddRole")
 	err := DBAddRole(dbConn, role)
 	if err != nil {
-		logit.Error.Println("error in AddRole: " + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	return nil
@@ -176,7 +176,7 @@ func (d DefaultSec) DeleteRole(dbConn *sql.DB, name string) error {
 	logit.Info.Println("DefaultSec.DeleteRole name=" + name)
 	err := DBDeleteRole(dbConn, name)
 	if err != nil {
-		logit.Error.Println("error in DeleteRole: " + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	return nil
@@ -188,7 +188,7 @@ func (d DefaultSec) GetAllRoles(dbConn *sql.DB) ([]Role, error) {
 	var err error
 	roles, err = DBGetRoles(dbConn)
 	if err != nil {
-		logit.Error.Println("error in GetAllRoles: " + err.Error())
+		logit.Error.Println(err.Error())
 		return roles, err
 	}
 
@@ -253,7 +253,7 @@ func (d DefaultSec) Authorize(dbConn *sql.DB, token string, action string) error
 		if err == sql.ErrNoRows {
 			return errors.New("security error, contact CPM admin")
 		} else {
-			logit.Error.Println("error in DefaultSec.Authorize: " + err.Error())
+			logit.Error.Println(err.Error())
 			return errors.New("error authorizing user session - u")
 		}
 	}
@@ -309,7 +309,7 @@ func (d DefaultSec) CompareUserToToken(dbConn *sql.DB, username string, token st
 		if err == sql.ErrNoRows {
 			return false, errors.New("expired user session, new user login required")
 		} else {
-			logit.Error.Println("error in CompareUserToToken: " + err.Error())
+			logit.Error.Println(err.Error())
 			return false, err
 		}
 	}
@@ -321,14 +321,13 @@ func (d DefaultSec) CompareUserToToken(dbConn *sql.DB, username string, token st
 		if err == sql.ErrNoRows {
 			return false, errors.New("security error, contact CPM admin 2")
 		} else {
-			logit.Error.Println("error in CompareUserToToken: " + err.Error())
+			logit.Error.Println(err.Error())
 			return false, err
 		}
 	}
 
 	logit.Info.Println("comparing [" + username + "] to [" + user.Name + "]")
 	if username == user.Name {
-		logit.Error.Println("compare returning true")
 		return true, nil
 	}
 

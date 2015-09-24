@@ -29,7 +29,7 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 	//get node
 	node, err := admindb.GetContainerByName(dbConn, args.ContainerName)
 	if err != nil {
-		logit.Error.Println("Provision:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
@@ -58,7 +58,7 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 	//get server info
 	server, err := admindb.GetServer(dbConn, params.ServerID)
 	if err != nil {
-		logit.Error.Println("Provision:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
@@ -88,7 +88,7 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 		var proxy admindb.Proxy
 		proxy, err = admindb.GetProxy(dbConn, args.ContainerName)
 		if err != nil {
-			logit.Error.Println("Provision:" + err.Error())
+			logit.Error.Println(err.Error())
 			return err
 		}
 		params.EnvVars["BACKUP_PROXY_HOST"] = proxy.Host
@@ -96,7 +96,7 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 
 	setting, err = admindb.GetSetting(dbConn, "PG-PORT")
 	if err != nil {
-		logit.Error.Println("Provision:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	params.EnvVars["BACKUP_PORT"] = setting.Value
@@ -119,7 +119,7 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 	url = "http://" + server.IPAddress + ":10001"
 	response, err = cpmserverapi.DockerRunClient(url, params)
 	if err != nil {
-		logit.Error.Println("Provision: " + response.Output)
+		logit.Error.Println(response.Output)
 		return err
 	}
 	logit.Info.Println("docker-run-backup.sh output=" + response.Output)

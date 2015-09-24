@@ -227,7 +227,7 @@ func StatusClient(host string) (StatusResponse, error) {
 	logit.Info.Println("status client about to post to " + url)
 	r, err := http.Get(url)
 	if err != nil {
-		logit.Error.Println("status client error:" + err.Error())
+		logit.Error.Println(err.Error())
 		response.Status = "DOWN"
 		return response, nil
 	}

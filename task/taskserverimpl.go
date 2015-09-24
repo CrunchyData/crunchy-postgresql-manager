@@ -105,14 +105,14 @@ func StatusAdd(w rest.ResponseWriter, r *rest.Request) {
 	request := TaskStatus{}
 	err := r.DecodeJsonPayload(&request)
 	if err != nil {
-		logit.Error.Println("StatusAdd: error in decode" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("StatusAdd: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 
@@ -123,7 +123,7 @@ func StatusAdd(w rest.ResponseWriter, r *rest.Request) {
 	var id string
 	id, err = AddStatus(dbConn, &request)
 	if err != nil {
-		logit.Error.Println("AddStatus error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -138,7 +138,7 @@ func StatusUpdate(w rest.ResponseWriter, r *rest.Request) {
 	request := TaskStatus{}
 	err := r.DecodeJsonPayload(&request)
 	if err != nil {
-		logit.Error.Println("StatusUpdate: error in decode" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -146,7 +146,7 @@ func StatusUpdate(w rest.ResponseWriter, r *rest.Request) {
 	var dbConn *sql.DB
 	dbConn, err = util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("StatusUpdate: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 
@@ -157,7 +157,7 @@ func StatusUpdate(w rest.ResponseWriter, r *rest.Request) {
 
 	err = UpdateStatus(dbConn, &request)
 	if err != nil {
-		logit.Error.Println("UpdateStatus error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -172,7 +172,7 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 	request := TaskRequest{}
 	err := r.DecodeJsonPayload(&request)
 	if err != nil {
-		logit.Error.Println("ExecuteNow: error in decode" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -180,7 +180,7 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 	var dbConn *sql.DB
 	dbConn, err = util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("ExecuteNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 
@@ -190,7 +190,7 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 
 	err = ProvisionBackupJob(dbConn, &request)
 	if err != nil {
-		logit.Error.Println("ExecuteNow.impl error:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -208,7 +208,7 @@ func Reload(w rest.ResponseWriter, r *rest.Request) {
 
 	err := LoadSchedules()
 	if err != nil {
-		logit.Error.Println("Reload error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -222,7 +222,7 @@ func LoadSchedules() error {
 
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("LoadSchedules: error " + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 
 	}
@@ -233,7 +233,7 @@ func LoadSchedules() error {
 	var schedules []TaskSchedule
 	schedules, err = GetSchedules(dbConn)
 	if err != nil {
-		logit.Error.Println("LoadSchedules error " + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
