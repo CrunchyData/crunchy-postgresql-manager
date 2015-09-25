@@ -184,11 +184,12 @@ var ContainerMonitorbgwriterController = function($scope, $stateParams, $state, 
 };
 
 
-var ContainerMonitorbadgerController = function($sce, $scope, $stateParams, $state, containersFactory, utils, usSpinnerService) {
+var ContainerMonitorbadgerController = function($sce, $scope, $stateParams, $state, containersFactory, utils, usSpinnerService, spinnerService) {
     $scope.badgerreportlink = $sce.trustAsResourceUrl(
         'http://' + $stateParams.containerName + ':10001/static/badger.html?rand=' + Math.round(Math.random() * 10000000));
     $scope.refresh = function() {
         usSpinnerService.spin('spinner-1');
+	spinnerService.show('badgerSpinner');
         containersFactory.badger($stateParams.containerId)
             .success(function(data) {
                 usSpinnerService.stop('spinner-1');
@@ -209,7 +210,10 @@ var ContainerMonitorbadgerController = function($sce, $scope, $stateParams, $sta
                     msg: error.Error
                 }];
                 console.log('here is an error ' + error.Error);
-            });
+            })
+	    .finally(function () {
+		spinnerService.hide('badgerSpinner');
+	    });
         usSpinnerService.stop('spinner-1');
     };
 

@@ -1,7 +1,8 @@
 angular.module('uiRouterSample.projects', [
     'ui.router',
     'ngCookies',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'angularSpinners'
 ])
 
 .config(
