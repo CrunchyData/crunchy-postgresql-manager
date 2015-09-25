@@ -15,11 +15,7 @@
 
 package adminapi
 
-import (
-	"github.com/ant0ine/go-json-rest/rest"
-	"net/http"
-)
-
+import ()
 
 type MonitorServerParam struct {
 	ServerID string
@@ -47,20 +43,20 @@ type Server struct {
 }
 
 type Proxy struct {
-	ID             string
-	ContainerUserID           string
-	Database           string
-	Host           string
-	Usename           string
-	Passwd           string
-	ContainerID      string
-	ContainerName      string
+	ID              string
+	ContainerUserID string
+	Database        string
+	Host            string
+	Usename         string
+	Passwd          string
+	ContainerID     string
+	ContainerName   string
 	ServerName      string
-	Status      string
-	ContainerStatus      string
-	ProjectID string
-	Port     string
-	UpdateDate     string
+	Status          string
+	ContainerStatus string
+	ProjectID       string
+	Port            string
+	UpdateDate      string
 }
 
 type ClusterProfiles struct {
@@ -139,7 +135,6 @@ type SimpleStatus struct {
 	Status string
 }
 
-
 type PostgresStatement struct {
 	Database   string
 	Query      string
@@ -174,9 +169,3 @@ type NodeUser struct {
 	Rollogin       bool
 	Rolreplication bool
 }
-
-func GetVersion(w rest.ResponseWriter, r *rest.Request) {
-
-	w.(http.ResponseWriter).Write([]byte("0.9.3"))
-}
-

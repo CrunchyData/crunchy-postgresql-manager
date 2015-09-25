@@ -128,7 +128,7 @@ func main() {
 		//&rest.Route{"GET", "/mon/server/:Metric.:ServerID.:Interval.:Token", adminapi.GetServerMetrics},
 		//&rest.Route{"GET", "/mon/container/pg2/:Name.:Interval.:Token", adminapi.GetPG2},
 		&rest.Route{"GET", "/mon/healthcheck/:Token", adminapi.GetHealthCheck},
-		&rest.Route{"GET", "/version", adminapi.GetVersion},
+		&rest.Route{"GET", "/version", GetVersion},
 		&rest.Route{"POST", "/dbuser/add", adminapi.AddContainerUser},
 		&rest.Route{"POST", "/dbuser/update", adminapi.UpdateContainerUser},
 		&rest.Route{"GET", "/dbuser/delete/:ContainerID.:Rolname.:Token", adminapi.DeleteContainerUser},
@@ -155,4 +155,9 @@ func main() {
 	//	http.HandleFunc("/", handler)
 	log.Fatal(http.ListenAndServe(":13001", &handler))
 	log.Fatal(http.ListenAndServeTLS(":13000", "/cpmkeys/cert.pem", "/cpmkeys/key.pem", &handler))
+}
+
+func GetVersion(w rest.ResponseWriter, r *rest.Request) {
+
+	w.(http.ResponseWriter).Write([]byte("0.9.6"))
 }
