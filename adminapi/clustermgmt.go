@@ -229,6 +229,12 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 		logit.Error.Println("configureCluster:" + err.Error())
 		return err
 	}
+	var sleepSetting admindb.Setting
+	sleepSetting, err = admindb.GetSetting(dbConn, "SLEEP-PROV")
+	if err != nil {
+		logit.Error.Println("configureCluster:" + err.Error())
+		return err
+	}
 
 	logit.Info.Println("configureCluster:GetContainerMaster")
 
@@ -300,6 +306,8 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	logit.Info.Println("configureCluster:master startpg output was" + startResp.Output)
 
 	//sleep loop until the master's PG can respond
+	var sleepTime time.Duration
+	sleepTime, err = time.ParseDuration(sleepSetting.Value)
 	var found = false
 	var currentStatus string
 	var masterhost = master.Name
@@ -310,8 +318,8 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 			found = true
 			break
 		} else {
-			logit.Info.Println("sleeping 1 sec waiting on master..")
-			time.Sleep(1000 * time.Millisecond)
+			logit.Info.Println("sleeping waiting on master..")
+			time.Sleep(sleepTime)
 		}
 	}
 	if !found {
@@ -413,7 +421,8 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	}
 
 	logit.Info.Println("configureCluster: sleeping 5 seconds before configuring pgpool...")
-	time.Sleep(5000 * time.Millisecond)
+	clustersleepTime, _ := time.ParseDuration("5s")
+	time.Sleep(clustersleepTime)
 
 	pgpoolNode, err4 := admindb.GetContainerPgpool(dbConn, cluster.ID)
 	logit.Info.Println("configureCluster: lookup pgpool node")
@@ -1070,6 +1079,22 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	var sleepSetting admindb.Setting
+	sleepSetting, err2 = admindb.GetSetting(dbConn, "SLEEP-PROV")
+	if err2 != nil {
+		logit.Error.Println("SLEEP-PROV setting error " + err2.Error())
+		rest.Error(w, err2.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var sleepTime time.Duration
+	sleepTime, err2 = time.ParseDuration(sleepSetting.Value)
+	if err2 != nil {
+		logit.Error.Println(err2.Error())
+		rest.Error(w, err2.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	//create standby containers
 	var count int
 	count, err2 = strconv.Atoi(profile.Count)
@@ -1156,7 +1181,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//make sure every node is ready
-	err2 = waitTillAllReady(dockermaster, dockerpgpool, dockerstandby)
+	err2 = waitTillAllReady(dockermaster, dockerpgpool, dockerstandby, sleepTime)
 	if err2 != nil {
 		logit.Error.Println("cluster members not responding in time")
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -1277,19 +1302,19 @@ func roundRobin(dbConn *sql.DB, profile ClusterProfiles) (admindb.Server, []admi
 	return masterServer, chosen, nil
 }
 
-func waitTillAllReady(dockermaster cpmserverapi.DockerRunRequest, dockerpgpool cpmserverapi.DockerRunRequest, dockerstandby []cpmserverapi.DockerRunRequest) error {
-	err := waitTillReady(dockermaster.ContainerName)
+func waitTillAllReady(dockermaster cpmserverapi.DockerRunRequest, dockerpgpool cpmserverapi.DockerRunRequest, dockerstandby []cpmserverapi.DockerRunRequest, sleepTime time.Duration) error {
+	err := waitTillReady(dockermaster.ContainerName, sleepTime)
 	if err != nil {
 		logit.Error.Println("time out waiting for " + dockermaster.ContainerName)
 		return err
 	}
-	err = waitTillReady(dockerpgpool.ContainerName)
+	err = waitTillReady(dockerpgpool.ContainerName, sleepTime)
 	if err != nil {
 		logit.Error.Println("time out waiting for " + dockerpgpool.ContainerName)
 		return err
 	}
 	for x := 0; x < len(dockerstandby); x++ {
-		err = waitTillReady(dockerstandby[x].ContainerName)
+		err = waitTillReady(dockerstandby[x].ContainerName, sleepTime)
 		if err != nil {
 			logit.Error.Println("time out waiting for " + dockerstandby[x].ContainerName)
 			return err

@@ -22,7 +22,6 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
-	"time"
 )
 
 func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
@@ -71,9 +70,6 @@ func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	//give the UI a chance to see the start
-	time.Sleep(3000 * time.Millisecond)
 
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}
@@ -129,9 +125,6 @@ func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	//give the UI a chance to see the stop
-	time.Sleep(3000 * time.Millisecond)
 
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}

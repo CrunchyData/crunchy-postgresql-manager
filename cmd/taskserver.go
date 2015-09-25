@@ -27,7 +27,8 @@ import (
 func main() {
 
 	logit.Info.Println("sleeping during startup to give DNS a chance")
-	time.Sleep(time.Millisecond * 7000)
+	sleepTime, _ := time.ParseDuration("7s")
+	time.Sleep(sleepTime)
 
 	task.LoadSchedules()
 

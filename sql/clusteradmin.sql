@@ -147,6 +147,7 @@ insert into settings (name, value, updatedt) values ('CP-LG-S-SERVER', 'low', no
 insert into settings (name, value, updatedt) values ('CP-SM-ALGO', 'round-robin', now());
 insert into settings (name, value, updatedt) values ('CP-MED-ALGO', 'round-robin', now());
 insert into settings (name, value, updatedt) values ('CP-LG-ALGO', 'round-robin', now());
+insert into settings (name, value, updatedt) values ('SLEEP-PROV', '2s', now());
 
 create table taskprofile (
 	id serial primary key,

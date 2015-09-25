@@ -79,7 +79,8 @@ func main() {
 	go stats("hi")
 
 	io.WriteString(file, "giving DNS time to register the backup job....sleeping for 7 secs")
-	time.Sleep(7000 * time.Millisecond)
+	sleepTime, _ := time.ParseDuration("7s")
+	time.Sleep(sleepTime)
 
 	//perform the backup
 	backupfunc("end")
@@ -108,10 +109,12 @@ func closeLog() {
 //report stats back to the cpm-admin for this backup job
 func stats(str string) {
 
+	sleepTime, _ := time.ParseDuration("7s")
+
 	for true {
 		io.WriteString(file, "sending stats...\n")
 		io.WriteString(file, "sleeping for 7 secs\n")
-		time.Sleep(7000 * time.Millisecond)
+		time.Sleep(sleepTime)
 		stats := task.TaskStatus{}
 		eDuration := time.Since(startTime)
 		stats.StartTime = startTimeString

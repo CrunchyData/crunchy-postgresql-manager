@@ -32,7 +32,8 @@ func main() {
 	flag.Parse()
 
 	logit.Info.Println("sleeping during startup to give DNS a chance")
-	time.Sleep(time.Millisecond * 7000)
+	sleepTime, _ := time.ParseDuration("7s")
+	time.Sleep(sleepTime)
 
 	//verify cpm db exists in influxdb
 	mon.Bootdb()
@@ -45,7 +46,7 @@ func main() {
 		if err != nil {
 			logit.Error.Println(err.Error())
 			logit.Error.Println("could not get initial database connection, will retry in 5 seconds")
-			time.Sleep(time.Millisecond * 5000)
+			time.Sleep(sleepTime)
 		} else {
 			logit.Info.Println("got db connection")
 			found = true

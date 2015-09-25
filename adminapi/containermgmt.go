@@ -763,7 +763,9 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 			return
 		}
 
-		time.Sleep(2000 * time.Millisecond)
+		sleepTime, _ := time.ParseDuration("2s")
+		time.Sleep(sleepTime)
+
 		//stop container
 		request := &cpmserverapi.DockerStopRequest{}
 		request.ContainerName = containers[i].Name

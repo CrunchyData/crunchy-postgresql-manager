@@ -37,7 +37,8 @@ func init() {
 func main() {
 
 	fmt.Println("dockerapi started...")
-	time.Sleep(time.Millisecond * 5000)
+	sleepTime, _ := time.ParseDuration("3s")
+	time.Sleep(sleepTime)
 	fmt.Println("action: " + ACTION)
 	fmt.Println("containers: " + CONTAINERS)
 	var containers = strings.Split(CONTAINERS, ",")
@@ -62,6 +63,6 @@ func main() {
 		if err != nil {
 			fmt.Println(err.Error())
 		}
-		time.Sleep(time.Millisecond * 2000)
+		time.Sleep(sleepTime)
 	}
 }

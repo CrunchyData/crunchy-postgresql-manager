@@ -109,11 +109,11 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-		err = provisionImplInit(dbConn, params, PROFILE, false)
-		if err != nil {
-			rest.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
+	err = provisionImplInit(dbConn, params, PROFILE, false)
+	if err != nil {
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	status := SimpleStatus{}
@@ -311,6 +311,7 @@ func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PR
 	//go get the domain name from the settings
 	var domainname admindb.Setting
 	var pgport admindb.Setting
+	var sleepSetting admindb.Setting
 	var err error
 
 	domainname, err = admindb.GetSetting(dbConn, "DOMAIN-NAME")
@@ -324,13 +325,21 @@ func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PR
 		return err
 	}
 
+	sleepSetting, err = admindb.GetSetting(dbConn, "SLEEP-PROV")
+	if err != nil {
+		logit.Error.Println("Provision:SLEEP-PROV setting error " + err.Error())
+		return err
+	}
+	var sleepTime time.Duration
+	sleepTime, err = time.ParseDuration(sleepSetting.Value)
+
 	fqdn := params.ContainerName + "." + domainname.Value
 
 	//we are depending on a DNS entry being created shortly after
 	//creating the node in Docker
 	//you might need to wait here until you can reach the new node's agent
 	logit.Info.Println("PROFILE waiting till DNS ready")
-	err = waitTillReady(fqdn)
+	err = waitTillReady(fqdn, sleepTime)
 	if err != nil {
 		logit.Error.Println("Provision:" + err.Error())
 		return err
@@ -403,14 +412,12 @@ func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PR
 	return nil
 }
 
-func waitTillReady(container string) error {
-
-	var err error
+func waitTillReady(container string, sleepTime time.Duration) error {
 	for i := 0; i < 40; i++ {
-		_, err = cpmcontainerapi.RemoteWritefileClient("/tmp/waitTest", "waitTillReady was here", container)
+		_, err := cpmcontainerapi.RemoteWritefileClient("/tmp/waitTest", "waitTillReady was here", container)
 		if err != nil {
 			logit.Error.Println("waitTillReady:waited for cpmcontainerapi on " + container)
-			time.Sleep(2000 * time.Millisecond)
+			time.Sleep(sleepTime)
 		} else {
 			logit.Info.Println("waitTillReady:connected to cpmcontainerapi on " + container)
 			return nil

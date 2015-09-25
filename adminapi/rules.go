@@ -27,7 +27,6 @@ import (
 	_ "github.com/lib/pq"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 type Rule struct {
@@ -725,9 +724,6 @@ func performConfigUpdate(dbConn *sql.DB, ContainerID string) error {
 			return err
 		}
 
-		//give the UI a chance to see the start
-		time.Sleep(5000 * time.Millisecond)
-
 	}
 
 	//make template changes here
@@ -750,9 +746,6 @@ func performConfigUpdate(dbConn *sql.DB, ContainerID string) error {
 		logit.Error.Println("AdminStoppg:" + err.Error())
 		return err
 	}
-
-	//give the UI a chance to see the stop
-	time.Sleep(5000 * time.Millisecond)
 
 	logit.Info.Println("performConfigUpdate....starting postgres")
 	if container.Role == "pgpool" {
