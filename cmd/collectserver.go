@@ -4,6 +4,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/collect"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"github.com/prometheus/client_golang/prometheus"
 	"net/http"
@@ -82,7 +83,7 @@ func main() {
 		if err2 != nil {
 			logit.Error.Println(err2.Error())
 		}
-		var servers []admindb.Server
+		var servers []types.Server
 		servers, err = admindb.GetAllServers(dbConn)
 		if err != nil {
 			logit.Error.Println(err.Error())

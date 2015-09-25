@@ -20,6 +20,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 	"strconv"
@@ -51,8 +52,8 @@ func GetServer(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	server := Server{results.ID, results.Name, results.IPAddress,
-		results.DockerBridgeIP, results.PGDataPath, results.ServerClass, results.CreateDate}
+	server := types.Server{results.ID, results.Name, results.IPAddress,
+		results.DockerBridgeIP, results.PGDataPath, results.ServerClass, results.CreateDate, ""}
 	logit.Info.Println("GetServer: results=" + results.ID)
 
 	w.WriteJson(&server)
@@ -77,7 +78,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	CreateDate := ""
-	server := Server{r.PathParam("ID"), r.PathParam("Name"), r.PathParam("IPAddress"), r.PathParam("DockerBridgeIP"), r.PathParam("PGDataPath"), r.PathParam("ServerClass"), CreateDate}
+	server := types.Server{r.PathParam("ID"), r.PathParam("Name"), r.PathParam("IPAddress"), r.PathParam("DockerBridgeIP"), r.PathParam("PGDataPath"), r.PathParam("ServerClass"), CreateDate, ""}
 
 	server.IPAddress = strings.Replace(server.IPAddress, "_", ".", -1)
 	server.DockerBridgeIP = strings.Replace(server.DockerBridgeIP, "_", ".", -1)
@@ -99,7 +100,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var servers []admindb.Server
+	var servers []types.Server
 	servers, err = admindb.GetAllServers(dbConn)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -118,7 +119,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 		}
 	}
 
-	dbserver := admindb.Server{server.ID, server.Name, server.IPAddress,
+	dbserver := types.Server{server.ID, server.Name, server.IPAddress,
 		server.DockerBridgeIP, server.PGDataPath, server.ServerClass, CreateDate, ""}
 	if dbserver.ID == "0" {
 		strid, err := admindb.InsertServer(dbConn, dbserver)
@@ -229,7 +230,7 @@ func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	servers := make([]Server, len(results))
+	servers := make([]types.Server, len(results))
 	i := 0
 	for i = range results {
 		servers[i].ID = results[i].ID

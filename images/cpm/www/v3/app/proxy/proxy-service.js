@@ -40,17 +40,31 @@ angular.module('uiRouterSample.proxy.service', ['ngCookies'])
             'ProjectID': container.ProjectID,
             'ContainerName': container.Name,
             'Standalone': 'false',
-            'DatabaseHost': proxy.DatabaseHost,
-            'DatabaseUserID': proxy.UserID,
-            'DatabaseUserPassword': proxy.UserPassword,
+            'Host': proxy.DatabaseHost,
+            'Usename': proxy.UserID,
+            'Passwd': proxy.UserPassword,
             'Database': proxy.DatabaseName,
-            'DatabasePort': proxy.DatabasePort,
+            'Port': proxy.DatabasePort,
             'Token': $cookieStore.get('cpm_token')
 
         });
+	};
 
+    proxyFactory.update = function(proxy) {
 
-    };
+	console.log("in update service with proxy....");
+	console.log(JSON.stringify(proxy));
+        var url = $cookieStore.get('AdminURL') + '/proxy/update';
+        console.log(url);
+
+ 	return $http.post(url, { 
+		'ID' : proxy.ID,
+		'Port' : proxy.Port,
+		'Host' : proxy.Host,
+		'Database' : proxy.Database,
+            	'Token': $cookieStore.get('cpm_token')
+	});
+ 	};
 
  	return proxyFactory;
 

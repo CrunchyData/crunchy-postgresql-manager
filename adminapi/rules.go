@@ -23,6 +23,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/template"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	_ "github.com/lib/pq"
 	"net/http"
@@ -144,7 +145,7 @@ func RulesDelete(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&status)
@@ -195,7 +196,7 @@ func RulesUpdate(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&status)
@@ -239,7 +240,7 @@ func RulesInsert(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&status)
@@ -443,69 +444,10 @@ func ContainerAccessRuleGetAll(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&cars)
 }
 
-/*
-func ContainerAccessRuleDelete(w rest.ResponseWriter, r *rest.Request) {
-	var err error
-	err = secimpl.Authorize(r.PathParam("Token"), "perm-read")
-	if err != nil {
-		logit.Error.Println("ContainerRuleDelete: authorize error " + err.Error())
-		rest.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	containerRuleID := r.PathParam("ID")
-	if containerRuleID == "" {
-		rest.Error(w, "ID required", http.StatusBadRequest)
-		return
-	}
-
-	err = DeleteContainerAccessRule(containerRuleID)
-	if err != nil {
-		logit.Error.Println("ContainerRuleDelete:" + err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	status := SimpleStatus{}
-	status.Status = "OK"
-	w.WriteHeader(http.StatusOK)
-	w.WriteJson(&status)
-}
-
-func ContainerAccessRuleInsert(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("ContainerAccessRuleInsert")
-	car := ContainerAccessRule{}
-	err := r.DecodeJsonPayload(&car)
-	if err != nil {
-		logit.Error.Println("ContainerAccessRuleInsert: error in decode" + err.Error())
-		rest.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	err = secimpl.Authorize(car.Token, "perm-container")
-	if err != nil {
-		logit.Error.Println("ContainerAccessRuleInsert: authorize error " + err.Error())
-		rest.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	err = InsertContainerAccessRule(car)
-	if err != nil {
-		logit.Error.Println("ContainerAccessRuleUpdate: error " + err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	status := SimpleStatus{}
-	status.Status = "OK"
-	w.WriteHeader(http.StatusOK)
-	w.WriteJson(&status)
-}
-*/
 func ContainerAccessRuleUpdate(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -578,7 +520,7 @@ func ContainerAccessRuleUpdate(w rest.ResponseWriter, r *rest.Request) {
 		}
 	}
 
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&status)

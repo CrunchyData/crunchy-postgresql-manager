@@ -25,6 +25,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/template"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 	"strconv"
@@ -70,7 +71,7 @@ func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var containers []admindb.Container
+	var containers []types.Container
 	containers, err = admindb.GetAllContainersForCluster(dbConn, ID)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -116,7 +117,7 @@ func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//need to update the new container's ClusterID
-	var node admindb.Container
+	var node types.Container
 	node, err = admindb.GetContainerByName(dbConn, params.ContainerName)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -141,7 +142,7 @@ func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -168,8 +169,14 @@ func GetCluster(w rest.ResponseWriter, r *rest.Request) {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	cluster := Cluster{results.ID, results.ProjectID, results.Name, results.ClusterType,
-		results.Status, results.CreateDate, "", results.Containers}
+	cluster := types.Cluster{}
+	cluster.ID = results.ID
+	cluster.ProjectID = results.ProjectID
+	cluster.Name = results.Name
+	cluster.ClusterType = results.ClusterType
+	cluster.Status = results.Status
+	cluster.CreateDate = results.CreateDate
+	cluster.Containers = results.Containers
 	logit.Info.Println("GetCluser:db call results=" + results.ID)
 
 	w.WriteJson(&cluster)
@@ -208,12 +215,12 @@ func ConfigureCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
 
-func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool) error {
+func configureCluster(dbConn *sql.DB, cluster types.Cluster, autocluster bool) error {
 	logit.Info.Println("configureCluster:GetCluster")
 
 	//get master node for this cluster
@@ -223,13 +230,13 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 		return err
 	}
 
-	var pgport admindb.Setting
+	var pgport types.Setting
 	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return err
 	}
-	var sleepSetting admindb.Setting
+	var sleepSetting types.Setting
 	sleepSetting, err = admindb.GetSetting(dbConn, "SLEEP-PROV")
 	if err != nil {
 		logit.Error.Println("configureCluster:" + err.Error())
@@ -262,7 +269,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	logit.Info.Println("configureCluster:master postgresql.conf copied to remote")
 
 	//get domain name
-	var domainname admindb.Setting
+	var domainname types.Setting
 	domainname, err = admindb.GetSetting(dbConn, "DOMAIN-NAME")
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -543,7 +550,7 @@ func GetAllClustersForProject(w rest.ResponseWriter, r *rest.Request) {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	clusters := make([]Cluster, len(results))
+	clusters := make([]types.Cluster, len(results))
 	i := 0
 	for i = range results {
 		clusters[i].ID = results[i].ID
@@ -580,7 +587,7 @@ func GetAllClusters(w rest.ResponseWriter, r *rest.Request) {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	clusters := make([]Cluster, len(results))
+	clusters := make([]types.Cluster, len(results))
 	i := 0
 	for i = range results {
 		clusters[i].ID = results[i].ID
@@ -607,7 +614,7 @@ func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer dbConn.Close()
 	logit.Info.Println("PostCluster: in PostCluster")
-	cluster := Cluster{}
+	cluster := types.Cluster{}
 	err = r.DecodeJsonPayload(&cluster)
 	if err != nil {
 		logit.Error.Println("error in decode" + err.Error())
@@ -629,7 +636,13 @@ func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	logit.Info.Println("PostCluster: have ID=" + cluster.ID + " Name=" + cluster.Name + " type=" + cluster.ClusterType + " status=" + cluster.Status)
-	dbcluster := admindb.Cluster{cluster.ID, cluster.ProjectID, cluster.Name, cluster.ClusterType, cluster.Status, "", cluster.Containers}
+	dbcluster := types.Cluster{}
+	dbcluster.ID = cluster.ID
+	dbcluster.ProjectID = cluster.ProjectID
+	dbcluster.Name = cluster.Name
+	dbcluster.ClusterType = cluster.ClusterType
+	dbcluster.Status = cluster.Status
+	dbcluster.Containers = cluster.Containers
 	if cluster.ID == "" {
 		strid, err := admindb.InsertCluster(dbConn, dbcluster)
 		newid := strconv.Itoa(strid)
@@ -692,7 +705,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 	i := 0
 
 	i = 0
-	server := admindb.Server{}
+	server := types.Server{}
 	for i = range containers {
 
 		//go get the docker server IPAddress
@@ -744,7 +757,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		}
 	}
 
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&status)
@@ -774,7 +787,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 
 	//dbNode is the standby node we are going to fail over and
 	//make the new master in the cluster
-	var dbNode admindb.Container
+	var dbNode types.Container
 	dbNode, err = admindb.GetContainer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -799,7 +812,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("AdminFailover: fail-over output " + failoverResp.Output)
 
 	//update the old master to standalone role
-	oldMaster := admindb.Container{}
+	oldMaster := types.Container{}
 	oldMaster, err = admindb.GetContainerMaster(dbConn, dbNode.ClusterID)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -842,7 +855,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 
@@ -895,7 +908,7 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 	i := 0
 	pgpoolCount := 0
 
-	origDBNode := admindb.Container{}
+	origDBNode := types.Container{}
 	for i = range idList {
 		if idList[i] != "" {
 			logit.Info.Println("EventJoinCluster: idList[" + strconv.Itoa(i) + "]=" + idList[i])
@@ -954,7 +967,7 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -1009,7 +1022,14 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("AutoCluster: Name=" + params.Name + " ClusterType=" + params.ClusterType + " Profile=" + params.ClusterProfile + " ProjectID=" + params.ProjectID)
 
 	//create cluster definition
-	dbcluster := admindb.Cluster{"", params.ProjectID, params.Name, params.ClusterType, "uninitialized", "", make(map[string]string)}
+	dbcluster := types.Cluster{}
+	dbcluster.ID = ""
+	dbcluster.ProjectID = params.ProjectID
+	dbcluster.Name = params.Name
+	dbcluster.ClusterType = params.ClusterType
+	dbcluster.Status = "uninitialized"
+	dbcluster.Containers = make(map[string]string)
+
 	var ival int
 	ival, err = admindb.InsertCluster(dbConn, dbcluster)
 	clusterID := strconv.Itoa(ival)
@@ -1029,8 +1049,8 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var masterServer admindb.Server
-	var chosenServers []admindb.Server
+	var masterServer types.Server
+	var chosenServers []types.Server
 	if profile.Algo == "round-robin" {
 		masterServer, chosenServers, err2 = roundRobin(dbConn, profile)
 	} else {
@@ -1061,7 +1081,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	logit.Info.Println("AUTO CLUSTER PROFILE master container created")
-	var node admindb.Container
+	var node types.Container
 	//update node with cluster iD
 	node, err2 = admindb.GetContainerByName(dbConn, dockermaster.ContainerName)
 	if err2 != nil {
@@ -1079,7 +1099,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var sleepSetting admindb.Setting
+	var sleepSetting types.Setting
 	sleepSetting, err2 = admindb.GetSetting(dbConn, "SLEEP-PROV")
 	if err2 != nil {
 		logit.Error.Println("SLEEP-PROV setting error " + err2.Error())
@@ -1200,7 +1220,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	logit.Info.Println("AUTO CLUSTER PROFILE done")
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -1209,8 +1229,8 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 //  to promote least used servers, incoming servers list
 //  should be sorted by class and least used order
 //  returns the master server and the list of standby servers
-func roundRobin(dbConn *sql.DB, profile ClusterProfiles) (admindb.Server, []admindb.Server, error) {
-	var masterServer admindb.Server
+func roundRobin(dbConn *sql.DB, profile types.ClusterProfiles) (types.Server, []types.Server, error) {
+	var masterServer types.Server
 	count, err := strconv.Atoi(profile.Count)
 
 	//add 1 to the standby count to make room for the pgpool node
@@ -1218,7 +1238,7 @@ func roundRobin(dbConn *sql.DB, profile ClusterProfiles) (admindb.Server, []admi
 
 	//create a slice to hold servers for standby and pgpool nodes
 	//assumes 1 pgpool node per cluster which is enforced by auto-cluster
-	chosen := make([]admindb.Server, count)
+	chosen := make([]types.Server, count)
 
 	//get all the servers available
 	servers, err := admindb.GetAllServersByClassByCount(dbConn)
@@ -1365,7 +1385,7 @@ func StartCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	i = 0
 	var response cpmserverapi.DockerStartResponse
-	server := admindb.Server{}
+	server := types.Server{}
 	for i = range containers {
 
 		//go get the docker server IPAddress
@@ -1391,7 +1411,7 @@ func StartCluster(w rest.ResponseWriter, r *rest.Request) {
 		i++
 	}
 
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&status)
@@ -1438,7 +1458,7 @@ func StopCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	i = 0
 	var response cpmserverapi.DockerStopResponse
-	server := admindb.Server{}
+	server := types.Server{}
 	for i = range containers {
 
 		//go get the docker server IPAddress
@@ -1464,7 +1484,7 @@ func StopCluster(w rest.ResponseWriter, r *rest.Request) {
 		i++
 	}
 
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&status)

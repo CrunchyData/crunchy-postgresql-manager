@@ -19,6 +19,7 @@ import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/sec"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 )
@@ -94,7 +95,7 @@ func Logout(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -135,7 +136,7 @@ func UpdateUser(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -174,7 +175,7 @@ func AddUser(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -203,7 +204,7 @@ func GetUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&status)
@@ -272,7 +273,7 @@ func DeleteUser(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -311,7 +312,7 @@ func UpdateRole(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -350,7 +351,7 @@ func AddRole(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -386,7 +387,7 @@ func DeleteRole(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -507,7 +508,7 @@ func ChangePassword(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }

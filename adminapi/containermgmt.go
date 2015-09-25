@@ -23,6 +23,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 	"time"
@@ -69,7 +70,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	var currentStatus = "UNKNOWN"
 
 	//go get the docker server IPAddress
-	server := admindb.Server{}
+	server := types.Server{}
 	server, err = admindb.GetServer(dbConn, node.ServerID)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -96,7 +97,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 		logit.Info.Println("pinging db finished")
 	}
 
-	clusternode := ClusterNode{node.ID, node.ClusterID, node.ServerID,
+	clusternode := types.ClusterNode{node.ID, node.ClusterID, node.ServerID,
 		node.Name, node.Role, node.Image, node.CreateDate, currentStatus, node.ProjectID, node.ProjectName, node.ServerName, node.ClusterName}
 
 	w.WriteJson(clusternode)
@@ -131,7 +132,7 @@ func GetAllNodesForProject(w rest.ResponseWriter, r *rest.Request) {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	nodes := make([]ClusterNode, len(results))
+	nodes := make([]types.ClusterNode, len(results))
 	i := 0
 	for i = range results {
 		nodes[i].ID = results[i].ID
@@ -174,7 +175,7 @@ func GetAllNodes(w rest.ResponseWriter, r *rest.Request) {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	nodes := make([]ClusterNode, len(results))
+	nodes := make([]types.ClusterNode, len(results))
 	i := 0
 	for i = range results {
 		nodes[i].ID = results[i].ID
@@ -218,7 +219,7 @@ func GetAllNodesNotInCluster(w rest.ResponseWriter, r *rest.Request) {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	nodes := make([]ClusterNode, len(results))
+	nodes := make([]types.ClusterNode, len(results))
 	i := 0
 	for i = range results {
 		nodes[i].ID = results[i].ID
@@ -269,7 +270,7 @@ func GetAllNodesForCluster(w rest.ResponseWriter, r *rest.Request) {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	nodes := make([]ClusterNode, len(results))
+	nodes := make([]types.ClusterNode, len(results))
 	i := 0
 	for i = range results {
 		nodes[i].ID = results[i].ID
@@ -319,7 +320,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//go get the node we intend to delete
-	var dbNode admindb.Container
+	var dbNode types.Container
 	dbNode, err = admindb.GetContainer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -328,7 +329,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//go get the docker server IPAddress
-	server := admindb.Server{}
+	server := types.Server{}
 	server, err = admindb.GetServer(dbConn, dbNode.ServerID)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -370,7 +371,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	//the containers via the docker api
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -416,7 +417,7 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 	var response cpmserverapi.DockerInspectResponse
 	var e error
 	var url string
-	nodes := make([]ClusterNode, len(results))
+	nodes := make([]types.ClusterNode, len(results))
 	i := 0
 	for i = range results {
 		nodes[i].ID = results[i].ID
@@ -482,7 +483,7 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	server := admindb.Server{}
+	server := types.Server{}
 	server, err = admindb.GetServer(dbConn, node.ServerID)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -501,7 +502,7 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println(response.Output)
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 
@@ -538,7 +539,7 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	server := admindb.Server{}
+	server := types.Server{}
 	server, err = admindb.GetServer(dbConn, node.ServerID)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -555,18 +556,18 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 
 }
 
-func PingPG(dbConn *sql.DB, node *admindb.Container) (string, error) {
+func PingPG(dbConn *sql.DB, node *types.Container) (string, error) {
 
 	var status = "OFFLINE"
 	var err error
 
-	var credential admindb.Credential
+	var credential types.Credential
 	credential, err = admindb.GetUserCredentials(dbConn, node)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -605,7 +606,7 @@ func GetPGStatus2(dbConn *sql.DB, nodename string, hostname string) (string, err
 
 	logit.Info.Println("cpmtest password is " + nodeuser.Passwd)
 
-	var pgport admindb.Setting
+	var pgport types.Setting
 	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 
 	dbConn2, err := util.GetMonitoringConnection(hostname, "cpmtest", pgport.Value, "cpmtest", nodeuser.Passwd)
@@ -672,7 +673,7 @@ func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 
 	for i := range containers {
 		//fetch the server
-		server := admindb.Server{}
+		server := types.Server{}
 		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
 		if err != nil {
 			logit.Error.Println(err.Error())
@@ -695,7 +696,7 @@ func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 
@@ -736,7 +737,7 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	var url string
 	//for each, get server, stop container
 	for i := range containers {
-		server := admindb.Server{}
+		server := types.Server{}
 		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
 		if err != nil {
 			logit.Error.Println(err.Error())
@@ -774,7 +775,7 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 

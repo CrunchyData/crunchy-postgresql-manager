@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	_ "github.com/lib/pq"
 )
@@ -22,9 +23,8 @@ func Collecthc() error {
 	}
 	defer dbConn.Close()
 
-
 	//get all containers
-	var containers []admindb.Container
+	var containers []types.Container
 	containers, err = admindb.GetAllContainers(dbConn)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -32,14 +32,14 @@ func Collecthc() error {
 
 	//for each container, do a health check
 	i := 0
-	var credential admindb.Credential
-	var checks []admindb.HealthCheck
-	checks = make([]admindb.HealthCheck, 0)
+	var credential types.Credential
+	var checks []types.HealthCheck
+	checks = make([]types.HealthCheck, 0)
 
 	var status string
 
 	for i = range containers {
-		hc := admindb.HealthCheck{}
+		hc := types.HealthCheck{}
 		hc.ProjectID = containers[i].ProjectID
 		hc.ProjectName = containers[i].ProjectName
 		hc.ContainerName = containers[i].Name
@@ -48,10 +48,9 @@ func Collecthc() error {
 		hc.ContainerImage = containers[i].Image
 
 		credential, err = admindb.GetUserCredentials(dbConn, &containers[i])
-                if err != nil {
-                        logit.Error.Println(err.Error())
-                } else {
-
+		if err != nil {
+			logit.Error.Println(err.Error())
+		} else {
 
 			status, err = ping(&credential)
 			hc.Status = status
@@ -81,12 +80,12 @@ func Collecthc() error {
 	return nil
 }
 
-func ping(credential *admindb.Credential) (string, error) {
+func ping(credential *types.Credential) (string, error) {
 	var db *sql.DB
 	var err error
 
 	db, err = util.GetMonitoringConnection(credential.Host,
-		credential.Username, credential.Port, credential.Database, 
+		credential.Username, credential.Port, credential.Database,
 		credential.Password)
 	defer db.Close()
 	if err != nil {

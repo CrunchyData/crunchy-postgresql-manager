@@ -21,6 +21,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"time"
 )
 
@@ -33,7 +34,7 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 		return err
 	}
 
-	var credential admindb.Credential
+	var credential types.Credential
 	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -65,7 +66,7 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 	params.PGDataPath = server.PGDataPath + "/" + backupcontainername + "/" + getFormattedDate()
 
 	//get the docker profile settings
-	var setting admindb.Setting
+	var setting types.Setting
 	setting, err = admindb.GetSetting(dbConn, "S-DOCKER-PROFILE-CPU")
 	params.CPU = setting.Value
 	setting, err = admindb.GetSetting(dbConn, "S-DOCKER-PROFILE-MEM")
@@ -85,7 +86,7 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 	params.EnvVars["BACKUP_HOST"] = args.ContainerName
 
 	if node.Image == "cpm-node-proxy" {
-		var proxy admindb.Proxy
+		var proxy types.Proxy
 		proxy, err = admindb.GetProxy(dbConn, args.ContainerName)
 		if err != nil {
 			logit.Error.Println(err.Error())

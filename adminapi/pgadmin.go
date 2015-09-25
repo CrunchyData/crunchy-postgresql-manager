@@ -20,6 +20,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 )
@@ -72,7 +73,7 @@ func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -102,7 +103,7 @@ func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var dbNode admindb.Container
+	var dbNode types.Container
 	dbNode, err = admindb.GetContainer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -127,7 +128,7 @@ func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }

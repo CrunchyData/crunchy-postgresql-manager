@@ -21,117 +21,16 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/sec"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	_ "github.com/lib/pq"
 	"strconv"
 	"strings"
 )
 
-type Credential struct {
-	Host     string
-	Database string
-	Username string
-	Password string
-	Port     string
-}
-
-type Setting struct {
-	Name       string
-	Value      string
-	UpdateDate string
-}
-type Server struct {
-	ID             string
-	Name           string
-	IPAddress      string
-	DockerBridgeIP string
-	PGDataPath     string
-	ServerClass    string
-	CreateDate     string
-	NodeCount      string
-}
-
-type Project struct {
-	ID         string
-	Name       string
-	Desc       string
-	Containers map[string]string
-	Clusters   map[string]string
-	Proxies    map[string]string
-	UpdateDate string
-}
-
-type Container struct {
-	ID          string
-	ClusterID   string
-	ServerID    string
-	ServerName  string
-	Name        string
-	Role        string
-	Image       string
-	CreateDate  string
-	ProjectID   string
-	ProjectName string
-	ClusterName string
-}
-
-type Cluster struct {
-	ID          string
-	ProjectID   string
-	Name        string
-	ClusterType string
-	Status      string
-	CreateDate  string
-	Containers  map[string]string
-}
-
-type ContainerUser struct {
-	ID             string
-	Containername  string
-	ContainerID    string
-	Passwd         string
-	Rolname        string
-	Rolsuper       string
-	Rolinherit     string
-	Rolcreaterole  string
-	Rolcreatedb    string
-	Rolcanlogin    string
-	Rolreplication string
-	UpdateDate     string
-}
-
-type Proxy struct {
-	ID              string
-	ContainerUserID string
-	Database        string
-	Host            string
-	Usename         string
-	Passwd          string
-	ContainerID     string
-	ContainerName   string
-	ServerName      string
-	Status          string
-	ContainerStatus string
-	ProjectID       string
-	Port            string
-	UpdateDate      string
-}
-
-type LinuxStats struct {
-	ID        string
-	ClusterID string
-	Stats     string
-}
-
-type PGStats struct {
-	ID        string
-	ClusterID string
-	Stats     string
-}
-
-func GetServer(dbConn *sql.DB, id string) (Server, error) {
+func GetServer(dbConn *sql.DB, id string) (types.Server, error) {
 	//logit.Info.Println("GetServer called with id=" + id)
-	server := Server{}
+	server := types.Server{}
 
 	err := dbConn.QueryRow(fmt.Sprintf("select id, name, ipaddress, dockerbip, pgdatapath, serverclass, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from server where id=%s", id)).Scan(&server.ID, &server.Name, &server.IPAddress, &server.DockerBridgeIP, &server.PGDataPath, &server.ServerClass, &server.CreateDate)
 	switch {
@@ -166,9 +65,9 @@ func GetClusterName(dbConn *sql.DB, id string) (string, error) {
 	return clustername, err
 }
 
-func GetCluster(dbConn *sql.DB, id string) (Cluster, error) {
+func GetCluster(dbConn *sql.DB, id string) (types.Cluster, error) {
 	//logit.Info.Println("admindb:GetCluster: called")
-	cluster := Cluster{}
+	cluster := types.Cluster{}
 
 	err := dbConn.QueryRow(fmt.Sprintf("select projectid, id, name, clustertype, status, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from cluster where id=%s", id)).Scan(&cluster.ProjectID, &cluster.ID, &cluster.Name, &cluster.ClusterType, &cluster.Status, &cluster.CreateDate)
 	switch {
@@ -182,7 +81,7 @@ func GetCluster(dbConn *sql.DB, id string) (Cluster, error) {
 		logit.Info.Println("admindb:GetCluster: cluster name returned is " + cluster.Name)
 	}
 
-	var containers []Container
+	var containers []types.Container
 	cluster.Containers = make(map[string]string)
 
 	containers, err = GetAllContainersForCluster(dbConn, cluster.ID)
@@ -198,7 +97,7 @@ func GetCluster(dbConn *sql.DB, id string) (Cluster, error) {
 	return cluster, nil
 }
 
-func GetAllClustersForProject(dbConn *sql.DB, projectId string) ([]Cluster, error) {
+func GetAllClustersForProject(dbConn *sql.DB, projectId string) ([]types.Cluster, error) {
 	//logit.Info.Println("admindb:GetAllClusters: called")
 	var rows *sql.Rows
 	var err error
@@ -207,10 +106,10 @@ func GetAllClustersForProject(dbConn *sql.DB, projectId string) ([]Cluster, erro
 		return nil, err
 	}
 	defer rows.Close()
-	var containers []Container
-	clusters := make([]Cluster, 0)
+	var containers []types.Container
+	clusters := make([]types.Cluster, 0)
 	for rows.Next() {
-		cluster := Cluster{}
+		cluster := types.Cluster{}
 		if err = rows.Scan(
 			&cluster.ID,
 			&cluster.ProjectID,
@@ -238,7 +137,7 @@ func GetAllClustersForProject(dbConn *sql.DB, projectId string) ([]Cluster, erro
 	}
 	return clusters, nil
 }
-func GetAllClusters(dbConn *sql.DB) ([]Cluster, error) {
+func GetAllClusters(dbConn *sql.DB) ([]types.Cluster, error) {
 	//logit.Info.Println("admindb:GetAllClusters: called")
 	var rows *sql.Rows
 	var err error
@@ -247,10 +146,10 @@ func GetAllClusters(dbConn *sql.DB) ([]Cluster, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var containers []Container
-	clusters := make([]Cluster, 0)
+	var containers []types.Container
+	clusters := make([]types.Cluster, 0)
 	for rows.Next() {
-		cluster := Cluster{}
+		cluster := types.Cluster{}
 		if err = rows.Scan(
 			&cluster.ID,
 			&cluster.ProjectID,
@@ -279,7 +178,7 @@ func GetAllClusters(dbConn *sql.DB) ([]Cluster, error) {
 	return clusters, nil
 }
 
-func UpdateCluster(dbConn *sql.DB, cluster Cluster) error {
+func UpdateCluster(dbConn *sql.DB, cluster types.Cluster) error {
 	//logit.Info.Println("admindb:UpdateCluster:called")
 	queryStr := fmt.Sprintf("update cluster set ( name, clustertype, status) = ('%s', '%s', '%s') where id = %s returning id", cluster.Name, cluster.ClusterType, cluster.Status, cluster.ID)
 
@@ -295,7 +194,7 @@ func UpdateCluster(dbConn *sql.DB, cluster Cluster) error {
 	return nil
 
 }
-func InsertCluster(dbConn *sql.DB, cluster Cluster) (int, error) {
+func InsertCluster(dbConn *sql.DB, cluster types.Cluster) (int, error) {
 	//logit.Info.Println("admindb:InsertCluster:called")
 	queryStr := fmt.Sprintf("insert into cluster ( name, projectid, clustertype, status, createdt) values ( '%s', %s, '%s', '%s', now()) returning id", cluster.Name, cluster.ProjectID, cluster.ClusterType, cluster.Status)
 
@@ -328,9 +227,9 @@ func DeleteCluster(dbConn *sql.DB, id string) error {
 	return nil
 }
 
-func GetContainer(dbConn *sql.DB, id string) (Container, error) {
+func GetContainer(dbConn *sql.DB, id string) (types.Container, error) {
 	//logit.Info.Println("admindb:GetContainer:called")
-	container := Container{}
+	container := types.Container{}
 
 	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from container c, project p, server s where c.id=%s and p.id = c.projectid and c.serverid = s.id", id)
 	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName)
@@ -354,9 +253,9 @@ func GetContainer(dbConn *sql.DB, id string) (Container, error) {
 	return container, nil
 }
 
-func GetContainerByName(dbConn *sql.DB, name string) (Container, error) {
+func GetContainerByName(dbConn *sql.DB, name string) (types.Container, error) {
 	//logit.Info.Println("admindb:GetNodeByName:called")
-	container := Container{}
+	container := types.Container{}
 
 	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s, container c where c.name='%s' and c.projectid = p.id and c.serverid = s.id", name)
 	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName)
@@ -381,9 +280,9 @@ func GetContainerByName(dbConn *sql.DB, name string) (Container, error) {
 }
 
 //find the oldest container in a cluster, used for serf join-cluster event
-func GetContainerOldestInCluster(dbConn *sql.DB, clusterid string) (Container, error) {
+func GetContainerOldestInCluster(dbConn *sql.DB, clusterid string) (types.Container, error) {
 	//logit.Info.Println("admindb:GetNodeOldestInCluster:called")
-	container := Container{}
+	container := types.Container{}
 
 	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s, container c where  c.projectid = p.id and c.serverid = s.id and c.createdt = (select max(createdt) from container where clusterid = %s)", clusterid)
 	logit.Info.Println("admindb:GetNodeOldestInCluster:" + queryStr)
@@ -410,9 +309,9 @@ func GetContainerOldestInCluster(dbConn *sql.DB, clusterid string) (Container, e
 }
 
 //find the master container in a cluster, used for serf fail-over event
-func GetContainerMaster(dbConn *sql.DB, clusterid string) (Container, error) {
+func GetContainerMaster(dbConn *sql.DB, clusterid string) (types.Container, error) {
 	//logit.Info.Println("admindb:GetContainerMaster:called")
-	container := Container{}
+	container := types.Container{}
 
 	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s, container c   where c.role = 'master' and c.clusterid = %s and c.projectid = p.id and c.serverid = s.id", clusterid)
 	logit.Info.Println("admindb:GetContainerMaster:" + queryStr)
@@ -440,9 +339,9 @@ func GetContainerMaster(dbConn *sql.DB, clusterid string) (Container, error) {
 }
 
 //find the pgpool container in a cluster
-func GetContainerPgpool(dbConn *sql.DB, clusterid string) (Container, error) {
+func GetContainerPgpool(dbConn *sql.DB, clusterid string) (types.Container, error) {
 	//logit.Info.Println("admindb:GetContainerMaster:called")
-	container := Container{}
+	container := types.Container{}
 
 	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s, container c  where c.serverid = s.id and c.role = 'pgpool' and c.clusterid = %s and c.projectid = p.id", clusterid)
 	logit.Info.Println("admindb:GetContainerPgpool:" + queryStr)
@@ -470,7 +369,7 @@ func GetContainerPgpool(dbConn *sql.DB, clusterid string) (Container, error) {
 //
 // TODO combine with GetMaster into a GetContainersByRole func
 //
-func GetAllStandbyContainers(dbConn *sql.DB, clusterid string) ([]Container, error) {
+func GetAllStandbyContainers(dbConn *sql.DB, clusterid string) ([]types.Container, error) {
 	var rows *sql.Rows
 	var err error
 	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s, container c  where c.role = 'standby' and c.clusterid = %s and c.projectid = p.id and c.serverid = s.id", clusterid)
@@ -481,9 +380,9 @@ func GetAllStandbyContainers(dbConn *sql.DB, clusterid string) ([]Container, err
 	}
 	defer rows.Close()
 	var clustername string
-	containers := make([]Container, 0)
+	containers := make([]types.Container, 0)
 	for rows.Next() {
-		container := Container{}
+		container := types.Container{}
 		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName); err != nil {
 			return nil, err
 		}
@@ -503,7 +402,7 @@ func GetAllStandbyContainers(dbConn *sql.DB, clusterid string) ([]Container, err
 	return containers, nil
 }
 
-func GetAllContainersForServer(dbConn *sql.DB, serverID string) ([]Container, error) {
+func GetAllContainersForServer(dbConn *sql.DB, serverID string) ([]types.Container, error) {
 	var rows *sql.Rows
 	var err error
 	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s, container c where c.serverid = %s  and c.projectid = p.id  and c.serverid = s.id order by c.name", serverID)
@@ -514,9 +413,9 @@ func GetAllContainersForServer(dbConn *sql.DB, serverID string) ([]Container, er
 	}
 	defer rows.Close()
 	var clustername string
-	containers := make([]Container, 0)
+	containers := make([]types.Container, 0)
 	for rows.Next() {
-		container := Container{}
+		container := types.Container{}
 		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName); err != nil {
 			return nil, err
 		}
@@ -536,7 +435,7 @@ func GetAllContainersForServer(dbConn *sql.DB, serverID string) ([]Container, er
 	return containers, nil
 }
 
-func GetAllContainersForCluster(dbConn *sql.DB, clusterID string) ([]Container, error) {
+func GetAllContainersForCluster(dbConn *sql.DB, clusterID string) ([]types.Container, error) {
 	var rows *sql.Rows
 	var err error
 	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s, container c  where c.clusterid = %s  and c.projectid = p.id and c.serverid = s.id order by c.name", clusterID)
@@ -547,9 +446,9 @@ func GetAllContainersForCluster(dbConn *sql.DB, clusterID string) ([]Container, 
 	}
 	defer rows.Close()
 	var clustername string
-	containers := make([]Container, 0)
+	containers := make([]types.Container, 0)
 	for rows.Next() {
-		container := Container{}
+		container := types.Container{}
 		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName); err != nil {
 			return nil, err
 		}
@@ -569,7 +468,7 @@ func GetAllContainersForCluster(dbConn *sql.DB, clusterID string) ([]Container, 
 	return containers, nil
 }
 
-func GetAllContainersForProject(dbConn *sql.DB, projectID string) ([]Container, error) {
+func GetAllContainersForProject(dbConn *sql.DB, projectID string) ([]types.Container, error) {
 	var rows *sql.Rows
 	var err error
 	queryStr := fmt.Sprintf("select c.id, c.name from container c where c.id not in (select p.containerid from proxy p) and c.projectid = %s order by c.name", projectID)
@@ -579,9 +478,9 @@ func GetAllContainersForProject(dbConn *sql.DB, projectID string) ([]Container, 
 		return nil, err
 	}
 	defer rows.Close()
-	containers := make([]Container, 0)
+	containers := make([]types.Container, 0)
 	for rows.Next() {
-		container := Container{}
+		container := types.Container{}
 		if err = rows.Scan(&container.ID, &container.Name); err != nil {
 			return nil, err
 		}
@@ -598,7 +497,7 @@ func GetAllContainersForProject(dbConn *sql.DB, projectID string) ([]Container, 
 // GetAllContainersNotInCluster is used to fetch all nodes that
 // are eligible to be added into a cluster
 //
-func GetAllContainersNotInCluster(dbConn *sql.DB) ([]Container, error) {
+func GetAllContainersNotInCluster(dbConn *sql.DB) ([]types.Container, error) {
 	var rows *sql.Rows
 	var err error
 	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name, l.name from project p, server s , container c left join cluster l on c.clusterid = l.id where c.role != 'standalone' and c.clusterid = -1 and c.projectid = p.id  and c.serverid = s.id order by c.name")
@@ -608,9 +507,9 @@ func GetAllContainersNotInCluster(dbConn *sql.DB) ([]Container, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	containers := make([]Container, 0)
+	containers := make([]types.Container, 0)
 	for rows.Next() {
-		container := Container{}
+		container := types.Container{}
 		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName, &container.ClusterName); err != nil {
 			return nil, err
 		}
@@ -623,7 +522,7 @@ func GetAllContainersNotInCluster(dbConn *sql.DB) ([]Container, error) {
 	return containers, nil
 }
 
-func GetAllContainers(dbConn *sql.DB) ([]Container, error) {
+func GetAllContainers(dbConn *sql.DB) ([]types.Container, error) {
 	var rows *sql.Rows
 	var err error
 	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s , container c where c.projectid = p.id  and c.serverid = s.id order by c.name")
@@ -634,9 +533,9 @@ func GetAllContainers(dbConn *sql.DB) ([]Container, error) {
 	}
 	defer rows.Close()
 	var clustername string
-	containers := make([]Container, 0)
+	containers := make([]types.Container, 0)
 	for rows.Next() {
-		container := Container{}
+		container := types.Container{}
 		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName); err != nil {
 			return nil, err
 		}
@@ -658,7 +557,7 @@ func GetAllContainers(dbConn *sql.DB) ([]Container, error) {
 	return containers, nil
 }
 
-func InsertContainer(dbConn *sql.DB, container Container) (int, error) {
+func InsertContainer(dbConn *sql.DB, container types.Container) (int, error) {
 	queryStr := fmt.Sprintf("insert into container ( name, clusterid, serverid, role, image, createdt, projectid) values ( '%s', %s, %s, '%s','%s', now(), %s) returning id", container.Name, container.ClusterID, container.ServerID, container.Role, container.Image, container.ProjectID)
 
 	logit.Info.Println("admindb:InsertContainer:" + queryStr)
@@ -691,7 +590,7 @@ func DeleteContainer(dbConn *sql.DB, id string) error {
 	return nil
 }
 
-func UpdateContainer(dbConn *sql.DB, container Container) error {
+func UpdateContainer(dbConn *sql.DB, container types.Container) error {
 	queryStr := fmt.Sprintf("update container set ( name, clusterid, serverid, role, image) = ('%s', %s, %s, '%s', '%s') where id = %s returning id", container.Name, container.ClusterID, container.ServerID, container.Role, container.Image, container.ID)
 	logit.Info.Println("admindb:UpdateContainer:" + queryStr)
 
@@ -707,7 +606,7 @@ func UpdateContainer(dbConn *sql.DB, container Container) error {
 
 }
 
-func GetAllServers(dbConn *sql.DB) ([]Server, error) {
+func GetAllServers(dbConn *sql.DB) ([]types.Server, error) {
 	logit.Info.Println("admindb:GetAllServer:called")
 	var rows *sql.Rows
 	var err error
@@ -716,9 +615,9 @@ func GetAllServers(dbConn *sql.DB) ([]Server, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	servers := make([]Server, 0)
+	servers := make([]types.Server, 0)
 	for rows.Next() {
-		server := Server{}
+		server := types.Server{}
 		if err = rows.Scan(&server.ID, &server.Name,
 			&server.IPAddress, &server.DockerBridgeIP, &server.PGDataPath, &server.ServerClass, &server.CreateDate); err != nil {
 			return nil, err
@@ -731,7 +630,7 @@ func GetAllServers(dbConn *sql.DB) ([]Server, error) {
 	return servers, nil
 }
 
-func GetAllServersByClassByCount(dbConn *sql.DB) ([]Server, error) {
+func GetAllServersByClassByCount(dbConn *sql.DB) ([]types.Server, error) {
 	//select s.id, s.name, s.serverclass, count(n) from server s left join node n on  s.id = n.serverid  group by s.id order by s.serverclass, count(n);
 
 	logit.Info.Println("admindb:GetAllServerByClassByCount:called")
@@ -742,9 +641,9 @@ func GetAllServersByClassByCount(dbConn *sql.DB) ([]Server, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	servers := make([]Server, 0)
+	servers := make([]types.Server, 0)
 	for rows.Next() {
-		server := Server{}
+		server := types.Server{}
 		if err = rows.Scan(&server.ID, &server.Name,
 			&server.IPAddress, &server.DockerBridgeIP, &server.PGDataPath, &server.ServerClass, &server.CreateDate, &server.NodeCount); err != nil {
 			return nil, err
@@ -757,7 +656,7 @@ func GetAllServersByClassByCount(dbConn *sql.DB) ([]Server, error) {
 	return servers, nil
 }
 
-func UpdateServer(dbConn *sql.DB, server Server) error {
+func UpdateServer(dbConn *sql.DB, server types.Server) error {
 	logit.Info.Println("admindb:UpdateServer:called")
 	queryStr := fmt.Sprintf("update server set ( name, ipaddress, pgdatapath, serverclass, dockerbip) = ('%s', '%s', '%s', '%s', '%s') where id = %s returning id", server.Name, server.IPAddress, server.PGDataPath, server.ServerClass, server.DockerBridgeIP, server.ID)
 
@@ -773,7 +672,7 @@ func UpdateServer(dbConn *sql.DB, server Server) error {
 	return nil
 
 }
-func InsertServer(dbConn *sql.DB, server Server) (int, error) {
+func InsertServer(dbConn *sql.DB, server types.Server) (int, error) {
 	//logit.Info.Println("admindb:InsertServer:called")
 	queryStr := fmt.Sprintf("insert into server ( name, ipaddress, pgdatapath, serverclass, dockerbip, createdt) values ( '%s', '%s', '%s', '%s', '%s', now()) returning id", server.Name, server.IPAddress, server.PGDataPath, server.ServerClass, server.DockerBridgeIP)
 
@@ -806,7 +705,7 @@ func DeleteServer(dbConn *sql.DB, id string) error {
 	return nil
 }
 
-func GetAllGeneralSettings(dbConn *sql.DB) ([]Setting, error) {
+func GetAllGeneralSettings(dbConn *sql.DB) ([]types.Setting, error) {
 	var rows *sql.Rows
 	var err error
 	rows, err = dbConn.Query("select name, value, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from settings where name in ('PG-PORT', 'DOMAIN-NAME', 'DOCKER-REGISTRY', 'ADMIN-URL') order by name")
@@ -814,9 +713,9 @@ func GetAllGeneralSettings(dbConn *sql.DB) ([]Setting, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	settings := make([]Setting, 0)
+	settings := make([]types.Setting, 0)
 	for rows.Next() {
-		setting := Setting{}
+		setting := types.Setting{}
 		if err = rows.Scan(
 			&setting.Name,
 			&setting.Value,
@@ -831,7 +730,7 @@ func GetAllGeneralSettings(dbConn *sql.DB) ([]Setting, error) {
 	return settings, nil
 }
 
-func GetAllSettings(dbConn *sql.DB) ([]Setting, error) {
+func GetAllSettings(dbConn *sql.DB) ([]types.Setting, error) {
 	//logit.Info.Println("admindb:GetAllSettings: called")
 	var rows *sql.Rows
 	var err error
@@ -840,9 +739,9 @@ func GetAllSettings(dbConn *sql.DB) ([]Setting, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	settings := make([]Setting, 0)
+	settings := make([]types.Setting, 0)
 	for rows.Next() {
-		setting := Setting{}
+		setting := types.Setting{}
 		if err = rows.Scan(
 			&setting.Name,
 			&setting.Value,
@@ -857,9 +756,9 @@ func GetAllSettings(dbConn *sql.DB) ([]Setting, error) {
 	return settings, nil
 }
 
-func GetSetting(dbConn *sql.DB, key string) (Setting, error) {
+func GetSetting(dbConn *sql.DB, key string) (types.Setting, error) {
 	//logit.Info.Println("admindb:GetSetting:called")
-	setting := Setting{}
+	setting := types.Setting{}
 
 	queryStr := fmt.Sprintf("select value, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from settings where name = '%s'", key)
 	//logit.Info.Println("admindb:GetSetting:" + queryStr)
@@ -875,7 +774,7 @@ func GetSetting(dbConn *sql.DB, key string) (Setting, error) {
 	return setting, nil
 }
 
-func InsertSetting(dbConn *sql.DB, setting Setting) error {
+func InsertSetting(dbConn *sql.DB, setting types.Setting) error {
 	logit.Info.Println("admindb:InsertSetting:called")
 	queryStr := fmt.Sprintf("insert into setting ( name, value, createdt) values ( '%s', '%s', now()) returning name", setting.Name, setting.Value)
 
@@ -892,7 +791,7 @@ func InsertSetting(dbConn *sql.DB, setting Setting) error {
 	return nil
 }
 
-func UpdateSetting(dbConn *sql.DB, setting Setting) error {
+func UpdateSetting(dbConn *sql.DB, setting types.Setting) error {
 	logit.Info.Println("admindb:UpdateSetting:called")
 	queryStr := fmt.Sprintf("update settings set ( value, updatedt) = ('%s', now()) where name = '%s'  returning name", setting.Value, setting.Name)
 
@@ -922,7 +821,7 @@ func GetAllSettingsMap(dbConn *sql.DB) (map[string]string, error) {
 	defer rows.Close()
 	//settings := make([]Setting, 0)
 	for rows.Next() {
-		setting := Setting{}
+		setting := types.Setting{}
 		if err = rows.Scan(
 			&setting.Name,
 			&setting.Value,
@@ -954,7 +853,7 @@ func GetDomain(dbConn *sql.DB) (string, error) {
 	return domain, nil
 }
 
-func AddContainerUser(dbConn *sql.DB, s ContainerUser) (int, error) {
+func AddContainerUser(dbConn *sql.DB, s types.ContainerUser) (int, error) {
 
 	//logit.Info.Println("AddContainerUser called")
 
@@ -1000,8 +899,8 @@ func DeleteContainerUser(dbConn *sql.DB, containername string, rolname string) e
 	return nil
 }
 
-func GetContainerUser(dbConn *sql.DB, containername string, usename string) (ContainerUser, error) {
-	var user ContainerUser
+func GetContainerUser(dbConn *sql.DB, containername string, usename string) (types.ContainerUser, error) {
+	var user types.ContainerUser
 	var err error
 	queryStr := fmt.Sprintf("select id, passwd, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from containeruser where usename = '%s' and containername = '%s'", usename, containername)
 	logit.Info.Println("admindb:GetContainerUser:" + queryStr)
@@ -1025,7 +924,7 @@ func GetContainerUser(dbConn *sql.DB, containername string, usename string) (Con
 	return user, nil
 }
 
-func UpdateContainerUser(dbConn *sql.DB, user ContainerUser) error {
+func UpdateContainerUser(dbConn *sql.DB, user types.ContainerUser) error {
 	logit.Info.Println("admindb:UpdateContainerUser encrypting password of " + user.Passwd)
 	encrypted, err := sec.EncryptPassword(user.Passwd)
 	queryStr := fmt.Sprintf("update containeruser set ( passwd, updatedt) = ('%s', now()) where usename = '%s' returning id", encrypted, user.Rolname)
@@ -1043,9 +942,9 @@ func UpdateContainerUser(dbConn *sql.DB, user ContainerUser) error {
 
 }
 
-func GetProject(dbConn *sql.DB, id string) (Project, error) {
+func GetProject(dbConn *sql.DB, id string) (types.Project, error) {
 	//logit.Info.Println("GetProject called with id=" + id)
-	project := Project{}
+	project := types.Project{}
 
 	err := dbConn.QueryRow(fmt.Sprintf("select id, name, description, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from project where id=%s", id)).Scan(&project.ID, &project.Name, &project.Desc, &project.UpdateDate)
 	switch {
@@ -1060,7 +959,7 @@ func GetProject(dbConn *sql.DB, id string) (Project, error) {
 	}
 
 	project.Containers = make(map[string]string)
-	var containers []Container
+	var containers []types.Container
 	containers, err = GetAllContainersForProject(dbConn, project.ID)
 	if err != nil {
 		logit.Info.Println("admindb:GetProject:" + err.Error())
@@ -1071,7 +970,7 @@ func GetProject(dbConn *sql.DB, id string) (Project, error) {
 		project.Containers[containers[i].ID] = containers[i].Name
 	}
 	project.Clusters = make(map[string]string)
-	var clusters []Cluster
+	var clusters []types.Cluster
 	clusters, err = GetAllClustersForProject(dbConn, project.ID)
 	if err != nil {
 		logit.Info.Println("admindb:GetProject:" + err.Error())
@@ -1085,7 +984,7 @@ func GetProject(dbConn *sql.DB, id string) (Project, error) {
 	return project, nil
 }
 
-func GetAllProjects(dbConn *sql.DB) ([]Project, error) {
+func GetAllProjects(dbConn *sql.DB) ([]types.Project, error) {
 	//logit.Info.Println("admindb:GetAllProjects: called")
 	var rows *sql.Rows
 	var err error
@@ -1094,13 +993,13 @@ func GetAllProjects(dbConn *sql.DB) ([]Project, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	projects := make([]Project, 0)
-	var containers []Container
-	var clusters []Cluster
-	var proxies []Proxy
+	projects := make([]types.Project, 0)
+	var containers []types.Container
+	var clusters []types.Cluster
+	var proxies []types.Proxy
 
 	for rows.Next() {
-		project := Project{}
+		project := types.Project{}
 		if err = rows.Scan(
 			&project.ID,
 			&project.Name,
@@ -1152,7 +1051,7 @@ func GetAllProjects(dbConn *sql.DB) ([]Project, error) {
 	return projects, nil
 }
 
-func UpdateProject(dbConn *sql.DB, project Project) error {
+func UpdateProject(dbConn *sql.DB, project types.Project) error {
 	//logit.Info.Println("admindb:UpdateProject:called")
 	queryStr := fmt.Sprintf("update project set ( name, description, updatedt) = ('%s', '%s', now()) where id = %s returning id", project.Name, project.Desc, project.ID)
 
@@ -1184,7 +1083,7 @@ func DeleteProject(dbConn *sql.DB, id string) error {
 	return nil
 }
 
-func InsertProject(dbConn *sql.DB, project Project) (int, error) {
+func InsertProject(dbConn *sql.DB, project types.Project) (int, error) {
 	//logit.Info.Println("admindb:InsertProject:called")
 	queryStr := fmt.Sprintf("insert into project ( name, description, updatedt) values ( '%s', '%s', now()) returning id", project.Name, project.Desc)
 
@@ -1202,7 +1101,7 @@ func InsertProject(dbConn *sql.DB, project Project) (int, error) {
 	return projectid, nil
 }
 
-func GetAllProxiesForProject(dbConn *sql.DB, projectID string) ([]Proxy, error) {
+func GetAllProxiesForProject(dbConn *sql.DB, projectID string) ([]types.Proxy, error) {
 	var rows *sql.Rows
 	var err error
 	queryStr := fmt.Sprintf("select p.containerid, c.name from proxy p, container c where p.containerid = c.id and p.projectid = %s order by c.name", projectID)
@@ -1212,9 +1111,9 @@ func GetAllProxiesForProject(dbConn *sql.DB, projectID string) ([]Proxy, error) 
 		return nil, err
 	}
 	defer rows.Close()
-	proxies := make([]Proxy, 0)
+	proxies := make([]types.Proxy, 0)
 	for rows.Next() {
-		proxy := Proxy{}
+		proxy := types.Proxy{}
 		if err = rows.Scan(&proxy.ContainerID, &proxy.ContainerName); err != nil {
 			return nil, err
 		}
@@ -1226,9 +1125,9 @@ func GetAllProxiesForProject(dbConn *sql.DB, projectID string) ([]Proxy, error) 
 	return proxies, nil
 }
 
-func GetProxy(dbConn *sql.DB, containername string) (Proxy, error) {
+func GetProxy(dbConn *sql.DB, containername string) (types.Proxy, error) {
 	var rows *sql.Rows
-	proxy := Proxy{}
+	proxy := types.Proxy{}
 	var err error
 
 	queryStr := fmt.Sprintf("select u.usename , u.passwd, c.name , p.port, p.host, p.databasename from proxy p, container c, containeruser u where p.containerid = c.id and p.containeruserid = u.id and c.name = '%s'", containername)
@@ -1257,9 +1156,9 @@ func GetProxy(dbConn *sql.DB, containername string) (Proxy, error) {
 	return proxy, nil
 }
 
-func GetProxyByContainerID(dbConn *sql.DB, containerID string) (Proxy, error) {
+func GetProxyByContainerID(dbConn *sql.DB, containerID string) (types.Proxy, error) {
 	var rows *sql.Rows
-	proxy := Proxy{}
+	proxy := types.Proxy{}
 	var err error
 
 	queryStr := fmt.Sprintf("select p.projectid, p.id, p.containeruserid, p.containerid, s.name, u.usename , u.passwd, c.name , p.port, p.host, p.databasename from proxy p, server s, container c, containeruser u where p.containerid = c.id and p.containeruserid = u.id and c.id = %s and c.serverid = s.id", containerID)
@@ -1312,7 +1211,7 @@ func GetDatabaseStatus(dbConn *sql.DB, containerid string) (string, error) {
 		return "", err
 	}
 
-	var credential Credential
+	var credential types.Credential
 	credential, err = GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())

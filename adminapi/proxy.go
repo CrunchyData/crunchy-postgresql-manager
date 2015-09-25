@@ -1,4 +1,5 @@
 /*
+
  Copyright 2015 Crunchy Data Solutions, Inc.
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -21,24 +22,26 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 	"strconv"
 )
 
 type ProxyRequest struct {
-	Token                string
-	Profile              string
-	Image                string
-	ServerID             string
-	ProjectID            string
-	ContainerName        string
-	Standalone           string
-	DatabaseHost         string
-	DatabaseUserID       string
-	DatabaseUserPassword string
-	DatabasePort         string
-	Database             string
+	Token         string
+	ID            string
+	Profile       string
+	Image         string
+	ServerID      string
+	ProjectID     string
+	ContainerName string
+	Standalone    string
+	Host          string
+	Usename       string
+	Passwd        string
+	Port          string
+	Database      string
 }
 
 func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
@@ -97,9 +100,15 @@ func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, errorStr, http.StatusBadRequest)
 		return
 	}
-	if proxyrequest.DatabaseHost == "" {
+	if proxyrequest.Host == "" {
 		logit.Error.Println("ProvisionProxy error DatabaseHost required")
 		errorStr = "DatabaseHost required"
+		rest.Error(w, errorStr, http.StatusBadRequest)
+		return
+	}
+	if proxyrequest.Host == "127.0.0.1" || proxyrequest.Host == "localhost" {
+		logit.Error.Println("ProvisionProxy error DatabaseHost can not be localhost")
+		errorStr = "DatabaseHost can not be localhost"
 		rest.Error(w, errorStr, http.StatusBadRequest)
 		return
 	}
@@ -138,7 +147,7 @@ func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 
@@ -149,10 +158,10 @@ func insertProxy(request *ProxyRequest) error {
 	var containerUserID int
 
 	//create user in the admin db
-	dbuser := admindb.ContainerUser{}
+	dbuser := types.ContainerUser{}
 	dbuser.Containername = request.ContainerName
-	dbuser.Passwd = request.DatabaseUserPassword
-	dbuser.Rolname = request.DatabaseUserID
+	dbuser.Passwd = request.Passwd
+	dbuser.Rolname = request.Usename
 
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -170,20 +179,20 @@ func insertProxy(request *ProxyRequest) error {
 
 	logit.Info.Printf("insertProxy: new ID %d\n ", containerUserID)
 
-	var container admindb.Container
+	var container types.Container
 	container, err = admindb.GetContainerByName(dbConn, request.ContainerName)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return err
 	}
 
-	proxy := Proxy{}
+	proxy := types.Proxy{}
 	proxy.ContainerUserID = strconv.Itoa(containerUserID)
 	proxy.ContainerID = container.ID
-	proxy.Host = request.DatabaseHost
+	proxy.Host = request.Host
 	proxy.Database = request.Database
 	proxy.ProjectID = request.ProjectID
-	proxy.Port = request.DatabasePort
+	proxy.Port = request.Port
 
 	queryStr := fmt.Sprintf("insert into proxy ( containeruserid, containerid, projectid, port, host, databasename, updatedt) values ( %s, %s, %s, '%s', '%s', '%s', now()) returning id",
 		proxy.ContainerUserID, proxy.ContainerID, proxy.ProjectID, proxy.Port, proxy.Host, proxy.Database)
@@ -233,4 +242,48 @@ func GetProxyByContainerID(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteJson(&proxy)
+}
+
+func ProxyUpdate(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	req := ProxyRequest{}
+	err = r.DecodeJsonPayload(&req)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	logit.Info.Println("ID=" + req.ID)
+	logit.Info.Println("Port" + req.Port)
+	logit.Info.Println("Host" + req.Host)
+	logit.Info.Println("Database" + req.Database)
+
+	queryStr := fmt.Sprintf("update proxy set ( port, host, databasename, updatedt) = ( '%s', '%s', '%s', now()) where id = %s returning id",
+		req.Port, req.Host, req.Database, req.ID)
+
+	logit.Info.Println("UpdateProxy:" + queryStr)
+	var proxyid int
+	err = dbConn.QueryRow(queryStr).Scan(&proxyid)
+	switch {
+	case err != nil:
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	default:
+		logit.Info.Println("UpdateProxy: update " + strconv.Itoa(proxyid))
+	}
+
+	w.WriteHeader(http.StatusOK)
+	status := types.SimpleStatus{}
+	status.Status = "OK"
+	w.WriteJson(&status)
 }

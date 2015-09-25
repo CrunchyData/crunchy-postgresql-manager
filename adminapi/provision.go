@@ -24,6 +24,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/template"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 	"strconv"
@@ -116,7 +117,7 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 
@@ -206,7 +207,7 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 		return err
 	}
 
-	dbnode := admindb.Container{}
+	dbnode := types.Container{}
 	dbnode.ID = ""
 	dbnode.Name = params.ContainerName
 	dbnode.Image = params.Image
@@ -240,9 +241,9 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 
 //currently we define default DB users (postgres, cpmtest, pgpool)
 //for all database containers
-func createDBUsers(dbConn *sql.DB, dbnode admindb.Container) error {
+func createDBUsers(dbConn *sql.DB, dbnode types.Container) error {
 	var err error
-	var password admindb.Setting
+	var password types.Setting
 
 	//get the postgres password
 	password, err = admindb.GetSetting(dbConn, "POSTGRESPSW")
@@ -251,7 +252,7 @@ func createDBUsers(dbConn *sql.DB, dbnode admindb.Container) error {
 		return err
 	}
 	//register postgres user
-	var user = admindb.ContainerUser{}
+	var user = types.ContainerUser{}
 	user.Containername = dbnode.Name
 	user.Rolname = "postgres"
 	user.Passwd = password.Value
@@ -301,9 +302,9 @@ func createDBUsers(dbConn *sql.DB, dbnode admindb.Container) error {
 
 func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFILE string, standby bool) error {
 	//go get the domain name from the settings
-	var domainname admindb.Setting
-	var pgport admindb.Setting
-	var sleepSetting admindb.Setting
+	var domainname types.Setting
+	var pgport types.Setting
+	var sleepSetting types.Setting
 	var err error
 
 	domainname, err = admindb.GetSetting(dbConn, "DOMAIN-NAME")
@@ -423,7 +424,7 @@ func waitTillReady(container string, sleepTime time.Duration) error {
 //return the CPU MEM settings
 func getDockerResourceSettings(dbConn *sql.DB, size string) (string, string, error) {
 	var CPU, MEM string
-	var setting admindb.Setting
+	var setting types.Setting
 	var err error
 
 	switch size {

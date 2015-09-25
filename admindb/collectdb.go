@@ -19,23 +19,12 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	_ "github.com/lib/pq"
 	"strconv"
 )
 
-type HealthCheck struct {
-	ID             string
-	ProjectName    string
-	ProjectID      string
-	ContainerName  string
-	ContainerID    string
-	ContainerRole  string
-	ContainerImage string
-	Status         string
-	UpdateDate     string
-}
-
-func GetHealthCheck(dbConn *sql.DB) ([]HealthCheck, error) {
+func GetHealthCheck(dbConn *sql.DB) ([]types.HealthCheck, error) {
 	var rows *sql.Rows
 	var err error
 	rows, err = dbConn.Query(
@@ -46,10 +35,10 @@ func GetHealthCheck(dbConn *sql.DB) ([]HealthCheck, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var checks []HealthCheck
-	checks = make([]HealthCheck, 0)
+	var checks []types.HealthCheck
+	checks = make([]types.HealthCheck, 0)
 	for rows.Next() {
-		check := HealthCheck{}
+		check := types.HealthCheck{}
 		if err = rows.Scan(
 			&check.ID,
 			&check.ProjectName,
@@ -70,7 +59,7 @@ func GetHealthCheck(dbConn *sql.DB) ([]HealthCheck, error) {
 	return checks, nil
 }
 
-func InsertHealthCheck(dbConn *sql.DB, hc HealthCheck) (int, error) {
+func InsertHealthCheck(dbConn *sql.DB, hc types.HealthCheck) (int, error) {
 	queryStr := fmt.Sprintf(
 		"insert into healthcheck ( "+
 			"ProjectName, ProjectID, ContainerName, ContainerID, "+

@@ -20,6 +20,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/task"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 )
@@ -98,7 +99,7 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//get the server details for where the backup should be made
-	server := admindb.Server{}
+	server := types.Server{}
 	server, err = admindb.GetServer(dbConn, postMsg.ServerID)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -122,7 +123,7 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("output=" + output.Output)
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -204,7 +205,7 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 	//to the task server
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -251,7 +252,7 @@ func DeleteSchedule(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("reload output=" + output.Output)
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 
@@ -503,7 +504,7 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("reload output=" + output.Output)
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -531,11 +532,11 @@ func GetBackupNodes(w rest.ResponseWriter, r *rest.Request) {
 	}
 	i := 0
 	//nodes := make([]ClusterNode, found)
-	nodes := []ClusterNode{}
+	nodes := []types.ClusterNode{}
 	for i = range results {
 		if results[i].Role == "unassigned" ||
 			results[i].Role == "master" {
-			n := ClusterNode{}
+			n := types.ClusterNode{}
 			n.ID = results[i].ID
 			n.Name = results[i].Name
 			n.ClusterID = results[i].ClusterID

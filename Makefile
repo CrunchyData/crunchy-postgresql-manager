@@ -1,6 +1,7 @@
 
 gendeps:
 		godep save \
+		github.com/crunchydata/crunchy-postgresql-manager/types \
 		github.com/crunchydata/crunchy-postgresql-manager/collect \
 		github.com/crunchydata/crunchy-postgresql-manager/util \
 		github.com/crunchydata/crunchy-postgresql-manager/logit \
@@ -28,6 +29,7 @@ buildimages:
 		cd images/cpm-admin && make  
 		cd images/cpm && make 
 		cd images/cpm-node && make  
+		cd images/cpm-node-proxy && make  
 		cd images/cpm-pgpool && make
 		cd images/cpm-task && make
 		cd images/cpm-backup-job && make

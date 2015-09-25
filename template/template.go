@@ -22,6 +22,7 @@ import (
 	"flag"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"io/ioutil"
 	"os"
@@ -178,9 +179,9 @@ func Hba(dbConn *sql.DB, mode string, hostname string, port string, clusterid st
 //
 // getMasterValues returns a master node, pgpool node, and list of standby nodes
 //
-func getMasterValues(dbConn *sql.DB, clusterID string, domainname string) (admindb.Container, admindb.Container, []string, error) {
-	master := admindb.Container{}
-	pgpool := admindb.Container{}
+func getMasterValues(dbConn *sql.DB, clusterID string, domainname string) (types.Container, types.Container, []string, error) {
+	master := types.Container{}
+	pgpool := types.Container{}
 	//we pass in a list of containers in this cluster
 	//that will be added to the pg_hba.conf of the master
 	//for allowing replication

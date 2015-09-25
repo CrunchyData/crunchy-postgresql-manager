@@ -18,18 +18,19 @@ package admindb
 import (
 	"database/sql"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 )
 
 const CPMTEST_DB = "cpmtest"
 const CPMTEST_USER = "cpmtest"
 
-func GetUserCredentials(dbConn *sql.DB, node *Container) (Credential, error) {
+func GetUserCredentials(dbConn *sql.DB, node *types.Container) (types.Credential, error) {
 	var err error
-	cred := Credential{}
+	cred := types.Credential{}
 
 	if node.Image != "cpm-node-proxy" {
 		//get port
-		var pgport Setting
+		var pgport types.Setting
 		pgport, err = GetSetting(dbConn, "PG-PORT")
 		nodeuser, err := GetContainerUser(dbConn, node.Name, CPMTEST_USER)
 		if err != nil {
@@ -45,7 +46,7 @@ func GetUserCredentials(dbConn *sql.DB, node *Container) (Credential, error) {
 	}
 
 	//return proxy credentials
-	var proxy Proxy
+	var proxy types.Proxy
 	proxy, err = GetProxy(dbConn, node.Name)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -60,4 +61,3 @@ func GetUserCredentials(dbConn *sql.DB, node *Container) (Credential, error) {
 	return cred, err
 
 }
-

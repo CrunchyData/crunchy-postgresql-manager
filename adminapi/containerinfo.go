@@ -22,6 +22,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	_ "github.com/lib/pq"
 	"net/http"
@@ -65,7 +66,7 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//return database, user, password, error
-	var credential admindb.Credential
+	var credential types.Credential
 	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -78,7 +79,7 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 	dbConn2, err := util.GetMonitoringConnection(credential.Host, credential.Username, credential.Port, credential.Database, credential.Password)
 	defer dbConn2.Close()
 
-	settings := make([]PostgresSetting, 0)
+	settings := make([]types.PostgresSetting, 0)
 	var rows *sql.Rows
 
 	rows, err = dbConn2.Query("select name, current_setting(name), source from pg_settings where source not in ('default','override')")
@@ -89,7 +90,7 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		setting := PostgresSetting{}
+		setting := types.PostgresSetting{}
 		if err = rows.Scan(
 			&setting.Name,
 			&setting.CurrentSetting,
@@ -141,7 +142,7 @@ func MonitorContainerControldata(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	settings := make([]PostgresControldata, 0)
+	settings := make([]types.PostgresControldata, 0)
 
 	//send the container a pg_controldata command
 	var cdout cpmcontainerapi.ControldataResponse
@@ -158,7 +159,7 @@ func MonitorContainerControldata(w rest.ResponseWriter, r *rest.Request) {
 	for i := range lines {
 		//fmt.Println(len(lines[i]))
 		if len(lines[i]) > 1 {
-			setting := PostgresControldata{}
+			setting := types.PostgresControldata{}
 			columns := strings.Split(lines[i], ":")
 			setting.Name = strings.TrimSpace(columns[0])
 			setting.Value = strings.TrimSpace(columns[1])
@@ -210,7 +211,7 @@ func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var credential admindb.Credential
+	var credential types.Credential
 	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -281,7 +282,7 @@ func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var credential admindb.Credential
+	var credential types.Credential
 	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -388,7 +389,7 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 	var host = node.Name
 
 	//fetch cpmtest user credentials
-	var nodeuser admindb.ContainerUser
+	var nodeuser types.ContainerUser
 	nodeuser, err = admindb.GetContainerUser(dbConn, node.Name, CPMTEST_USER)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -397,7 +398,7 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//get port
-	var pgport admindb.Setting
+	var pgport types.Setting
 	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 
 	dbConn2, err := util.GetMonitoringConnection(host, CPMTEST_DB, pgport.Value, CPMTEST_USER, nodeuser.Passwd)
@@ -495,7 +496,7 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 
 	//var host = node.Name
 
-	var credential admindb.Credential
+	var credential types.Credential
 	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -514,7 +515,7 @@ func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&results)
 }
 
-func loadtest(dbConn *sql.DB, credential *admindb.Credential, writes int) ([]Loadtestresults, error) {
+func loadtest(dbConn *sql.DB, credential *types.Credential, writes int) ([]Loadtestresults, error) {
 	var err error
 	var name string
 	var query string
@@ -634,7 +635,7 @@ func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var credential admindb.Credential
+	var credential types.Credential
 	credential, err = admindb.GetUserCredentials(dbConn, &container)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -677,7 +678,7 @@ func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 
 	rows.Close()
 
-	statements := make([]PostgresStatement, 0)
+	statements := make([]types.PostgresStatement, 0)
 
 	for i := range databases {
 		//get a database connection to a specific database
@@ -693,7 +694,7 @@ func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 		}
 		defer rows.Close()
 		for rows.Next() {
-			stat := PostgresStatement{}
+			stat := types.PostgresStatement{}
 			stat.Database = databases[i]
 			if err = rows.Scan(
 				&stat.Query,
@@ -771,7 +772,7 @@ func getDatabaseStatus(dbConn *sql.DB, containerid string) (string, error) {
 		return "", err
 	}
 
-	var credential admindb.Credential
+	var credential types.Credential
 	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())

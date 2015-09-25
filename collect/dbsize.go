@@ -19,6 +19,7 @@ import (
 	"database/sql"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"github.com/prometheus/client_golang/prometheus"
 	"time"
@@ -45,7 +46,7 @@ func CollectDBSize(gauge *prometheus.GaugeVec) error {
 	//domain, err = getDomain(dbConn)
 
 	//get all containers
-	var containers []admindb.Container
+	var containers []types.Container
 	containers, err = admindb.GetAllContainers(dbConn)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -53,7 +54,7 @@ func CollectDBSize(gauge *prometheus.GaugeVec) error {
 
 	//for each container, collect db size metrics
 	i := 0
-	var credential admindb.Credential
+	var credential types.Credential
 
 	for i = range containers {
 		logit.Info.Println("dbsize processing " + containers[i].Name)
@@ -72,7 +73,7 @@ func CollectDBSize(gauge *prometheus.GaugeVec) error {
 	return nil
 }
 
-func process(node *admindb.Container, credential *admindb.Credential, gauge *prometheus.GaugeVec) error {
+func process(node *types.Container, credential *types.Credential, gauge *prometheus.GaugeVec) error {
 	var err error
 
 	logit.Info.Println("dbsize node=" + node.Name + " credentials Username:" + credential.Username + " Password:" + credential.Password + " Database:" + credential.Database + " Host:" + credential.Host)

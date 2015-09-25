@@ -16,6 +16,23 @@ var ProxyDetailController = function($scope, $state, $cookieStore, $stateParams,
                 }];
                 console.log('here is an error ' + error.Error);
             });
+    $scope.save = function() {
+        console.log('save logic should go here');
+        console.log(JSON.stringify($scope.proxy));
+        proxyFactory.update($scope.proxy)
+            .success(function(data) {
+                $state.go('projects.proxy', $stateParams, {
+                    reload: true,
+                    inherit: false
+                });
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+            });
+    };
 
 };
 
@@ -367,6 +384,7 @@ var ProxyUsersEditController = function($scope, $stateParams, $state, containers
             console.log('here is an error ' + error.Error);
         });
     $scope.save = function() {
+    	console.log('in save');
         $scope.user.ContainerID = $stateParams.containerId;
         containersFactory.updateuser($scope.user)
             .success(function(data) {

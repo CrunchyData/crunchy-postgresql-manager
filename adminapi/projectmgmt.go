@@ -19,19 +19,10 @@ import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 )
-
-type Project struct {
-	ID         string
-	Name       string
-	Desc       string
-	UpdateDate string
-	Token      string
-	Containers map[string]string
-	Clusters   map[string]string
-}
 
 type Child2 struct {
 	Name      string `json:"name"`
@@ -65,7 +56,7 @@ func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
 	defer dbConn.Close()
 
 	logit.Info.Println("UpdateProject: in UpdateProject")
-	project := Project{}
+	project := types.Project{}
 	err = r.DecodeJsonPayload(&project)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -85,13 +76,14 @@ func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbproject := admindb.Project{
+	dbproject := types.Project{
 		ID:         project.ID,
 		Name:       project.Name,
 		Desc:       project.Desc,
 		UpdateDate: project.UpdateDate,
 		Containers: project.Containers,
-		Clusters:   project.Clusters}
+		Clusters:   project.Clusters,
+		Proxies:    project.Proxies}
 
 	err = admindb.UpdateProject(dbConn, dbproject)
 	if err != nil {
@@ -101,7 +93,7 @@ func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -117,7 +109,7 @@ func AddProject(w rest.ResponseWriter, r *rest.Request) {
 	defer dbConn.Close()
 
 	logit.Info.Println("AddProject: in AddProject")
-	project := Project{}
+	project := types.Project{}
 	err = r.DecodeJsonPayload(&project)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -132,12 +124,13 @@ func AddProject(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dbproject := admindb.Project{
+	dbproject := types.Project{
 		ID:         project.ID,
 		Name:       project.Name,
 		Desc:       project.Desc,
 		UpdateDate: project.UpdateDate,
-		Containers: project.Containers}
+		Containers: project.Containers,
+		Proxies:    project.Proxies}
 	var newid int
 	newid, err = admindb.InsertProject(dbConn, dbproject)
 	if err != nil {
@@ -149,7 +142,7 @@ func AddProject(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Printf("added project id= %d\n", newid)
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -184,7 +177,14 @@ func GetProject(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	project := Project{results.ID, results.Name, results.Desc, results.UpdateDate, "", results.Containers, results.Clusters}
+	project := types.Project{}
+	project.ID = results.ID
+	project.Name = results.Name
+	project.Desc = results.Desc
+	project.UpdateDate = results.UpdateDate
+	project.Containers = results.Containers
+	project.Clusters = results.Clusters
+	project.Proxies = results.Proxies
 
 	w.WriteJson(&project)
 }
@@ -314,7 +314,7 @@ func DeleteProject(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 

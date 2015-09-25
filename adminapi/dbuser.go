@@ -20,6 +20,7 @@ import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	_ "github.com/lib/pq"
 	"net/http"
@@ -27,7 +28,7 @@ import (
 )
 
 func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
-	postMsg := NodeUser{}
+	postMsg := types.NodeUser{}
 	err := r.DecodeJsonPayload(&postMsg)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -77,7 +78,7 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var credential admindb.Credential
+	var credential types.Credential
 	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -136,7 +137,7 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//create user in the admin db
-	dbuser := admindb.ContainerUser{}
+	dbuser := types.ContainerUser{}
 	dbuser.Containername = node.Name
 	dbuser.Passwd = postMsg.Passwd
 	dbuser.Rolname = postMsg.Rolname
@@ -151,7 +152,7 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Printf("AddContainerUser: new ID %d\n", result)
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
@@ -215,7 +216,7 @@ func DeleteContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		}
 	}
 
-	var credential admindb.Credential
+	var credential types.Credential
 	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -241,7 +242,7 @@ func DeleteContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 
@@ -283,7 +284,7 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var credential admindb.Credential
+	var credential types.Credential
 	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -302,7 +303,7 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	logit.Info.Println(query)
 
-	nodeuser := admindb.ContainerUser{}
+	nodeuser := types.ContainerUser{}
 
 	err = dbConn2.QueryRow(query).Scan(
 		&nodeuser.Rolname,
@@ -346,7 +347,7 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//get container info
-	var node admindb.Container
+	var node types.Container
 	node, err = admindb.GetContainer(dbConn, ID)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -354,7 +355,7 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var credential admindb.Credential
+	var credential types.Credential
 	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -368,7 +369,7 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 		credential.Port, credential.Database, credential.Password)
 	defer dbConn2.Close()
 
-	users := make([]admindb.ContainerUser, 0)
+	users := make([]types.ContainerUser, 0)
 
 	//query results
 	var rows *sql.Rows
@@ -382,7 +383,7 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 	defer rows.Close()
 
 	for rows.Next() {
-		user := admindb.ContainerUser{}
+		user := types.ContainerUser{}
 		if err = rows.Scan(
 			&user.Rolname,
 			&user.Rolsuper,
@@ -421,7 +422,7 @@ func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer dbConn.Close()
 
-	postMsg := NodeUser{}
+	postMsg := types.NodeUser{}
 	err = r.DecodeJsonPayload(&postMsg)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -450,7 +451,7 @@ func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	//create user on the container
 	//get container info
-	var node admindb.Container
+	var node types.Container
 	node, err = admindb.GetContainer(dbConn, postMsg.ID)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -463,7 +464,7 @@ func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 		//update the password
 	}
 
-	var credential admindb.Credential
+	var credential types.Credential
 	credential, err = admindb.GetUserCredentials(dbConn, &node)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -543,7 +544,7 @@ func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 	if postMsg.Passwd != "" {
 		//update user's password
-		dbuser := admindb.ContainerUser{}
+		dbuser := types.ContainerUser{}
 		dbuser.Containername = node.Name
 		dbuser.Passwd = postMsg.Passwd
 		dbuser.Rolname = postMsg.Rolname
@@ -559,7 +560,7 @@ func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := SimpleStatus{}
+	status := types.SimpleStatus{}
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
