@@ -56,12 +56,6 @@ func CollectDBSize(gauge *prometheus.GaugeVec) error {
 	var credential admindb.Credential
 
 	for i = range containers {
-		//containers[i].ProjectID
-		//containers[i].ProjectName
-		//containers[i].Name
-		//containers[i].ID
-		//containers[i].Role
-		//containers[i].Image
 		logit.Info.Println("dbsize processing " + containers[i].Name)
 		credential, err = admindb.GetUserCredentials(dbConn, &containers[i])
 		if err != nil {
@@ -80,14 +74,6 @@ func CollectDBSize(gauge *prometheus.GaugeVec) error {
 
 func process(node *admindb.Container, credential *admindb.Credential, gauge *prometheus.GaugeVec) error {
 	var err error
-	//var userid, password, database string
-
-	//get node credentials
-	//userid, password, database, err = getCredential(dbConn, containerName, containerRole)
-//	if err != nil {
-//		logit.Error.Println(err.Error())
-//		return err
-//	}
 
 	logit.Info.Println("dbsize node=" + node.Name + " credentials Username:" + credential.Username + " Password:" + credential.Password + " Database:" + credential.Database + " Host:" + credential.Host)
 	var db *sql.DB
@@ -146,7 +132,7 @@ func pg2(databaseConn *sql.DB) ([]DBMetric, error) {
 		values = append(values, m)
 	}
 	if err = rows.Err(); err != nil {
-		logit.Error.Println("pg2:error:" + err.Error())
+		logit.Error.Println(err.Error())
 		return nil, err
 	}
 

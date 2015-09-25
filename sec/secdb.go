@@ -42,7 +42,7 @@ func DBGetUser(dbConn *sql.DB, Name string) (User, error) {
 		logit.Error.Println("DBGetUser:no user with that name")
 		return user, err
 	case err != nil:
-		logit.Error.Println("DBGetuser:Get User:" + err.Error())
+		logit.Error.Println(err.Error())
 		return user, err
 	default:
 	}
@@ -93,7 +93,7 @@ func DBGetRole(dbConn *sql.DB, Name string) (Role, error) {
 	var perms []Permission
 	perms, err = DBGetPermissions(dbConn)
 	if err != nil {
-		logit.Error.Println("error in DBGetRole:GetPermissions")
+		logit.Error.Println(err.Error())
 		return role, err
 	}
 	role.Permissions = make(map[string]Permission)
@@ -212,7 +212,7 @@ func DBAddRole(dbConn *sql.DB, role Role) error {
 	err := dbConn.QueryRow(queryStr).Scan(&theName)
 	switch {
 	case err != nil:
-		logit.Error.Println("secdb:AddRole:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	default:
 		logit.Info.Println("secdb:AddRole: role inserted " + role.Name)
@@ -239,7 +239,7 @@ func DBAddUserRole(dbConn *sql.DB, user string, role string) error {
 	err := dbConn.QueryRow(queryStr).Scan(&theUser)
 	switch {
 	case err != nil:
-		logit.Error.Println("secdb:AddUserRole:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	default:
 		logit.Info.Println("secdb:AddUserRole: inserted user=" + user + " role=" + role)
@@ -257,7 +257,7 @@ func DBAddRolePerm(dbConn *sql.DB, role string, perm string) error {
 	err := dbConn.QueryRow(queryStr).Scan(&theRole)
 	switch {
 	case err != nil:
-		logit.Error.Println("secdb:AddRolePerm:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	default:
 		logit.Info.Println("secdb:AddRolePerm: inserted role=" + role + " perm=" + perm)
@@ -275,7 +275,7 @@ func DBAddUser(dbConn *sql.DB, user User) error {
 	err := dbConn.QueryRow(queryStr).Scan(&theName)
 	switch {
 	case err != nil:
-		logit.Error.Println("secdb:AddUser:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	default:
 		logit.Info.Println("secdb:AddUser: inserted " + user.Name)
@@ -345,7 +345,7 @@ func DBGetAllUsers(dbConn *sql.DB) ([]User, error) {
 			return userList, err
 		}
 		if err != nil {
-			logit.Error.Println("error in GetUser" + err.Error())
+			logit.Error.Println(err.Error())
 			return userList, err
 		}
 		userList = append(userList, user)
@@ -359,7 +359,7 @@ func DBGetAllUsers(dbConn *sql.DB) ([]User, error) {
 		logit.Info.Println("fetching user info for " + userList[i].Name)
 		user, err = DBGetUser(dbConn, userList[i].Name)
 		if err != nil {
-			logit.Error.Println("error" + err.Error())
+			logit.Error.Println(err.Error())
 			return userList, err
 		}
 
@@ -381,7 +381,7 @@ func DBGetRoles(dbConn *sql.DB) ([]Role, error) {
 	rows, err = dbConn.Query(queryStr)
 
 	if err != nil {
-		logit.Error.Println("error in GetRoles:" + err.Error())
+		logit.Error.Println(err.Error())
 		return slice, err
 	}
 	defer rows.Close()
@@ -404,7 +404,7 @@ func DBGetRoles(dbConn *sql.DB) ([]Role, error) {
 		//logit.Info.Println("fetching role info for " + slice[i].Name)
 		role, err = DBGetRole(dbConn, slice[i].Name)
 		if err != nil {
-			logit.Error.Println("error" + err.Error())
+			logit.Error.Println(err.Error())
 			return slice, err
 		}
 
@@ -453,7 +453,7 @@ func DBGetSession(dbConn *sql.DB, token string) (Session, error) {
 		logit.Error.Println("secdb:DBGetSession:no token matched")
 		return session, err
 	case err != nil:
-		logit.Error.Println("secdb:DBGetSession:" + err.Error())
+		logit.Error.Println(err.Error())
 		return session, err
 	default:
 		//logit.Info.Println("secdb:DBGetSession: token returned is " + session.Token)
@@ -471,7 +471,7 @@ func DBAddSession(dbConn *sql.DB, uuid string, id string) error {
 	err := dbConn.QueryRow(queryStr).Scan(&theToken)
 	switch {
 	case err != nil:
-		logit.Error.Println("secdb:DBAddSession:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	default:
 		logit.Info.Println("secdb:AddSession: Session inserted " + theToken)

@@ -27,7 +27,7 @@ import (
 func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -36,7 +36,7 @@ func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-cluster")
 	if err != nil {
-		logit.Error.Println("AdminStartpg: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -50,7 +50,7 @@ func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 
 	dbNode, err := admindb.GetContainer(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("AdminStartpg: " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -66,7 +66,7 @@ func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	if err != nil {
-		logit.Error.Println("AdminStartpg:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -80,7 +80,7 @@ func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -89,7 +89,7 @@ func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-cluster")
 	if err != nil {
-		logit.Error.Println("AdminStoppg: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -105,7 +105,7 @@ func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 	var dbNode admindb.Container
 	dbNode, err = admindb.GetContainer(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("AdminStartpg: " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -121,7 +121,7 @@ func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 		logit.Info.Println("AdminStoppg:" + stoppgResp.Output)
 	}
 	if err != nil {
-		logit.Error.Println("AdminStoppg:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

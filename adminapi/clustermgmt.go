@@ -48,7 +48,7 @@ func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -57,7 +57,7 @@ func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("GetCluster: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -149,7 +149,7 @@ func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
 func GetCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -157,7 +157,7 @@ func GetCluster(w rest.ResponseWriter, r *rest.Request) {
 	defer dbConn.Close()
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("GetCluster: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -165,7 +165,7 @@ func GetCluster(w rest.ResponseWriter, r *rest.Request) {
 	ID := r.PathParam("ID")
 	results, err := admindb.GetCluster(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("GetCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 	cluster := Cluster{results.ID, results.ProjectID, results.Name, results.ClusterType,
@@ -179,7 +179,7 @@ func ConfigureCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -187,7 +187,7 @@ func ConfigureCluster(w rest.ResponseWriter, r *rest.Request) {
 	defer dbConn.Close()
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-cluster")
 	if err != nil {
-		logit.Error.Println("ConfigureCluster: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -195,14 +195,14 @@ func ConfigureCluster(w rest.ResponseWriter, r *rest.Request) {
 	ID := r.PathParam("ID")
 	cluster, err := admindb.GetCluster(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("ConfigureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	err = configureCluster(dbConn, cluster, false)
 	if err != nil {
-		logit.Error.Println("ConfigureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -219,14 +219,14 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	//get master node for this cluster
 	master, err := admindb.GetContainerMaster(dbConn, cluster.ID)
 	if err != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
 	var pgport admindb.Setting
 	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
 	if err != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	var sleepSetting admindb.Setting
@@ -246,7 +246,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 		data, err = template.Postgresql("master", pgport.Value, "")
 	}
 	if err != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
@@ -255,7 +255,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	//write master postgresql.conf file remotely
 	_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/postgresql.conf", data, master.Name)
 	if err != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
@@ -265,7 +265,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	var domainname admindb.Setting
 	domainname, err = admindb.GetSetting(dbConn, "DOMAIN-NAME")
 	if err != nil {
-		logit.Error.Println("configureCluster: DOMAIN-NAME err " + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
@@ -273,7 +273,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	rules := make([]template.Rule, 0)
 	data, err = template.Hba(dbConn, "master", master.Name, pgport.Value, cluster.ID, domainname.Value, rules)
 	if err != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
@@ -282,7 +282,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	//write master pg_hba.conf file remotely
 	_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/pg_hba.conf", data, master.Name)
 	if err != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
@@ -292,7 +292,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	var stopResp cpmcontainerapi.StopPGResponse
 	stopResp, err = cpmcontainerapi.StopPGClient(master.Name)
 	if err != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	logit.Info.Println("configureCluster: master stoppg output was" + stopResp.Output)
@@ -300,7 +300,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	var startResp cpmcontainerapi.StartPGResponse
 	startResp, err = cpmcontainerapi.StartPGClient(master.Name)
 	if err != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	logit.Info.Println("configureCluster:master startpg output was" + startResp.Output)
@@ -329,7 +329,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 
 	standbynodes, err2 := admindb.GetAllStandbyContainers(dbConn, cluster.ID)
 	if err2 != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	//configure all standby nodes
@@ -342,7 +342,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 			if !autocluster {
 				stopPGResp, err = cpmcontainerapi.StopPGClient(standbynodes[i].Name)
 				if err != nil {
-					logit.Error.Println("configureCluster:" + err.Error())
+					logit.Error.Println(err.Error())
 					return err
 				}
 				logit.Info.Println("configureCluster:stop output was" + stopPGResp.Output)
@@ -356,14 +356,14 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 			var backupresp cpmcontainerapi.BasebackupResponse
 			backupresp, err = cpmcontainerapi.BasebackupClient(masterhost+"."+domainname.Value, standbynodes[i].Name, username, password)
 			if err != nil {
-				logit.Error.Println("configureCluster:" + err.Error())
+				logit.Error.Println(err.Error())
 				return err
 			}
 			logit.Info.Println("configureCluster:basebackup output was" + backupresp.Output)
 
 			data, err = template.Recovery(masterhost, pgport.Value, "postgres")
 			if err != nil {
-				logit.Error.Println("configureCluster:" + err.Error())
+				logit.Error.Println(err.Error())
 				return err
 			}
 			logit.Info.Println("configureCluster:standby recovery.conf generated")
@@ -371,21 +371,21 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 			//write standby recovery.conf file remotely
 			_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/recovery.conf", data, standbynodes[i].Name)
 			if err != nil {
-				logit.Error.Println("configureCluster:" + err.Error())
+				logit.Error.Println(err.Error())
 				return err
 			}
 			logit.Info.Println("configureCluster:standby recovery.conf copied remotely")
 
 			data, err = template.Postgresql(STANDBY, pgport.Value, "")
 			if err != nil {
-				logit.Error.Println("configureCluster:" + err.Error())
+				logit.Error.Println(err.Error())
 				return err
 			}
 
 			//write standby postgresql.conf file remotely
 			_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/postgresql.conf", data, standbynodes[i].Name)
 			if err != nil {
-				logit.Error.Println("configureCluster:" + err.Error())
+				logit.Error.Println(err.Error())
 				return err
 			}
 			logit.Info.Println("configureCluster:standby postgresql.conf copied remotely")
@@ -393,7 +393,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 			//configure standby pg_hba.conf file
 			data, err = template.Hba(dbConn, STANDBY, standbynodes[i].Name, pgport.Value, cluster.ID, domainname.Value, rules)
 			if err != nil {
-				logit.Error.Println("configureCluster:" + err.Error())
+				logit.Error.Println(err.Error())
 				return err
 			}
 
@@ -402,7 +402,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 			//write standby pg_hba.conf file remotely
 			_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/pg_hba.conf", data, standbynodes[i].Name)
 			if err != nil {
-				logit.Error.Println("configureCluster:" + err.Error())
+				logit.Error.Println(err.Error())
 				return err
 			}
 			logit.Info.Println("configureCluster:standby pg_hba.conf copied remotely")
@@ -412,7 +412,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 			var stResp cpmcontainerapi.StartPGOnStandbyResponse
 			stResp, err = cpmcontainerapi.StartPGOnStandbyClient(standbynodes[i].Name)
 			if err != nil {
-				logit.Error.Println("configureCluster:" + err.Error())
+				logit.Error.Println(err.Error())
 				return err
 			}
 			logit.Info.Println("configureCluster:standby startpg output was" + stResp.Output)
@@ -427,7 +427,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	pgpoolNode, err4 := admindb.GetContainerPgpool(dbConn, cluster.ID)
 	logit.Info.Println("configureCluster: lookup pgpool node")
 	if err4 != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	logit.Info.Println("configureCluster:" + pgpoolNode.Name)
@@ -445,7 +445,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	//generate pgpool.conf HOST_LIST
 	data, err = template.Poolconf(poolnames)
 	if err != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
@@ -454,7 +454,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	//write pgpool.conf to remote pool node
 	_, err = cpmcontainerapi.RemoteWritefileClient(util.GetBase()+"/bin/"+"pgpool.conf", data, pgpoolNode.Name)
 	if err != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	logit.Info.Println("configureCluster:pgpool pgpool.conf copied remotely")
@@ -462,7 +462,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	//generate pool_passwd
 	data, err = template.Poolpasswd()
 	if err != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
@@ -471,7 +471,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	//write pgpool.conf to remote pool node
 	_, err = cpmcontainerapi.RemoteWritefileClient(util.GetBase()+"/bin/"+"pool_passwd", data, pgpoolNode.Name)
 	if err != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	logit.Info.Println("configureCluster:pgpool pool_passwd copied remotely")
@@ -479,7 +479,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	//generate pool_hba.conf
 	data, err = template.Poolhba()
 	if err != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
@@ -488,7 +488,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	//write pgpool.conf to remote pool node
 	_, err = cpmcontainerapi.RemoteWritefileClient(util.GetBase()+"/bin/"+"pool_hba.conf", data, pgpoolNode.Name)
 	if err != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	logit.Info.Println("configureCluster:pgpool pool_hba copied remotely")
@@ -497,7 +497,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	var startPoolResp cpmcontainerapi.StartPgpoolResponse
 	startPoolResp, err = cpmcontainerapi.StartPgpoolClient(pgpoolNode.Name)
 	if err != nil {
-		logit.Error.Println("configureCluster: " + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 	logit.Info.Println("configureCluster: pgpool startpgpool output was" + startPoolResp.Output)
@@ -507,7 +507,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 	cluster.Status = "initialized"
 	err = admindb.UpdateCluster(dbConn, cluster)
 	if err != nil {
-		logit.Error.Println("configureCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	}
 
@@ -518,7 +518,7 @@ func configureCluster(dbConn *sql.DB, cluster admindb.Cluster, autocluster bool)
 func GetAllClustersForProject(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -526,21 +526,21 @@ func GetAllClustersForProject(w rest.ResponseWriter, r *rest.Request) {
 	defer dbConn.Close()
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("GetAllClustersForProject: authorize error " + err.Error())
+		logit.Error.Println("authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	ID := r.PathParam("ID")
 	if ID == "" {
-		logit.Error.Println("GetAllClustersForProject: error project ID required")
+		logit.Error.Println("project ID required")
 		rest.Error(w, "project ID required", http.StatusBadRequest)
 		return
 	}
 
 	results, err := admindb.GetAllClustersForProject(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("GetAllClustersForProject: error-" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 	clusters := make([]Cluster, len(results))
@@ -562,7 +562,7 @@ func GetAllClustersForProject(w rest.ResponseWriter, r *rest.Request) {
 func GetAllClusters(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -570,14 +570,14 @@ func GetAllClusters(w rest.ResponseWriter, r *rest.Request) {
 	defer dbConn.Close()
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("GetAllClusters: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	results, err := admindb.GetAllClusters(dbConn)
 	if err != nil {
-		logit.Error.Println("GetAllClusters: error-" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 	clusters := make([]Cluster, len(results))
@@ -600,7 +600,7 @@ func GetAllClusters(w rest.ResponseWriter, r *rest.Request) {
 func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -610,14 +610,14 @@ func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 	cluster := Cluster{}
 	err = r.DecodeJsonPayload(&cluster)
 	if err != nil {
-		logit.Error.Println("PostCluster: error in decode" + err.Error())
+		logit.Error.Println("error in decode" + err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = secimpl.Authorize(dbConn, cluster.Token, "perm-cluster")
 	if err != nil {
-		logit.Error.Println("PostCluster: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -634,7 +634,7 @@ func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 		strid, err := admindb.InsertCluster(dbConn, dbcluster)
 		newid := strconv.Itoa(strid)
 		if err != nil {
-			logit.Error.Println("PostCluster:" + err.Error())
+			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -643,7 +643,7 @@ func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 		logit.Info.Println("PostCluster: about to call UpdateCluster")
 		err2 := admindb.UpdateCluster(dbConn, dbcluster)
 		if err2 != nil {
-			logit.Error.Println("PostCluster: error in UpdateCluster " + err.Error())
+			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -655,7 +655,7 @@ func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -664,28 +664,28 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-cluster")
 	if err != nil {
-		logit.Error.Println("DeleteCluster: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	ID := r.PathParam("ID")
 	if ID == "" {
-		logit.Error.Println("DeleteCluster: error cluster ID required")
+		logit.Error.Println("cluster ID required")
 		rest.Error(w, "cluster ID required", http.StatusBadRequest)
 		return
 	}
 
 	cluster, err := admindb.GetCluster(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("DeleteCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
 	//delete docker containers
 	containers, err := admindb.GetAllContainersForCluster(dbConn, cluster.ID)
 	if err != nil {
-		logit.Error.Println("DeleteCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
@@ -698,7 +698,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		//go get the docker server IPAddress
 		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
 		if err != nil {
-			logit.Error.Println("DeleteCluster:" + err.Error())
+			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -715,7 +715,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		var url = "http://" + server.IPAddress + ":10001"
 		_, err = cpmserverapi.DockerRemoveClient(url, dremreq)
 		if err != nil {
-			logit.Error.Println("DeleteCluster: error when trying to remove container" + err.Error())
+			logit.Error.Println("error when trying to remove container" + err.Error())
 		}
 
 		//send the server a deletevolume command
@@ -724,7 +724,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		ddreq.Path = server.PGDataPath + "/" + containers[i].Name
 		_, err = cpmserverapi.DiskDeleteClient(url, ddreq)
 		if err != nil {
-			logit.Error.Println("DeleteCluster: error when trying to remove disk volume" + err.Error())
+			logit.Error.Println("error when trying to remove disk volume" + err.Error())
 		}
 
 		i++
@@ -738,7 +738,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 
 		err = admindb.DeleteContainer(dbConn, containers[i].ID)
 		if err != nil {
-			logit.Error.Println("DeleteCluster:" + err.Error())
+			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -753,7 +753,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -761,13 +761,13 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	defer dbConn.Close()
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-cluster")
 	if err != nil {
-		logit.Error.Println("AdminFailover: authorize error " + err.Error())
+		logit.Error.Println("authorize error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 	ID := r.PathParam("ID")
 	if ID == "" {
-		logit.Error.Println("AdminFailover: node ID required error")
+		logit.Error.Println("node ID required error")
 		rest.Error(w, "node ID required", http.StatusBadRequest)
 		return
 	}
@@ -777,14 +777,14 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	var dbNode admindb.Container
 	dbNode, err = admindb.GetContainer(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("AdminFailover:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	cluster, err := admindb.GetCluster(dbConn, dbNode.ClusterID)
 	if err != nil {
-		logit.Error.Println("AdminFailover:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -792,7 +792,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	var failoverResp cpmcontainerapi.FailoverResponse
 	failoverResp, err = cpmcontainerapi.FailoverClient(dbNode.Name)
 	if err != nil {
-		logit.Error.Println("AdminFailover: fail-over error " + err.Error())
+		logit.Error.Println("fail-over error " + err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -802,7 +802,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	oldMaster := admindb.Container{}
 	oldMaster, err = admindb.GetContainerMaster(dbConn, dbNode.ClusterID)
 	if err != nil {
-		logit.Error.Println("AdminFailover:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -810,7 +810,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	oldMaster.ClusterID = "-1"
 	err = admindb.UpdateContainer(dbConn, oldMaster)
 	if err != nil {
-		logit.Error.Println("AdminFailover:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -819,7 +819,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	dbNode.Role = "master"
 	err = admindb.UpdateContainer(dbConn, dbNode)
 	if err != nil {
-		logit.Error.Println("AdminFailover:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -829,7 +829,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	var stopPGResp cpmcontainerapi.StopPGResponse
 	stopPGResp, err = cpmcontainerapi.StopPGClient(oldMaster.Name)
 	if err != nil {
-		logit.Error.Println("AdminFailover: " + err.Error() + stopPGResp.Output)
+		logit.Error.Println(err.Error() + stopPGResp.Output)
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -852,7 +852,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -860,14 +860,14 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 	defer dbConn.Close()
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-cluster")
 	if err != nil {
-		logit.Error.Println("EventJoinCluster: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	IDList := r.PathParam("IDList")
 	if IDList == "" {
-		logit.Error.Println("EventJoinCluster: error IDList required")
+		logit.Error.Println("IDList required")
 		rest.Error(w, "IDList required", http.StatusBadRequest)
 		return
 	} else {
@@ -876,7 +876,7 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	MasterID := r.PathParam("MasterID")
 	if MasterID == "" {
-		logit.Error.Println("EventJoinCluster: error MasterID required")
+		logit.Error.Println("MasterID required")
 		rest.Error(w, "MasterID required", http.StatusBadRequest)
 		return
 	} else {
@@ -884,7 +884,7 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 	ClusterID := r.PathParam("ClusterID")
 	if ClusterID == "" {
-		logit.Error.Println("EventJoinCluster: error ClusterID required")
+		logit.Error.Println("ClusterID required")
 		rest.Error(w, "node ClusterID required", http.StatusBadRequest)
 		return
 	} else {
@@ -901,7 +901,7 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 			logit.Info.Println("EventJoinCluster: idList[" + strconv.Itoa(i) + "]=" + idList[i])
 			origDBNode, err = admindb.GetContainer(dbConn, idList[i])
 			if err != nil {
-				logit.Error.Println("EventJoinCluster:" + err.Error())
+				logit.Error.Println(err.Error())
 				rest.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
@@ -923,7 +923,7 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 
 			err = admindb.UpdateContainer(dbConn, origDBNode)
 			if err != nil {
-				logit.Error.Println("EventJoinCluster:" + err.Error())
+				logit.Error.Println(err.Error())
 				rest.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
@@ -938,7 +938,7 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 		//update the master node
 		origDBNode, err = admindb.GetContainer(dbConn, MasterID)
 		if err != nil {
-			logit.Error.Println("EventJoinCluster:" + err.Error())
+			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -947,7 +947,7 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 		origDBNode.Role = "master"
 		err = admindb.UpdateContainer(dbConn, origDBNode)
 		if err != nil {
-			logit.Error.Println("EventJoinCluster:" + err.Error())
+			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -962,7 +962,7 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -973,14 +973,14 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	params := AutoClusterInfo{}
 	err = r.DecodeJsonPayload(&params)
 	if err != nil {
-		logit.Error.Println("AutoCluster: error in decode" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = secimpl.Authorize(dbConn, params.Token, "perm-cluster")
 	if err != nil {
-		logit.Error.Println("AutoCluster: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -1016,7 +1016,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbcluster.ID = clusterID
 	logit.Info.Println(clusterID)
 	if err != nil {
-		logit.Error.Println("AutoCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, "Insert Cluster error:"+err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -1024,7 +1024,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	//lookup profile
 	profile, err2 := getClusterProfileInfo(dbConn, params.ClusterProfile)
 	if err2 != nil {
-		logit.Error.Println("AutoCluster: error-" + err2.Error())
+		logit.Error.Println(err2.Error())
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
 		return
 	}
@@ -1327,7 +1327,7 @@ func waitTillAllReady(dockermaster cpmserverapi.DockerRunRequest, dockerpgpool c
 func StartCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("StartCluster: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -1336,7 +1336,7 @@ func StartCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-cluster")
 	if err != nil {
-		logit.Error.Println("StartCluster: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -1350,14 +1350,14 @@ func StartCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	cluster, err := admindb.GetCluster(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("StartCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
 	//start docker containers
 	containers, err := admindb.GetAllContainersForCluster(dbConn, cluster.ID)
 	if err != nil {
-		logit.Error.Println("StartCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
@@ -1371,7 +1371,7 @@ func StartCluster(w rest.ResponseWriter, r *rest.Request) {
 		//go get the docker server IPAddress
 		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
 		if err != nil {
-			logit.Error.Println("StartCluster:" + err.Error())
+			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -1400,7 +1400,7 @@ func StartCluster(w rest.ResponseWriter, r *rest.Request) {
 func StopCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("StopCluster: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -1409,7 +1409,7 @@ func StopCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-cluster")
 	if err != nil {
-		logit.Error.Println("StopCluster: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -1423,14 +1423,14 @@ func StopCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	cluster, err := admindb.GetCluster(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("StopCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
 	//stop docker containers
 	containers, err := admindb.GetAllContainersForCluster(dbConn, cluster.ID)
 	if err != nil {
-		logit.Error.Println("StopCluster:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
@@ -1444,7 +1444,7 @@ func StopCluster(w rest.ResponseWriter, r *rest.Request) {
 		//go get the docker server IPAddress
 		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
 		if err != nil {
-			logit.Error.Println("StopCluster:" + err.Error())
+			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}

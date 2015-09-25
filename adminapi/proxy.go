@@ -16,58 +16,54 @@
 package adminapi
 
 import (
-	"strconv"
+	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
-	//"github.com/crunchydata/crunchy-postgresql-manager/template"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
-	//"strconv"
-	//"time"
-	"fmt"
+	"strconv"
 )
 
 type ProxyRequest struct {
-	Token string
-	Profile string
-	Image string
-	ServerID string
-	ProjectID string
-	ContainerName string
-	Standalone string
-	DatabaseHost string
-	DatabaseUserID string
+	Token                string
+	Profile              string
+	Image                string
+	ServerID             string
+	ProjectID            string
+	ContainerName        string
+	Standalone           string
+	DatabaseHost         string
+	DatabaseUserID       string
 	DatabaseUserPassword string
-	DatabasePort string
-	Database string
+	DatabasePort         string
+	Database             string
 }
 
 func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("ProvisionProxy: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
 	}
 	defer dbConn.Close()
 
-
 	proxyrequest := ProxyRequest{}
-  	err = r.DecodeJsonPayload(&proxyrequest)
-        if err != nil {
-                logit.Error.Println("ProvisionProxy: error in decode" + err.Error())
-                rest.Error(w, err.Error(), http.StatusInternalServerError)
-                return
-        }
+	err = r.DecodeJsonPayload(&proxyrequest)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	logit.Info.Println("ProvisionProxy:  Token=[" + proxyrequest.Token + "]")
 
 	err = secimpl.Authorize(dbConn, proxyrequest.Token, "perm-container")
 	if err != nil {
-		logit.Error.Println("ProvisionProxy: validate token error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -114,7 +110,6 @@ func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-
 	logit.Info.Println("Image=" + proxyrequest.Image)
 	logit.Info.Println("Profile=" + proxyrequest.Profile)
 	logit.Info.Println("ServerID=" + proxyrequest.ServerID)
@@ -122,23 +117,23 @@ func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("ContainerName=" + proxyrequest.ContainerName)
 	logit.Info.Println("Standalone=" + proxyrequest.Standalone)
 
- 	params := &cpmserverapi.DockerRunRequest{}
-        params.Image = proxyrequest.Image
-        params.ServerID = proxyrequest.ServerID
-        params.ProjectID = proxyrequest.ProjectID
-        params.ContainerName = proxyrequest.ContainerName
-        params.Standalone = proxyrequest.Standalone
+	params := &cpmserverapi.DockerRunRequest{}
+	params.Image = proxyrequest.Image
+	params.ServerID = proxyrequest.ServerID
+	params.ProjectID = proxyrequest.ProjectID
+	params.ContainerName = proxyrequest.ContainerName
+	params.Standalone = proxyrequest.Standalone
 
 	err = provisionImpl(dbConn, params, proxyrequest.Profile, false)
 	if err != nil {
-		logit.Error.Println("ProvisionProxy error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	err = insertProxy(&proxyrequest)
 	if err != nil {
-		logit.Error.Println("ProvisionProxy error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -149,95 +144,93 @@ func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
-func insertProxy(request *ProxyRequest) (error) {
+func insertProxy(request *ProxyRequest) error {
 
 	var containerUserID int
 
-        //create user in the admin db
-        dbuser := admindb.ContainerUser{}
-        dbuser.Containername = request.ContainerName
-        dbuser.Passwd = request.DatabaseUserPassword
-        dbuser.Rolname = request.DatabaseUserID
+	//create user in the admin db
+	dbuser := admindb.ContainerUser{}
+	dbuser.Containername = request.ContainerName
+	dbuser.Passwd = request.DatabaseUserPassword
+	dbuser.Rolname = request.DatabaseUserID
 
-        dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-        if err != nil {
-                logit.Error.Println("insertProxy: error " + err.Error())
-                return err
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
 
-        }
-        defer dbConn.Close()
+	}
+	defer dbConn.Close()
 
-        containerUserID, err = admindb.AddContainerUser(dbConn, dbuser)
-        if err != nil {
-                logit.Error.Println("insertProxy: " + err.Error())
-                return err
-        }
+	containerUserID, err = admindb.AddContainerUser(dbConn, dbuser)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
 
-        logit.Info.Printf("insertProxy: new ID %d\n " ,  containerUserID)
+	logit.Info.Printf("insertProxy: new ID %d\n ", containerUserID)
 
 	var container admindb.Container
-        container, err = admindb.GetContainerByName(dbConn, request.ContainerName)
-        if err != nil {
-                logit.Error.Println("insertProxy: " + err.Error())
-                return err
-        }
+	container, err = admindb.GetContainerByName(dbConn, request.ContainerName)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
 
 	proxy := Proxy{}
-        proxy.ContainerUserID = strconv.Itoa(containerUserID)
-        proxy.ContainerID = container.ID
-        proxy.Host = request.DatabaseHost
-        proxy.Database = request.Database
-        proxy.ProjectID = request.ProjectID
-        proxy.Port = request.DatabasePort
+	proxy.ContainerUserID = strconv.Itoa(containerUserID)
+	proxy.ContainerID = container.ID
+	proxy.Host = request.DatabaseHost
+	proxy.Database = request.Database
+	proxy.ProjectID = request.ProjectID
+	proxy.Port = request.DatabasePort
 
- 	queryStr := fmt.Sprintf("insert into proxy ( containeruserid, containerid, projectid, port, host, databasename, updatedt) values ( %s, %s, %s, '%s', '%s', '%s', now()) returning id", 
-	proxy.ContainerUserID, proxy.ContainerID, proxy.ProjectID, proxy.Port, proxy.Host, proxy.Database) 
- 
-        logit.Info.Println("insertProxy:" + queryStr) 
-        var proxyid int 
-        err = dbConn.QueryRow(queryStr).Scan(&proxyid) 
-        switch { 
-        case err != nil: 
-                logit.Info.Println("insertProxy:" + err.Error()) 
-                return err 
-        default: 
-                logit.Info.Println("insertProxy: inserted returned is " + strconv.Itoa(proxyid)) 
-        }
+	queryStr := fmt.Sprintf("insert into proxy ( containeruserid, containerid, projectid, port, host, databasename, updatedt) values ( %s, %s, %s, '%s', '%s', '%s', now()) returning id",
+		proxy.ContainerUserID, proxy.ContainerID, proxy.ProjectID, proxy.Port, proxy.Host, proxy.Database)
+
+	logit.Info.Println("insertProxy:" + queryStr)
+	var proxyid int
+	err = dbConn.QueryRow(queryStr).Scan(&proxyid)
+	switch {
+	case err != nil:
+		logit.Info.Println("insertProxy:" + err.Error())
+		return err
+	default:
+		logit.Info.Println("insertProxy: inserted returned is " + strconv.Itoa(proxyid))
+	}
 
 	return err
 }
 
 func GetProxyByContainerID(w rest.ResponseWriter, r *rest.Request) {
-        dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-        if err != nil {
-                logit.Error.Println("GetProxyByContainerID: error " + err.Error())
-                rest.Error(w, err.Error(), 400)
-                return
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
 
-        }
-        defer dbConn.Close()
-        err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
-        if err != nil {
-                logit.Error.Println("GetProxyByContainerID: authorize error " + err.Error())
-                rest.Error(w, err.Error(), http.StatusUnauthorized)
-                return
-        }
+	}
+	defer dbConn.Close()
+	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
 
-        ContainerID := r.PathParam("ContainerID")
-        if ContainerID == "" {
-                logit.Error.Println("GetProxyByContainerID: ContainerID is required")
-                rest.Error(w, err.Error(), http.StatusBadRequest)
-                return
-        }
+	ContainerID := r.PathParam("ContainerID")
+	if ContainerID == "" {
+		logit.Error.Println("ContainerID is required")
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
- 	proxy, err := admindb.GetProxyByContainerID(dbConn, ContainerID)
-        if err != nil {
-                logit.Error.Println("GetProxyByContainerID:" + err.Error())
-                rest.Error(w, err.Error(), http.StatusBadRequest)
-                return
-        }
+	proxy, err := admindb.GetProxyByContainerID(dbConn, ContainerID)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-        w.WriteJson(&proxy)
+	w.WriteJson(&proxy)
 }
-
-

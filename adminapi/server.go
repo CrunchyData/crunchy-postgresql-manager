@@ -29,7 +29,7 @@ import (
 func GetServer(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -37,7 +37,7 @@ func GetServer(w rest.ResponseWriter, r *rest.Request) {
 	defer dbConn.Close()
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("GetServer: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -46,7 +46,7 @@ func GetServer(w rest.ResponseWriter, r *rest.Request) {
 
 	results, err := admindb.GetServer(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("GetServer:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -62,7 +62,7 @@ func GetServer(w rest.ResponseWriter, r *rest.Request) {
 func AddServer(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -71,7 +71,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-server")
 	if err != nil {
-		logit.Error.Println("AddServer: authorize token error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -102,7 +102,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 	var servers []admindb.Server
 	servers, err = admindb.GetAllServers(dbConn)
 	if err != nil {
-		logit.Error.Println("AddServer: get all servers error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -124,7 +124,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 		strid, err := admindb.InsertServer(dbConn, dbserver)
 		newid := strconv.Itoa(strid)
 		if err != nil {
-			logit.Error.Println("AddServer:" + err.Error())
+			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -141,7 +141,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -149,7 +149,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	defer dbConn.Close()
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("MonitorServerGetInfo: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -157,7 +157,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	Metric := r.PathParam("Metric")
 
 	if ServerID == "" {
-		logit.Error.Println("MonitorServerGetInfo: error ServerID required")
+		logit.Error.Println("error ServerID required")
 		rest.Error(w, "ServerID required", http.StatusBadRequest)
 		return
 	}
@@ -170,7 +170,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	//go get the IPAddress
 	server, err := admindb.GetServer(dbConn, ServerID)
 	if err != nil {
-		logit.Error.Println("MonitorServerGetInfo:" + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -182,7 +182,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 		var iostatResp cpmserverapi.MetricIostatResponse
 		iostatResp, err = cpmserverapi.MetricIostatClient(url, &iostatreq)
 		if err != nil {
-			logit.Error.Println("MonitorServerGetInfo:" + err.Error())
+			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), 400)
 			return
 		}
@@ -192,7 +192,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 		var dfResp cpmserverapi.MetricDfResponse
 		dfResp, err = cpmserverapi.MetricDfClient(url, &dfreq)
 		if err != nil {
-			logit.Error.Println("MonitorServerGetInfo:" + err.Error())
+			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), 400)
 			return
 		}
@@ -211,7 +211,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -219,14 +219,14 @@ func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 	defer dbConn.Close()
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
 	if err != nil {
-		logit.Error.Println("GetAllServers: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	results, err := admindb.GetAllServers(dbConn)
 	if err != nil {
-		logit.Error.Println("GetAllServers: " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 	servers := make([]Server, len(results))
@@ -248,7 +248,7 @@ func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 func DeleteServer(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
-		logit.Error.Println("BackupNow: error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), 400)
 		return
 
@@ -257,7 +257,7 @@ func DeleteServer(w rest.ResponseWriter, r *rest.Request) {
 
 	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-server")
 	if err != nil {
-		logit.Error.Println("DeleteServer: authorize error " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -271,7 +271,7 @@ func DeleteServer(w rest.ResponseWriter, r *rest.Request) {
 
 	err = admindb.DeleteServer(dbConn, ID)
 	if err != nil {
-		logit.Error.Println("DeleteServer: " + err.Error())
+		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 

@@ -44,7 +44,7 @@ func AddStatus(dbConn *sql.DB, status *TaskStatus) (string, error) {
 		&theID)
 	switch {
 	case err != nil:
-		logit.Error.Println("AddStatus: error " + err.Error())
+		logit.Error.Println(err.Error())
 		return "", err
 	default:
 	}
@@ -70,7 +70,7 @@ func UpdateStatus(dbConn *sql.DB, status *TaskStatus) error {
 	err := dbConn.QueryRow(queryStr).Scan(&name)
 	switch {
 	case err != nil:
-		logit.Error.Println("backup:UpdateStatus:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	default:
 	}
@@ -99,13 +99,13 @@ func AddSchedule(dbConn *sql.DB, s TaskSchedule) (string, error) {
 	err := dbConn.QueryRow(queryStr).Scan(
 		&theID)
 	if err != nil {
-		logit.Error.Println("error in AddSchedule query " + err.Error())
+		logit.Error.Println(err.Error())
 		return "", err
 	}
 
 	switch {
 	case err != nil:
-		logit.Error.Println("AddSchedule: error " + err.Error())
+		logit.Error.Println(err.Error())
 		return "", err
 	default:
 	}
@@ -133,7 +133,7 @@ func UpdateSchedule(dbConn *sql.DB, s TaskSchedule) error {
 	err := dbConn.QueryRow(queryStr).Scan(&name)
 	switch {
 	case err != nil:
-		logit.Error.Println("backup:UpdateSchedule:" + err.Error())
+		logit.Error.Println(err.Error())
 		return err
 	default:
 	}
@@ -166,7 +166,7 @@ func GetSchedule(dbConn *sql.DB, id string) (TaskSchedule, error) {
 		logit.Error.Println("taskdb:GetSchedule:no schedule with that id")
 		return s, err
 	case err != nil:
-		logit.Error.Println("taskdb:GetSchedule:" + err.Error())
+		logit.Error.Println(err.Error())
 		return s, err
 	default:
 	}
@@ -261,7 +261,7 @@ func GetStatus(dbConn *sql.DB, id string) (TaskStatus, error) {
 		logit.Error.Println("taskdb:GetStatus:no status with that id")
 		return s, err
 	case err != nil:
-		logit.Error.Println("taskdb:GetStatus:" + err.Error())
+		logit.Error.Println(err.Error())
 		return s, err
 	default:
 	}
