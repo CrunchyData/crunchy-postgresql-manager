@@ -21,10 +21,16 @@ var ProxyDetailController = function($scope, $state, $cookieStore, $stateParams,
         console.log(JSON.stringify($scope.proxy));
         proxyFactory.update($scope.proxy)
             .success(function(data) {
+                $scope.alerts = [{
+                    type: 'success',
+                    msg: 'proxy saved'
+                }];
+	    /**
                 $state.go('projects.proxy', $stateParams, {
                     reload: true,
                     inherit: false
                 });
+		*/
             })
             .error(function(error) {
                 $scope.alerts = [{

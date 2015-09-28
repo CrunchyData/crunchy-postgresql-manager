@@ -3,7 +3,7 @@
 		<div class="form-group">
 			<label for="inputName" class="control-label col-xs-3">Name</label>
 			<div class="col-xs-5">
-				<input type="text" class="form-control" id="inputName" ng-model="proxy.ContainerName">
+				<input disabled type="text" class="form-control" id="inputName" ng-model="proxy.ContainerName">
 			</div>
 		</div>
 		<div class="form-group">
@@ -55,6 +55,9 @@
 			</div>
 		</div>
 		<span us-spinner spinner-key="spinner-1"></span>
+		  <div>
+			          <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+				      </div>
 		<div class="form-group">
 			<div class="col-xs-offset-2 col-xs-5">
 				<button type="submit" ng-click="save()" class="btn btn-primary">Save</button>
