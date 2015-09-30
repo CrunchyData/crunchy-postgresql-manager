@@ -21,7 +21,7 @@
 set -e
 
 # set the istall directory
-export VERSION=0.9.5
+export VERSION=0.9.6
 export WORKDIR=$GOPATH/src/github.com/crunchydata/crunchy-postgresql-manager
 export TMPDIR=/tmp/var/cpm
 export ARCHIVE=/tmp/cpm.$VERSION-linux-amd64.tar.gz
@@ -98,6 +98,12 @@ pushImages () {
 	sudo docker tag -f cpm-node crunchydata/cpm-node:latest
 	sudo docker push -f crunchydata/cpm-node:$VERSION
 	sudo docker push -f crunchydata/cpm-node:latest
+
+	echo "saving cpm-node-proxy image"
+	sudo docker tag -f cpm-node-proxy crunchydata/cpm-node-proxy:$VERSION
+	sudo docker tag -f cpm-node-proxy crunchydata/cpm-node-proxy:latest
+	sudo docker push -f crunchydata/cpm-node-proxy:$VERSION
+	sudo docker push -f crunchydata/cpm-node-proxy:latest
 }
 
 saveImages () {
@@ -118,13 +124,16 @@ saveImages () {
 	sudo docker save crunchydata/cpm-collect > /tmp/cpm-collect.tar
 
 	echo "saving cpm-backup image"
-	sudo docker save crunchydata/cpm-backup > /tmp/cpm-backup.tar
+	sudo docker save crunchydata/cpm-task > /tmp/cpm-task.tar
 
 	echo "saving cpm-backup-job image"
 	sudo docker save crunchydata/cpm-backup-job > /tmp/cpm-backup-job.tar
 
 	echo "saving cpm-node image"
 	sudo docker save crunchydata/cpm-node > /tmp/cpm-node.tar
+
+	echo "saving cpm-node-proxy image"
+	sudo docker save crunchydata/cpm-node-proxy > /tmp/cpm-node-proxy.tar
 
 }
 

@@ -23,6 +23,7 @@ build:
 		godep go install cmd/dummyserver.go
 		godep go install cmd/dockerapi.go
 		godep go install cmd/collectserver.go
+		godep go install cmd/backrestrestore.go
 
 buildimages:
 		cd images/cpm-base && make  
