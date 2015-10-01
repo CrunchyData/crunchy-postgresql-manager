@@ -35,18 +35,11 @@ var backupPort string
 var backupUser string
 var backupAgentURL string
 var StatusID = ""
-var filename = "/tmp/backupjob.log"
 var CPMBIN = "/var/cpm/bin/"
-var file *os.File
 
 func init() {
 	startTime = time.Now()
 	startTimeString = startTime.String()
-	var err error
-	file, err = os.Create(filename)
-	if err != nil {
-		logit.Error.Println(err.Error())
-	}
 }
 
 func main() {
@@ -83,8 +76,8 @@ func stats(str string) {
 	sleepTime, _ := time.ParseDuration("7s")
 
 	for true {
-		logit.Info.Println(file, "sending stats...")
-		logit.Info.Println(file, "sleeping for 7 secs")
+		logit.Info.Println("sending stats...")
+		logit.Info.Println("sleeping for 7 secs")
 		time.Sleep(sleepTime)
 		stats := task.TaskStatus{}
 		eDuration := time.Since(startTime)
@@ -193,6 +186,12 @@ func getEnvVars() {
 	}
 	backupSet = "--set=" + backupSet
 
+	scheduleID = os.Getenv("BACKUP_SCHEDULEID")
+	if scheduleID == "" {
+		logit.Error.Println("BACKUP_SCHEDULEID env var not set")
+		found = false
+	}
+
 	backrestKeyPass = os.Getenv("BACKREST_KEY_PASS")
 	if backrestKeyPass == "" {
 		logit.Error.Println("BACKREST_KEY_PASS env var not set\n")
@@ -223,7 +222,9 @@ func getEnvVars() {
 }
 
 func du() string {
-	cmd := exec.Command("du", "-hs", "/pgdata")
+	path := os.Getenv("PGDATA")
+	logit.Info.Println("PGDATA is " + path)
+	cmd := exec.Command("du", "-hs", path)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
