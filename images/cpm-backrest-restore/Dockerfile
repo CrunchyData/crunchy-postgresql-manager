@@ -9,6 +9,6 @@ ADD backrest/lib  /usr/local/lib
 VOLUME ["/keys"]
 VOLUME ["/pgdata"]
 
-USER postgres
+USER root
 
 CMD ["/var/cpm/bin/start-restore.sh"]
