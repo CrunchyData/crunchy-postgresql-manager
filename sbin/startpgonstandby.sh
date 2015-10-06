@@ -16,4 +16,4 @@
 
 source /var/cpm/bin/setenv.sh
 
-pg_ctl -D /pgdata start 2> /tmp/startpgonstandby.err > /tmp/startpgonstandby.log
+su - postgres -c 'source /var/cpm/bin/setenv.sh;pg_ctl -D /pgdata start 2> /tmp/startpgonstandby.err > /tmp/startpgonstandby.log'

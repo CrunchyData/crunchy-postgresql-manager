@@ -82,7 +82,7 @@ func main() {
 		&rest.Route{"GET", "/nodes/nocluster/:Token", adminapi.GetAllNodesNotInCluster},
 		&rest.Route{"GET", "/clusternodes/:ClusterID.:Token", adminapi.GetAllNodesForCluster},
 		&rest.Route{"GET", "/nodes/forserver/:ServerID.:Token", adminapi.GetAllNodesForServer},
-		&rest.Route{"GET", "/provision/:Profile.:Image.:ServerID.:ProjectID.:ContainerName.:Standalone.:Token", adminapi.Provision},
+		&rest.Route{"POST", "/provision", adminapi.Provision},
 		&rest.Route{"GET", "/node/:ID.:Token", adminapi.GetNode},
 		&rest.Route{"GET", "/deletenode/:ID.:Token", adminapi.DeleteNode},
 		&rest.Route{"GET", "/monitor/server-getinfo/:ServerID.:Metric.:Token", adminapi.MonitorServerGetInfo},

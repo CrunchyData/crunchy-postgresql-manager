@@ -31,4 +31,8 @@ echo "*:*:*:"$2":"$3  >> $PGPASSFILE
 
 chmod 600 $PGPASSFILE
 
+chown postgres:postgres $PGPASSFILE
+
 pg_basebackup -R --pgdata /pgdata --host=$1 --port=5432 -U $2
+
+chown -R postgres:postgres /pgdata

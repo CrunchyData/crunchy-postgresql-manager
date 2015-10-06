@@ -51,6 +51,7 @@ func main() {
 		&rest.Route{"POST", "/docker/run", cpmserverapi.DockerRun},
 		&rest.Route{"POST", "/disk/provision", cpmserverapi.DiskProvision},
 		&rest.Route{"POST", "/disk/delete", cpmserverapi.DiskDelete},
+		&rest.Route{"POST", "/disk/switchpath", cpmserverapi.SwitchPath},
 	)
 	if err != nil {
 		log.Fatal(err)

@@ -132,8 +132,9 @@ func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 	params.ProjectID = proxyrequest.ProjectID
 	params.ContainerName = proxyrequest.ContainerName
 	params.Standalone = proxyrequest.Standalone
+	params.Profile = proxyrequest.Profile
 
-	err = provisionImpl(dbConn, params, proxyrequest.Profile, false)
+	_, err = provisionImpl(dbConn, params, false)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)

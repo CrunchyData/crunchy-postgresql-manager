@@ -126,6 +126,19 @@ func RemoteWritefile(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	var cmd *exec.Cmd
+	cmd = exec.Command("/usr/bin/chown", "postgres:postgres", req.Path)
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err = cmd.Run()
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	var response RemoteWritefileResponse
 	response.Status = "OK"
 	w.WriteJson(&response)

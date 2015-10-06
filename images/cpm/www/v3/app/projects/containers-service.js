@@ -52,18 +52,18 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
     };
 
     containersFactory.add = function(container, standalone, dockerprofile) {
-
-        var url = $cookieStore.get('AdminURL') + '/provision/' +
-            dockerprofile + '.' +
-            container.Image + '.' +
-            container.ServerID + '.' +
-            container.ProjectID + '.' +
-            container.Name + '.' +
-            standalone + '.' +
-            $cookieStore.get('cpm_token');
+        var url = $cookieStore.get('AdminURL') + '/provision' ;
         console.log(url);
 
-        return $http.get(url);
+        return $http.post(url, {
+            'Profile': dockerprofile,
+            'Image': container.Image,
+            'ServerID': container.ServerID,
+            'ProjectID': container.ProjectID,
+            'ContainerName': container.Name,
+            'Standalone': standalone.toString(),
+            'Token': $cookieStore.get('cpm_token')
+	});
     };
 
     containersFactory.pgstatdatabase = function(id) {

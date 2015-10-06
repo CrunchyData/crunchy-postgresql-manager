@@ -1,5 +1,4 @@
-#!/bin/bash
-
+#!/bin/bash -x
 
 # Copyright 2015 Crunchy Data Solutions, Inc.
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-source /var/cpm/bin/setenv.sh
+#
+# move an existing data volume to a backup location
+# and replace it with a restored data volume
+# $1 is the container name
+#
+DATA_DIR=$1
+CONTAINER=$2
 
-# clean up any leftover locks that pg might have left
-rm /var/run/postgresql/.s.*
+EVENT_LOG=/tmp/server-events.log
+echo volume to switch is $CONTAINER in $DATA_DIR >> $EVENT_LOG
 
-su - postgres -c 'source /var/cpm/bin/setenv.sh;pg_ctl -w -D /pgdata start 2> /tmp/startpg.err > /tmp/startpg.log'
+echo `date` >> $EVENT_LOG
+mv $DATA_DIR/$CONTAINER $DATA_DIR/$CONTAINER-orig
+mv $DATA_DIR/$CONTAINER-restore $DATA_DIR/$CONTAINER
+
+exit 0

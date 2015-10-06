@@ -98,18 +98,18 @@ func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
 	params.ContainerName = cluster.Name + "-" + STANDBY + "-" + fmt.Sprintf("%d", standbyCnt)
 	params.Standalone = "false"
 	var standby = true
-	var PROFILE = "LG"
+	params.Profile = "LG"
 
 	logit.Info.Printf("here with ProjectID %s\n", cluster.ProjectID)
 
-	err = provisionImpl(dbConn, params, PROFILE, standby)
+	_, err = provisionImpl(dbConn, params, standby)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = provisionImplInit(dbConn, params, PROFILE, false)
+	err = provisionImplInit(dbConn, params, false)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -1066,6 +1066,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	dockermaster.ServerID = masterServer.ID
 	dockermaster.ProjectID = params.ProjectID
 	dockermaster.Standalone = "false"
+	dockermaster.Profile = profile.MasterProfile
 	if err != nil {
 		logit.Error.Println("AutoCluster: error-create master node " + err.Error())
 		rest.Error(w, "AutoCluster error"+err.Error(), http.StatusBadRequest)
@@ -1073,7 +1074,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//	provision the master
-	err2 = provisionImpl(dbConn, &dockermaster, profile.MasterProfile, false)
+	_, err2 = provisionImpl(dbConn, &dockermaster, false)
 	if err2 != nil {
 		logit.Error.Println("AutoCluster: error-provision master " + err2.Error())
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -1133,7 +1134,9 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		dockerstandby[i].Image = "cpm-node"
 		dockerstandby[i].ContainerName = params.Name + "-" + STANDBY + "-" + strconv.Itoa(i)
 		dockerstandby[i].Standalone = "false"
-		err2 = provisionImpl(dbConn, &dockerstandby[i], profile.StandbyProfile, true)
+		dockerstandby[i].Profile = profile.StandbyProfile
+
+		_, err2 = provisionImpl(dbConn, &dockerstandby[i], true)
 		if err2 != nil {
 			logit.Error.Println("AutoCluster: error-provision master " + err2.Error())
 			rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -1166,8 +1169,9 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	dockerpgpool.ServerID = chosenServers[count].ID
 	dockerpgpool.ProjectID = params.ProjectID
 	dockerpgpool.Standalone = "false"
+	dockerpgpool.Profile = profile.StandbyProfile
 
-	err2 = provisionImpl(dbConn, &dockerpgpool, profile.StandbyProfile, true)
+	_, err2 = provisionImpl(dbConn, &dockerpgpool, true)
 	if err2 != nil {
 		logit.Error.Println("AutoCluster: error-provision pgpool " + err2.Error())
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)
@@ -1193,7 +1197,8 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	//init the master DB
 	//	provision the master
-	err2 = provisionImplInit(dbConn, &dockermaster, profile.MasterProfile, false)
+	dockermaster.Profile = profile.MasterProfile
+	err2 = provisionImplInit(dbConn, &dockermaster, false)
 	if err2 != nil {
 		logit.Error.Println("AutoCluster: error-provisionInit master " + err2.Error())
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)

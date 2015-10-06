@@ -32,8 +32,6 @@ import (
 	"time"
 )
 
-//docker run
-//TODO:  convert this to POST
 func Provision(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -44,24 +42,24 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer dbConn.Close()
 
-	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-container")
+	params := cpmserverapi.DockerRunRequest{}
+	err = r.DecodeJsonPayload(&params)
+	if err != nil {
+		logit.Error.Println("error in decode" + err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = secimpl.Authorize(dbConn, params.Token, "perm-container")
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	params := &cpmserverapi.DockerRunRequest{}
-	PROFILE := r.PathParam("Profile")
-	params.Image = r.PathParam("Image")
-	params.ServerID = r.PathParam("ServerID")
-	params.ProjectID = r.PathParam("ProjectID")
-	params.ContainerName = r.PathParam("ContainerName")
-	params.Standalone = r.PathParam("Standalone")
-
 	errorStr := ""
 
-	if PROFILE == "" {
+	if params.Profile == "" {
 		logit.Error.Println("Provision error profile required")
 		errorStr = "Profile required"
 		rest.Error(w, errorStr, http.StatusBadRequest)
@@ -98,32 +96,34 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 	logit.Info.Println("params.Image=" + params.Image)
-	logit.Info.Println("params.Profile=" + PROFILE)
+	logit.Info.Println("params.Profile=" + params.Profile)
 	logit.Info.Println("params.ServerID=" + params.ServerID)
 	logit.Info.Println("params.ProjectID=" + params.ProjectID)
 	logit.Info.Println("params.ContainerName=" + params.ContainerName)
 	logit.Info.Println("params.Standalone=" + params.Standalone)
 
-	err = provisionImpl(dbConn, params, PROFILE, false)
+	var newid string
+	newid, err = provisionImpl(dbConn, &params, false)
 	if err != nil {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = provisionImplInit(dbConn, params, PROFILE, false)
+	err = provisionImplInit(dbConn, &params, false)
 	if err != nil {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	status := types.SimpleStatus{}
+	status := types.ProvisionStatus{}
 	status.Status = "OK"
+	status.ID = newid
 	w.WriteJson(&status)
 
 }
 
-func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFILE string, standby bool) error {
+func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, standby bool) (string, error) {
 	logit.Info.Println("PROFILE: provisionImpl starts 1")
 
 	var errorStr string
@@ -131,19 +131,19 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 	_, err2 := admindb.GetContainerByName(dbConn, params.ContainerName)
 	if err2 != nil {
 		if err2 != sql.ErrNoRows {
-			return err2
+			return "", err2
 		}
 	} else {
 		errorStr = "container name" + params.ContainerName + " already used can't provision"
 		logit.Error.Println(errorStr)
-		return errors.New(errorStr)
+		return "", errors.New(errorStr)
 	}
 
 	//go get the IPAddress
 	server, err := admindb.GetServer(dbConn, params.ServerID)
 	if err != nil {
 		logit.Error.Println(err.Error())
-		return err
+		return "", err
 	}
 
 	logit.Info.Println("provisioning on server " + server.IPAddress)
@@ -165,7 +165,7 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 		_, err = cpmserverapi.DiskProvisionClient(url, preq)
 		if err != nil {
 			logit.Error.Println(err.Error())
-			return err
+			return "", err
 		}
 		logit.Info.Println("Provision: provisionvolume call response=" + responseStr)
 	}
@@ -173,10 +173,10 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 
 	//run docker run to create the container
 
-	params.CPU, params.MEM, err = getDockerResourceSettings(dbConn, PROFILE)
+	params.CPU, params.MEM, err = getDockerResourceSettings(dbConn, params.Profile)
 	if err != nil {
 		logit.Error.Println(err.Error())
-		return err
+		return "", err
 	}
 
 	//remove any existing docker containers with this name
@@ -187,7 +187,7 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 	_, err = cpmserverapi.DockerRemoveClient(url, rreq)
 	if err != nil {
 		logit.Error.Println(err.Error())
-		return err
+		return "", err
 	}
 	logit.Info.Println("PROFILE provisionImpl remove old container end")
 	params.CommandPath = "docker-run.sh"
@@ -196,7 +196,7 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 	if err != nil {
 		logit.Error.Println(err.Error())
 		logit.Error.Println(resp.Output)
-		return err
+		return "", err
 	}
 	logit.Info.Println("docker-run.sh output=[" + resp.Output + "]")
 	logit.Info.Println("docker-run.sh trimmed output=[" + strings.TrimSpace(resp.Output) + "]")
@@ -204,7 +204,7 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 	if strings.TrimSpace(resp.Output) != "0" {
 		err = errors.New("bad return code from docker-run.sh")
 		logit.Error.Println(err.Error())
-		return err
+		return "", err
 	}
 
 	dbnode := types.Container{}
@@ -226,7 +226,7 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 	newid := strconv.Itoa(strid)
 	if err != nil {
 		logit.Error.Println(err.Error())
-		return err
+		return "", err
 	}
 	dbnode.ID = newid
 
@@ -235,7 +235,7 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFIL
 		err = createDBUsers(dbConn, dbnode)
 	}
 
-	return err
+	return newid, err
 
 }
 
@@ -300,7 +300,7 @@ func createDBUsers(dbConn *sql.DB, dbnode types.Container) error {
 	return err
 }
 
-func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PROFILE string, standby bool) error {
+func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, standby bool) error {
 	//go get the domain name from the settings
 	var domainname types.Setting
 	var pgport types.Setting
@@ -342,46 +342,58 @@ func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, PR
 	if standby {
 		logit.Info.Println("standby node being created, will not initdb")
 	} else {
-		//initdb on the new node
+		if params.RestoreJob != "" {
+			logit.Info.Println("RestoreJob found...")
+			//get restore env vars
+			//RESTORE_REMOTE_PATH
+			//RESTORE_REMOTE_HOST
+			//RESTORE_REMOTE_USER
+			//RESTORE_DB_USER
+			//RESTORE_DB_PASS
+			//RESTORE_SET
 
-		logit.Info.Println("PROFILE running initdb on the node")
-		var resp cpmcontainerapi.InitdbResponse
+		} else {
+			//initdb on the new node
+			logit.Info.Println("PROFILE running initdb on the node")
+			var resp cpmcontainerapi.InitdbResponse
 
-		logit.Info.Println("checkpt 2")
-		resp, err = cpmcontainerapi.InitdbClient(fqdn)
-		if err != nil {
-			logit.Error.Println(err.Error())
-			return err
-		}
-		logit.Info.Println("checkpt 3")
-		logit.Info.Println("initdb output was" + resp.Output)
-		logit.Info.Println("PROFILE initdb completed")
-		//create postgresql.conf
-		var data string
-		var mode = "standalone"
+			logit.Info.Println("checkpt 2")
+			resp, err = cpmcontainerapi.InitdbClient(fqdn)
+			if err != nil {
+				logit.Error.Println(err.Error())
+				return err
+			}
+			logit.Info.Println("checkpt 3")
+			logit.Info.Println("initdb output was" + resp.Output)
+			logit.Info.Println("PROFILE initdb completed")
+			//create postgresql.conf
+			var data string
+			var mode = "standalone"
 
-		data, err = template.Postgresql(mode, pgport.Value, "")
+			data, err = template.Postgresql(mode, pgport.Value, "")
 
-		//place postgresql.conf on new node
-		_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/postgresql.conf", data, fqdn)
-		if err != nil {
-			logit.Error.Println(err.Error())
-			return err
+			//place postgresql.conf on new node
+			_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/postgresql.conf", data, fqdn)
+			if err != nil {
+				logit.Error.Println(err.Error())
+				return err
+			}
+			//create pg_hba.conf
+			rules := make([]template.Rule, 0)
+			data, err = template.Hba(dbConn, mode, params.ContainerName, pgport.Value, "", domainname.Value, rules)
+			if err != nil {
+				logit.Error.Println(err.Error())
+				return err
+			}
+			//place pg_hba.conf on new node
+			_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/pg_hba.conf", data, fqdn)
+			if err != nil {
+				logit.Error.Println(err.Error())
+				return err
+			}
+			logit.Info.Println("PROFILE templates all built and copied to node")
 		}
-		//create pg_hba.conf
-		rules := make([]template.Rule, 0)
-		data, err = template.Hba(dbConn, mode, params.ContainerName, pgport.Value, "", domainname.Value, rules)
-		if err != nil {
-			logit.Error.Println(err.Error())
-			return err
-		}
-		//place pg_hba.conf on new node
-		_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/pg_hba.conf", data, fqdn)
-		if err != nil {
-			logit.Error.Println(err.Error())
-			return err
-		}
-		logit.Info.Println("PROFILE templates all built and copied to node")
+
 		//start pg on new node
 		var startResp cpmcontainerapi.StartPGResponse
 		startResp, err = cpmcontainerapi.StartPGClient(fqdn)

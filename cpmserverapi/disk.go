@@ -38,9 +38,16 @@ type DiskDeleteResponse struct {
 	Output string
 	Status string
 }
+type SwitchPathRequest struct {
+	DataDir       string
+	ContainerName string
+}
+type SwitchPathResponse struct {
+	Output string
+	Status string
+}
 
 func DiskProvision(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("DiskProvision called")
 	req := DiskProvisionRequest{}
 	err := r.DecodeJsonPayload(&req)
 	if err != nil {
@@ -48,6 +55,7 @@ func DiskProvision(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	logit.Info.Println("DiskProvision called " + req.Path)
 
 	var cmd *exec.Cmd
 	cmd = exec.Command("provisionvolume.sh", req.Path)
@@ -69,7 +77,6 @@ func DiskProvision(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func DiskDelete(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("DiskDelete called")
 	req := DiskDeleteRequest{}
 	err := r.DecodeJsonPayload(&req)
 	if err != nil {
@@ -77,6 +84,7 @@ func DiskDelete(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	logit.Info.Println("DiskDelete called " + req.Path)
 
 	var cmd *exec.Cmd
 	cmd = exec.Command("deletevolume", req.Path)
@@ -92,6 +100,35 @@ func DiskDelete(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var response DiskDeleteResponse
+	response.Output = out.String()
+	response.Status = "OK"
+	w.WriteJson(&response)
+}
+
+func SwitchPath(w rest.ResponseWriter, r *rest.Request) {
+	req := SwitchPathRequest{}
+	err := r.DecodeJsonPayload(&req)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logit.Info.Println("SwitchPath called " + req.DataDir + " " + req.ContainerName)
+
+	var cmd *exec.Cmd
+	cmd = exec.Command("switchpath", req.DataDir, req.ContainerName)
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err = cmd.Run()
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+	}
+
+	var response SwitchPathResponse
 	response.Output = out.String()
 	response.Status = "OK"
 	w.WriteJson(&response)

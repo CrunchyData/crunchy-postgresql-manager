@@ -62,6 +62,18 @@ func DiskDeleteClient(url string, req *DiskDeleteRequest) (DiskDeleteResponse, e
 	return response, err
 }
 
+func SwitchPathClient(url string, req *SwitchPathRequest) (SwitchPathResponse, error) {
+	var err error
+	buf, _ := json.Marshal(req)
+	body := bytes.NewBuffer(buf)
+	r, _ := http.Post(url+"/disk/switchpath", "application/json", body)
+	rawresponse, _ := ioutil.ReadAll(r.Body)
+	response := SwitchPathResponse{}
+	err = json.Unmarshal(rawresponse, &response)
+	//fmt.Println(string(rawresponse))
+	return response, err
+}
+
 func DockerInspectClient(url string, req *DockerInspectRequest) (DockerInspectResponse, error) {
 	var err error
 	buf, _ := json.Marshal(req)

@@ -17,8 +17,13 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/task"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"strings"
@@ -29,6 +34,7 @@ var startTime time.Time
 var startTimeString string
 var nodeName, repoRemotePath, backupHost, backupSet, backrestKeyPass string
 var nodeProfileName, backupServerName, backupServerIP string
+var dataDir, serverID, token, dockerProfileName, projectID string
 
 var scheduleID string
 var backupPort string
@@ -36,6 +42,7 @@ var backupUser string
 var backupAgentURL string
 var StatusID = ""
 var CPMBIN = "/var/cpm/bin/"
+var CPM_ADMIN = "cpm-admin:13001"
 
 func init() {
 	startTime = time.Now()
@@ -56,7 +63,7 @@ func main() {
 	sendStats(&s)
 
 	//kick off stats reporting in a separate thread
-	go stats("hi")
+	//go stats("hi")
 
 	logit.Info.Println("giving DNS time to register the backup job....sleeping for 7 secs")
 	sleepTime, _ := time.ParseDuration("7s")
@@ -64,6 +71,44 @@ func main() {
 
 	//perform the restore
 	restore("end")
+
+	//start pg locally to complete the recovery
+	//exec startpg.sh
+
+	newid, err := createContainer()
+	if err != nil {
+		s.Status = "error in createContainer"
+		sendStats(&s)
+		return
+	}
+
+	logit.Info.Println("created container ID=" + newid)
+
+	err = stopContainer()
+	if err != nil {
+		s.Status = "error in stopContainer"
+		sendStats(&s)
+		return
+	}
+	err = switchPaths()
+	if err != nil {
+		s.Status = "error in switchPaths"
+		sendStats(&s)
+		return
+	}
+
+	err = startContainer()
+	if err != nil {
+		s.Status = "error in startContainer"
+		sendStats(&s)
+		return
+	}
+	err = seedDatabase()
+	if err != nil {
+		s.Status = "error in seedDatabase"
+		sendStats(&s)
+		return
+	}
 
 	//send final stats to backup
 	finalstats("end")
@@ -111,7 +156,7 @@ func restore(str string) {
 
 	logit.Info.Println("doing restore")
 
-	cmd := exec.Command("pg_backrest", "restore", "--stanza=main", backupSet)
+	cmd := exec.Command("pg_backrest", "restore", "--type=none", "--stanza=main", backupSet)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
@@ -192,6 +237,18 @@ func getEnvVars() {
 		found = false
 	}
 
+	projectID = os.Getenv("BACKUP_PROJECTID")
+	if projectID == "" {
+		logit.Error.Println("BACKUP_PROJECTID env var not set")
+		found = false
+	}
+
+	serverID = os.Getenv("BACKUP_SERVERID")
+	if serverID == "" {
+		logit.Error.Println("BACKUP_SERVERID env var not set")
+		found = false
+	}
+
 	backrestKeyPass = os.Getenv("BACKREST_KEY_PASS")
 	if backrestKeyPass == "" {
 		logit.Error.Println("BACKREST_KEY_PASS env var not set\n")
@@ -203,6 +260,11 @@ func getEnvVars() {
 		logit.Error.Println("BACKUP_SERVERNAME env var not set")
 		found = false
 	}
+	token = os.Getenv("TOKEN")
+	if token == "" {
+		logit.Error.Println("TOKEN env var not set")
+		found = false
+	}
 
 	backupServerIP = os.Getenv("BACKUP_SERVERIP")
 	if backupServerIP == "" {
@@ -212,6 +274,16 @@ func getEnvVars() {
 	nodeProfileName = os.Getenv("NODE_PROFILENAME")
 	if nodeProfileName == "" {
 		logit.Error.Println("NODE_PROFILENAME env var not set")
+		found = false
+	}
+	dockerProfileName = os.Getenv("DOCKER_PROFILENAME")
+	if dockerProfileName == "" {
+		logit.Error.Println("DOCKER_PROFILENAME env var not set")
+		found = false
+	}
+	dataDir = os.Getenv("DATA_DIR")
+	if dataDir == "" {
+		logit.Error.Println("DATA_DIR env var not set")
 		found = false
 	}
 
@@ -240,4 +312,80 @@ func du() string {
 	var parsed = strings.Split(out.String(), "\t")
 	return parsed[0]
 
+}
+func createContainer() (string, error) {
+	var err error
+
+	params := &cpmserverapi.DockerRunRequest{}
+	params.Image = "cpm-node"
+	params.ServerID = serverID
+	params.ProjectID = projectID
+	params.ContainerName = nodeName
+	params.Standalone = "true"
+
+	response := types.ProvisionStatus{}
+	url := "http://" + CPM_ADMIN + "/provision/" +
+		dockerProfileName + "." +
+		params.Image + "." +
+		params.ServerID + "." +
+		params.ProjectID + "." +
+		params.ContainerName + "." +
+		params.Standalone + "." +
+		token
+	logit.Info.Println("url=" + url)
+	r, err := http.Get(url)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return "", err
+	}
+	rawresponse, _ := ioutil.ReadAll(r.Body)
+	err = json.Unmarshal(rawresponse, &response)
+	logit.Info.Println(string(rawresponse))
+
+	return response.ID, err
+}
+
+func stopContainer() error {
+	req := cpmserverapi.DockerStopRequest{}
+	req.ContainerName = nodeName
+	response, err := cpmserverapi.DockerStopClient("http://"+backupHost+":10001", &req)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
+
+	logit.Info.Println("stopContainer:" + response.Output)
+	return err
+}
+
+func switchPaths() error {
+	var err error
+
+	var req = cpmserverapi.SwitchPathRequest{}
+	req.DataDir = dataDir
+	req.ContainerName = nodeName
+
+	var url = "http://" + backupHost + ":10001"
+	response, err := cpmserverapi.SwitchPathClient(url, &req)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
+	logit.Info.Println(response.Output)
+
+	return err
+}
+
+func startContainer() error {
+	req := cpmserverapi.DockerStartRequest{}
+	req.ContainerName = nodeName
+	response, err := cpmserverapi.DockerStartClient("http://"+backupHost+":10001", &req)
+
+	logit.Info.Println("startContainer:" + response.Output)
+	return err
+}
+
+func seedDatabase() error {
+	var err error
+	return err
 }

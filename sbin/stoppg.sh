@@ -15,4 +15,4 @@
 # limitations under the License.
 
 source /var/cpm/bin/setenv.sh
-pg_ctl --mode immediate -D /pgdata stop 2> /tmp/stoppg.err > /tmp/stoppg.log
+su - postgres -c 'source /var/cpm/bin/setenv.sh;pg_ctl --mode immediate -D /pgdata stop 2> /tmp/stoppg.err > /tmp/stoppg.log'

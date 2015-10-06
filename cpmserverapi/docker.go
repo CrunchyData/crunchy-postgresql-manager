@@ -64,6 +64,9 @@ type DockerRunRequest struct {
 	ContainerType string
 	CommandOutput string
 	CommandPath   string
+	Profile       string
+	RestoreJob    string
+	Token         string
 	EnvVars       map[string]string
 }
 type DockerRunResponse struct {
