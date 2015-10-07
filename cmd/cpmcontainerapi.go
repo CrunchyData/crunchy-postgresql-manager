@@ -53,6 +53,7 @@ func main() {
 		&rest.Route{"POST", "/failover", cpmcontainerapi.Failover},
 		&rest.Route{"POST", "/controldata", cpmcontainerapi.Controldata},
 		&rest.Route{"POST", "/badgergenerate", cpmcontainerapi.BadgerGenerate},
+		&rest.Route{"POST", "/restore", cpmcontainerapi.Restore},
 	)
 	if err != nil {
 		log.Fatal(err)

@@ -171,6 +171,12 @@ create table taskschedule (
 	dayofmonth varchar(80) not null,
 	month varchar(80) not null,
 	dayofweek varchar(80) not null,
+	restoreset varchar(80) not null,
+	restoreremotepath varchar(80) not null,
+	restoreremotehost varchar(80) not null,
+	restoreremoteuser varchar(30) not null,
+	restoredbuser varchar(80) not null,
+	restoredbpass varchar(80) not null,
 	updatedt timestamp not null,
 	constraint valid_enabled check (
 		enabled in ('YES', 'NO')

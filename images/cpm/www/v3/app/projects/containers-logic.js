@@ -589,10 +589,18 @@ var ContainerScheduleController = function($scope, $stateParams, $state, tasksFa
 };
 
 var ContainerScheduleAddController = function($scope, $filter, $stateParams, $state, tasksFactory, serversFactory, utils, servers) {
+	$scope.schedule = {};
+	$scope.schedule.RestoreSet = 'latest';
+	$scope.schedule.RestoreRemotePath = '';
+	$scope.schedule.RestoreRemoteHost = '';
+	$scope.schedule.RestoreRemoteUser = '';
+	$scope.schedule.RestoreDbUser = '';
+	$scope.schedule.RestoreDbPass = '';
+
     $scope.profiles = [{
         name: 'pg_basebackup'
     }, {
-        name: 'pg_other'
+        name: 'pg_backrest_restore'
     }];
     $scope.currentProfileName = $scope.profiles[0];
 
@@ -632,6 +640,7 @@ var ContainerScheduleAddController = function($scope, $filter, $stateParams, $st
         }
         $scope.schedule.ServerID = $scope.myServer;
         $scope.schedule.ProfileName = $scope.currentProfileName.name;
+	console.log('adding schedule with schedule='+ JSON.stringify($scope.schedule));
         tasksFactory.addschedule($scope.schedule, $scope.container.Name)
             .success(function(data) {
                 $state.go('projects.container.taskschedules', $stateParams, {
@@ -654,7 +663,7 @@ var ContainerScheduleEditController = function($scope, $filter, $stateParams, $s
     $scope.profiles = [{
         name: 'pg_basebackup'
     }, {
-        name: 'pg_other'
+        name: 'pg_backrest_restore'
     }];
     $scope.currentProfileName = $scope.profiles[0];
 
@@ -673,6 +682,12 @@ var ContainerScheduleEditController = function($scope, $filter, $stateParams, $s
             } else {
                 $scope.thething.checked = false;
             }
+
+	    if ($scope.schedule.ProfileName == 'pg_basebackup') {
+    		$scope.currentProfileName = $scope.profiles[0];
+		} else {
+    		$scope.currentProfileName = $scope.profiles[1];
+		}
             $scope.setServer();
         })
         .error(function(error) {

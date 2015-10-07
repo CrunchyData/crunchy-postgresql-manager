@@ -4,15 +4,10 @@
 # restore a database from a pg_backrest backup
 #
 # Passed in Env Vars:
-#	NODE_NAME - the name we give the provisioned db container
-#	REPO_REMOTE_PATH - the pg_backrest remote path used for the restore
-#	BACKUP_HOST - the pg_backrest host to contact for the restore
-#	BACKUP_USER - the pg_backrest user to connect to the backup host
-#	BACKUP_SET - the pg_backrest backup set to restore
-#	BACKREST_KEY_PASS - the pg_backrest ssh key passphrase
-#	BACKUP_SERVERNAME - the CPM server name the restore is executing on
-#	BACKUP_SERVERIP - the CPM server ip address the restore is executing on
-#	NODE_PROFILENAME - should be a static value of "backrest-restore"
+#	RestoreRemotePath - the pg_backrest remote path used for the restore
+#	RestoreRemoteHost - the pg_backrest host to contact for the restore
+#	RestoreRemoteUser - the pg_backrest user to connect to the backup host
+#	RestoreSet - the pg_backrest backup set to restore
 #
 # Mounted paths:
 # 	/pgdata - the db path to restore files to
@@ -22,16 +17,12 @@
 source /var/cpm/bin/setenv.sh
 
 echo ***Environment vars***
-echo NODE_NAME=$NODE_NAME
-echo REPO_REMOTE_PATH=$REPO_REMOTE_PATH
-echo BACKUP_HOST=$BACKUP_HOST
-echo BACKUP_USER=$BACKUP_USER
-echo BACKUP_SET=$BACKUP_SET
-echo BACKREST_KEY_PASS=$BACKREST_KEY_PASS
-echo BACKUP_SERVERNAME=$BACKUP_SERVERNAME
-echo BACKUP_SERVERIP=$BACKUP_SERVERIP
-echo NODE_PROFILENAME=$NODE_PROFILENAME
-echo BACKUP_SCHEDULEID=$BACKUP_SCHEDULEID
+echo RestoreRemotePath=$RestoreRemotePath
+echo RestoreRemoteHost=$RestoreRemoteHost
+echo RestoreRemoteUser=$RestoreRemoteUser
+echo RestoreDbUser=$RestoreDbUser
+echo RestoreDbPass=$RestoreDbPass
+echo RestoreSet=$RestoreSet
 echo PGDATA=$PGDATA
 echo ***end of Environment vars***
 
@@ -40,11 +31,11 @@ echo ***end of Environment vars***
 # function to create the backrest config file
 #
 createBackrestConfig() {
-sed "s+REPO_REMOTE_PATH+$REPO_REMOTE_PATH+g; \
-	s/BACKUP_HOST/$BACKUP_HOST/g; \
+sed "s+RestoreRemotePath+$RestoreRemotePath+g; \
+	s/RestoreRemoteHost/$RestoreRemoteHost/g; \
 	s+PGDATA+$PGDATA+g; \
-	s/BACKUP_USER/$BACKUP_USER/g" \
-	/var/cpm/conf/pg_backrest.conf.template  > /etc/pg_backrest.conf
+	s/RestoreRemoteUser/$RestoreRemoteUser/g" \
+	/var/cpm/conf/pg_backrest.conf.template  > /tmp/pg_backrest.conf
 }
 
 # ssh public key to use for backrest..../tmp/keys is mounted
@@ -67,16 +58,15 @@ DB_PATH=$PGDATA
 createBackrestConfig
 
 # test ssh
-#ssh -i /keys/id_rsa -o StrictHostKeyChecking=no $BACKUP_USER@$BACKUP_HOST
-#ssh -i /keys/id_rsa -o StrictHostKeyChecking=no $BACKUP_USER@$BACKUP_HOST 'hostname'
-setupssh.sh $BACKUP_HOST $BACKUP_USER $BACKREST_KEY_PASS
+#ssh -i /keys/id_rsa -o StrictHostKeyChecking=no $RestoreRemoteUser@$RestoreRemoteHost
+#ssh -i /keys/id_rsa -o StrictHostKeyChecking=no $RestoreRemoteUser@$RestoreRemoteHost 'hostname'
+setupssh.sh $RestoreRemoteHost $RestoreRemoteUser
 
 # run restore daemon as postgres user
-# daemon needs to run 'pg_backrest restore --stanza=main --set=$BACKUP_SET'
+# daemon needs to run 'pg_backrest restore --stanza=main --set=$RestoreSet'
 # and send back stats to cpm-admin database
 # and provision a cpm-node
 
-backrestrestore
+pg_backrest --config=/tmp/pg_backrest.conf --stanza=main --target=$RestoreSet restore 
 
-dummyserver
-
+exit 0

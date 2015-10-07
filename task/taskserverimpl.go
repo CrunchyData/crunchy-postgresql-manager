@@ -20,6 +20,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 
 	"database/sql"
+	"errors"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/robfig/cron"
 	"net/http"
@@ -57,20 +58,26 @@ type TaskRequest struct {
 }
 
 type TaskSchedule struct {
-	ID            string
-	ServerID      string
-	ServerName    string
-	ServerIP      string
-	ContainerName string
-	ProfileName   string
-	Name          string
-	Enabled       string
-	Minutes       string
-	Hours         string
-	DayOfMonth    string
-	Month         string
-	DayOfWeek     string
-	UpdateDt      string
+	ID                string
+	ServerID          string
+	ServerName        string
+	ServerIP          string
+	ContainerName     string
+	ProfileName       string
+	Name              string
+	Enabled           string
+	Minutes           string
+	Hours             string
+	DayOfMonth        string
+	Month             string
+	DayOfWeek         string
+	UpdateDt          string
+	RestoreSet        string
+	RestoreRemotePath string
+	RestoreRemoteHost string
+	RestoreRemoteUser string
+	RestoreDbUser     string
+	RestoreDbPass     string
 }
 
 type StatusAddResponse struct {
@@ -186,11 +193,26 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 
 	}
 	defer dbConn.Close()
-	logit.Info.Println("ExecuteNow.impl called")
+	logit.Info.Println("ExecuteNow.impl called profile=" + request.ProfileName)
 
-	err = ProvisionBackupJob(dbConn, &request)
-	if err != nil {
-		logit.Error.Println(err.Error())
+	if request.ProfileName == "pg_basebackup" {
+		err = ProvisionBackupJob(dbConn, &request)
+		if err != nil {
+			logit.Error.Println(err.Error())
+			rest.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else if request.ProfileName == "pg_backrest_restore" {
+		logit.Info.Println("doing restore job on...")
+		err = ProvisionRestoreJob(dbConn, &request)
+		if err != nil {
+			logit.Error.Println(err.Error())
+			rest.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		err = errors.New("invalid profile name found:" + request.ProfileName)
+		logit.Error.Println(err)
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

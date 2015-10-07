@@ -59,3 +59,40 @@ func BadgerGenerate(w rest.ResponseWriter, r *rest.Request) {
 	response.Status = "OK"
 	w.WriteJson(&response)
 }
+
+type RestoreRequest struct {
+	ContainerName string
+}
+type RestoreResponse struct {
+	Output string
+	Status string
+}
+
+func Restore(w rest.ResponseWriter, r *rest.Request) {
+	logit.Info.Println("Restore called")
+	req := RestoreRequest{}
+	err := r.DecodeJsonPayload(&req)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var cmd *exec.Cmd
+	cmd = exec.Command("start-restore.sh")
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err = cmd.Run()
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+	}
+
+	var response RestoreResponse
+	response.Output = out.String()
+	response.Status = "OK"
+	w.WriteJson(&response)
+}

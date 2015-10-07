@@ -23,7 +23,7 @@ build:
 		godep go install cmd/dummyserver.go
 		godep go install cmd/dockerapi.go
 		godep go install cmd/collectserver.go
-		godep go install cmd/backrestrestore.go
+		godep go install cmd/restorecommand.go
 
 buildimages:
 		cd images/cpm-base && make  
@@ -34,6 +34,7 @@ buildimages:
 		cd images/cpm-pgpool && make
 		cd images/cpm-task && make
 		cd images/cpm-backup-job && make
+		cd images/cpm-restore-job && make
 		cd images/cpm-prometheus && make
 		cd images/cpm-collect && make
 

@@ -17,6 +17,8 @@
 # start up the cpm container agent
 #
 
+env > /tmp/envvars.out
+
 source /var/cpm/bin/setenv.sh
 
 # when the container starts, see if there is a pg instance we can start up

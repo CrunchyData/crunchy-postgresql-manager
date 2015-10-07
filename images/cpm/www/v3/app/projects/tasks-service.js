@@ -51,7 +51,13 @@ angular.module('uiRouterSample.tasks.service', ['ngCookies'])
             'DayOfMonth': schedule.DayOfMonth,
             'Month': schedule.Month,
             'DayOfWeek': schedule.DayOfWeek,
-            'Name': schedule.Name
+            'Name': schedule.Name,
+            'RestoreSet': schedule.RestoreSet,
+            'RestoreRemotePath': schedule.RestoreRemotePath,
+            'RestoreRemoteHost': schedule.RestoreRemoteHost,
+            'RestoreRemoteUser': schedule.RestoreRemoteUser,
+            'RestoreDbUser': schedule.RestoreDbUser,
+            'RestoreDbPass': schedule.RestoreDbPass
 
         });
     };
@@ -79,7 +85,13 @@ angular.module('uiRouterSample.tasks.service', ['ngCookies'])
             'ServerID': schedule.ServerID,
             'ContainerName': containerName,
             'ProfileName': schedule.ProfileName,
-            'Name': schedule.Name
+            'Name': schedule.Name,
+            'RestoreSet': schedule.RestoreSet,
+            'RestoreRemotePath': schedule.RestoreRemotePath,
+            'RestoreRemoteHost': schedule.RestoreRemoteHost,
+            'RestoreRemoteUser': schedule.RestoreRemoteUser,
+            'RestoreDbUser': schedule.RestoreDbUser,
+            'RestoreDbPass': schedule.RestoreDbPass
         });
     };
 

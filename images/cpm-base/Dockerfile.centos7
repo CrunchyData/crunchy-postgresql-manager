@@ -30,6 +30,10 @@ RUN chown -R postgres:postgres /pgdata
 VOLUME ["/cpmlogs"]
 RUN chown -R postgres:postgres /cpmlogs
 
+# add volumes to allow restore
+VOLUME ["/keys"]
+RUN chown -R root:root /keys
+
 # open up the postgres port
 EXPOSE 5432
 

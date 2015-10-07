@@ -25,11 +25,9 @@ echo $3 " is docker run container type " >> $CLUSTER_LOG
 echo $4 " is docker run cpu " >> $CLUSTER_LOG
 echo $5 " is docker run mem " >> $CLUSTER_LOG
 echo $6 " is docker env vars " >> $CLUSTER_LOG
-#docker run --name=$2 -d --privileged -v $1:/pgdata -v /sys/fs/cgroup:/sys/fs/cgroup:ro  $3
-docker run --name=$2 $6 -c $4 -m $5 -d \
-	-v /var/cpm/data/keys:/keys \
-	-v $1:/pgdata  crunchydata/$3 &> /tmp/docker-run.output
+docker rm $2
+docker run --name=$2 $6 -c $4 -m $5 -d -v /var/cpm/keys:/keys -v $1:/pgdata $3
+#docker run --name=$2 $6 -c $4 -m $5 -d -v $1:/pgdata $3
+#docker run --name=$2 $6 -c $4 -m $5 --rm=true -v $1:/pgdata $3
 
-RC=$?
-echo $RC
 

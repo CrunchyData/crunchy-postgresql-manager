@@ -6,6 +6,6 @@ build:
 		cp ../../sbin/setupssh.sh ./bin
 		cp ../../../../../../bin/backrestrestore ./bin
 		cp ../../../../../../bin/dummyserver ./bin
-	        sudo docker build -t cpm-backrest-restore .
-		sudo docker tag -f cpm-backrest-restore:latest crunchydata/cpm-backrest-restore
+	        sudo docker build -t cpm-restore-job .
+		sudo docker tag -f cpm-restore-job:latest crunchydata/cpm-restore-job
 

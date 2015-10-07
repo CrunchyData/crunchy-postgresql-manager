@@ -14,8 +14,9 @@
     <div class="form-group">
         <label for="inputProf" class="control-label col-xs-2">Task</label>
         <div class="col-xs-3">
-		<select type="text" class="form-control" id="inputProf" ng-model="currentProfileName" ng-options="profile.name for profile in profiles">
-		</select>
+            <select type="text" class="form-control" id="inputProf" ng-model="currentProfileName"
+            ng-options="profile.name for profile in profiles">
+            </select>
         </div>
     </div>
 
@@ -57,6 +58,56 @@
             </select>
         </div>
     </div>
+
+    <hr>
+    <div ng-show="currentProfileName.name == 'pg_backrest_restore'">
+        <div class="form-group">
+            <H4>Restore Parameters</H4>
+        </div>
+        <div class="form-group">
+            <label for="inputRestoreSet" class="control-label col-xs-2">Set</label>
+            <div class="col-xs-5">
+                <input type="text" class="form-control" id="inputRestoreSet" placeholder="latest"
+                ng-model="schedule.RestoreSet">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputRestoreRemotePath" class="control-label col-xs-2">Remote Path</label>
+            <div class="col-xs-5">
+                <input type="text" class="form-control" id="inputRestoreRemotePath" placeholder="latest"
+                ng-model="schedule.RestoreRemotePath">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputRestoreRemoteHost" class="control-label col-xs-2">Remote Host</label>
+            <div class="col-xs-5">
+                <input type="text" class="form-control" id="inputRestoreRemoteHost" placeholder="value"
+                ng-model="schedule.RestoreRemoteHost">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputRestoreRemoteUser" class="control-label col-xs-2">Remote User</label>
+            <div class="col-xs-5">
+                <input type="text" class="form-control" id="inputRestoreRemoteUser" placeholder="value"
+                ng-model="schedule.RestoreRemoteUser">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputRestoreDbUser" class="control-label col-xs-2">DB User</label>
+            <div class="col-xs-5">
+                <input type="text" class="form-control" id="inputRestoreDbUser" placeholder="value"
+                ng-model="schedule.RestoreDbUser">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputRestoreDbPass" class="control-label col-xs-2">DB Password</label>
+            <div class="col-xs-5">
+                <input type="password" class="form-control" id="inputRestoreDbPass" placeholder="value"
+                ng-model="schedule.RestoreDbPass">
+            </div>
+        </div>
+    </div>
+
 
     <div class="form-group">
         <div class="col-xs-5">

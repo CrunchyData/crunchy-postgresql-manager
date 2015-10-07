@@ -51,23 +51,29 @@ type DockerStopResponse struct {
 }
 
 type DockerRunRequest struct {
-	CPU           string
-	MEM           string
-	ClusterID     string
-	ServerID      string
-	ProjectID     string
-	Image         string
-	IPAddress     string
-	Standalone    string
-	PGDataPath    string
-	ContainerName string
-	ContainerType string
-	CommandOutput string
-	CommandPath   string
-	Profile       string
-	RestoreJob    string
-	Token         string
-	EnvVars       map[string]string
+	CPU               string
+	MEM               string
+	ClusterID         string
+	ServerID          string
+	ProjectID         string
+	Image             string
+	IPAddress         string
+	Standalone        string
+	PGDataPath        string
+	ContainerName     string
+	ContainerType     string
+	CommandOutput     string
+	CommandPath       string
+	Profile           string
+	Token             string
+	EnvVars           map[string]string
+	RestoreJob        string
+	RestoreRemotePath string
+	RestoreRemoteHost string
+	RestoreRemoteUser string
+	RestoreDbUser     string
+	RestoreDbPass     string
+	RestoreSet        string
 }
 type DockerRunResponse struct {
 	Output string

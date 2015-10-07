@@ -189,6 +189,22 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, standb
 		logit.Error.Println(err.Error())
 		return "", err
 	}
+
+	//pass any restore env vars to the new container
+	if params.RestoreJob != "" {
+		if params.EnvVars == nil {
+			logit.Info.Println("making envvars map")
+			params.EnvVars = make(map[string]string)
+		}
+		params.EnvVars["RestoreJob"] = params.RestoreJob
+		params.EnvVars["RestoreRemotePath"] = params.RestoreRemotePath
+		params.EnvVars["RestoreRemoteHost"] = params.RestoreRemoteHost
+		params.EnvVars["RestoreRemoteUser"] = params.RestoreRemoteUser
+		params.EnvVars["RestoreDbUser"] = params.RestoreDbUser
+		params.EnvVars["RestoreDbPass"] = params.RestoreDbPass
+		params.EnvVars["RestoreSet"] = params.RestoreSet
+	}
+
 	logit.Info.Println("PROFILE provisionImpl remove old container end")
 	params.CommandPath = "docker-run.sh"
 	var resp cpmserverapi.DockerRunResponse
@@ -343,15 +359,7 @@ func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, st
 		logit.Info.Println("standby node being created, will not initdb")
 	} else {
 		if params.RestoreJob != "" {
-			logit.Info.Println("RestoreJob found...")
-			//get restore env vars
-			//RESTORE_REMOTE_PATH
-			//RESTORE_REMOTE_HOST
-			//RESTORE_REMOTE_USER
-			//RESTORE_DB_USER
-			//RESTORE_DB_PASS
-			//RESTORE_SET
-
+			logit.Info.Println("RestoreJob found, not doing initdb...")
 		} else {
 			//initdb on the new node
 			logit.Info.Println("PROFILE running initdb on the node")

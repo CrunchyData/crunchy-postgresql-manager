@@ -33,18 +33,23 @@ type BackupNowPost struct {
 }
 
 type AddSchedulePost struct {
-	ID            string
-	Token         string
-	ServerID      string
-	ProfileName   string
-	Name          string
-	Enabled       string
-	ContainerName string
-	Minutes       string
-	Hours         string
-	DayOfMonth    string
-	Month         string
-	DayOfWeek     string
+	ID                string
+	Token             string
+	ServerID          string
+	ProfileName       string
+	Name              string
+	Enabled           string
+	ContainerName     string
+	Minutes           string
+	Hours             string
+	DayOfMonth        string
+	Month             string
+	DayOfWeek         string
+	RestoreSet        string
+	RestoreRemotePath string
+	RestoreRemoteHost string
+	RestoreDbUser     string
+	RestoreDbPass     string
 }
 
 const CLUSTERADMIN_DB = "clusteradmin"
@@ -188,6 +193,11 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 	s.DayOfMonth = "1"
 	s.Month = "*"
 	s.DayOfWeek = "*"
+	s.RestoreSet = postMsg.RestoreSet
+	s.RestoreRemotePath = postMsg.RestoreRemotePath
+	s.RestoreRemoteHost = postMsg.RestoreRemoteHost
+	s.RestoreDbUser = postMsg.RestoreDbUser
+	s.RestoreDbPass = postMsg.RestoreDbPass
 
 	result, err := task.AddSchedule(dbConn, s)
 	if err != nil {
