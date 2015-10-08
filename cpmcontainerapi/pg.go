@@ -90,6 +90,14 @@ type SeedResponse struct {
 	Output string
 	Status string
 }
+type RemoveDataRequest struct {
+	ContainerName string
+}
+type RemoveDataResponse struct {
+	Output string
+	Stderr string
+	Status string
+}
 type ControldataRequest struct {
 	Path string
 }
@@ -99,7 +107,7 @@ type ControldataResponse struct {
 }
 
 func RemoteWritefile(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("RemoteWritefile called")
+	logit.Info.Println("cpmcontainerapi: RemoteWritefile called")
 	req := RemoteWritefileRequest{}
 	err := r.DecodeJsonPayload(&req)
 	if err != nil {
@@ -145,7 +153,7 @@ func RemoteWritefile(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func Initdb(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("Initdb called")
+	logit.Info.Println("cpmcontainerapi: Initdb called")
 	req := InitdbRequest{}
 	err := r.DecodeJsonPayload(&req)
 	if err != nil {
@@ -174,7 +182,7 @@ func Initdb(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func StartPG(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("StartPG called")
+	logit.Info.Println("cpmcontainerapi: StartPG called")
 	req := StartPGRequest{}
 	err := r.DecodeJsonPayload(&req)
 	if err != nil {
@@ -203,7 +211,7 @@ func StartPG(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func StopPG(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("StopPG called")
+	logit.Info.Println("cpmcontainerapi: StopPG called")
 	req := StopPGRequest{}
 	err := r.DecodeJsonPayload(&req)
 	if err != nil {
@@ -232,7 +240,7 @@ func StopPG(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func Basebackup(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("Basebackup called")
+	logit.Info.Println("cpmcontainerapi: Basebackup called")
 	req := BasebackupRequest{}
 	err := r.DecodeJsonPayload(&req)
 	if err != nil {
@@ -274,7 +282,7 @@ func Basebackup(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func Failover(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("Failover called")
+	logit.Info.Println("cpmcontainerapi: Failover called")
 	req := FailoverRequest{}
 	err := r.DecodeJsonPayload(&req)
 	if err != nil {
@@ -308,7 +316,7 @@ func Failover(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func Seed(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("Seed called")
+	logit.Info.Println("cpmcontainerapi: Seed called")
 	req := SeedRequest{}
 	err := r.DecodeJsonPayload(&req)
 	if err != nil {
@@ -337,7 +345,7 @@ func Seed(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func StartPGOnStandby(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("StartPGOnStandby called")
+	logit.Info.Println("cpmcontainerapi: StartPGOnStandby called")
 	req := StartPGOnStandbyRequest{}
 	err := r.DecodeJsonPayload(&req)
 	if err != nil {
@@ -366,7 +374,7 @@ func StartPGOnStandby(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func Controldata(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("Controldata called")
+	logit.Info.Println("cpmcontainerapi: Controldata called")
 	req := ControldataRequest{}
 	err := r.DecodeJsonPayload(&req)
 	if err != nil {
@@ -398,5 +406,35 @@ func Status(w rest.ResponseWriter, r *rest.Request) {
 	response := StatusResponse{}
 	response.Status = "RUNNING"
 	w.WriteHeader(http.StatusOK)
+	w.WriteJson(&response)
+}
+
+func RemoveData(w rest.ResponseWriter, r *rest.Request) {
+	logit.Info.Println("cpmcontainerapi: RemoveData called")
+	req := RemoveDataRequest{}
+	err := r.DecodeJsonPayload(&req)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var cmd *exec.Cmd
+	cmd = exec.Command("removedata.sh", req.ContainerName)
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err = cmd.Run()
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+	}
+
+	var response RemoveDataResponse
+	response.Output = out.String()
+	response.Stderr = stderr.String()
+	response.Status = "OK"
 	w.WriteJson(&response)
 }

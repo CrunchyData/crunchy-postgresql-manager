@@ -237,9 +237,8 @@ func StatusClient(host string) (StatusResponse, error) {
 	return response, err
 }
 
-func RestoreClient(host string) (RestoreResponse, error) {
+func RestoreClient(host string, req *RestoreRequest) (RestoreResponse, error) {
 	var err error
-	req := RestoreRequest{}
 	req.ContainerName = host
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
@@ -248,6 +247,22 @@ func RestoreClient(host string) (RestoreResponse, error) {
 	r, _ := http.Post(url, "application/json", body)
 	rawresponse, _ := ioutil.ReadAll(r.Body)
 	response := RestoreResponse{}
+	err = json.Unmarshal(rawresponse, &response)
+	//fmt.Println(string(rawresponse))
+	return response, err
+}
+
+func RemoveDataClient(host string) (RemoveDataResponse, error) {
+	var err error
+	req := RemoveDataRequest{}
+	req.ContainerName = host
+	buf, _ := json.Marshal(req)
+	body := bytes.NewBuffer(buf)
+	url := "http://" + host + PORT + "/api/removedata"
+	logit.Info.Println("removedata client about to post to " + url)
+	r, _ := http.Post(url, "application/json", body)
+	rawresponse, _ := ioutil.ReadAll(r.Body)
+	response := RemoveDataResponse{}
 	err = json.Unmarshal(rawresponse, &response)
 	//fmt.Println(string(rawresponse))
 	return response, err

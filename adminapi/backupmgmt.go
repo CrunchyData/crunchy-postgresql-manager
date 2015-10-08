@@ -48,6 +48,7 @@ type AddSchedulePost struct {
 	RestoreSet        string
 	RestoreRemotePath string
 	RestoreRemoteHost string
+	RestoreRemoteUser string
 	RestoreDbUser     string
 	RestoreDbPass     string
 }
@@ -196,6 +197,7 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 	s.RestoreSet = postMsg.RestoreSet
 	s.RestoreRemotePath = postMsg.RestoreRemotePath
 	s.RestoreRemoteHost = postMsg.RestoreRemoteHost
+	s.RestoreRemoteUser = postMsg.RestoreRemoteUser
 	s.RestoreDbUser = postMsg.RestoreDbUser
 	s.RestoreDbPass = postMsg.RestoreDbPass
 
@@ -494,6 +496,12 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 	s.Month = postMsg.Month
 	s.DayOfWeek = postMsg.DayOfWeek
 	s.Name = postMsg.Name
+	s.RestoreSet = postMsg.RestoreSet
+	s.RestoreRemotePath = postMsg.RestoreRemotePath
+	s.RestoreRemoteHost = postMsg.RestoreRemoteHost
+	s.RestoreRemoteUser = postMsg.RestoreRemoteUser
+	s.RestoreDbUser = postMsg.RestoreDbUser
+	s.RestoreDbPass = postMsg.RestoreDbPass
 
 	err = task.UpdateSchedule(dbConn, s)
 	if err != nil {

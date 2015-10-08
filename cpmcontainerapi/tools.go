@@ -32,7 +32,7 @@ type BadgerGenerateResponse struct {
 }
 
 func BadgerGenerate(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("BadgerGenerate called")
+	logit.Info.Println("cpmcontainerapi: BadgerGenerate called")
 	req := BadgerGenerateRequest{}
 	err := r.DecodeJsonPayload(&req)
 	if err != nil {
@@ -61,7 +61,13 @@ func BadgerGenerate(w rest.ResponseWriter, r *rest.Request) {
 }
 
 type RestoreRequest struct {
-	ContainerName string
+	ContainerName     string
+	RestoreRemotePath string
+	RestoreRemoteHost string
+	RestoreRemoteUser string
+	RestoreDbUser     string
+	RestoreDbPass     string
+	RestoreSet        string
 }
 type RestoreResponse struct {
 	Output string
@@ -69,7 +75,7 @@ type RestoreResponse struct {
 }
 
 func Restore(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("Restore called")
+	logit.Info.Println("cpmcontainerapi: Restore called")
 	req := RestoreRequest{}
 	err := r.DecodeJsonPayload(&req)
 	if err != nil {
@@ -79,7 +85,9 @@ func Restore(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var cmd *exec.Cmd
-	cmd = exec.Command("start-restore.sh")
+	cmd = exec.Command("start-restore.sh", req.RestoreRemotePath,
+		req.RestoreRemoteHost, req.RestoreRemoteUser, req.RestoreDbUser,
+		req.RestoreDbPass, req.RestoreSet)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out

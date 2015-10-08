@@ -35,7 +35,7 @@ var CPMBIN = CPMDIR + "bin/"
 
 func main() {
 
-	logit.Info.Println("containeragent starting")
+	logit.Info.Println("cpmcontainerapi: containeragent starting")
 
 	api := rest.NewApi()
 	api.Use(rest.DefaultDevStack...)
@@ -54,6 +54,7 @@ func main() {
 		&rest.Route{"POST", "/controldata", cpmcontainerapi.Controldata},
 		&rest.Route{"POST", "/badgergenerate", cpmcontainerapi.BadgerGenerate},
 		&rest.Route{"POST", "/restore", cpmcontainerapi.Restore},
+		&rest.Route{"POST", "/removedata", cpmcontainerapi.RemoveData},
 	)
 	if err != nil {
 		log.Fatal(err)

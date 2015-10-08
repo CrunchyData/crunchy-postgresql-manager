@@ -26,6 +26,7 @@ import (
 func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 
 	//get node
+	/**
 	node, err := admindb.GetContainerByName(dbConn, args.ContainerName)
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -38,6 +39,7 @@ func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 		logit.Error.Println(err.Error())
 		return err
 	}
+	*/
 
 	logit.Info.Println("task.ProvisionRestoreJob called")
 	logit.Info.Println("with scheduleid=" + args.ScheduleID)
@@ -50,7 +52,7 @@ func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 	params := &cpmserverapi.DockerRunRequest{}
 	params.Image = "crunchydata/cpm-restore-job"
 	params.ServerID = args.ServerID
-	restorecontainername := args.ContainerName + "-restore"
+	restorecontainername := args.ContainerName + "-restore-job"
 	params.ContainerName = restorecontainername
 	params.Standalone = "false"
 
@@ -84,38 +86,18 @@ func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 	params.EnvVars["RestoreDbUser"] = schedule.RestoreDbUser
 	params.EnvVars["RestoreDbPass"] = schedule.RestoreDbPass
 	params.EnvVars["RestoreSet"] = schedule.RestoreSet
-
-	params.EnvVars["BACKUP_NAME"] = restorecontainername
-	params.EnvVars["BACKUP_SERVERNAME"] = server.Name
-	params.EnvVars["BACKUP_SERVERIP"] = server.IPAddress
-	params.EnvVars["BACKUP_SCHEDULEID"] = args.ScheduleID
-	params.EnvVars["BACKUP_PROFILENAME"] = args.ProfileName
-	params.EnvVars["BACKUP_CONTAINERNAME"] = args.ContainerName
-	params.EnvVars["BACKUP_PATH"] = params.PGDataPath
-	params.EnvVars["BACKUP_USERNAME"] = credential.Username
-	params.EnvVars["BACKUP_PASSWORD"] = credential.Password
-	params.EnvVars["BACKUP_HOST"] = args.ContainerName
+	params.EnvVars["RestoreContainerName"] = args.ContainerName
+	params.EnvVars["RestoreScheduleID"] = args.ScheduleID
+	params.EnvVars["RestoreServerName"] = server.Name
+	params.EnvVars["RestoreServerIP"] = server.IPAddress
+	params.EnvVars["RestoreProfileName"] = args.ProfileName
 
 	setting, err = admindb.GetSetting(dbConn, "PG-PORT")
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return err
 	}
-	params.EnvVars["BACKUP_PORT"] = setting.Value
-	params.EnvVars["BACKUP_USER"] = "postgres"
-	params.EnvVars["BACKUP_SERVER_URL"] = "cpm-task:13001"
-
-	//provision the volume
-	/**
-	request := &cpmserverapi.DiskProvisionRequest{"/tmp/foo"}
-	request.Path = params.PGDataPath
-	var url = "http://" + server.IPAddress + ":10001"
-	_, err = cpmserverapi.DiskProvisionClient(url, request)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return err
-	}
-	*/
+	params.EnvVars["RestorePGPort"] = setting.Value
 
 	//run the container
 	params.CommandPath = "docker-run-restore.sh"

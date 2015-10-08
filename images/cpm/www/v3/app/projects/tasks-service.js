@@ -38,6 +38,8 @@ angular.module('uiRouterSample.tasks.service', ['ngCookies'])
 
     tasksFactory.updateschedule = function(schedule) {
 
+	console.log('jeff set is ' + schedule.RestoreSet);
+
         var url = $cookieStore.get('AdminURL') + '/task/updateschedule';
         console.log(url);
 

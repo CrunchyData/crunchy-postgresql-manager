@@ -41,7 +41,7 @@ type StopPgpoolResponse struct {
 }
 
 func StartPgpool(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("StartPgpool called")
+	logit.Info.Println("cpmcontainerapi: StartPgpool called")
 	response := StartPgpoolResponse{}
 	req := StartPgpoolRequest{}
 	err := r.DecodeJsonPayload(&req)
@@ -77,7 +77,7 @@ func StartPgpool(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func StopPgpool(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("StopPgpool called")
+	logit.Info.Println("cpmcontainerapi: StopPgpool called")
 	response := StopPgpoolResponse{}
 	req := StopPgpoolRequest{}
 	err := r.DecodeJsonPayload(&req)
