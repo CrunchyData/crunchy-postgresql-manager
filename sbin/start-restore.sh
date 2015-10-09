@@ -85,8 +85,27 @@ setupssh.sh $RestoreRemoteHost $RestoreRemoteUser
 # the database startup to work using pg_backrest
 su postgres -c '/var/cpm/bin/setupssh.sh $RestoreRemoteHost $RestoreRemoteUser'
 
+# save off the original CPM generated config files
+# for merging after the restore
+cp $PGDATA/pg_hba.conf /tmp/pg_hba.conf.cpm
+cp $PGDATA/postgresql.conf /tmp/postgresql.conf.cpm
+
+# clean out data files before the restore
+rm -rf $PGDATA/*
+
+# do the restore
 pg_backrest restore --type=name --stanza=main --target=$RestoreSet 
 
+#
+# save off the restored config files 
+cp $PGDATA/pg_hba.conf /tmp/pg_hba.conf.restore
+cp $PGDATA/postgresql.conf /tmp/postgresql.conf.restore
+
+# revert back to the cpm config 
+cp /tmp/pg_hba.conf.cpm $PGDATA/pg_hba.conf
+cp /tmp/postgresql.conf.cpm $PGDATA/postgresql.conf
+
+# reset the permissions where pgdata is owned by postgres 
 chown -R postgres:postgres /tmp/backrest-repo
 chown -R postgres:postgres $PGDATA
 

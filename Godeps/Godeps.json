@@ -2,6 +2,7 @@
 	"ImportPath": "github.com/crunchydata/crunchy-postgresql-manager",
 	"GoVersion": "go1.4.2",
 	"Packages": [
+		"github.com/crunchydata/crunchy-postgresql-manager/types",
 		"github.com/crunchydata/crunchy-postgresql-manager/collect",
 		"github.com/crunchydata/crunchy-postgresql-manager/util",
 		"github.com/crunchydata/crunchy-postgresql-manager/logit",
@@ -114,6 +115,11 @@
 		{
 			"ImportPath": "github.com/prometheus/procfs",
 			"Rev": "c91d8eefde16bd047416409eb56353ea84a186e4"
+		},
+		{
+			"ImportPath": "github.com/robfig/cron",
+			"Comment": "v1-2-g67823cd",
+			"Rev": "67823cd24dece1b04cced3a0a0b3ca2bc84d875e"
 		}
 	]
 }
