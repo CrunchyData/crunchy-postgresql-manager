@@ -1,14 +1,11 @@
 
+OSFLAVOR=centos7
+
 build:
-		rm -rf bin
-		mkdir bin
-		cp ../../sbin/start-cpmcontainerapi.sh ./bin
-		cp ../../sbin/start-restore.sh ./bin
-		cp ../../sbin/removedata.sh ./bin
-		cp ../../sbin/fail-over.sh ./bin
-		cp ../../sbin/badger-generate.sh ./bin
-		cp ../../../../../../bin/cpmcontainerapi ./bin
-		cp ../../../../../../bin/dummyserver ./bin
-	        sudo docker build -t cpm-node .
+		cp ../../sbin/setenv.sh ./bin
+		cp ../../config/.bash_profile ./bin
+		cp $(GOBIN)/cpmcontainerapi ./bin
+#		cp $(GOBIN)/dummyserver ./bin
+	        sudo docker build -t cpm-node -f Dockerfile.$(OSFLAVOR) .
 		sudo docker tag -f cpm-node:latest crunchydata/cpm-node
 
