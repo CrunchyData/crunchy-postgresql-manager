@@ -1,9 +1,7 @@
-
+OSFLAVOR=centos7
 build:
-		rm -rf bin
-		mkdir bin
-		cp ../../../../../../bin/collectserver ./bin
-		cp ../../sbin/start-collect.sh ./bin
-	        sudo docker build -t cpm-collect .
+		cp ../../sbin/setenv.sh ./bin
+		cp $(GOBIN)/collectserver ./bin
+	        sudo docker build -t cpm-collect -f Dockerfile.$(OSFLAVOR) .
 		sudo docker tag -f cpm-collect:latest crunchydata/cpm-collect
 
