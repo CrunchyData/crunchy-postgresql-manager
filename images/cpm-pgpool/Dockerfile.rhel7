@@ -17,6 +17,7 @@ RUN yum install -y procps-ng postgresql94 postgresql94-contrib pgpool-II-94 libx
 EXPOSE 5432
 
 ADD bin /var/cpm/bin
+ADD sbin /var/cpm/bin
 ADD conf/pgpool /var/cpm/conf/pgpool
 ADD conf/pgpool/pool_hba.conf  /etc/pgpool-II-94/pool_hba.conf
 ADD conf/pgpool/pool_passwd /etc/pgpool-II-94/pool_passwd
