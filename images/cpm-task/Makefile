@@ -1,10 +1,8 @@
-
+OSFLAVOR=centos7
 build:
-		rm -rf bin
-		mkdir bin
-		cp ../../sbin/start-taskserver.sh ./bin
-		cp ../../../../../../bin/taskserver ./bin
-		cp ../../../../../../bin/dummyserver ./bin
-	        sudo docker build -t cpm-task .
+		cp $(GOBIN)/taskserver ./bin
+		cp $(GOBIN)/dummyserver ./bin
+		cp ../../sbin/setenv.sh ./bin
+	        sudo docker build -t cpm-task -f Dockerfile.$(OSFLAVOR) .
 		sudo docker tag -f cpm-task:latest crunchydata/cpm-task
 
