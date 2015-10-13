@@ -1,0 +1,13 @@
+[global:general]
+repo-path=/tmp/backrest-repo
+repo-remote-path=RestoreRemotePath
+
+[global:backup]
+backup-host=RestoreRemoteHost
+backup-user=RestoreRemoteUser
+
+[global:archive]
+archive-async=y
+
+[main]
+db-path=PGDATA
