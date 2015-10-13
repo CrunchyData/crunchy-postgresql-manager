@@ -1,13 +1,11 @@
-
+OSFLAVOR=centos7
 build:
-	        rm -rf bin
-	        mkdir bin
-	        cp ../../sql/clusteradmin.sql  ./bin/setup.sql
-	        cp ../../sql/*  ./bin
-	        cp ../../sbin/startadmin.sh ./bin
-	        cp ../../sbin/badger-generate.sh ./bin
-	        cp ../../../../../../bin/adminapi  ./bin
-	        cp ../../../../../../bin/dummyserver  ./bin
-	        sudo docker build -t cpm-admin .
+	        cp ../../sbin/setenv.sh  ./bin
+	        cp ../../config/.bash_profile  ./bin
+	        cp ../../sql/clusteradmin.sql  ./sql/setup.sql
+	        cp ../../sql/*  ./sql
+	        cp $(GOBIN)/adminapi  ./bin
+	        cp $(GOBIN)/dummyserver  ./bin
+	        sudo docker build -t cpm-admin -f Dockerfile.$(OSFLAVOR) .
 		sudo docker tag -f cpm-admin:latest crunchydata/cpm-admin
 
