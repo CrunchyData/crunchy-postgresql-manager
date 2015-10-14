@@ -22,11 +22,6 @@
 			"Rev": "75cd24fc2f2c2a2088577d12123ddee5f54e0675"
 		},
 		{
-			"ImportPath": "github.com/Sirupsen/logrus",
-			"Comment": "v0.7.2-4-gcdd90c3",
-			"Rev": "cdd90c38c6e3718c731b555b9c3ed1becebec3ba"
-		},
-		{
 			"ImportPath": "github.com/ant0ine/go-json-rest/rest",
 			"Comment": "v3.1.0",
 			"Rev": "fc0d6bacef3ca8295c53fb0232cc042734521394"
@@ -34,46 +29,6 @@
 		{
 			"ImportPath": "github.com/beorn7/perks/quantile",
 			"Rev": "b965b613227fddccbfffe13eae360ed3fa822f8d"
-		},
-		{
-			"ImportPath": "github.com/docker/docker/pkg/archive",
-			"Comment": "v1.4.1-2386-ge011119",
-			"Rev": "e011119a497b6c6c18a6d1f048b1e69e2ab2eb7a"
-		},
-		{
-			"ImportPath": "github.com/docker/docker/pkg/fileutils",
-			"Comment": "v1.4.1-2386-ge011119",
-			"Rev": "e011119a497b6c6c18a6d1f048b1e69e2ab2eb7a"
-		},
-		{
-			"ImportPath": "github.com/docker/docker/pkg/ioutils",
-			"Comment": "v1.4.1-2386-ge011119",
-			"Rev": "e011119a497b6c6c18a6d1f048b1e69e2ab2eb7a"
-		},
-		{
-			"ImportPath": "github.com/docker/docker/pkg/pools",
-			"Comment": "v1.4.1-2386-ge011119",
-			"Rev": "e011119a497b6c6c18a6d1f048b1e69e2ab2eb7a"
-		},
-		{
-			"ImportPath": "github.com/docker/docker/pkg/promise",
-			"Comment": "v1.4.1-2386-ge011119",
-			"Rev": "e011119a497b6c6c18a6d1f048b1e69e2ab2eb7a"
-		},
-		{
-			"ImportPath": "github.com/docker/docker/pkg/system",
-			"Comment": "v1.4.1-2386-ge011119",
-			"Rev": "e011119a497b6c6c18a6d1f048b1e69e2ab2eb7a"
-		},
-		{
-			"ImportPath": "github.com/docker/docker/pkg/units",
-			"Comment": "v1.4.1-2386-ge011119",
-			"Rev": "e011119a497b6c6c18a6d1f048b1e69e2ab2eb7a"
-		},
-		{
-			"ImportPath": "github.com/docker/docker/vendor/src/code.google.com/p/go/src/pkg/archive/tar",
-			"Comment": "v1.4.1-2386-ge011119",
-			"Rev": "e011119a497b6c6c18a6d1f048b1e69e2ab2eb7a"
 		},
 		{
 			"ImportPath": "github.com/fsouza/go-dockerclient",
@@ -93,17 +48,7 @@
 			"Rev": "fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a"
 		},
 		{
-			"ImportPath": "github.com/prometheus/client_golang/model",
-			"Comment": "0.6.0-15-g00e4c46",
-			"Rev": "00e4c4629626a912cb8b44f8839a058768fc9c3f"
-		},
-		{
 			"ImportPath": "github.com/prometheus/client_golang/prometheus",
-			"Comment": "0.6.0-15-g00e4c46",
-			"Rev": "00e4c4629626a912cb8b44f8839a058768fc9c3f"
-		},
-		{
-			"ImportPath": "github.com/prometheus/client_golang/text",
 			"Comment": "0.6.0-15-g00e4c46",
 			"Rev": "00e4c4629626a912cb8b44f8839a058768fc9c3f"
 		},
@@ -111,6 +56,14 @@
 			"ImportPath": "github.com/prometheus/client_model/go",
 			"Comment": "model-0.0.2-12-gfa8ad6f",
 			"Rev": "fa8ad6fec33561be4280a8f0514318c79d7f6cb6"
+		},
+		{
+			"ImportPath": "github.com/prometheus/common/expfmt",
+			"Rev": "ffe929a3f4c4faeaa10f2b9535c2b1be3ad15650"
+		},
+		{
+			"ImportPath": "github.com/prometheus/common/model",
+			"Rev": "ffe929a3f4c4faeaa10f2b9535c2b1be3ad15650"
 		},
 		{
 			"ImportPath": "github.com/prometheus/procfs",

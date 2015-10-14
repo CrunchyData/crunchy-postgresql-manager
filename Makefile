@@ -26,7 +26,6 @@ build:
 		godep go install cmd/restorecommand.go
 
 buildimages:
-		cd images/cpm-base && make  
 		cd images/cpm-admin && make  
 		cd images/cpm && make 
 		cd images/cpm-node && make  
