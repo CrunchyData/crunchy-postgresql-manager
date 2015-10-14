@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 # Copyright 2015 Crunchy Data Solutions, Inc.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,17 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-export PGROOT=/usr/pgsql-9.4
-export CPMBASE=/var/cpm
-export PGDATA=/pgdata
-export PG_LOG=/tmp/pg.log
-export CLUSTER_LOG=/tmp/cluster-admin.log
-export PATH=$CPMBASE/bin:$PGROOT/bin:$PATH:/usr/local/bin
-export LD_LIBRARY_PATH=$PGROOT/lib
+source /var/cpm/bin/setenv.sh
 
-hostip() {
-	grep `hostname` /etc/hosts | cut -f 1
-}
+# clean up any leftover locks that pg might have left
+rm /var/run/postgresql/.s.*
 
-export PG_HOST_IP=`hostip`
-
+su - postgres -c 'source /var/cpm/bin/setenv.sh;pg_ctl -w -D /pgdata start 2> /tmp/startpg.err > /tmp/startpg.log'

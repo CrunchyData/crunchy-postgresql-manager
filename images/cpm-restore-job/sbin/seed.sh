@@ -13,17 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-export PGROOT=/usr/pgsql-9.4
-export CPMBASE=/var/cpm
-export PGDATA=/pgdata
-export PG_LOG=/tmp/pg.log
-export CLUSTER_LOG=/tmp/cluster-admin.log
-export PATH=$CPMBASE/bin:$PGROOT/bin:$PATH:/usr/local/bin
-export LD_LIBRARY_PATH=$PGROOT/lib
+#
+# seed the database after provisioning
+# we will execute this script on each host since
+# we dont' want to open up the superuser 'postgres' access 
+# to outside of the container
+#
 
-hostip() {
-	grep `hostname` /etc/hosts | cut -f 1
-}
-
-export PG_HOST_IP=`hostip`
-
+psql -U postgres postgres < /var/cpm/bin/setup.sql

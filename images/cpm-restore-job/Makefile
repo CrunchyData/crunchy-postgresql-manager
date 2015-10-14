@@ -1,11 +1,9 @@
+OSFLAVOR=centos7
 
 build:
-		rm -rf bin
-		mkdir bin
-		cp ../../sbin/start-restore-job.sh ./bin
-		cp ../../sbin/setupssh.sh ./bin
-		cp ../../../../../../bin/restorecommand ./bin
-		cp ../../../../../../bin/dummyserver ./bin
-	        sudo docker build -t cpm-restore-job .
+		cp ../../sbin/setenv.sh ./bin
+		cp $(GOBIN)/restorecommand ./bin
+#		cp $(GOBIN)/dummyserver ./bin
+	        sudo docker build -t cpm-restore-job -f Dockerfile.$(OSFLAVOR) .
 		sudo docker tag -f cpm-restore-job:latest crunchydata/cpm-restore-job
 
