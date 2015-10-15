@@ -643,7 +643,8 @@ func performConfigUpdate(dbConn *sql.DB, ContainerID string) error {
 	}
 
 	var currentStatus string
-	currentStatus, err = GetPGStatus2(dbConn, container.Name, container.Name)
+	//currentStatus, err = GetPGStatus2(dbConn, container.Name, container.Name)
+	currentStatus, err = NewPingPG(dbConn, &container)
 	if err != nil {
 		logit.Error.Println("GetNode:" + err.Error())
 		return err

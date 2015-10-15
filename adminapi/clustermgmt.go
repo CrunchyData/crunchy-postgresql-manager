@@ -319,7 +319,8 @@ func configureCluster(dbConn *sql.DB, cluster types.Cluster, autocluster bool) e
 	var currentStatus string
 	var masterhost = master.Name
 	for i := 0; i < 20; i++ {
-		currentStatus, err = GetPGStatus2(dbConn, master.Name, masterhost)
+		//currentStatus, err = GetPGStatus2(dbConn, master.Name, masterhost)
+		currentStatus, err = NewPingPG(dbConn, &master)
 		if currentStatus == "RUNNING" {
 			logit.Info.Println("master is running...continuing")
 			found = true

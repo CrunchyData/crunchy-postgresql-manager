@@ -16,6 +16,7 @@
 package adminapi
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
@@ -26,6 +27,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
+	"os/exec"
 	"time"
 )
 
@@ -87,7 +89,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	if currentStatus != "CONTAINER NOT FOUND" {
-		currentStatus, err = PingPG(dbConn, &node)
+		currentStatus, err = NewPingPG(dbConn, &node)
 		if err != nil {
 			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -556,6 +558,39 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
+func NewPingPG(dbConn *sql.DB, node *types.Container) (string, error) {
+
+	var err error
+
+	var pgport types.Setting
+	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return "OFFLINE", err
+	}
+
+	var cmd *exec.Cmd
+	logit.Info.Println("about to newping " + node.Name + " at port " + pgport.Value)
+	cmd = exec.Command("ping-wrapper.sh", node.Name, pgport.Value)
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err = cmd.Run()
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return "OFFLINE", err
+	}
+	var rc = out.String()
+	logit.Info.Println("NewPingPG rc is " + rc)
+	if rc != "connected" {
+		return "OFFLINE", nil
+	}
+
+	return "RUNNING", nil
+}
+
+/**
 func PingPG(dbConn *sql.DB, node *types.Container) (string, error) {
 
 	var status = "OFFLINE"
@@ -626,6 +661,7 @@ func GetPGStatus2(dbConn *sql.DB, nodename string, hostname string) (string, err
 
 	return "RUNNING", nil
 }
+*/
 
 func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
