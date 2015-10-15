@@ -1,0 +1,1 @@
+curl -H "Content-Type: application/json" -X POST -d '{"ContainerName":"foo","password":"xyz"}' http://foo:10001/docker/inspect

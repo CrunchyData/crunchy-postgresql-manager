@@ -8,14 +8,19 @@ import (
 	"net/http"
 )
 
+const URL = "http://cpm-"
+const PORT = ":10001"
+
 //
 // example of calling one of these
 //
 // request := &cpmserverapi.MetricIostatRequest{"something", "yes"}
 // response, err := cpmserverapi.MetricIostatClient("http://localhost:10001", request)
 //
-func MetricIostatClient(url string, req *MetricIostatRequest) (MetricIostatResponse, error) {
+func MetricIostatClient(serverName string, req *MetricIostatRequest) (MetricIostatResponse, error) {
 	var err error
+	var url = URL + serverName + PORT
+
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
 	r, _ := http.Post(url+"/metrics/iostat", "application/json", body)
@@ -26,8 +31,9 @@ func MetricIostatClient(url string, req *MetricIostatRequest) (MetricIostatRespo
 	return response, err
 }
 
-func MetricDfClient(url string, req *MetricDfRequest) (MetricDfResponse, error) {
+func MetricDfClient(serverName string, req *MetricDfRequest) (MetricDfResponse, error) {
 	var err error
+	var url = URL + serverName + PORT
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
 	r, _ := http.Post(url+"/metrics/df", "application/json", body)
@@ -38,8 +44,9 @@ func MetricDfClient(url string, req *MetricDfRequest) (MetricDfResponse, error) 
 	return response, err
 }
 
-func DiskProvisionClient(url string, req *DiskProvisionRequest) (DiskProvisionResponse, error) {
+func DiskProvisionClient(serverName string, req *DiskProvisionRequest) (DiskProvisionResponse, error) {
 	var err error
+	var url = URL + serverName + PORT
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
 	r, _ := http.Post(url+"/disk/provision", "application/json", body)
@@ -50,8 +57,9 @@ func DiskProvisionClient(url string, req *DiskProvisionRequest) (DiskProvisionRe
 	return response, err
 }
 
-func DiskDeleteClient(url string, req *DiskDeleteRequest) (DiskDeleteResponse, error) {
+func DiskDeleteClient(serverName string, req *DiskDeleteRequest) (DiskDeleteResponse, error) {
 	var err error
+	var url = URL + serverName + PORT
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
 	r, _ := http.Post(url+"/disk/delete", "application/json", body)
@@ -62,20 +70,9 @@ func DiskDeleteClient(url string, req *DiskDeleteRequest) (DiskDeleteResponse, e
 	return response, err
 }
 
-func SwitchPathClient(url string, req *SwitchPathRequest) (SwitchPathResponse, error) {
+func DockerInspectClient(serverName string, req *DockerInspectRequest) (DockerInspectResponse, error) {
 	var err error
-	buf, _ := json.Marshal(req)
-	body := bytes.NewBuffer(buf)
-	r, _ := http.Post(url+"/disk/switchpath", "application/json", body)
-	rawresponse, _ := ioutil.ReadAll(r.Body)
-	response := SwitchPathResponse{}
-	err = json.Unmarshal(rawresponse, &response)
-	//fmt.Println(string(rawresponse))
-	return response, err
-}
-
-func DockerInspectClient(url string, req *DockerInspectRequest) (DockerInspectResponse, error) {
-	var err error
+	var url = URL + serverName + PORT
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
 	r, _ := http.Post(url+"/docker/inspect", "application/json", body)
@@ -86,8 +83,9 @@ func DockerInspectClient(url string, req *DockerInspectRequest) (DockerInspectRe
 	return response, err
 }
 
-func DockerRemoveClient(url string, req *DockerRemoveRequest) (DockerRemoveResponse, error) {
+func DockerRemoveClient(serverName string, req *DockerRemoveRequest) (DockerRemoveResponse, error) {
 	var err error
+	var url = URL + serverName + PORT
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
 	r, _ := http.Post(url+"/docker/remove", "application/json", body)
@@ -98,8 +96,9 @@ func DockerRemoveClient(url string, req *DockerRemoveRequest) (DockerRemoveRespo
 	return response, err
 }
 
-func DockerStartClient(url string, req *DockerStartRequest) (DockerStartResponse, error) {
+func DockerStartClient(serverName string, req *DockerStartRequest) (DockerStartResponse, error) {
 	var err error
+	var url = URL + serverName + PORT
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
 	r, _ := http.Post(url+"/docker/start", "application/json", body)
@@ -110,8 +109,9 @@ func DockerStartClient(url string, req *DockerStartRequest) (DockerStartResponse
 	return response, err
 }
 
-func DockerStopClient(url string, req *DockerStopRequest) (DockerStopResponse, error) {
+func DockerStopClient(serverName string, req *DockerStopRequest) (DockerStopResponse, error) {
 	var err error
+	var url = URL + serverName + PORT
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
 	r, _ := http.Post(url+"/docker/stop", "application/json", body)
@@ -136,8 +136,9 @@ func DockerStopClient(url string, req *DockerStopRequest) (DockerStopResponse, e
 //envvars["one"] = "uno"
 //request.EnvVars = envvars
 //
-func DockerRunClient(url string, req *DockerRunRequest) (DockerRunResponse, error) {
+func DockerRunClient(serverName string, req *DockerRunRequest) (DockerRunResponse, error) {
 	var err error
+	var url = URL + serverName + PORT
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
 	r, _ := http.Post(url+"/docker/run", "application/json", body)
@@ -148,8 +149,9 @@ func DockerRunClient(url string, req *DockerRunRequest) (DockerRunResponse, erro
 	return response, err
 }
 
-func MetricCPUClient(url string, req *MetricCPURequest) (MetricCPUResponse, error) {
+func MetricCPUClient(serverName string, req *MetricCPURequest) (MetricCPUResponse, error) {
 	var err error
+	var url = URL + serverName + PORT
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
 	r, _ := http.Post(url+"/metrics/cpu", "application/json", body)
@@ -160,8 +162,9 @@ func MetricCPUClient(url string, req *MetricCPURequest) (MetricCPUResponse, erro
 	return response, err
 }
 
-func MetricMEMClient(url string, req *MetricMEMRequest) (MetricMEMResponse, error) {
+func MetricMEMClient(serverName string, req *MetricMEMRequest) (MetricMEMResponse, error) {
 	var err error
+	var url = URL + serverName + PORT
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
 	r, _ := http.Post(url+"/metrics/mem", "application/json", body)

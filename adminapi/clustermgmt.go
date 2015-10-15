@@ -725,17 +725,15 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		dremreq := &cpmserverapi.DockerRemoveRequest{}
 		dremreq.ContainerName = containers[i].Name
 		logit.Info.Println("will attempt to delete container " + dremreq.ContainerName)
-		var url = "http://" + server.IPAddress + ":10001"
-		_, err = cpmserverapi.DockerRemoveClient(url, dremreq)
+		_, err = cpmserverapi.DockerRemoveClient(server.Name, dremreq)
 		if err != nil {
 			logit.Error.Println("error when trying to remove container" + err.Error())
 		}
 
 		//send the server a deletevolume command
-		url = "http://" + server.IPAddress + ":10001"
 		ddreq := &cpmserverapi.DiskDeleteRequest{}
 		ddreq.Path = server.PGDataPath + "/" + containers[i].Name
-		_, err = cpmserverapi.DiskDeleteClient(url, ddreq)
+		_, err = cpmserverapi.DiskDeleteClient(server.Name, ddreq)
 		if err != nil {
 			logit.Error.Println("error when trying to remove disk volume" + err.Error())
 		}
@@ -1406,8 +1404,7 @@ func StartCluster(w rest.ResponseWriter, r *rest.Request) {
 		req := &cpmserverapi.DockerStartRequest{}
 		req.ContainerName = containers[i].Name
 		logit.Info.Println("will attempt to start container " + req.ContainerName)
-		var url = "http://" + server.IPAddress + ":10001"
-		response, err = cpmserverapi.DockerStartClient(url, req)
+		response, err = cpmserverapi.DockerStartClient(server.Name, req)
 		if err != nil {
 			logit.Error.Println("StartCluster: error when trying to start container" + err.Error())
 		}
@@ -1479,8 +1476,7 @@ func StopCluster(w rest.ResponseWriter, r *rest.Request) {
 		req := &cpmserverapi.DockerStopRequest{}
 		req.ContainerName = containers[i].Name
 		logit.Info.Println("will attempt to stop container " + req.ContainerName)
-		var url = "http://" + server.IPAddress + ":10001"
-		response, err = cpmserverapi.DockerStopClient(url, req)
+		response, err = cpmserverapi.DockerStopClient(server.Name, req)
 		if err != nil {
 			logit.Error.Println("StopCluster: error when trying to stop container" + err.Error())
 		}

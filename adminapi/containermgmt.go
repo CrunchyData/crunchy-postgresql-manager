@@ -80,8 +80,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 
 	request := &cpmserverapi.DockerInspectRequest{}
 	request.ContainerName = node.Name
-	var url = "http://" + server.IPAddress + ":10001"
-	_, err = cpmserverapi.DockerInspectClient(url, request)
+	_, err = cpmserverapi.DockerInspectClient(server.Name, request)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		currentStatus = CONTAINER_NOT_FOUND
@@ -336,7 +335,6 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	var url = "http://" + server.IPAddress + ":10001"
 
 	err = admindb.DeleteContainer(dbConn, ID)
 	if err != nil {
@@ -353,7 +351,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 
 	request := &cpmserverapi.DockerRemoveRequest{}
 	request.ContainerName = dbNode.Name
-	_, err = cpmserverapi.DockerRemoveClient(url, request)
+	_, err = cpmserverapi.DockerRemoveClient(server.Name, request)
 	if err != nil {
 		logit.Error.Println(err.Error())
 	}
@@ -361,7 +359,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	//send the server a deletevolume command
 	request2 := &cpmserverapi.DiskDeleteRequest{}
 	request2.Path = server.PGDataPath + "/" + dbNode.Name
-	_, err = cpmserverapi.DiskDeleteClient(url, request2)
+	_, err = cpmserverapi.DiskDeleteClient(server.Name, request2)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -416,7 +414,6 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 
 	var response cpmserverapi.DockerInspectResponse
 	var e error
-	var url string
 	nodes := make([]types.ClusterNode, len(results))
 	i := 0
 	for i = range results {
@@ -434,8 +431,7 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 
 		request := &cpmserverapi.DockerInspectRequest{}
 		request.ContainerName = results[i].Name
-		url = "http://" + server.IPAddress + ":10001"
-		response, e = cpmserverapi.DockerInspectClient(url, request)
+		response, e = cpmserverapi.DockerInspectClient(server.Name, request)
 		logit.Info.Println("GetAllNodesForServer:" + results[i].Name + " " + response.IPAddress + " " + response.RunningState)
 		if e != nil {
 			logit.Error.Println(e.Error())
@@ -491,11 +487,10 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var url = "http://" + server.IPAddress + ":10001"
 	var response cpmserverapi.DockerStartResponse
 	request := &cpmserverapi.DockerStartRequest{}
 	request.ContainerName = node.Name
-	response, err = cpmserverapi.DockerStartClient(url, request)
+	response, err = cpmserverapi.DockerStartClient(server.Name, request)
 	if err != nil {
 		logit.Error.Println(err.Error())
 	}
@@ -549,8 +544,7 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 
 	request := &cpmserverapi.DockerStopRequest{}
 	request.ContainerName = node.Name
-	var url = "http://" + server.IPAddress + ":10001"
-	_, err = cpmserverapi.DockerStopClient(url, request)
+	_, err = cpmserverapi.DockerStopClient(server.Name, request)
 	if err != nil {
 		logit.Error.Println(err.Error())
 	}
@@ -669,8 +663,6 @@ func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	//use a 'best effort' approach here since containers
 	//can be removed outside of CPM's control
 
-	var url string
-
 	for i := range containers {
 		//fetch the server
 		server := types.Server{}
@@ -686,8 +678,7 @@ func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 		var err error
 		request := &cpmserverapi.DockerStartRequest{}
 		request.ContainerName = containers[i].Name
-		url = "http://" + server.IPAddress + ":10001"
-		response, err = cpmserverapi.DockerStartClient(url, request)
+		response, err = cpmserverapi.DockerStartClient(server.Name, request)
 		if err != nil {
 			logit.Error.Println("AdminStartServerContainers: error when trying to start container " + err.Error())
 		}
@@ -734,7 +725,6 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var url string
 	//for each, get server, stop container
 	for i := range containers {
 		server := types.Server{}
@@ -767,8 +757,7 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 		//stop container
 		request := &cpmserverapi.DockerStopRequest{}
 		request.ContainerName = containers[i].Name
-		url = "http://" + server.IPAddress + ":10001"
-		_, err = cpmserverapi.DockerStopClient(url, request)
+		_, err = cpmserverapi.DockerStopClient(server.Name, request)
 		if err != nil {
 			logit.Error.Println("AdminStopServerContainers: error when trying to start container " + err.Error())
 		}

@@ -161,8 +161,7 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, standb
 	if params.Image != "cpm-pgpool" {
 		preq := &cpmserverapi.DiskProvisionRequest{}
 		preq.Path = params.PGDataPath
-		var url = "http://" + server.IPAddress + ":10001"
-		_, err = cpmserverapi.DiskProvisionClient(url, preq)
+		_, err = cpmserverapi.DiskProvisionClient(server.Name, preq)
 		if err != nil {
 			logit.Error.Println(err.Error())
 			return "", err
@@ -183,8 +182,7 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, standb
 	logit.Info.Println("PROFILE provisionImpl remove old container start")
 	rreq := &cpmserverapi.DockerRemoveRequest{}
 	rreq.ContainerName = params.ContainerName
-	var url = "http://" + server.IPAddress + ":10001"
-	_, err = cpmserverapi.DockerRemoveClient(url, rreq)
+	_, err = cpmserverapi.DockerRemoveClient(server.Name, rreq)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return "", err
@@ -208,7 +206,7 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, standb
 	logit.Info.Println("PROFILE provisionImpl remove old container end")
 	params.CommandPath = "docker-run.sh"
 	var resp cpmserverapi.DockerRunResponse
-	resp, err = cpmserverapi.DockerRunClient(url, params)
+	resp, err = cpmserverapi.DockerRunClient(server.Name, params)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		logit.Error.Println(resp.Output)

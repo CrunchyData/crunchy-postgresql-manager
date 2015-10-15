@@ -104,32 +104,3 @@ func DiskDelete(w rest.ResponseWriter, r *rest.Request) {
 	response.Status = "OK"
 	w.WriteJson(&response)
 }
-
-func SwitchPath(w rest.ResponseWriter, r *rest.Request) {
-	req := SwitchPathRequest{}
-	err := r.DecodeJsonPayload(&req)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	logit.Info.Println("SwitchPath called " + req.DataDir + " " + req.ContainerName)
-
-	var cmd *exec.Cmd
-	cmd = exec.Command("switchpath", req.DataDir, req.ContainerName)
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-	err = cmd.Run()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), 400)
-		return
-	}
-
-	var response SwitchPathResponse
-	response.Output = out.String()
-	response.Status = "OK"
-	w.WriteJson(&response)
-}

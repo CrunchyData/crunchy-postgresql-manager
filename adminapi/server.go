@@ -177,11 +177,10 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	var output string
-	url := "http://" + server.IPAddress + ":10001"
 	if Metric == "cpmiostat" {
 		iostatreq := cpmserverapi.MetricIostatRequest{}
 		var iostatResp cpmserverapi.MetricIostatResponse
-		iostatResp, err = cpmserverapi.MetricIostatClient(url, &iostatreq)
+		iostatResp, err = cpmserverapi.MetricIostatClient(server.Name, &iostatreq)
 		if err != nil {
 			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), 400)
@@ -191,7 +190,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	} else if Metric == "cpmdf" {
 		dfreq := cpmserverapi.MetricDfRequest{}
 		var dfResp cpmserverapi.MetricDfResponse
-		dfResp, err = cpmserverapi.MetricDfClient(url, &dfreq)
+		dfResp, err = cpmserverapi.MetricDfClient(server.Name, &dfreq)
 		if err != nil {
 			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), 400)
