@@ -1,17 +1,32 @@
 Developer Setup
 =================
 
-Development Environment
-=======================
-Here are the steps required to set up a CPM development environment, CPM is 
-built using Centos 7.1  and Docker 1.5
+Here are the steps required to set up a CPM development environment on a 
+clean RHEL or Centos 7.1 minimal installation.
 
 This instruction assumes you are using a static IP address of
-192.168.56.103 for your CPM server.
+192.168.0.107 for your CPM server.
+
+### RHEL Setup  ###
+note that for RHEL 7.1, you will need to add the following repos:
+~~~~~~~~~~~~~~~
+subscription-manager repos --enable=rhel-7-server-extras-rpms
+subscription-manager repos --enable=rhel-7-server-optional-rpms
+~~~~~~~~~~~~~~~
+
+### Install Dependencies development machine ####
+Note that I like to use the PGDG postgres distro instead of the redhat provided postgres!
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sudo yum -y install net-tools bind-utils install golang git docker mercurial sysstat
+rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
+yum install -y nmap-ncat procps-ng postgresql94 postgresql94-contrib postgresql94-server libxslt unzip openssh-clients hostname bind-utils pgbadger
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Setup Go Project Structure ###
+As your development user, create the development directory as follows:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-yum -y install golang git docker  mercurial sysstat
 mkdir -p devproject/src devproject/bin devproject/pkg
 
 export GOPATH=~/devproject
