@@ -60,13 +60,14 @@ Start CPM Server Agent
 ----------------------
 After you have successfully compiled CPM and built the CPM Docker images,
 on each server that is to run CPM, you will need to start a CPM Server
-Agent, this is started using systemd.  CPM server files are copied to
-each server by the sbin/install-cpmserverapi.sh script.  Modify this script
-if you are going to configure multiple CPM hosts.  The script is currently
-setup for a single CPM host installation.
-~~~~~~~~~~~~~~~~~~~~~~~~
-./sbin/install-cpmserverapi.sh
-~~~~~~~~~~~~~~~~~~~~~~~~
+Agent.  The server agent is run within the cpm-server container on each
+server host that will be configured to be used in CPM.
+
+Each container needs to be started with skybridge running and also
+have its container name set to 'cpm-servername' where servername is
+the server name you have given the server in the CPM server page once
+CPM is running.
+
 
 Network Configuration
 ------------------------------
@@ -129,10 +130,20 @@ This will cause the skybridge DNS nameserver to be queried first.
 
 Running CPM
 --------------
+
+Modify the run-cpm.sh script by updating the INSTALLDIR 
+variable to the path on your host that you are installing CPM 
+from.
+
+Also, edit or remove the local host port mapping that is
+provided in the example to meet your local requirements
+for accessing CPM.
+
 You can run CPM by running the following script:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 sudo ./run-cpm.sh
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 This script will start several Docker containers that make up CPM.  You will
 need to edit the run-cpm.sh script to specify your IP address of your
 server as well as your CPM installation directory path.  You can

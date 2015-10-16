@@ -11,7 +11,7 @@ login and return an auth token
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -27,7 +27,7 @@ returns all clusters
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/clusters/789c31ff-b18f-47b3-bb63-1fd603895aa5
+curl  http://cpm-admin.crunchy.lab:13001/clusters/789c31ff-b18f-47b3-bb63-1fd603895aa5
 [
   {
     "ID": "2",
@@ -50,7 +50,7 @@ returns all servers
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/servers/789c31ff-b18f-47b3-bb63-1fd603895aa5
+curl  http://cpm-admin.crunchy.lab:13001/servers/789c31ff-b18f-47b3-bb63-1fd603895aa5
 [
   {
     "ID": "1",
@@ -77,13 +77,11 @@ updates or adds a cluster
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/provisionproxy
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-curl --insecure -i -d '{"ID":"1","ClusterID":"1"}' https://cpm-admin.crunchy.lab:13000/event/join-cluster
+curl  -i -d '{"ID":"1","ClusterID":"1"}' http://cpm-admin.crunchy.lab:13001/event/join-cluster
 
 ###POST /autocluster
 
@@ -98,10 +96,8 @@ performs an auto-cluster
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/provisionproxy
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###POST /savesettings
@@ -118,10 +114,8 @@ saves settings
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/provisionproxy
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###POST /saveprofiles
@@ -140,10 +134,8 @@ saves profiles
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/provisionproxy
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###POST /saveclusterprofiles
@@ -163,10 +155,8 @@ saves cluster profiles
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/provisionproxy
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###GET /settings/:Token
@@ -179,7 +169,7 @@ returns all settings
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/settings/789c31ff-b18f-7b3-bb63-1fd603895aa5
+curl  http://cpm-admin.crunchy.lab:13001/settings/789c31ff-b18f-7b3-bb63-1fd603895aa5
 [
   {
     "Name": "CP-LG-ALGO",
@@ -210,7 +200,7 @@ add a server
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/addserver
+curl  http://cpm-admin.crunchy.lab:13001/addserver
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -227,7 +217,7 @@ return a server
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d
+curl  http://cpm-admin.crunchy.lab:13001/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d
 {
   "ID": "1",
   "Name": "espresso",
@@ -250,7 +240,7 @@ return a cluster
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/cluster/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/cluster/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2
 {
   "ID": "2",
   "Name": "aa",
@@ -272,7 +262,7 @@ configure a cluster
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -289,7 +279,7 @@ delete a cluster
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -306,7 +296,7 @@ delete a server
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -322,7 +312,7 @@ return all containers
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/nodes/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/nodes/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 [
   {
     "ID": "9",
@@ -357,7 +347,7 @@ return all containers not in a cluster
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/nodes/nocluster/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/nodes/nocluster/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 [
   {
     "ID": "8",
@@ -383,7 +373,7 @@ return all containers for a given cluster
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/clusternodes/2.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/clusternodes/2.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 [
   {
     "ID": "9",
@@ -429,7 +419,7 @@ return all containers for a server
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/nodes/forserver/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/nodes/forserver/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 [
   {
     "ID": "9",
@@ -469,7 +459,7 @@ provision a new container
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -485,7 +475,7 @@ return a container
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/node/8.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/node/8.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 {
   "ID": "8",
   "ClusterID": "-1",
@@ -508,7 +498,7 @@ return boolean of kube configuration
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/kube/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/kube/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 {
   "URL": "KUBE_URL is not set"
 }
@@ -524,7 +514,7 @@ delete a container
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure -X DELETE https://cpm-admin.crunchy.lab:13000/node/17
+curl  -X DELETE http://cpm-admin.crunchy.lab:13001/node/17
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -538,7 +528,7 @@ return server monitoring data
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/monitor/server-getinfo/.cpmdf.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/monitor/server-getinfo/.cpmdf.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 {"df":[
 {"filesystem":"/dev/mapper/centos-root","total":"32G","used":"7G","available":"26G","pctused":"20%","mountpt":"/"}
 ,
@@ -566,7 +556,7 @@ perform a load test and return the results
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin:13000/monior/container/loadtest/1.1000.9a8f9a1e-9c81-4e4f-9f52-01d2ea6cd741
+curl  http://cpm-admin:13001/monior/container/loadtest/1.1000.9a8f9a1e-9c81-4e4f-9f52-01d2ea6cd741
  
 
 [{"operation":"inserts","count":1000,"results":44.979},{"operation":"selects","count":1000,"results":31.952},{"operation":"updates","count":1000,"results":40.442},{"operation":"deletes","count":1000,"results":30.374}]
@@ -595,7 +585,7 @@ start a container
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/admin/start/8.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/admin/start/8.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 {
   "Status": "OK"
 }
@@ -611,7 +601,7 @@ stop a container
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/admin/stop/8.1efbfd50-9b2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/admin/stop/8.1efbfd50-9b2-43a0-8c91-b6f4a837a4f2
 {
   "Status": "OK"
 }
@@ -627,7 +617,7 @@ cause a postgres fail over
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -643,7 +633,7 @@ stop a container's postgres
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/admin/stop-pg/8.1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/admin/stop-pg/8.1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2
 {
   "Status": "OK"
 }
@@ -659,7 +649,7 @@ add a node to a cluster
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -676,7 +666,7 @@ logout Logout
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/logout/ab3ba695-533-43a4-a3c0-9a4c55288c14
+curl  http://cpm-admin.crunchy.lab:13001/sec/logout/ab3ba695-533-43a4-a3c0-9a4c55288c14
 {
   "Status": "OK"
 }
@@ -693,10 +683,8 @@ update a user's account into UpdateUser
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/provisionproxy
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###POST /sec/cp
@@ -719,10 +707,8 @@ add a user AddUser
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/provisionproxy
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###GET /sec/getuser/:ID.:Token
@@ -735,7 +721,7 @@ return a user's information GetUser
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/getuser/cpm.1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/sec/getuser/cpm.1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2
 {
   "Status": "OK"
 }
@@ -751,7 +737,7 @@ return all users information GetAllUsers
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/getusers/1efbfd50-9b2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/sec/getusers/1efbfd50-9b2-43a0-8c91-b6f4a837a4f2
 [
   {
     "Name": "cpm",
@@ -812,7 +798,7 @@ delete a user DeleteUser
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -828,10 +814,8 @@ update a CPM role UpdateRole
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/provisionproxy
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###POST /sec/addrole
@@ -844,10 +828,8 @@ add a CPM role AddRole
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/provisionproxy
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###GET /sec/deleterole/:ID.:Token
@@ -860,7 +842,7 @@ delete a CPM role DeleteRole
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -876,7 +858,7 @@ get all CPM roles GetAllRoles
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/getroles/1efbfd50-9b2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/sec/getroles/1efbfd50-9b2-43a0-8c91-b6f4a837a4f2
 [
   {
     "Name": "superuser",
@@ -929,7 +911,7 @@ get a CPM role GetRole (CURRENTLY NOT USED)
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000sec/getrole/superuser.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001sec/getrole/superuser.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 {
   "Name": "",
   "Selected": false,
@@ -949,10 +931,8 @@ perform a postgres backup BackupNow
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/provisionproxy
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###POST /backup/addschedule
@@ -965,10 +945,8 @@ add a new container admin schedule AddSchedule
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/provisionproxy
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###GET /backup/deleteschedule/:ID.:Token
@@ -981,7 +959,7 @@ remove a container schedule DeleteSchedule
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -997,10 +975,8 @@ update a container schedule UpdateSchedule
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
-{
-  "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
-}
+curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/provisionproxy
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###GET /backup/getschedules/:ContainerName.:Token
@@ -1013,7 +989,7 @@ get all schedules for a container GetAllSchedules
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -1029,7 +1005,7 @@ get a container schedule GetSchedule
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -1045,7 +1021,7 @@ get a schedule job's status GetStatus
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -1061,7 +1037,7 @@ get all scheduled job's status for a container GetAllStatus
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -1077,7 +1053,7 @@ GetBackupNodes
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 {
   "Contents": "789c31ff-b18f-47b3-bb63-1fd603895aa5"
 }
@@ -1091,7 +1067,7 @@ GetServerMetrics
 
 ###Example
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/mon/server/cpu.1.1w.18c0bb2a-2fa2-422e-a583-9df68948802f
+curl  http://cpm-admin.crunchy.lab:13001/mon/server/cpu.1.1w.18c0bb2a-2fa2-422e-a583-9df68948802f
 [
   {
     "name": "cpu",
@@ -1128,7 +1104,7 @@ GetPG2 - container database sizes
 
 ###Example
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/mon/container/pg2/pga.1w.a1459da5-8db1-48ac-b1f0-3bb3427f96e2
+curl  http://cpm-admin.crunchy.lab:13001/mon/container/pg2/pga.1w.a1459da5-8db1-48ac-b1f0-3bb3427f96e2
 [
  {
     "Color": "#c05020",
@@ -1189,7 +1165,7 @@ GetHC1 - health check 1 - databases down
 
 ###Example
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/mon/h1/24c715ca-2468-4450-8fee-6e2a9f7714dc
+curl  http://cpm-admin.crunchy.lab:13001/mon/h1/24c715ca-2468-4450-8fee-6e2a9f7714dc
 [
   {
     "name": "hc1",
@@ -1247,7 +1223,7 @@ returns the CPM version number
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/version
+curl  http://cpm-admin.crunchy.lab:13001/version
 1.0.0
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1262,7 +1238,7 @@ return container pg_settings data
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/monitor/container/settings/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/monitor/container/settings/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###GET /monitor/container/repl/:ID.Token
@@ -1276,7 +1252,7 @@ return container pg_replication data
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/monitor/container/repl/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/monitor/container/repl/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 [
   {
     "Pid": "39",
@@ -1309,7 +1285,7 @@ return container pg_databases data
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/monitor/container/database/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/monitor/container/database/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 [
   {
     "Datname": "template1",
@@ -1365,7 +1341,7 @@ return container bgwriter data
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/monitor/container/bgwriter/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/monitor/container/bgwriter/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 {
   "Now": "03/03/15 04:00:38",
   "AllocMbps": ".0015",
@@ -1387,7 +1363,7 @@ return container controldata data
 ###Example
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl --insecure https://cpm-admin.crunchy.lab:13000/monitor/container/controldata/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+curl  http://cpm-admin.crunchy.lab:13001/monitor/container/controldata/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###POST /project/add

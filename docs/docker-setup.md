@@ -58,33 +58,14 @@ the following command to add a user to the docker group:
 
 ** docker images
 -------------
-right now, I am not using a docker image registry, so to get
-the images, you will need to build them using the github 
-docker files:
+Docker images are stored in Docker Hub but you can also build them
+from source.
 
-to load the base centos7 image:
+Here is an example of pulling down an image from Docker Hub:
+~~~~~~~~~~~~
+docker pull crunchydata/cpm-admin
+~~~~~~~~~~~~
 
-download from the crunchy repo site the CentOS 7 docker image we will be using
-for the demo, then execute the following command to load the image locally:
-
-	cat CentOS-7-x86_64-docker.img.tar.xz  | docker import - crunchy/centos7
-
-OR for rhel7, see https://access.redhat.com/articles/881893#get:
-
-	docker load -i rhel-server-docker-7.0-21.4.x86_64.tar.gz
-
-	git clone git@github.com:crunchyds/docker-pg-cluster.git
-	cd docker-pg-cluster/images/
-
-Only on the admin server:
-	cd ./crunchy-admin
-	docker build -t crunchy-admin .
-	cd ../crunchy-cpm
-	docker build -t crunchy-cpm .
-
-Only on the node servers:
-	cd ./crunchy-node
-	docker build -t crunchy-node .
 
 Docker Setup
 ------------
@@ -110,12 +91,12 @@ Docker Configuration Explaination
 --------------------
 
 Each VM will run Docker.  Docker creates a dynamic Ethernet bridge it
-uses to assign IP addressese to it's containers.
+uses to assign IP addresses to its containers.
 Docker by default assigns IP addresses to containers in a dynamic manner, 
 starting with the default address range of 172.17.0.0/16
 
 To avoid IP address conflicts on each host, we override the 
-Docker bridge's IP address range for each docker server to be unique.  
+Docker bridges IP address range for each docker server to be unique.  
 The POC assignments are as follows:
 
 server1.crunchy.lab - 172.18.42.1/16

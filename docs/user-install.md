@@ -12,7 +12,7 @@ Obtain the Media
 Download the binary install archives for skybridge and CPM
 from the following:
 ~~~~~~~~~~~~~~~~~
-https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.4-linux-amd64.tar.gz
+https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.7-linux-amd64.tar.gz
 https://s3.amazonaws.com/crunchydata/cpm/skybridge.1.0.2-linux-amd64.tar.gz
 ~~~~~~~~~~~~~~~~~
 
@@ -28,7 +28,7 @@ tar xvzf ../skybridge.1.0.2-linux-amd64.tar.gz
 
 mkdir cpm-install
 cd cpm-install
-tar xvzf ../cpm.0.9.4-linux-amd64.tar.gz
+tar xvzf ../cpm.0.9.7-linux-amd64.tar.gz
 
 ./basic-user-install.sh
 ~~~~~~~~~~~~~~~~~
@@ -80,7 +80,7 @@ Initial Login
 -------------
 When you first access CPM, you will receive a Login dialog, on that
 page enter 'cpm' for the userid, 'cpm' for the password, and
-'https://cpm-admin.example.com:13000' for the Admin URL.
+'http://cpm-admin.example.com:13001' for the Admin URL.
 
 Refer to the CPM User Guide for details on how to use the application, but
 generally you would first create a Server.  Your current host is
