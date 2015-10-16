@@ -97,10 +97,10 @@ func main() {
 			i := 0
 			for i = range servers {
 				//v := rand.Float64() * 100.00
-				metric, err = collect.Collectcpu(servers[i].IPAddress)
+				metric, err = collect.Collectcpu(servers[i].Name)
 				gauge.WithLabelValues(servers[i].Name).Set(metric.Value)
 				logit.Info.Println("setting cpu metric for " + servers[i].Name + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
-				metric, err = collect.Collectmem(servers[i].IPAddress)
+				metric, err = collect.Collectmem(servers[i].Name)
 				gaugeMem.WithLabelValues(servers[i].Name).Set(metric.Value)
 				logit.Info.Println("setting mem metric for " + servers[i].Name + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
 				i++

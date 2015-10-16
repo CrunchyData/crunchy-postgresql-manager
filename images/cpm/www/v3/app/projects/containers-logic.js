@@ -9,10 +9,10 @@ var ContainerDetailController = function($scope, $state, $cookieStore, $statePar
 };
 
 var GotocontainerController = function($scope, $state, $cookieStore, $stateParams, utils) {
- 	$state.go('projects.container.details', {
-       		containerId: $stateParams.containerId,
-               	projectId:  $stateParams.projectId
-	});
+    $state.go('projects.container.details', {
+        containerId: $stateParams.containerId,
+        projectId: $stateParams.projectId
+    });
 
 
 };
@@ -38,20 +38,20 @@ var ContainerTaskSchedulesController = function($scope, $stateParams, $state, co
 
 var ContainerUsersController = function($scope, $stateParams, $state, containersFactory, utils) {
     $scope.refresh = function() {
-    containersFactory.getallusers($stateParams.containerId)
-        .success(function(data) {
-            $scope.users = data;
-        })
-        .error(function(error) {
-            $scope.alerts = [{
-                type: 'danger',
-                msg: error.Error
-            }];
-            console.log('here is an error ' + error.Error);
-        });
-	}
+        containersFactory.getallusers($stateParams.containerId)
+            .success(function(data) {
+                $scope.users = data;
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+            });
+    }
 
-	$scope.refresh();
+    $scope.refresh();
 
     $scope.edit = function() {
         $state.go('.edit', $stateParams);
@@ -90,9 +90,9 @@ var ContainerStartController = function($scope, $stateParams, $state, containers
         containersFactory.start($stateParams.containerId)
             .success(function(data) {
                 $state.go('projects.container.details', $stateParams, {
-			reload: true,
-			inherit: false
-		});
+                    reload: true,
+                    inherit: false
+                });
                 usSpinnerService.stop('spinner-1');
             })
             .error(function(error) {
@@ -189,7 +189,7 @@ var ContainerMonitorbadgerController = function($sce, $scope, $stateParams, $sta
         'http://' + $stateParams.containerName + ':10001/static/badger.html?rand=' + Math.round(Math.random() * 10000000));
     $scope.refresh = function() {
         usSpinnerService.spin('spinner-1');
-	spinnerService.show('badgerSpinner');
+        spinnerService.show('badgerSpinner');
         containersFactory.badger($stateParams.containerId)
             .success(function(data) {
                 usSpinnerService.stop('spinner-1');
@@ -211,9 +211,9 @@ var ContainerMonitorbadgerController = function($sce, $scope, $stateParams, $sta
                 }];
                 console.log('here is an error ' + error.Error);
             })
-	    .finally(function () {
-		spinnerService.hide('badgerSpinner');
-	    });
+            .finally(function() {
+                spinnerService.hide('badgerSpinner');
+            });
         usSpinnerService.stop('spinner-1');
     };
 
@@ -362,32 +362,32 @@ var ContainerFailoverController = function($scope, $stateParams, $state, contain
 
 var ContainerAccessRulesController = function($cookieStore, $scope, $stateParams, $state, utils, containersFactory, usSpinnerService) {
 
-        containersFactory.getaccessrules($stateParams.containerId)
-            .success(function(data) {
-                $scope.cars = data;
-            })
-            .error(function(error) {
-                $scope.alerts = [{
-                    type: 'danger',
-                    msg: error.Error
-                }];
-                console.log('here is an error ' + error.Error);
-            });
+    containersFactory.getaccessrules($stateParams.containerId)
+        .success(function(data) {
+            $scope.cars = data;
+        })
+        .error(function(error) {
+            $scope.alerts = [{
+                type: 'danger',
+                msg: error.Error
+            }];
+            console.log('here is an error ' + error.Error);
+        });
 
 
     $scope.save = function() {
-    	usSpinnerService.spin('spinner-1');
-            angular.forEach($scope.cars, function(car) {
-	    	car.Token = $cookieStore.get('cpm_token');
-		car.ContainerID = $stateParams.containerId;
-            });
+        usSpinnerService.spin('spinner-1');
+        angular.forEach($scope.cars, function(car) {
+            car.Token = $cookieStore.get('cpm_token');
+            car.ContainerID = $stateParams.containerId;
+        });
         containersFactory.updateaccessrules($scope.cars)
             .success(function(data) {
                 $scope.alerts = [{
                     type: 'success',
                     msg: 'successfully saved access rules'
                 }];
-            	usSpinnerService.stop('spinner-1');
+                usSpinnerService.stop('spinner-1');
 
             })
             .error(function(error) {
@@ -396,7 +396,7 @@ var ContainerAccessRulesController = function($cookieStore, $scope, $stateParams
                     msg: error.Error
                 }];
                 console.log('here is an error ' + error.Error);
-            	usSpinnerService.stop('spinner-1');
+                usSpinnerService.stop('spinner-1');
             });
 
     };
@@ -519,7 +519,7 @@ var ContainerScheduleExecuteController = function($scope, $stateParams, $state, 
                 type: 'success',
                 msg: 'success'
             }];
-    		usSpinnerService.stop('spinner-1');
+            usSpinnerService.stop('spinner-1');
         })
         .error(function(error) {
             $scope.alerts = [{
@@ -536,17 +536,26 @@ var ContainerScheduleHistoryController = function($scope, $stateParams, $state, 
     $scope.edit = function() {
         $state.go('.edit', $stateParams);
     };
-    tasksFactory.getallstatus($stateParams.scheduleID)
-        .success(function(data) {
-            $scope.stats = data;
-        })
-        .error(function(error) {
-            $scope.alerts = [{
-                type: 'danger',
-                msg: error.Error
-            }];
-            console.log('here is an error ' + error.Error);
-        });
+
+    $scope.deletehistory = function() {
+    	console.log('not implemented yet');
+    };
+
+    $scope.refresh = function() {
+        tasksFactory.getallstatus($stateParams.scheduleID)
+            .success(function(data) {
+                $scope.stats = data;
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+            });
+    };
+
+    $scope.refresh();
 };
 
 var ContainerScheduleController = function($scope, $stateParams, $state, tasksFactory, serversFactory, utils) {
@@ -589,13 +598,13 @@ var ContainerScheduleController = function($scope, $stateParams, $state, tasksFa
 };
 
 var ContainerScheduleAddController = function($scope, $filter, $stateParams, $state, tasksFactory, serversFactory, utils, servers) {
-	$scope.schedule = {};
-	$scope.schedule.RestoreSet = 'latest';
-	$scope.schedule.RestoreRemotePath = '';
-	$scope.schedule.RestoreRemoteHost = '';
-	$scope.schedule.RestoreRemoteUser = '';
-	$scope.schedule.RestoreDbUser = '';
-	$scope.schedule.RestoreDbPass = '';
+    $scope.schedule = {};
+    $scope.schedule.RestoreSet = 'latest';
+    $scope.schedule.RestoreRemotePath = '';
+    $scope.schedule.RestoreRemoteHost = '';
+    $scope.schedule.RestoreRemoteUser = '';
+    $scope.schedule.RestoreDbUser = '';
+    $scope.schedule.RestoreDbPass = '';
 
     $scope.profiles = [{
         name: 'pg_basebackup'
@@ -640,7 +649,7 @@ var ContainerScheduleAddController = function($scope, $filter, $stateParams, $st
         }
         $scope.schedule.ServerID = $scope.myServer;
         $scope.schedule.ProfileName = $scope.currentProfileName.name;
-	console.log('adding schedule with schedule='+ JSON.stringify($scope.schedule));
+        console.log('adding schedule with schedule=' + JSON.stringify($scope.schedule));
         tasksFactory.addschedule($scope.schedule, $scope.container.Name)
             .success(function(data) {
                 $state.go('projects.container.taskschedules', $stateParams, {
@@ -683,11 +692,11 @@ var ContainerScheduleEditController = function($scope, $filter, $stateParams, $s
                 $scope.thething.checked = false;
             }
 
-	    if ($scope.schedule.ProfileName == 'pg_basebackup') {
-    		$scope.currentProfileName = $scope.profiles[0];
-		} else {
-    		$scope.currentProfileName = $scope.profiles[1];
-		}
+            if ($scope.schedule.ProfileName == 'pg_basebackup') {
+                $scope.currentProfileName = $scope.profiles[0];
+            } else {
+                $scope.currentProfileName = $scope.profiles[1];
+            }
             $scope.setServer();
         })
         .error(function(error) {

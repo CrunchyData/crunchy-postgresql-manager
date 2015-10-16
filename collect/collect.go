@@ -25,8 +25,7 @@ func Collectcpu(serverName string) (Metric, error) {
 
 	var response cpmserverapi.MetricCPUResponse
 	request := &cpmserverapi.MetricCPURequest{}
-	var url = "http://" + serverName + ":10001"
-	response, err = cpmserverapi.MetricCPUClient(url, request)
+	response, err = cpmserverapi.MetricCPUClient(serverName, request)
 	if err != nil {
 		logit.Error.Println("cpu metric error:" + err.Error())
 		return values, err
@@ -53,8 +52,7 @@ func Collectmem(serverName string) (Metric, error) {
 
 	var response cpmserverapi.MetricMEMResponse
 	request := &cpmserverapi.MetricMEMRequest{}
-	var url = "http://" + serverName + ":10001"
-	response, err = cpmserverapi.MetricMEMClient(url, request)
+	response, err = cpmserverapi.MetricMEMClient(serverName, request)
 	if err != nil {
 		logit.Error.Println("mem metric error:" + err.Error())
 		return values, err

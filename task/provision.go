@@ -107,8 +107,7 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 	//provision the volume
 	request := &cpmserverapi.DiskProvisionRequest{"/tmp/foo"}
 	request.Path = params.PGDataPath
-	var url = "http://" + server.IPAddress + ":10001"
-	_, err = cpmserverapi.DiskProvisionClient(url, request)
+	_, err = cpmserverapi.DiskProvisionClient(server.Name, request)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return err
@@ -117,8 +116,7 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 	//run the container
 	params.CommandPath = "docker-run-backup.sh"
 	var response cpmserverapi.DockerRunResponse
-	url = "http://" + server.IPAddress + ":10001"
-	response, err = cpmserverapi.DockerRunClient(url, params)
+	response, err = cpmserverapi.DockerRunClient(server.Name, params)
 	if err != nil {
 		logit.Error.Println(response.Output)
 		return err
