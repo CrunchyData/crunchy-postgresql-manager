@@ -30,6 +30,9 @@ chcon -Rt svirt_sandbox_file_t $LOGDIR
 
 echo "setting up keys dir..."
 KEYSDIR=/var/cpm/keys
+mkdir $KEYSDIR
+cp $INSTALLDIR/sbin/key.pem $KEYSDIR
+cp $INSTALLDIR/sbin/cert $KEYSDIR
 chcon -Rt svirt_sandbox_file_t $KEYSDIR
 
 echo "deleting all old log files...."
