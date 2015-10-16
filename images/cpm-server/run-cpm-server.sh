@@ -20,6 +20,12 @@ if [[ $EUID -ne 0 ]]; then
 	      exit 1
 fi
 
+echo "setting up log dir..."
+LOGDIR=/var/cpm/logs
+mkdir -p $LOGDIR
+chmod -R 777 $LOGDIR
+chcon -Rt svirt_sandbox_file_t $LOGDIR
+
 echo "restarting foo..."
 docker stop cpm-newserver
 docker rm cpm-newserver
@@ -29,5 +35,5 @@ docker run --name=cpm-newserver -d \
 	-v /:/rootfs \
 	-v /var/cpm/data/pgsql:/var/cpm/data/pgsql \
 	-v /var/run/docker.sock:/var/run/docker.sock \
-	crunchydata/foo:latest
+	crunchydata/cpm-server:latest
 
