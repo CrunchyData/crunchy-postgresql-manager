@@ -1,4 +1,4 @@
-Crunchy Postgresql Manager (Beta v0.9.6)
+Crunchy Postgresql Manager (Beta v0.9.7)
 ==========================
 Crunchy Postgresql Manager (CPM) is a Docker-based solution which
 provides an on-premise PostgreSQL-as-a-Service platform.
@@ -25,7 +25,7 @@ The user install allows you to get CPM up and running quickly by
 downloading pre-built binaries and Docker images.
 
 The user installation archive can be downloaded from:
-[https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.6-linux-amd64.tar.gz](https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.6-linux-amd64.tar.gz)
+[https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.7-linux-amd64.tar.gz](https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.7-linux-amd64.tar.gz)
 
 See docs/user-install.md for details on the user installation 
 requirements.
@@ -68,6 +68,10 @@ found at http://cpm-promdash:3000
 * cpm-prometheus - cpm-prometheus.crunchy.lab - the Prometheus database
 is found at http://cpm-prometheus:9090
 
+* cpm-server - cpm-yourserver.crunchy.lab - the server agent, one of these is
+run on each CPM server, the name of the container is important, it needs to
+match the server name you define in CPM
+
 Testing the Install
 ===========
 
@@ -87,7 +91,7 @@ To shut down CPM, run the following commands:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 docker stop cpm
-docker stop cpm-backup
+docker stop cpm-task
 docker stop cpm-collect
 docker stop cpm-admin
 docker stop cpm-promdash
@@ -99,7 +103,7 @@ To start CPM, run the following commands:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 docker start cpm
-docker start cpm-backup
+docker start cpm-task
 docker start cpm-collect
 docker start cpm-admin
 docker start cpm-promdash
