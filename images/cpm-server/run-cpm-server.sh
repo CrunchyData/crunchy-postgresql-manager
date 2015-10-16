@@ -26,7 +26,7 @@ mkdir -p $LOGDIR
 chmod -R 777 $LOGDIR
 chcon -Rt svirt_sandbox_file_t $LOGDIR
 
-echo "restarting foo..."
+echo "restarting cpm-server"
 docker stop cpm-newserver
 docker rm cpm-newserver
 docker run --name=cpm-newserver -d \

@@ -2,6 +2,6 @@ OSFLAVOR=centos7
 build:
 	        cp $(GOBIN)/cpmserverapi  ./bin
 	        cp $(GOBIN)/dummyserver  ./bin
-	        sudo docker build -t foo -f Dockerfile.$(OSFLAVOR) .
-		sudo docker tag -f foo:latest crunchydata/foo
+	        sudo docker build -t cpm-server -f Dockerfile.$(OSFLAVOR) .
+		sudo docker tag -f cpm-server:latest crunchydata/cpm-server
 
