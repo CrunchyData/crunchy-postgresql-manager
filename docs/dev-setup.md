@@ -51,6 +51,8 @@ cd src/github.com/crunchydata/crunchy-postgresql-manager
 godep restore
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
+make build
+~~~~~~~~~~~~~~~~~~~~~~~~
 ### Compile CPM ###
 ~~~~~~~~~~~~~~~~~~~~~~~~
 make build
@@ -87,54 +89,17 @@ systemctl stop firewalld.service
 There is a document, firewall-setup.md, that shows how the CPM ports
 can be opened up.
 
-Start CPM Server Agent
-----------------------
-After you have successfully compiled CPM and built the CPM Docker images,
-on each server that is to run CPM, you will need to start a CPM Server
-Agent.  The server agent is run within the cpm-server container on each
-server host that will be configured to be used in CPM.
+### Setup skybridge ###
 
-Each container needs to be started with skybridge running and also
-have its container name set to 'cpm-servername' where servername is
-the server name you have given the server in the CPM server page once
-CPM is running.
+CPM services are found using DNS by the various parts of CPM.  When
+a Docker image is started, we need it to be registered with a DNS service
+and the local machine configured to resolve using that DNS server.
 
-
-Network Configuration
-------------------------------
 CPM requires a reliable IP address of the host on which it is running.
 When a VM is created to develop CPM upon, you would create an extra
 Ethernet adapter typically so that you can assign it a static IP
 address.  In Virtualbox, this adapter would be a Host-Only adapter
 for example.
-
-For development, you will likely want to turn off your firewall.  A
-script for setting firewall rules is offered if that is not an option
-for you.  See firewall.sh for the rules which open the required
-CPM ports.
-
-DNS Configuration
-------------------------------
-CPM uses a dedicated DNS server to orchestrate the Docker container-to-DNS
-mapping.  This DNS server is created by installing the dnsbridge or skybridge
-projects on your CPM development server.  The simpler installation
-of DNS server is the skybridge project.  These projects are found
-in github at the following locations:
-
-https://github.com/CrunchyData/skybridge
-
-The DNS installation will enable and configure the Docker service
-to specify the DNS server as the primary DNS nameserver.  This
-DNS server will also be your primary nameserver in your /etc/resolv.conf
-configuration.  You can install the Docker version of skybridge
-as follows, you will need to EDIT the run-skybridge.sh file
-to specify your IP address it will listen on:
-
-~~~~~~~~~~~~~~~~~
-git clone git@github.com:/crunchydata/skybridge
-cd skybridge/bin
-./run-skybridge.sh
-~~~~~~~~~~~~~~~~~
 
 For Docker to use the new DNS nameserver, you will need to modify
 the docker config file /etc/sysconfig/docker.  Add lines in it
@@ -152,12 +117,64 @@ Your /etc/resolv.conf should look similar to this if your network
 configuration is set up correctly:
 ~~~~~~~~~~~~~~~~~
 search crunchy.lab
-nameserver 192.168.0.106
+nameserver 192.168.0.107
 nameserver 192.168.0.1
 ~~~~~~~~~~~~~~~~~
 
+You can make these changes to your /etc/resolv.conf permanent by
+adding the following settings to your ethernet adapter configuration
+in /etc/syconfig/network-scripts:
+~~~~~~~~~~~~~~~~~~~~~~
+DNS1=192.168.0.107
+DNS2=192.168.0.1
+DOMAIN=crunchy.lab
+PEERDNS=no
+~~~~~~~~~~~~~~~~~~~~~~
+
 This will cause the skybridge DNS nameserver to be queried first.
 
+
+Pull down skybridge as follows:
+~~~~~~~~~~~~~~~~~~~~
+sudo docker pull crunchydata/skybridge
+~~~~~~~~~~~~~~~~~~~~
+
+Start skybridge by editing the sbin/run-skybridge.sh script
+to specify your local IP address, then run the skybridge container:
+~~~~~~~~~~~~~~~~~~~~
+sudo ./sbin/run-skybridge.sh
+~~~~~~~~~~~~~~~~~~~~
+
+
+Start CPM Server Agent
+----------------------
+After you have successfully compiled CPM and built the CPM Docker images,
+on each server that is to run CPM, you will need to start a CPM Server
+Agent.  The server agent is run within the cpm-server container on each
+server host that will be configured to be used in CPM.
+
+Each container needs to be started with skybridge running and also
+have its container name set to 'cpm-servername' where servername is
+the server name you have given the server in the CPM server page once
+CPM is running.
+
+For this example, I will name the CPM server, newserver.
+
+So, edit the sbin/run-cpmserver.sh script, and modify the server
+name to newserver.
+
+Then run the script which will create a running cpm-server named
+cpm-newserver.
+~~~~~~~~~~~~~~~
+sudo ./run-cpmserver.sh
+ping cpm-newserver
+~~~~~~~~~~~~~~~
+
+If your networking and skybridge are all correct, then you should be able 
+to ping the cpm-server container as follows:
+~~~~~~~~~~~~~~~
+ping cpm-newserver
+~~~~~~~~~~~~~~~
 
 Running CPM
 --------------

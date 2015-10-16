@@ -74,20 +74,6 @@ docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cpm-task -d crunchydata/cpm-task:latest
 
-echo "restarting cpm-collect container..."
-sleep 2
-docker stop cpm-collect
-docker rm cpm-collect
-docker run -e DB_HOST=cpm-admin.crunchy.lab \
-	--hostname="cpm-collect" \
-	-e CONT_POLL_INT=4 \
-	-e SERVER_POLL_INT=4 \
-	-e HC_POLL_INT=4 \
-	-e CPMBASE=/var/cpm \
-	-e DB_PORT=5432 -e DB_USER=postgres \
-	-v $LOGDIR:/cpmlogs \
-	-d --name=cpm-collect crunchydata/cpm-collect:latest 
-
 sleep 2
 ###############
 echo "restarting cpm-promdash container..."
@@ -119,11 +105,26 @@ docker run  \
 	--name=cpm-prometheus -d prom/prometheus:latest
 ##############
 
+echo "restarting cpm-collect container..."
+sleep 2
+docker stop cpm-collect
+docker rm cpm-collect
+docker run -e DB_HOST=cpm-admin.crunchy.lab \
+	--hostname="cpm-collect" \
+	-e CONT_POLL_INT=4 \
+	-e SERVER_POLL_INT=4 \
+	-e HC_POLL_INT=4 \
+	-e CPMBASE=/var/cpm \
+	-e DB_PORT=5432 -e DB_USER=postgres \
+	-v $LOGDIR:/cpmlogs \
+	-d --name=cpm-collect crunchydata/cpm-collect:latest 
+
 echo "testing containers for DNS resolution...."
 
 ping -c 2 cpm.crunchy.lab
 ping -c 2 cpm-admin.crunchy.lab
-ping -c 2 cpm-backup.crunchy.lab
+ping -c 2 cpm-task.crunchy.lab
 ping -c 2 cpm-promdash.crunchy.lab
 ping -c 2 cpm-prometheus.crunchy.lab
+ping -c 2 cpm-collect.crunchy.lab
 
