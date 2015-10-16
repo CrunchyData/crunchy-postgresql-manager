@@ -21,7 +21,7 @@ Note that I like to use the PGDG postgres distro instead of the redhat provided 
 sudo yum -y install net-tools bind-utils install golang git docker mercurial sysstat
 rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
 rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
-yum install -y nmap-ncat procps-ng postgresql94 postgresql94-contrib postgresql94-server libxslt unzip openssh-clients hostname bind-utils pgbadger
+yum install -y nmap-ncat procps-ng postgresql94 postgresql94-contrib postgresql94-server libxslt unzip openssh-clients hostname bind-utils
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Setup Go Project Structure ###
@@ -56,9 +56,26 @@ godep restore
 make build
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
+### Configure Docker ###
+Edit the docker configuration by editing the OPTIONS parameter as follows:
+~~~~~~~~~~~~~~~~~~~~~~~~
+vi /etc/sysconfig/docker
+OPTIONS='--selinux-enabled --bip=172.17.42.1/16 --dns-search=crunchy.lab --dns=192.168.0.107 --dns=192.168.0.1'
+systemctl enable docker.service
+systemctl start docker.service
+docker info
+~~~~~~~~~~~~~~~~~~~~~~~~
+
 ### Build CPM Docker Images ###
 ~~~~~~~~~~~~~~~~~~~~~~~~
 make buildimages
+docker images
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Pull down Prometheus images ###
+~~~~~~~~~~~~~~~~~~~~~~~~
+sudo docker pull prom/promdash
+sudo docker pull prom/prometheus
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Disable Firewalld ###
@@ -67,9 +84,8 @@ systemctl disable firewalld.service
 systemctl stop firewalld.service
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-There is a starter script in CPM /sbin directory
-that attempts to open up only the required CPM ports, adjust
-this for your local use if you require firewalld.
+There is a document, firewall-setup.md, that shows how the CPM ports
+can be opened up.
 
 Start CPM Server Agent
 ----------------------
