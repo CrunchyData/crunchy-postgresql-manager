@@ -202,17 +202,14 @@ On the dev host, the following URLs are useful:
 CPM Web User Interface
 ----------------------
 http://cpm.crunchy.lab:13001
-http://192.168.56.103:13001
 
 CPM Admin API
 ----------------------
 http://cpm-admin.crunchy.lab:13001
-http://192.168.56.103:14001
 
 Prometheus Dashboard
 ----------------------
 http://cpm-promdash.crunchy.lab:3000
-http://192.168.56.103:15000
 
 If you are running CPM on a VM (host-only) and
 accessing CPM from the VM host (not the guest), then
@@ -224,7 +221,6 @@ as http://192.168.56.103:16000.
 Prometheus DB
 ----------------------
 http://cpm-prometheus.crunchy.lab:9090
-http://192.168.56.103:16000
 
 If you are running the CPM user interface from outside the dev host
 (e.g.  from your vbox host browser), you will need to update
@@ -247,10 +243,16 @@ Browse to the CPM web user interface
 user id is cpm
 password is cpm
 Admin URL is either http://cpm-admin:13001 (on your CPM host)
-or http://192.168.56.103:13001
 
 Initially you will need to first define your CPM server which
-is your CPM host (e.g. 192.168.56.103)
+is your CPM host (e.g. 192.168.0.107, newserver)
 
 Then you will be ready to start creating PostgreSQL instances.
+
+nginx selinux issues
+--------------------
+
+in some cases with selinux enabled, you might see AVC errors, if so, look at this:
+
+http://axilleas.me/en/blog/2013/selinux-policy-for-nginx-and-gitlab-unix-socket-in-fedora-19/
 
