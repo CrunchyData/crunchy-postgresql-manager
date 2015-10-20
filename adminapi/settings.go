@@ -86,6 +86,7 @@ func GetAllSettings(w rest.ResponseWriter, r *rest.Request) {
 	for i = range results {
 		settings[i].Name = results[i].Name
 		settings[i].Value = results[i].Value
+		settings[i].Description = results[i].Description
 		settings[i].UpdateDate = results[i].UpdateDate
 		i++
 	}
@@ -134,6 +135,7 @@ func SaveSetting(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+/**
 func SaveSettings(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -287,6 +289,7 @@ func SaveClusterProfiles(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 
 }
+*/
 
 func getClusterProfileInfo(dbConn *sql.DB, sz string) (types.ClusterProfiles, error) {
 

@@ -26,10 +26,11 @@ type Credential struct {
 }
 
 type Setting struct {
-	Name       string
-	Value      string
-	UpdateDate string
-	Token      string
+	Name        string
+	Value       string
+	Description string
+	UpdateDate  string
+	Token       string
 }
 
 type Settings struct {

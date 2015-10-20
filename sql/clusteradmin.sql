@@ -8,6 +8,7 @@ create database clusteradmin;
 create table settings (
 	name varchar(30) primary key,
 	value varchar(50) not null,
+	description varchar(80) not null,
 	updatedt timestamp not null
 );
 
@@ -116,38 +117,38 @@ insert into secroleperm values ('superuser', 'perm-backup');
 insert into secroleperm values ('superuser', 'perm-user');
 
 
-insert into settings (name, value, updatedt) values ('S-DOCKER-PROFILE-CPU', '256', now());
-insert into settings (name, value, updatedt) values ('S-DOCKER-PROFILE-MEM', '512m', now());
-insert into settings (name, value, updatedt) values ('M-DOCKER-PROFILE-CPU', '512', now());
-insert into settings (name, value, updatedt) values ('M-DOCKER-PROFILE-MEM', '1g', now());
-insert into settings (name, value, updatedt) values ('L-DOCKER-PROFILE-CPU', '0', now());
-insert into settings (name, value, updatedt) values ('L-DOCKER-PROFILE-MEM', '0', now());
-insert into settings (name, value, updatedt) values ('DOCKER-REGISTRY', 'registry:5000', now());
-insert into settings (name, value, updatedt) values ('PG-PORT', '5432', now());
-insert into settings (name, value, updatedt) values ('DOMAIN-NAME', 'crunchy.lab', now());
-insert into settings (name, value, updatedt) values ('ADMIN-URL', 'http://cpm:13001', now());
+insert into settings (name, value, description, updatedt) values ('S-DOCKER-PROFILE-CPU', '256', 'small Docker profile CPU shares', now());
+insert into settings (name, value, description, updatedt) values ('S-DOCKER-PROFILE-MEM', '512m', 'small Docker profile Memory limit', now());
+insert into settings (name, value, description, updatedt) values ('M-DOCKER-PROFILE-CPU', '512', 'medium Docker profile CPU shares', now());
+insert into settings (name, value, description, updatedt) values ('M-DOCKER-PROFILE-MEM', '1g', 'medium Docker profile Memory limit', now());
+insert into settings (name, value, description, updatedt) values ('L-DOCKER-PROFILE-CPU', '0', 'large Docker profile CPU shares', now());
+insert into settings (name, value, description, updatedt) values ('L-DOCKER-PROFILE-MEM', '0', 'large Docker profile Memory limit', now());
+insert into settings (name, value, description, updatedt) values ('DOCKER-REGISTRY', 'registry:5000', 'not used currently', now());
+insert into settings (name, value, description, updatedt) values ('PG-PORT', '5432', 'Postgresql port to use', now());
+insert into settings (name, value, description, updatedt) values ('DOMAIN-NAME', 'crunchy.lab', 'domain name as configured in CPM', now());
+insert into settings (name, value, description, updatedt) values ('ADMIN-URL', 'http://cpm:13001', 'CPM admin url', now());
 
-insert into settings (name, value, updatedt) values ('CP-SM-COUNT', '1', now());
-insert into settings (name, value, updatedt) values ('CP-SM-M-PROFILE', 'small', now());
-insert into settings (name, value, updatedt) values ('CP-SM-S-PROFILE', 'small', now());
+insert into settings (name, value, description, updatedt) values ('CP-SM-COUNT', '1', 'small cluster profile standby count', now());
+insert into settings (name, value, description, updatedt) values ('CP-SM-M-PROFILE', 'small', 'small cluster profile master Docker profile', now());
+insert into settings (name, value, description, updatedt) values ('CP-SM-S-PROFILE', 'small', 'small cluster profile standby Docker profile', now());
 
-insert into settings (name, value, updatedt) values ('CP-MED-COUNT', '1', now());
-insert into settings (name, value, updatedt) values ('CP-MED-M-PROFILE', 'small', now());
-insert into settings (name, value, updatedt) values ('CP-MED-S-PROFILE', 'small', now());
+insert into settings (name, value, description, updatedt) values ('CP-MED-COUNT', '1', 'medium cluster profile standby count', now());
+insert into settings (name, value, description, updatedt) values ('CP-MED-M-PROFILE', 'small', 'medium cluster profile master Docker profile', now());
+insert into settings (name, value, description, updatedt) values ('CP-MED-S-PROFILE', 'small', 'medium cluster profile standby Docker profile', now());
 
-insert into settings (name, value, updatedt) values ('CP-LG-COUNT', '1', now());
-insert into settings (name, value, updatedt) values ('CP-LG-M-PROFILE', 'small', now());
-insert into settings (name, value, updatedt) values ('CP-LG-S-PROFILE', 'small', now());
-insert into settings (name, value, updatedt) values ('CP-SM-M-SERVER', 'low', now());
-insert into settings (name, value, updatedt) values ('CP-SM-S-SERVER', 'low', now());
-insert into settings (name, value, updatedt) values ('CP-MED-M-SERVER', 'low', now());
-insert into settings (name, value, updatedt) values ('CP-MED-S-SERVER', 'low', now());
-insert into settings (name, value, updatedt) values ('CP-LG-M-SERVER', 'low', now());
-insert into settings (name, value, updatedt) values ('CP-LG-S-SERVER', 'low', now());
-insert into settings (name, value, updatedt) values ('CP-SM-ALGO', 'round-robin', now());
-insert into settings (name, value, updatedt) values ('CP-MED-ALGO', 'round-robin', now());
-insert into settings (name, value, updatedt) values ('CP-LG-ALGO', 'round-robin', now());
-insert into settings (name, value, updatedt) values ('SLEEP-PROV', '2s', now());
+insert into settings (name, value, description, updatedt) values ('CP-LG-COUNT', '1', 'large cluster profile standby count', now());
+insert into settings (name, value, description, updatedt) values ('CP-LG-M-PROFILE', 'small', 'large cluster profile master Docker profile', now());
+insert into settings (name, value, description, updatedt) values ('CP-LG-S-PROFILE', 'small', 'large cluster profile standby Docker profile', now());
+insert into settings (name, value, description, updatedt) values ('CP-SM-M-SERVER', 'low', 'small cluster profile master server size', now());
+insert into settings (name, value, description, updatedt) values ('CP-SM-S-SERVER', 'low', 'small cluster profile standby server size', now());
+insert into settings (name, value, description, updatedt) values ('CP-MED-M-SERVER', 'low', 'medium cluster profile master server size', now());
+insert into settings (name, value, description, updatedt) values ('CP-MED-S-SERVER', 'low', 'medium cluster profile standby server size', now());
+insert into settings (name, value, description, updatedt) values ('CP-LG-M-SERVER', 'low', 'large cluster profile master server size', now());
+insert into settings (name, value, description, updatedt) values ('CP-LG-S-SERVER', 'low', 'large cluster profile standby server size', now());
+insert into settings (name, value, description, updatedt) values ('CP-SM-ALGO', 'round-robin', 'small cluster placement algorithm', now());
+insert into settings (name, value, description, updatedt) values ('CP-MED-ALGO', 'round-robin', 'medium cluster placement algorithm', now());
+insert into settings (name, value, description, updatedt) values ('CP-LG-ALGO', 'round-robin', 'large cluster placement algorithm', now());
+insert into settings (name, value, description, updatedt) values ('SLEEP-PROV', '2s', 'time to sleep during provisioning check', now());
 
 create table taskprofile (
 	id serial primary key,
@@ -249,9 +250,9 @@ create table proxy (
 	updatedt timestamp not null
 );
 
-insert into settings (name, value, updatedt) values ('POSTGRESPSW', '', now());
-insert into settings (name, value, updatedt) values ('CPMTESTPSW', 'cpmtest', now());
-insert into settings (name, value, updatedt) values ('PGPOOLPSW', 'pgpool', now());
+insert into settings (name, value, description, updatedt) values ('POSTGRESPSW', '', 'postgres superuser password', now());
+insert into settings (name, value, description, updatedt) values ('CPMTESTPSW', 'cpmtest', 'CPM test user password', now());
+insert into settings (name, value, description, updatedt) values ('PGPOOLPSW', 'pgpool', 'pgpool user account password', now());
 
 
 create table healthcheck (

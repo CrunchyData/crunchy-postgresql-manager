@@ -708,7 +708,7 @@ func DeleteServer(dbConn *sql.DB, id string) error {
 func GetAllGeneralSettings(dbConn *sql.DB) ([]types.Setting, error) {
 	var rows *sql.Rows
 	var err error
-	rows, err = dbConn.Query("select name, value, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from settings where name in ('PG-PORT', 'DOMAIN-NAME', 'DOCKER-REGISTRY', 'ADMIN-URL') order by name")
+	rows, err = dbConn.Query("select name, value, description, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from settings where name in ('PG-PORT', 'DOMAIN-NAME', 'DOCKER-REGISTRY', 'ADMIN-URL') order by name")
 	if err != nil {
 		return nil, err
 	}
@@ -719,6 +719,7 @@ func GetAllGeneralSettings(dbConn *sql.DB) ([]types.Setting, error) {
 		if err = rows.Scan(
 			&setting.Name,
 			&setting.Value,
+			&setting.Description,
 			&setting.UpdateDate); err != nil {
 			return nil, err
 		}
@@ -734,7 +735,7 @@ func GetAllSettings(dbConn *sql.DB) ([]types.Setting, error) {
 	//logit.Info.Println("admindb:GetAllSettings: called")
 	var rows *sql.Rows
 	var err error
-	rows, err = dbConn.Query("select name, value, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from settings order by name")
+	rows, err = dbConn.Query("select name, value, description, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from settings order by name")
 	if err != nil {
 		return nil, err
 	}
@@ -745,6 +746,7 @@ func GetAllSettings(dbConn *sql.DB) ([]types.Setting, error) {
 		if err = rows.Scan(
 			&setting.Name,
 			&setting.Value,
+			&setting.Description,
 			&setting.UpdateDate); err != nil {
 			return nil, err
 		}
@@ -760,9 +762,9 @@ func GetSetting(dbConn *sql.DB, key string) (types.Setting, error) {
 	//logit.Info.Println("admindb:GetSetting:called")
 	setting := types.Setting{}
 
-	queryStr := fmt.Sprintf("select value, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from settings where name = '%s'", key)
+	queryStr := fmt.Sprintf("select value, description, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from settings where name = '%s'", key)
 	//logit.Info.Println("admindb:GetSetting:" + queryStr)
-	err := dbConn.QueryRow(queryStr).Scan(&setting.Value, &setting.UpdateDate)
+	err := dbConn.QueryRow(queryStr).Scan(&setting.Value, &setting.Description, &setting.UpdateDate)
 	switch {
 	case err == sql.ErrNoRows:
 		logit.Info.Println("admindb:GetSetting: no Setting with that key " + key)
@@ -814,7 +816,7 @@ func GetAllSettingsMap(dbConn *sql.DB) (map[string]string, error) {
 
 	var rows *sql.Rows
 	var err error
-	rows, err = dbConn.Query("select name, value, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from settings order by name")
+	rows, err = dbConn.Query("select name, value, description, to_char(updatedt, 'MM-DD-YYYY HH24:MI:SS') from settings order by name")
 	if err != nil {
 		return m, err
 	}
@@ -825,6 +827,7 @@ func GetAllSettingsMap(dbConn *sql.DB) (map[string]string, error) {
 		if err = rows.Scan(
 			&setting.Name,
 			&setting.Value,
+			&setting.Description,
 			&setting.UpdateDate); err != nil {
 			return m, err
 		}
