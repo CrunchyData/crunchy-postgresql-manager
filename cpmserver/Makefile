@@ -1,8 +1,8 @@
 
 all:
-		godep go install cpmserverapi.go
+		godep go install cpmserver.go
 
 clean:
-		rm -rf $(GOBIN)/cpmserverapi
+		rm -rf $(GOBIN)/cpmserver
 
 

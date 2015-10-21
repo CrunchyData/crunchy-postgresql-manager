@@ -14,12 +14,17 @@
 # limitations under the License.
 
 #
-# start up the adminapi agent
+# start up the cpm container agent
 #
-
-env > /tmp/envvars.out
 
 source /var/cpm/bin/setenv.sh
 
-cpmserver
-#/var/cpm/bin/dummyserver 
+# when the container starts, see if there is a pg instance we can start up
+if [ -f /pgdata/postgresql.conf ]; then
+	rm /pgdata/postmaster.pid
+	pg_ctl -D /pgdata start
+fi
+
+cpmcontainerserver 
+
+#dummyserver

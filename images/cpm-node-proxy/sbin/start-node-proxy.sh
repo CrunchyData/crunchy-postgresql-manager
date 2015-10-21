@@ -19,6 +19,6 @@
 
 source /var/cpm/bin/setenv.sh
 
-cpmcontainerapi 
+cpmcontainerserver 
 
 #dummyserver

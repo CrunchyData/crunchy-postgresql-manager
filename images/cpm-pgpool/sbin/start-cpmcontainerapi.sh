@@ -24,6 +24,6 @@ source /var/cpm/bin/setenv.sh
 echo "about to run startpgpool.sh"
 startpgpool.sh
 
-cpmcontainerapi 
+cpmcontainerserver 
 
 #dummyserver
