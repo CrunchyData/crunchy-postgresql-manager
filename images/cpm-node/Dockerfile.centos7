@@ -36,4 +36,4 @@ EXPOSE 13000
 
 USER root
 
-CMD ["/var/cpm/bin/start-cpmcontainerapi.sh"]
+CMD ["/var/cpm/bin/start-cpmcontainerserver.sh"]

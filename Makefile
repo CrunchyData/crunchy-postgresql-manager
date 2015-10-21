@@ -15,15 +15,14 @@ gendeps:
 		github.com/crunchydata/crunchy-postgresql-manager/admindb 
 
 build:
-		godep go install cmd/adminapi.go
-		godep go install cmd/cpmserverapi.go
-		godep go install cmd/cpmcontainerapi.go
-		godep go install cmd/backupcommand.go
-		godep go install cmd/taskserver.go
-		godep go install cmd/dummyserver.go
-		godep go install cmd/dockerapi.go
-		godep go install cmd/collectserver.go
-		godep go install cmd/restorecommand.go
+		cd adminserver && make
+		cd cpmserver && make
+		cd cpmcontainerserver && make
+		cd backupcommand && make
+		cd taskserver && make
+		cd dummyserver && make
+		cd collectserver && make
+		cd restorecommand && make
 
 buildimages:
 		cd images/cpm-server && make  
