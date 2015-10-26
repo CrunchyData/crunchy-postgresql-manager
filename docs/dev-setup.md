@@ -256,3 +256,12 @@ in some cases with selinux enabled, you might see AVC errors, if so, look at thi
 
 http://axilleas.me/en/blog/2013/selinux-policy-for-nginx-and-gitlab-unix-socket-in-fedora-19/
 
+
+###Godocs
+
+To see the godocs, install godoc, and start up the godoc server, then 
+browse to the CPM API documentation:
+~~~~~~~~~~~~~~~~~~~~
+go get golang.org/x/tools/cmd/godoc
+godoc -http=:6060
+~~~~~~~~~~~~~~~~~~~~

@@ -18,10 +18,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/ant0ine/go-json-rest/rest"
-	"github.com/crunchydata/crunchy-postgresql-manager/adminapi"
 	"log"
 	"net/http"
+
+	"github.com/ant0ine/go-json-rest/rest"
+	"github.com/crunchydata/crunchy-postgresql-manager/adminapi"
 )
 
 func init() {

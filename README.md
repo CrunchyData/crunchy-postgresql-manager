@@ -1,4 +1,4 @@
-Crunchy Postgresql Manager (Beta v0.9.7)
+Crunchy Postgresql Manager (Beta v0.9.8)
 ==========================
 Crunchy Postgresql Manager (CPM) is a Docker-based solution which
 provides an on-premise PostgreSQL-as-a-Service platform.
