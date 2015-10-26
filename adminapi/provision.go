@@ -32,6 +32,7 @@ import (
 	"time"
 )
 
+// Provision creates a Docker container image
 func Provision(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {

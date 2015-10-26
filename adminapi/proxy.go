@@ -44,6 +44,7 @@ type ProxyRequest struct {
 	Database      string
 }
 
+// ProvisionProxy creates a Docker image for a proxy node definition
 func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -212,6 +213,7 @@ func insertProxy(request *ProxyRequest) error {
 	return err
 }
 
+// GetProxyByContainerID returns a proxy node defintion for a given container
 func GetProxyByContainerID(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -245,6 +247,7 @@ func GetProxyByContainerID(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&proxy)
 }
 
+// ProxyUpdate updates a proxy node definition
 func ProxyUpdate(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {

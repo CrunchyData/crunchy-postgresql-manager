@@ -45,6 +45,7 @@ type Project2 struct {
 	Children []Child `json:"children"`
 }
 
+// UpdateProject updates a project definition
 func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -98,6 +99,7 @@ func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// AddProject creates a new project definition
 func AddProject(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -147,6 +149,7 @@ func AddProject(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// GetProject returns a project definition
 func GetProject(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -189,6 +192,7 @@ func GetProject(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&project)
 }
 
+// GetAllProjects returns all the project definitions
 func GetAllProjects(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -283,6 +287,7 @@ func GetAllProjects(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&projects)
 }
 
+// DeleteProject deletes a given project
 func DeleteProject(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {

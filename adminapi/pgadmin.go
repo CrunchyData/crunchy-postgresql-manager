@@ -25,6 +25,7 @@ import (
 	"net/http"
 )
 
+// AdminStartpg starts the postgres database on a given container
 func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -78,6 +79,7 @@ func AdminStartpg(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// AdminStoppg stops a postgres database on a given container
 func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {

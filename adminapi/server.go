@@ -27,6 +27,7 @@ import (
 	"strings"
 )
 
+// GetServer return a server definition
 func GetServer(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -59,7 +60,7 @@ func GetServer(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&server)
 }
 
-//we use AddServer for both updating and inserting based on the ID passed in
+// AddServer updating and inserting a server
 func AddServer(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -138,7 +139,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&server)
 }
 
-//monitor server - get info
+// MonitorServerGetInfo return server information for a given server
 func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -208,6 +209,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// GetAllServers return a list of servers
 func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -245,6 +247,7 @@ func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&servers)
 }
 
+// DeleteServer delete a given server
 func DeleteServer(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {

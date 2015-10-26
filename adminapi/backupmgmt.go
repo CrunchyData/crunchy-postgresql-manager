@@ -55,6 +55,7 @@ type AddSchedulePost struct {
 
 const CLUSTERADMIN_DB = "clusteradmin"
 
+// ExecuteNow executes a task schedule on demand allowing an immediate task execution
 func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
@@ -134,6 +135,7 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// AddSchedule creates a new task schedule
 func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -222,6 +224,7 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// DeleteSchedule deletes an existing task schedule
 func DeleteSchedule(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -270,6 +273,7 @@ func DeleteSchedule(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
+// GetSchedule returns a task schedule
 func GetSchedule(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -303,6 +307,7 @@ func GetSchedule(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
+// GetAllSchedules returns a list of task schedules for a given container
 func GetAllSchedules(w rest.ResponseWriter, r *rest.Request) {
 	Token := r.PathParam("Token")
 	if Token == "" {
@@ -341,6 +346,7 @@ func GetAllSchedules(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
+// GetStatus returns the status of a given task schedule
 func GetStatus(w rest.ResponseWriter, r *rest.Request) {
 	Token := r.PathParam("Token")
 	if Token == "" {
@@ -377,6 +383,7 @@ func GetStatus(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(stat)
 }
 
+// GetAllStatus returns the full set of status results for a given task schedule
 func GetAllStatus(w rest.ResponseWriter, r *rest.Request) {
 	Token := r.PathParam("Token")
 	if Token == "" {
@@ -415,6 +422,7 @@ func GetAllStatus(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
+// UpdateSchedule updates a given task schedule
 func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -527,6 +535,7 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// TODO
 func GetBackupNodes(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {

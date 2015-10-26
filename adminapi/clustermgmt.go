@@ -45,6 +45,7 @@ type AutoClusterInfo struct {
 	Token          string
 }
 
+// ScaleUpCluster increases the count of standby containers in a cluster
 func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
@@ -147,6 +148,7 @@ func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// GetCluster returns a given cluster definition
 func GetCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -182,6 +184,7 @@ func GetCluster(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&cluster)
 }
 
+// TODO
 func ConfigureCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
@@ -523,6 +526,7 @@ func configureCluster(dbConn *sql.DB, cluster types.Cluster, autocluster bool) e
 
 }
 
+// GetAllClustersForProject returns a list of cluster definitions for a given project
 func GetAllClustersForProject(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -567,6 +571,7 @@ func GetAllClustersForProject(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&clusters)
 }
 
+// TODO
 func GetAllClusters(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -604,7 +609,7 @@ func GetAllClusters(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&clusters)
 }
 
-//we use POST for both updating and inserting based on the ID passed in
+// PostCluster updates or inserts a new cluster definition
 func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -666,6 +671,7 @@ func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&cluster)
 }
 
+// DeleteCluster deletes an existing cluster definition
 func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -762,6 +768,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// AdminFailover causes a cluster failorver to be performed for a given cluster
 func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -861,6 +868,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 	return
 }
 
+// TODO
 func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -971,6 +979,7 @@ func EventJoinCluster(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// AutoCluster creates a new cluster
 func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -1348,6 +1357,7 @@ func waitTillAllReady(dockermaster cpmserverapi.DockerRunRequest, dockerpgpool c
 
 }
 
+// StartCluster starts all nodes in a cluster
 func StartCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -1420,6 +1430,7 @@ func StartCluster(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// StopCluster stops all nodes in a cluster
 func StopCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {

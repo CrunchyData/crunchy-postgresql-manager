@@ -40,6 +40,7 @@ type ChgPassword struct {
 	Token    string
 }
 
+// Login perform a login using passed credentials and return a token if successful
 func Login(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -71,6 +72,7 @@ func Login(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&token)
 }
 
+// Logout perform a logout based on a given token
 func Logout(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -100,6 +102,7 @@ func Logout(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// UpdateUser update a CPM user security settings
 func UpdateUser(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -141,6 +144,7 @@ func UpdateUser(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// AddUser create a new CPM user
 func AddUser(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -180,6 +184,7 @@ func AddUser(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// GetUser return a CPM user
 func GetUser(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -210,6 +215,7 @@ func GetUser(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// GetAllUsers return all CPM users
 func GetAllUsers(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -242,6 +248,7 @@ func GetAllUsers(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&usersList)
 }
 
+// DeleteUser delete a CPM user
 func DeleteUser(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -278,6 +285,7 @@ func DeleteUser(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// UpdateRole update a CPM role
 func UpdateRole(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -317,6 +325,7 @@ func UpdateRole(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// AddRole create a new CPM role
 func AddRole(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -356,6 +365,7 @@ func AddRole(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// DeleteRole delete a CPM role
 func DeleteRole(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -392,6 +402,7 @@ func DeleteRole(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// GetAllRoles return all CPM roles
 func GetAllRoles(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -420,6 +431,7 @@ func GetAllRoles(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&roles)
 }
 
+// GetRole return a role
 func GetRole(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -455,6 +467,7 @@ func GetRole(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&role)
 }
 
+// ChangePassword change  a user password
 func ChangePassword(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {

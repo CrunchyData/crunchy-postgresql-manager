@@ -27,6 +27,7 @@ import (
 	"strconv"
 )
 
+// AddContainerUser creates a new database user for a given container
 func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	postMsg := types.NodeUser{}
 	err := r.DecodeJsonPayload(&postMsg)
@@ -157,6 +158,7 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// DeleteContainerUser deletes a database user on a given container
 func DeleteContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -248,6 +250,7 @@ func DeleteContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
+// GetContainerUser returns a database user for a given container
 func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -323,6 +326,7 @@ func GetContainerUser(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
+// GetAllusersForContainer returns a list of all database users on a given db container
 func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -412,6 +416,7 @@ func GetAllUsersForContainer(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
+// UpdateContainerUser updates a database users preferences on a given container db
 func UpdateContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {

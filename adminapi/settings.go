@@ -25,6 +25,7 @@ import (
 	"net/http"
 )
 
+// GetAllGeneralSettings return a list of general settings
 func GetAllGeneralSettings(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -59,6 +60,7 @@ func GetAllGeneralSettings(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&settings)
 }
 
+// GetAllSettings return all settings
 func GetAllSettings(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -94,6 +96,7 @@ func GetAllSettings(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&settings)
 }
 
+// SaveSetting update an existing setting value
 func SaveSetting(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -134,162 +137,6 @@ func SaveSetting(w rest.ResponseWriter, r *rest.Request) {
 	status.Status = "OK"
 	w.WriteJson(&status)
 }
-
-/**
-func SaveSettings(w rest.ResponseWriter, r *rest.Request) {
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), 400)
-		return
-
-	}
-	defer dbConn.Close()
-	logit.Info.Println("SaveSettings:")
-	settings := types.Settings{}
-	err = r.DecodeJsonPayload(&settings)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	err = secimpl.Authorize(dbConn, settings.Token, "perm-setting")
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	logit.Info.Println("SaveSettings: DockerRegistry=" + settings.DockerRegistry)
-	logit.Info.Println("SaveSettings: PGPort=" + settings.PGPort)
-	logit.Info.Println("SaveSettings: DomainName=" + settings.DomainName)
-
-	dbsetting := types.Setting{"DOCKER-REGISTRY", settings.DockerRegistry, "", ""}
-	err2 := admindb.UpdateSetting(dbConn, dbsetting)
-	dbsetting = types.Setting{"PG-PORT", settings.PGPort, "", ""}
-	err2 = admindb.UpdateSetting(dbConn, dbsetting)
-	dbsetting = types.Setting{"DOMAIN-NAME", settings.DomainName, "", ""}
-	err2 = admindb.UpdateSetting(dbConn, dbsetting)
-	if err2 != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	status := types.SimpleStatus{}
-	status.Status = "OK"
-	w.WriteJson(&status)
-}
-
-func SaveProfiles(w rest.ResponseWriter, r *rest.Request) {
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), 400)
-		return
-
-	}
-	defer dbConn.Close()
-
-	logit.Info.Println("SaveProfiles:")
-	profiles := types.Profiles{}
-	err = r.DecodeJsonPayload(&profiles)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	err = secimpl.Authorize(dbConn, profiles.Token, "perm-setting")
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	logit.Info.Println("SaveProfiles: smallCPU=" + profiles.SmallCPU + " smallMEM=" + profiles.SmallMEM)
-	logit.Info.Println("SaveProfiles: mediumCPU=" + profiles.MediumCPU + " mediumMEM=" + profiles.MediumMEM)
-	logit.Info.Println("SaveProfiles: largeCPU=" + profiles.LargeCPU + " largeMEM=" + profiles.LargeMEM)
-
-	dbsetting := types.Setting{"S-DOCKER-PROFILE-CPU", profiles.SmallCPU, "", ""}
-	err2 := admindb.UpdateSetting(dbConn, dbsetting)
-	dbsetting = types.Setting{"S-DOCKER-PROFILE-MEM", profiles.SmallMEM, "", ""}
-	err2 = admindb.UpdateSetting(dbConn, dbsetting)
-	dbsetting = types.Setting{"M-DOCKER-PROFILE-CPU", profiles.MediumCPU, "", ""}
-	err2 = admindb.UpdateSetting(dbConn, dbsetting)
-	dbsetting = types.Setting{"M-DOCKER-PROFILE-MEM", profiles.MediumMEM, "", ""}
-	err2 = admindb.UpdateSetting(dbConn, dbsetting)
-	dbsetting = types.Setting{"L-DOCKER-PROFILE-CPU", profiles.LargeCPU, "", ""}
-	err2 = admindb.UpdateSetting(dbConn, dbsetting)
-	dbsetting = types.Setting{"L-DOCKER-PROFILE-MEM", profiles.LargeMEM, "", ""}
-	err2 = admindb.UpdateSetting(dbConn, dbsetting)
-	if err2 != nil {
-		logit.Error.Println(err2.Error())
-		rest.Error(w, err2.Error(), http.StatusBadRequest)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	status := types.SimpleStatus{}
-	status.Status = "OK"
-	w.WriteJson(&status)
-
-}
-
-func SaveClusterProfiles(w rest.ResponseWriter, r *rest.Request) {
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), 400)
-		return
-
-	}
-	defer dbConn.Close()
-	logit.Info.Println("SaveProfiles:")
-	profiles := types.ClusterProfiles{}
-	err = r.DecodeJsonPayload(&profiles)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	err = secimpl.Authorize(dbConn, profiles.Token, "perm-setting")
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	logit.Info.Println("SaveClusterProfiles: size=" + profiles.Size)
-
-	dbsetting := types.Setting{"CP-" + profiles.Size + "-COUNT", profiles.Count, "", ""}
-	err = admindb.UpdateSetting(dbConn, dbsetting)
-	dbsetting = types.Setting{"CP-" + profiles.Size + "-ALGO", profiles.Algo, "", ""}
-	err = admindb.UpdateSetting(dbConn, dbsetting)
-	dbsetting = types.Setting{"CP-" + profiles.Size + "-M-PROFILE", profiles.MasterProfile, "", ""}
-	err = admindb.UpdateSetting(dbConn, dbsetting)
-	dbsetting = types.Setting{"CP-" + profiles.Size + "-S-PROFILE", profiles.StandbyProfile, "", ""}
-	err = admindb.UpdateSetting(dbConn, dbsetting)
-	dbsetting = types.Setting{"CP-" + profiles.Size + "-M-SERVER", profiles.MasterServer, "", ""}
-	err = admindb.UpdateSetting(dbConn, dbsetting)
-	dbsetting = types.Setting{"CP-" + profiles.Size + "-S-SERVER", profiles.StandbyServer, "", ""}
-	err = admindb.UpdateSetting(dbConn, dbsetting)
-
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	status := types.SimpleStatus{}
-	status.Status = "OK"
-	w.WriteJson(&status)
-
-}
-*/
 
 func getClusterProfileInfo(dbConn *sql.DB, sz string) (types.ClusterProfiles, error) {
 

@@ -24,6 +24,7 @@ import (
 	"net/http"
 )
 
+// GetHealthCheck returns the latest health check metrics that have been collected
 func GetHealthCheck(w rest.ResponseWriter, r *rest.Request) {
 
 	dbConn, err := util.GetConnection("clusteradmin")

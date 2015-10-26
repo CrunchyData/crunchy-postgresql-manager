@@ -33,6 +33,7 @@ import (
 
 const CONTAINER_NOT_FOUND = "CONTAINER NOT FOUND"
 
+// GetNode returns the container node definition
 func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -104,6 +105,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(clusternode)
 }
 
+// GetAllNodesForProject returns all node definitions for a given project
 func GetAllNodesForProject(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -154,6 +156,8 @@ func GetAllNodesForProject(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&nodes)
 
 }
+
+// TODO
 func GetAllNodes(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -198,6 +202,7 @@ func GetAllNodes(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
+// TODO
 func GetAllNodesNotInCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -242,6 +247,7 @@ func GetAllNodesNotInCluster(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
+// GetAllNodesForCluster returns a list of nodes for a given cluster
 func GetAllNodesForCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -376,6 +382,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// GetAllNodesForServer returns a list of all nodes on a given server
 func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -450,6 +457,7 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
+// AdminStartNode starts a container
 func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -505,6 +513,7 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
+// AdminStopNode stops a container
 func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -558,6 +567,7 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
+// NewPingPG performs a simple network (nc) ping on a given container's postgres database port
 func NewPingPG(dbConn *sql.DB, node *types.Container) (string, error) {
 
 	var err error
@@ -590,79 +600,7 @@ func NewPingPG(dbConn *sql.DB, node *types.Container) (string, error) {
 	return "RUNNING", nil
 }
 
-/**
-func PingPG(dbConn *sql.DB, node *types.Container) (string, error) {
-
-	var status = "OFFLINE"
-	var err error
-
-	var credential types.Credential
-	credential, err = admindb.GetUserCredentials(dbConn, node)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return status, err
-	}
-
-	dbConn2, err := util.GetMonitoringConnection(credential.Host, credential.Username, credential.Port, credential.Database, credential.Password)
-	defer dbConn2.Close()
-
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return status, err
-	}
-
-	//var value string
-
-	//err = dbConn2.QueryRow(fmt.Sprintf("select now()::text")).Scan(&value)
-	err = dbConn2.Ping()
-	if err != nil {
-		logit.Info.Println(err.Error())
-		logit.Info.Println("could not Ping PG")
-		return "OFFLINE", nil
-	}
-
-	return "RUNNING", nil
-}
-
-func GetPGStatus2(dbConn *sql.DB, nodename string, hostname string) (string, error) {
-
-	//fetch cpmtest user credentials
-	nodeuser, err := admindb.GetContainerUser(dbConn, nodename, "cpmtest")
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return "", err
-	}
-
-	logit.Info.Println("cpmtest password is " + nodeuser.Passwd)
-
-	var pgport types.Setting
-	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
-
-	dbConn2, err := util.GetMonitoringConnection(hostname, "cpmtest", pgport.Value, "cpmtest", nodeuser.Passwd)
-	defer dbConn2.Close()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return "", err
-	}
-
-	var value string
-
-	err = dbConn2.QueryRow(fmt.Sprintf("select now()::text")).Scan(&value)
-	switch {
-	case err == sql.ErrNoRows:
-		logit.Info.Println("getpgstatus 2 no rows returned")
-		return "OFFLINE", nil
-	case err != nil:
-		logit.Info.Println("getpgstatus2 error " + err.Error())
-		return "OFFLINE", nil
-	default:
-		logit.Info.Println("getpgstatus2 returned " + value)
-	}
-
-	return "RUNNING", nil
-}
-*/
-
+// AdminStartServerContainers starts all containers on a given server
 func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -728,6 +666,8 @@ func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 
 }
+
+// AdminStopServerContainers stops all containers on a given server
 func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {

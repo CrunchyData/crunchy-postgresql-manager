@@ -34,6 +34,7 @@ import (
 var CPMTEST_DB = "cpmtest"
 var CPMTEST_USER = "cpmtest"
 
+// MonitorContainerSettings returns the pg_settings values for a given container
 func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
@@ -112,6 +113,7 @@ func MonitorContainerSettings(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&settings)
 }
 
+// MonitorContainerControldata returns the pg_control settings for a given container
 func MonitorContainerControldata(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -181,6 +183,7 @@ type Bgwriter struct {
 	WriteMbps      string
 }
 
+// COntainerInfoBgwriter returns the bgwriter stats for a given container
 func ContainerInfoBgwriter(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -252,6 +255,7 @@ type Statdatabase struct {
 	StatsReset  string
 }
 
+// ContainerInfoStatdatabase returns the pg_stat_database values for a given container
 func ContainerInfoStatdatabase(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -356,6 +360,7 @@ type Statrepl struct {
 	SyncState      string
 }
 
+// ContainerInfoStat returns the pg_stat_replication values for a given container
 func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -449,6 +454,7 @@ func ContainerInfoStatrepl(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&stats)
 }
 
+// ContainerLoadTest executes a load test on a given container and returns the results
 func ContainerLoadTest(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -605,6 +611,7 @@ func loadtest(dbConn *sql.DB, credential *types.Credential, writes int) ([]Loadt
 	return results, nil
 }
 
+// MonitorStatements returns the pg_stat_statements values for a given container
 func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -720,6 +727,7 @@ func MonitorStatements(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&statements)
 }
 
+// BadgerGenerate runs pgbadger on a given container and generates the report
 func BadgerGenerate(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {

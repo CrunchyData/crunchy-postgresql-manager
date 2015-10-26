@@ -54,6 +54,7 @@ type ContainerAccessRule struct {
 	CreateDate     string
 }
 
+// RulesGet returns a given access rule definition
 func RulesGet(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -87,6 +88,7 @@ func RulesGet(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&rule)
 }
 
+// RulesGetAll returns all the access rule definitions
 func RulesGetAll(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -115,6 +117,7 @@ func RulesGetAll(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&rules)
 }
 
+// RulesDelete deletes a given rule
 func RulesDelete(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -151,6 +154,7 @@ func RulesDelete(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// RulesUpdate updates a given rule
 func RulesUpdate(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -200,7 +204,10 @@ func RulesUpdate(w rest.ResponseWriter, r *rest.Request) {
 	status.Status = "OK"
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&status)
+
 }
+
+// RulesInsert creates a new rule
 func RulesInsert(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -246,6 +253,7 @@ func RulesInsert(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
+// UpdateRule updates a rule definition in the database
 func UpdateRule(dbConn *sql.DB, rule Rule) error {
 	queryStr := fmt.Sprintf(
 		"update accessrule set ( name, ruletype, database, ruleuser, address, method, description, updatedt) = ('%s', '%s', '%s', '%s', '%s', '%s', '%s', now()) where id = %s returning id",
@@ -272,6 +280,7 @@ func UpdateRule(dbConn *sql.DB, rule Rule) error {
 
 }
 
+// InsertRule inserts a rule definition in the database
 func InsertRule(dbConn *sql.DB, rule Rule) error {
 	queryStr := fmt.Sprintf(
 		"insert into accessrule ( name, ruletype, database, ruleuser, address, method, description, createdt, updatedt) values ( '%s', '%s', '%s', '%s', '%s', '%s', '%s', now(), now()) returning id",
@@ -298,6 +307,7 @@ func InsertRule(dbConn *sql.DB, rule Rule) error {
 
 }
 
+// DeleteRule deletes a rule in the database
 func DeleteRule(dbConn *sql.DB, ID string) error {
 	queryStr := fmt.Sprintf("delete from accessrule where  id=%s returning id", ID)
 	logit.Info.Println(queryStr)
@@ -315,6 +325,7 @@ func DeleteRule(dbConn *sql.DB, ID string) error {
 
 }
 
+// GetAccessRule returns a rule from the database
 func GetAccessRule(dbConn *sql.DB, ID string) (Rule, error) {
 	rule := Rule{}
 
@@ -345,6 +356,7 @@ func GetAccessRule(dbConn *sql.DB, ID string) (Rule, error) {
 
 }
 
+// GetAllRules returns all rules from the database
 func GetAllRules(dbConn *sql.DB) ([]Rule, error) {
 
 	var rules []Rule
@@ -379,37 +391,7 @@ func GetAllRules(dbConn *sql.DB) ([]Rule, error) {
 	return rules, nil
 }
 
-//
-// containeraccessrules logic
-//
-
-/*
-func ContainerAccessRuleGet(w rest.ResponseWriter, r *rest.Request) {
-	err := secimpl.Authorize(r.PathParam("Token"), "perm-read")
-	if err != nil {
-		logit.Error.Println("ContainerRulesGet: authorize error " + err.Error())
-		rest.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	ID := r.PathParam("ID")
-	if ID == "" {
-		rest.Error(w, "ID required", http.StatusBadRequest)
-		return
-	}
-
-	car, err := GetContainerAccessRule(ID)
-	if err != nil {
-		logit.Error.Println("ContainerRulesGet:" + err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.WriteJson(&car)
-}
-*/
-
+// ContainerAccessRuleGetAll returns all the rules selected for a container
 func ContainerAccessRuleGetAll(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -444,6 +426,7 @@ func ContainerAccessRuleGetAll(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&cars)
 }
 
+// ContainerAccessRuleUpdate updates the rules assigned to a container
 func ContainerAccessRuleUpdate(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -526,10 +509,7 @@ func ContainerAccessRuleUpdate(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
-//
-// database logic for containeraccessrules
-//
-
+// DeleteContainerAccessRule deletes an access rule for a container
 func DeleteContainerAccessRule(dbConn *sql.DB, ID string) error {
 	queryStr := fmt.Sprintf("delete from containeraccessrule where id=%s returning id", ID)
 	logit.Info.Println(queryStr)
@@ -547,6 +527,7 @@ func DeleteContainerAccessRule(dbConn *sql.DB, ID string) error {
 
 }
 
+// InsertContainerAccessRule inserts a rule for a container
 func InsertContainerAccessRule(dbConn *sql.DB, car ContainerAccessRule) error {
 	queryStr := fmt.Sprintf(
 		"insert into containeraccessrule ( containerid, accessruleid, createdt ) values ( %s, %s, now()) returning id",
@@ -568,6 +549,7 @@ func InsertContainerAccessRule(dbConn *sql.DB, car ContainerAccessRule) error {
 
 }
 
+// GetAllContainerAccessRule returns all rules assigned to a container
 func GetAllContainerAccessRule(dbConn *sql.DB, containerID string) ([]ContainerAccessRule, error) {
 
 	var cars []ContainerAccessRule
@@ -603,6 +585,7 @@ func GetAllContainerAccessRule(dbConn *sql.DB, containerID string) ([]ContainerA
 	return cars, nil
 }
 
+// GetContainerAccessRule returns a rule assigned to a container
 func GetContainerAccessRule(dbConn *sql.DB, ID string) (ContainerAccessRule, error) {
 	car := ContainerAccessRule{}
 
