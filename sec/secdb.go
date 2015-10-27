@@ -21,6 +21,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 )
 
+// DBGetUser get a user from the database by name
 func DBGetUser(dbConn *sql.DB, Name string) (User, error) {
 	user := User{}
 	//logit.Info.Println("secdb:GetUser: called name=" + Name)
@@ -81,6 +82,7 @@ func DBGetUser(dbConn *sql.DB, Name string) (User, error) {
 	return user, nil
 }
 
+// DBGetRole get a role from the database by name
 func DBGetRole(dbConn *sql.DB, Name string) (Role, error) {
 	role := Role{}
 	role.Selected = false
@@ -138,6 +140,7 @@ func DBGetRole(dbConn *sql.DB, Name string) (Role, error) {
 	return role, nil
 }
 
+// DBGetPermissions get a complete list of possible permissions
 func DBGetPermissions(dbConn *sql.DB) ([]Permission, error) {
 	slice := []Permission{}
 	//logit.Info.Println("secdb:GetPermissions: called")
@@ -169,6 +172,7 @@ func DBGetPermissions(dbConn *sql.DB) ([]Permission, error) {
 	return slice, nil
 }
 
+// DBDeleteRole delete a role by name
 func DBDeleteRole(dbConn *sql.DB, name string) error {
 	queryStr := fmt.Sprintf("delete from secrole where name='%s' returning name", name)
 	//logit.Info.Println("secdb:DeleteRole:" + queryStr)
@@ -186,6 +190,7 @@ func DBDeleteRole(dbConn *sql.DB, name string) error {
 	return nil
 }
 
+// DBDeleteUser delete a user by userid
 func DBDeleteUser(dbConn *sql.DB, name string) error {
 	queryStr := fmt.Sprintf("delete from secuser where name='%s' returning name", name)
 	logit.Info.Println("secdb:DeleteUser:" + queryStr)
@@ -203,6 +208,7 @@ func DBDeleteUser(dbConn *sql.DB, name string) error {
 	return nil
 }
 
+// DBAddRole add a role
 func DBAddRole(dbConn *sql.DB, role Role) error {
 	logit.Info.Println("secdb:AddRole:called")
 	queryStr := fmt.Sprintf("insert into secrole( name, updatedt) values ( '%s', now()) returning name", role.Name)
@@ -230,6 +236,7 @@ func DBAddRole(dbConn *sql.DB, role Role) error {
 	return nil
 }
 
+// DBAddUserRole create a user to role mapping
 func DBAddUserRole(dbConn *sql.DB, user string, role string) error {
 	logit.Info.Println("secdb:AddUserRole:called")
 	queryStr := fmt.Sprintf("insert into secuserrole ( username, role) values ( '%s', '%s') returning username", user, role)
@@ -248,6 +255,7 @@ func DBAddUserRole(dbConn *sql.DB, user string, role string) error {
 	return nil
 }
 
+// DBAddRolePerm create a role to perm mapping
 func DBAddRolePerm(dbConn *sql.DB, role string, perm string) error {
 	logit.Info.Println("secdb:AddRolePerm:called")
 	queryStr := fmt.Sprintf("insert into secroleperm ( role, perm) values ( '%s', '%s') returning role", role, perm)
@@ -266,6 +274,7 @@ func DBAddRolePerm(dbConn *sql.DB, role string, perm string) error {
 	return nil
 }
 
+// DBAddUser create a new user
 func DBAddUser(dbConn *sql.DB, user User) error {
 	logit.Info.Println("secdb:AddUser:called")
 	queryStr := fmt.Sprintf("insert into secuser ( name, password, updatedt) values ( '%s', '%s', now()) returning name", user.Name, user.Password)
@@ -292,6 +301,7 @@ func DBAddUser(dbConn *sql.DB, user User) error {
 	return nil
 }
 
+// DBUpdateRole update a role
 func DBUpdateRole(dbConn *sql.DB, role Role) error {
 	logit.Info.Println("secdb:UpdateRole:called")
 	err := DBDeleteRole(dbConn, role.Name)
@@ -307,6 +317,7 @@ func DBUpdateRole(dbConn *sql.DB, role Role) error {
 	return nil
 }
 
+// DBUpdateUser update a user
 func DBUpdateUser(dbConn *sql.DB, user User) error {
 	logit.Info.Println("secdb:DBUpdateUser:called")
 
@@ -322,6 +333,7 @@ func DBUpdateUser(dbConn *sql.DB, user User) error {
 	return nil
 }
 
+// DBGetAllUsers get a list of all users
 func DBGetAllUsers(dbConn *sql.DB) ([]User, error) {
 	userList := []User{}
 	//logit.Info.Println("secdb:DBGetAllUser: called")
@@ -370,6 +382,7 @@ func DBGetAllUsers(dbConn *sql.DB) ([]User, error) {
 	return userList, nil
 }
 
+// DBGetRoles get a list of all roles
 func DBGetRoles(dbConn *sql.DB) ([]Role, error) {
 	slice := []Role{}
 	//logit.Info.Println("secdb:GetRoles: called")
@@ -414,6 +427,7 @@ func DBGetRoles(dbConn *sql.DB) ([]Role, error) {
 	return slice, nil
 }
 
+// LogUser print to stdout a user object
 func LogUser(user User) {
 	logit.Info.Println("***user***")
 	logit.Info.Println("user.Name=" + user.Name + " user.Password=" + user.Password)
@@ -428,6 +442,8 @@ func LogUser(user User) {
 	logit.Info.Println("******")
 
 }
+
+// LogPermissions print to stdout a map of permissions
 func LogPermissions(perms map[string]Permission) {
 	logit.Info.Println("***log of permissions***")
 	for i, j := range perms {
@@ -437,6 +453,7 @@ func LogPermissions(perms map[string]Permission) {
 
 }
 
+// DBGetSession get a user session
 func DBGetSession(dbConn *sql.DB, token string) (Session, error) {
 	session := Session{}
 	//logit.Info.Println("secdb:GetSession: called token=" + token)
@@ -462,6 +479,7 @@ func DBGetSession(dbConn *sql.DB, token string) (Session, error) {
 	return session, nil
 }
 
+// DBAddSession create a user session
 func DBAddSession(dbConn *sql.DB, uuid string, id string) error {
 	//logit.Info.Println("secdb:DBAddSession:called")
 	queryStr := fmt.Sprintf("insert into secsession ( token, name, updatedt) values ( '%s', '%s', now()) returning token", uuid, id)
@@ -480,6 +498,7 @@ func DBAddSession(dbConn *sql.DB, uuid string, id string) error {
 	return nil
 }
 
+// DBDeleteSession remove a user session
 func DBDeleteSession(dbConn *sql.DB, uuid string) error {
 	logit.Info.Println("secdb:DBDeleteSession:called")
 
@@ -505,6 +524,7 @@ func DBDeleteSession(dbConn *sql.DB, uuid string) error {
 	return nil
 }
 
+// DBUpdatePassword update a user password
 func DBUpdatePassword(dbConn *sql.DB, username string, password string) error {
 	logit.Info.Println("UpdatePassword:called")
 	queryStr := fmt.Sprintf("update secuser set ( password, updatedt) = ('%s', now()) where name = '%s' returning name", password, username)

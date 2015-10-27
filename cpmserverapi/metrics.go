@@ -53,6 +53,7 @@ type MetricDfResponse struct {
 	Output string
 }
 
+// MetricCPU obtain the cpu metrics and return the results
 func MetricCPU(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("MetricCPU called")
 	req := MetricCPURequest{}
@@ -79,6 +80,7 @@ func MetricCPU(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// MetricMEM perform the memory metric command and return the results
 func MetricMEM(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("MetricMEM called")
 	req := MetricMEMRequest{}
@@ -105,6 +107,7 @@ func MetricMEM(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// MetricIostat perform the iostat command and return the results
 func MetricIostat(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("MetricIostat called")
 	post := MetricIostatRequest{}
@@ -131,6 +134,7 @@ func MetricIostat(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// MetricDf perform the df command and return the results
 func MetricDf(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("MetricDf called")
 	post := MetricDfRequest{}

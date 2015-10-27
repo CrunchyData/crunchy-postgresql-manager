@@ -1,3 +1,9 @@
+//
+// example of calling one of these
+//
+// request := &backup.Reload{"something", "yes"}
+// response, err := backup.ReloadClient("http://cpm-task:13001", request)
+//
 package task
 
 import (
@@ -10,12 +16,8 @@ import (
 
 const URL = "http://cpm-task:13001"
 
-//
-// example of calling one of these
-//
-// request := &backup.Reload{"something", "yes"}
-// response, err := backup.ReloadClient("http://cpm-task:13001", request)
-//
+// ReloadClient is the client to the reload function which causes the scheduled tasks
+// to be reread from the database
 func ReloadClient() (ReloadResponse, error) {
 	var req = ReloadRequest{}
 	response := ReloadResponse{}
@@ -44,6 +46,7 @@ func ReloadClient() (ReloadResponse, error) {
 	return response, err
 }
 
+// ExecuteNowClient client for the execute now function which runs a task immediately
 func ExecuteNowClient(req *TaskRequest) (ExecuteNowResponse, error) {
 	var err error
 	buf, _ := json.Marshal(req)
@@ -58,6 +61,7 @@ func ExecuteNowClient(req *TaskRequest) (ExecuteNowResponse, error) {
 	return response, err
 }
 
+// StatusUpdateClient is the client to the StatusUpdate function
 func StatusUpdateClient(req *TaskStatus) (StatusUpdateResponse, error) {
 	var err error
 	buf, _ := json.Marshal(req)
@@ -72,6 +76,8 @@ func StatusUpdateClient(req *TaskStatus) (StatusUpdateResponse, error) {
 	return response, err
 }
 
+// StatusAddClient is the client to the StatusAdd function which allows
+// for the addition of new status info
 func StatusAddClient(req *TaskStatus) (StatusAddResponse, error) {
 	var err error
 	buf, _ := json.Marshal(req)

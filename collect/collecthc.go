@@ -11,6 +11,7 @@ import (
 
 const CLUSTERADMIN_DB = "clusteradmin"
 
+// Collecthc perform a health check, this will persist metrics
 func Collecthc() error {
 	var err error
 
@@ -80,6 +81,7 @@ func Collecthc() error {
 	return nil
 }
 
+// TODO refactor with other ping routine
 func ping(credential *types.Credential) (string, error) {
 	var db *sql.DB
 	var err error

@@ -76,6 +76,7 @@ type PGPoolParameters struct {
 	HOST_LIST []string
 }
 
+// Postgresql create a postgresql.conf file from a template and passed values, return the new file contents
 func Postgresql(mode string, port string, clusterType string) (string, error) {
 	var info PostgresqlParameters
 	info.PG_PORT = port
@@ -104,6 +105,7 @@ func Postgresql(mode string, port string, clusterType string) (string, error) {
 	return buff.String(), nil
 }
 
+// Hba create a pg_hba.conf file from a template and passed values, return the new file contents
 func Hba(dbConn *sql.DB, mode string, hostname string, port string, clusterid string, domainname string, cars []Rule) (string, error) {
 
 	var hbaInfo HBAParameters
@@ -176,9 +178,7 @@ func Hba(dbConn *sql.DB, mode string, hostname string, port string, clusterid st
 	return buff.String(), nil
 }
 
-//
 // getMasterValues returns a master node, pgpool node, and list of standby nodes
-//
 func getMasterValues(dbConn *sql.DB, clusterID string, domainname string) (types.Container, types.Container, []string, error) {
 	master := types.Container{}
 	pgpool := types.Container{}
@@ -224,6 +224,7 @@ func getMasterValues(dbConn *sql.DB, clusterID string, domainname string) (types
 	copy(nodelist, nodeslice)
 	return master, pgpool, nodelist, nil
 }
+
 func logInfo(info HBAParameters) {
 	logit.Info.Println("HBA Parameters are:")
 	logit.Info.Println("PG_HOST_IP=" + info.PG_HOST_IP)
@@ -246,6 +247,7 @@ func logInfo(info HBAParameters) {
 	}
 }
 
+// Recovery create a recovery.conf file based on passed values and a template, return the file contents
 func Recovery(masterhost string, port string, masteruser string) (string, error) {
 	var info RecoveryParameters
 	info.PG_PORT = port
@@ -270,10 +272,8 @@ func Recovery(masterhost string, port string, masteruser string) (string, error)
 	return buff.String(), nil
 }
 
-//
 // Poolhba right now this is simple, just read the template and spit it back
 // out, no substitutions are done right now, they will be in the future no doubt
-//
 func Poolhba() (string, error) {
 
 	var info RecoveryParameters
@@ -297,10 +297,8 @@ func Poolhba() (string, error) {
 	return buff.String(), nil
 }
 
-//
 // Poolpasswd right now this is simple, just read the template and spit it back
 // out, no substitutions are done right now, they will be in the future no doubt
-//
 func Poolpasswd() (string, error) {
 
 	var info RecoveryParameters
@@ -324,10 +322,8 @@ func Poolpasswd() (string, error) {
 	return buff.String(), nil
 }
 
-//
 // Poolconf generates a pgpool.conf file from a template and
 // values passed in
-//
 func Poolconf(poolnames []string) (string, error) {
 
 	var poolParams PGPoolParameters

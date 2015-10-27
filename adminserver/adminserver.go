@@ -59,7 +59,7 @@ func main() {
 
 	err = handler.SetRoutes(
 		&rest.Route{"GET", "/projectclusters/:ID.:Token", adminapi.GetAllClustersForProject},
-		&rest.Route{"GET", "/clusters/:Token", adminapi.GetAllClusters},
+		//		&rest.Route{"GET", "/clusters/:Token", adminapi.GetAllClusters},
 		&rest.Route{"GET", "/servers/:Token", adminapi.GetAllServers},
 		&rest.Route{"POST", "/cluster", adminapi.PostCluster},
 		&rest.Route{"POST", "/autocluster", adminapi.AutoCluster},

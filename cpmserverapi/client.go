@@ -1,3 +1,9 @@
+//
+// example of calling one of these
+//
+// request := &cpmserverapi.MetricIostatRequest{"something", "yes"}
+// response, err := cpmserverapi.MetricIostatClient("http://localhost:10001", request)
+//
 package cpmserverapi
 
 import (
@@ -11,12 +17,7 @@ import (
 const URL = "http://cpm-"
 const PORT = ":10001"
 
-//
-// example of calling one of these
-//
-// request := &cpmserverapi.MetricIostatRequest{"something", "yes"}
-// response, err := cpmserverapi.MetricIostatClient("http://localhost:10001", request)
-//
+// MetricIostatClient perform an iostat on the host and return the results of it
 func MetricIostatClient(serverName string, req *MetricIostatRequest) (MetricIostatResponse, error) {
 	var err error
 	var url = URL + serverName + PORT
@@ -31,6 +32,7 @@ func MetricIostatClient(serverName string, req *MetricIostatRequest) (MetricIost
 	return response, err
 }
 
+// MetricDfClient perform a df command on the host and return the results of it
 func MetricDfClient(serverName string, req *MetricDfRequest) (MetricDfResponse, error) {
 	var err error
 	var url = URL + serverName + PORT
@@ -44,6 +46,7 @@ func MetricDfClient(serverName string, req *MetricDfRequest) (MetricDfResponse, 
 	return response, err
 }
 
+// DiskProvisionClient client for provisioning a new directory on the host
 func DiskProvisionClient(serverName string, req *DiskProvisionRequest) (DiskProvisionResponse, error) {
 	var err error
 	var url = URL + serverName + PORT
@@ -57,6 +60,7 @@ func DiskProvisionClient(serverName string, req *DiskProvisionRequest) (DiskProv
 	return response, err
 }
 
+// DiskDeleteClient client for deleting a directory on the  host
 func DiskDeleteClient(serverName string, req *DiskDeleteRequest) (DiskDeleteResponse, error) {
 	var err error
 	var url = URL + serverName + PORT
@@ -70,6 +74,7 @@ func DiskDeleteClient(serverName string, req *DiskDeleteRequest) (DiskDeleteResp
 	return response, err
 }
 
+// DockerInspectClient client for performing a Docker inspect command
 func DockerInspectClient(serverName string, req *DockerInspectRequest) (DockerInspectResponse, error) {
 	var err error
 	var url = URL + serverName + PORT
@@ -83,6 +88,7 @@ func DockerInspectClient(serverName string, req *DockerInspectRequest) (DockerIn
 	return response, err
 }
 
+// DockerRemoveClient client for performing a Docker remove command
 func DockerRemoveClient(serverName string, req *DockerRemoveRequest) (DockerRemoveResponse, error) {
 	var err error
 	var url = URL + serverName + PORT
@@ -96,6 +102,7 @@ func DockerRemoveClient(serverName string, req *DockerRemoveRequest) (DockerRemo
 	return response, err
 }
 
+// DockerStartClient client for performing a Docker start command
 func DockerStartClient(serverName string, req *DockerStartRequest) (DockerStartResponse, error) {
 	var err error
 	var url = URL + serverName + PORT
@@ -109,6 +116,7 @@ func DockerStartClient(serverName string, req *DockerStartRequest) (DockerStartR
 	return response, err
 }
 
+// DockerStopClient client for performing a Docker stop command
 func DockerStopClient(serverName string, req *DockerStopRequest) (DockerStopResponse, error) {
 	var err error
 	var url = URL + serverName + PORT
@@ -122,7 +130,7 @@ func DockerStopClient(serverName string, req *DockerStopRequest) (DockerStopResp
 	return response, err
 }
 
-//
+// DockerRunClient client for performing a Docker run command
 // example:
 //
 //request := &cpmserverapi.DockerRunRequest{}
@@ -149,6 +157,7 @@ func DockerRunClient(serverName string, req *DockerRunRequest) (DockerRunRespons
 	return response, err
 }
 
+// MetricCPUClient client for getting the cpu metrics
 func MetricCPUClient(serverName string, req *MetricCPURequest) (MetricCPUResponse, error) {
 	var err error
 	var url = URL + serverName + PORT
@@ -162,6 +171,7 @@ func MetricCPUClient(serverName string, req *MetricCPURequest) (MetricCPURespons
 	return response, err
 }
 
+// MetricMEMClient client for getting the memory metrics
 func MetricMEMClient(serverName string, req *MetricMEMRequest) (MetricMEMResponse, error) {
 	var err error
 	var url = URL + serverName + PORT

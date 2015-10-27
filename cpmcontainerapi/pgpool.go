@@ -40,6 +40,7 @@ type StopPgpoolResponse struct {
 	Status string
 }
 
+// StartPgpool perform a start of pgpool
 func StartPgpool(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("cpmcontainerapi: StartPgpool called")
 	response := StartPgpoolResponse{}
@@ -76,6 +77,7 @@ func StartPgpool(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// StopPgpool perform a stop of pgpool
 func StopPgpool(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("cpmcontainerapi: StopPgpool called")
 	response := StopPgpoolResponse{}

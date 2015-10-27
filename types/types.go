@@ -18,16 +18,16 @@ package types
 import ()
 
 type Credential struct {
-	Host     string
-	Database string
-	Username string
-	Password string
-	Port     string
+	Host     string //container name
+	Database string //database name
+	Username string //database user name
+	Password string //database user password
+	Port     string //database port number
 }
 
 type Setting struct {
-	Name        string
-	Value       string
+	Name        string //setting name (key)
+	Value       string //setting value
 	Description string
 	UpdateDate  string
 	Token       string
@@ -41,142 +41,130 @@ type Settings struct {
 	Token          string
 }
 type Server struct {
-	ID             string
-	Name           string
-	IPAddress      string
-	DockerBridgeIP string
-	PGDataPath     string
-	ServerClass    string
+	ID             string //unique key
+	Name           string //server name
+	IPAddress      string //server ip address
+	DockerBridgeIP string //the docker bridge IP range that is assigned to this server
+	PGDataPath     string //the root directory to provision container data volumes into
+	ServerClass    string //the class of the server, small, medium, large
 	CreateDate     string
-	NodeCount      string
+	NodeCount      string //calculated value of the number of containers assigned to this server
 }
 
 type Project struct {
-	ID         string
-	Name       string
-	Desc       string
-	Containers map[string]string
-	Clusters   map[string]string
-	Proxies    map[string]string
+	ID         string            //unique key
+	Name       string            //project name
+	Desc       string            //description
+	Containers map[string]string //map of containers in this project
+	Clusters   map[string]string //map of clusters in this project
+	Proxies    map[string]string //map of proxies in this project
 	UpdateDate string
 	Token      string
 }
 
 type Container struct {
-	ID          string
-	ClusterID   string
-	ServerID    string
-	ServerName  string
-	Name        string
-	Role        string
-	Image       string
+	ID          string //unique key
+	ClusterID   string //foreign key to cluster
+	ServerID    string //foreigh key to server
+	ServerName  string //server name this container is on
+	Name        string //container name, also used as the host name
+	Role        string //role of this container (master, standby, standalone)
+	Image       string //docker image this container is based on
 	CreateDate  string
-	ProjectID   string
-	ProjectName string
-	ClusterName string
+	ProjectID   string //foreign key to project
+	ProjectName string //project name this container is in
+	ClusterName string //cluster name this contaienr is part of
 }
 
 type Cluster struct {
-	ID          string
-	ProjectID   string
-	Name        string
-	ClusterType string
-	Status      string
+	ID          string //unique key
+	ProjectID   string //foreign key to project
+	Name        string //cluster name
+	ClusterType string //async or sync type of replication
+	Status      string //either up or down or initialized
 	CreateDate  string
-	Containers  map[string]string
+	Containers  map[string]string //map of containers within this cluster
 	Token       string
 }
 
 type ContainerUser struct {
-	ID             string
-	Containername  string
-	ContainerID    string
-	Passwd         string
-	Rolname        string
-	Rolsuper       string
-	Rolinherit     string
-	Rolcreaterole  string
-	Rolcreatedb    string
-	Rolcanlogin    string
-	Rolreplication string
+	ID             string //unique key
+	Containername  string //container name
+	ContainerID    string //foreign key to the container
+	Passwd         string //database password of this user
+	Rolname        string //postgres role name
+	Rolsuper       string //postgres superuser permission flag
+	Rolinherit     string //postgres inherit permission flag
+	Rolcreaterole  string //postgres createrole permission flag
+	Rolcreatedb    string //postgres createdb permission flag
+	Rolcanlogin    string //postgres login permission flag
+	Rolreplication string //postgres replication permission flag
 	UpdateDate     string
 }
 
 type Proxy struct {
-	ID              string
-	ContainerUserID string
-	Database        string
-	Host            string
-	Usename         string
-	Passwd          string
-	ContainerID     string
-	ContainerName   string
-	ServerName      string
-	Status          string
-	ContainerStatus string
-	ProjectID       string
-	Port            string
+	ID              string //unique key
+	ContainerUserID string //foreign key to the container user
+	Database        string //database name
+	Host            string //database host name
+	Usename         string //database user name
+	Passwd          string //database password
+	ContainerID     string //foreign key to container
+	ContainerName   string //container name
+	ServerName      string //server name
+	Status          string //database status either down or running
+	ContainerStatus string //container status either down or running
+	ProjectID       string //foreign key to project
+	Port            string //database port number
 	UpdateDate      string
 	Token           string
 }
 
-type LinuxStats struct {
-	ID        string
-	ClusterID string
-	Stats     string
-}
-
-type PGStats struct {
-	ID        string
-	ClusterID string
-	Stats     string
-}
-
 type HealthCheck struct {
-	ID             string
-	ProjectName    string
-	ProjectID      string
-	ContainerName  string
-	ContainerID    string
-	ContainerRole  string
-	ContainerImage string
-	Status         string
+	ID             string //unique key
+	ProjectName    string //project name
+	ProjectID      string //foreign key to project
+	ContainerName  string //container name
+	ContainerID    string //foreign key to container
+	ContainerRole  string //container role
+	ContainerImage string //docker image of container
+	Status         string //either up or down
 	UpdateDate     string
 }
 
 type ClusterProfiles struct {
-	Size           string
-	Count          string
-	Algo           string
-	MasterProfile  string
-	StandbyProfile string
-	MasterServer   string
-	StandbyServer  string
+	Size           string //either small, medium, or large
+	Count          string //number of standby nodes
+	Algo           string //round-robin
+	MasterProfile  string //the docker profile to use for the master node
+	StandbyProfile string //the docker profile to use for the standby nodes
+	MasterServer   string //the server class to place the master on
+	StandbyServer  string //the server class to place the standby nodes on
 	Token          string
 }
 type Profiles struct {
-	SmallCPU  string
-	SmallMEM  string
-	MediumCPU string
-	MediumMEM string
-	LargeCPU  string
-	LargeMEM  string
+	SmallCPU  string //small profile cpu shares setting
+	SmallMEM  string //small profile memory setting
+	MediumCPU string //medium profile cpu shares setting
+	MediumMEM string //medium profile docker memory setting
+	LargeCPU  string //large profile docker cpu shares setting
+	LargeMEM  string //large profile docker memory setting
 	Token     string
 }
 
 type ClusterNode struct {
-	ID          string
-	ClusterID   string
-	ServerID    string
-	Name        string
-	Role        string
-	Image       string
+	ID          string //unique key
+	ClusterID   string //foreign key to cluster
+	ServerID    string //foreign key to server
+	Name        string //cluster name
+	Role        string //role of node in cluster
+	Image       string //docker image of node
 	CreateDate  string
 	Status      string
-	ProjectID   string
-	ProjectName string
-	ServerName  string
-	ClusterName string
+	ProjectID   string //foreign key to project
+	ProjectName string //project name
+	ServerName  string //server name
+	ClusterName string //cluster name
 }
 
 type ProvisionStatus struct {
@@ -189,12 +177,12 @@ type SimpleStatus struct {
 }
 
 type PostgresStatement struct {
-	Database   string
-	Query      string
-	Calls      string
-	TotalTime  string
-	Rows       string
-	HitPercent string
+	Database   string //pg_stat_statements database value
+	Query      string //pg_stat_statements query value
+	Calls      string //pg_stat_statements calls value
+	TotalTime  string //pg_stat_statements totaltime value
+	Rows       string //pg_stat_statements rows value
+	HitPercent string //pg_stat_statements hitpercent value
 }
 
 type PostgresSetting struct {
@@ -209,28 +197,28 @@ type PostgresControldata struct {
 }
 
 type NodeUser struct {
-	ID             string
-	Containername  string
-	Rolname        string
-	Passwd         string
+	ID             string //unique key
+	Containername  string //container name
+	Rolname        string //role name of this suser
+	Passwd         string //password of this user
 	Updatedt       string
 	Token          string
-	Rolsuper       bool
-	Rolinherit     bool
-	Rolcreaterole  bool
-	Rolcreatedb    bool
-	Rollogin       bool
-	Rolreplication bool
+	Rolsuper       bool //superuser permission flag
+	Rolinherit     bool //inherit permission flag
+	Rolcreaterole  bool //createrole permission flag
+	Rolcreatedb    bool //createdb permission flag
+	Rollogin       bool //login permission flag
+	Rolreplication bool //replication permission flag
 }
 
 type MonitorServerParam struct {
-	ServerID string
+	ServerID string //foreign key to server
 	Metric   string
 }
 type MonitorContainerParam struct {
-	ID           string
-	Metric       string
-	DatabaseName string
+	ID           string //unique key
+	Metric       string //metric name
+	DatabaseName string //database name
 }
 
 type MonitorOutput struct {

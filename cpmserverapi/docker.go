@@ -79,6 +79,7 @@ type DockerRunResponse struct {
 	Output string
 }
 
+// DockerInspect perform a Docker inspect
 func DockerInspect(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("DockerInspect called")
 	req := DockerInspectRequest{}
@@ -131,6 +132,7 @@ func DockerInspect(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// DockerRemove perform a Docker remove
 func DockerRemove(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("DockerRemove called")
 	req := DockerRemoveRequest{}
@@ -188,6 +190,7 @@ func DockerRemove(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// DockerStart perform a docker start
 func DockerStart(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("DockerStart called")
 	req := DockerStartRequest{}
@@ -216,6 +219,7 @@ func DockerStart(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// DockerStop perform a docker stop
 func DockerStop(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("DockerStop called")
 	req := DockerStopRequest{}
@@ -243,6 +247,7 @@ func DockerStop(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// DockerRun perform a docker run
 func DockerRun(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("DockerRun called")
 	req := DockerRunRequest{}

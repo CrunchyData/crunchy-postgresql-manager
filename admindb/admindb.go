@@ -25,9 +25,10 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	_ "github.com/lib/pq"
 	"strconv"
-	"strings"
+	//"strings"
 )
 
+// GetServer returns a server object from the database for a given server
 func GetServer(dbConn *sql.DB, id string) (types.Server, error) {
 	//logit.Info.Println("GetServer called with id=" + id)
 	server := types.Server{}
@@ -47,6 +48,7 @@ func GetServer(dbConn *sql.DB, id string) (types.Server, error) {
 	return server, nil
 }
 
+// GetClusterName returns the name of a cluster based for a given cluster ID
 func GetClusterName(dbConn *sql.DB, id string) (string, error) {
 	//logit.Info.Println("admindb:GetCluster: called")
 	var clustername string
@@ -65,6 +67,7 @@ func GetClusterName(dbConn *sql.DB, id string) (string, error) {
 	return clustername, err
 }
 
+// GetCluster returns a cluster object from the database for a given cluster ID
 func GetCluster(dbConn *sql.DB, id string) (types.Cluster, error) {
 	//logit.Info.Println("admindb:GetCluster: called")
 	cluster := types.Cluster{}
@@ -97,6 +100,7 @@ func GetCluster(dbConn *sql.DB, id string) (types.Cluster, error) {
 	return cluster, nil
 }
 
+// GetAllClustersForProject returns a list of cluster objects from the database for a given project
 func GetAllClustersForProject(dbConn *sql.DB, projectId string) ([]types.Cluster, error) {
 	//logit.Info.Println("admindb:GetAllClusters: called")
 	var rows *sql.Rows
@@ -137,6 +141,9 @@ func GetAllClustersForProject(dbConn *sql.DB, projectId string) ([]types.Cluster
 	}
 	return clusters, nil
 }
+
+// GetAllClusters returns a list of all cluster objects
+/**
 func GetAllClusters(dbConn *sql.DB) ([]types.Cluster, error) {
 	//logit.Info.Println("admindb:GetAllClusters: called")
 	var rows *sql.Rows
@@ -177,7 +184,9 @@ func GetAllClusters(dbConn *sql.DB) ([]types.Cluster, error) {
 	}
 	return clusters, nil
 }
+*/
 
+// UpdateCluster updates a given cluster object in the database
 func UpdateCluster(dbConn *sql.DB, cluster types.Cluster) error {
 	//logit.Info.Println("admindb:UpdateCluster:called")
 	queryStr := fmt.Sprintf("update cluster set ( name, clustertype, status) = ('%s', '%s', '%s') where id = %s returning id", cluster.Name, cluster.ClusterType, cluster.Status, cluster.ID)
@@ -194,6 +203,8 @@ func UpdateCluster(dbConn *sql.DB, cluster types.Cluster) error {
 	return nil
 
 }
+
+// InsertCluster inserts a new cluster object into the database
 func InsertCluster(dbConn *sql.DB, cluster types.Cluster) (int, error) {
 	//logit.Info.Println("admindb:InsertCluster:called")
 	queryStr := fmt.Sprintf("insert into cluster ( name, projectid, clustertype, status, createdt) values ( '%s', %s, '%s', '%s', now()) returning id", cluster.Name, cluster.ProjectID, cluster.ClusterType, cluster.Status)
@@ -212,6 +223,7 @@ func InsertCluster(dbConn *sql.DB, cluster types.Cluster) (int, error) {
 	return clusterid, nil
 }
 
+// DeleteCluster deletes a given cluster from the database
 func DeleteCluster(dbConn *sql.DB, id string) error {
 	queryStr := fmt.Sprintf("delete from cluster where  id=%s returning id", id)
 	//logit.Info.Println("admindb:DeleteCluster:" + queryStr)
@@ -227,6 +239,7 @@ func DeleteCluster(dbConn *sql.DB, id string) error {
 	return nil
 }
 
+// GetContainer returns a container object based on a container ID
 func GetContainer(dbConn *sql.DB, id string) (types.Container, error) {
 	//logit.Info.Println("admindb:GetContainer:called")
 	container := types.Container{}
@@ -253,6 +266,7 @@ func GetContainer(dbConn *sql.DB, id string) (types.Container, error) {
 	return container, nil
 }
 
+// GetContainerByName returns a container object based on a container name
 func GetContainerByName(dbConn *sql.DB, name string) (types.Container, error) {
 	//logit.Info.Println("admindb:GetNodeByName:called")
 	container := types.Container{}
@@ -279,7 +293,7 @@ func GetContainerByName(dbConn *sql.DB, name string) (types.Container, error) {
 	return container, nil
 }
 
-//find the oldest container in a cluster, used for serf join-cluster event
+// GetContainerOldestInCluster find the oldest container in a cluster
 func GetContainerOldestInCluster(dbConn *sql.DB, clusterid string) (types.Container, error) {
 	//logit.Info.Println("admindb:GetNodeOldestInCluster:called")
 	container := types.Container{}
@@ -308,7 +322,7 @@ func GetContainerOldestInCluster(dbConn *sql.DB, clusterid string) (types.Contai
 	return container, nil
 }
 
-//find the master container in a cluster, used for serf fail-over event
+// GetContainerMaster find the master container in a cluster
 func GetContainerMaster(dbConn *sql.DB, clusterid string) (types.Container, error) {
 	//logit.Info.Println("admindb:GetContainerMaster:called")
 	container := types.Container{}
@@ -338,7 +352,7 @@ func GetContainerMaster(dbConn *sql.DB, clusterid string) (types.Container, erro
 	return container, nil
 }
 
-//find the pgpool container in a cluster
+// GetContainerPgpool find the pgpool container in a cluster
 func GetContainerPgpool(dbConn *sql.DB, clusterid string) (types.Container, error) {
 	//logit.Info.Println("admindb:GetContainerMaster:called")
 	container := types.Container{}
@@ -366,7 +380,7 @@ func GetContainerPgpool(dbConn *sql.DB, clusterid string) (types.Container, erro
 	return container, nil
 }
 
-//
+// GetAllStandbyContainers returns a list of container standby objects for a given cluster
 // TODO combine with GetMaster into a GetContainersByRole func
 //
 func GetAllStandbyContainers(dbConn *sql.DB, clusterid string) ([]types.Container, error) {
@@ -402,6 +416,7 @@ func GetAllStandbyContainers(dbConn *sql.DB, clusterid string) ([]types.Containe
 	return containers, nil
 }
 
+// GetAllContainersForServer returns a list of container objects for a given server
 func GetAllContainersForServer(dbConn *sql.DB, serverID string) ([]types.Container, error) {
 	var rows *sql.Rows
 	var err error
@@ -435,6 +450,7 @@ func GetAllContainersForServer(dbConn *sql.DB, serverID string) ([]types.Contain
 	return containers, nil
 }
 
+// GetAllContainersForCluster returns a list of container objects for a given cluster
 func GetAllContainersForCluster(dbConn *sql.DB, clusterID string) ([]types.Container, error) {
 	var rows *sql.Rows
 	var err error
@@ -468,6 +484,7 @@ func GetAllContainersForCluster(dbConn *sql.DB, clusterID string) ([]types.Conta
 	return containers, nil
 }
 
+// GetAllContainersForProject returns a list of container objects for a given project
 func GetAllContainersForProject(dbConn *sql.DB, projectID string) ([]types.Container, error) {
 	var rows *sql.Rows
 	var err error
@@ -493,10 +510,7 @@ func GetAllContainersForProject(dbConn *sql.DB, projectID string) ([]types.Conta
 	return containers, nil
 }
 
-//
-// GetAllContainersNotInCluster is used to fetch all nodes that
-// are eligible to be added into a cluster
-//
+// GetAllContainersNotInCluster is used to fetch all nodes that are eligible to be added into a cluster
 func GetAllContainersNotInCluster(dbConn *sql.DB) ([]types.Container, error) {
 	var rows *sql.Rows
 	var err error
@@ -522,6 +536,7 @@ func GetAllContainersNotInCluster(dbConn *sql.DB) ([]types.Container, error) {
 	return containers, nil
 }
 
+// GetAllContainers returns a list of all containers
 func GetAllContainers(dbConn *sql.DB) ([]types.Container, error) {
 	var rows *sql.Rows
 	var err error
@@ -557,6 +572,7 @@ func GetAllContainers(dbConn *sql.DB) ([]types.Container, error) {
 	return containers, nil
 }
 
+// InsertContainer inserts a new container object and returns the container id
 func InsertContainer(dbConn *sql.DB, container types.Container) (int, error) {
 	queryStr := fmt.Sprintf("insert into container ( name, clusterid, serverid, role, image, createdt, projectid) values ( '%s', %s, %s, '%s','%s', now(), %s) returning id", container.Name, container.ClusterID, container.ServerID, container.Role, container.Image, container.ProjectID)
 
@@ -574,6 +590,7 @@ func InsertContainer(dbConn *sql.DB, container types.Container) (int, error) {
 	return nodeid, nil
 }
 
+// DeleteContainer deleles a given container
 func DeleteContainer(dbConn *sql.DB, id string) error {
 	queryStr := fmt.Sprintf("delete from container where  id=%s returning id", id)
 	logit.Info.Println("admindb:DeleteContainer:" + queryStr)
@@ -590,6 +607,7 @@ func DeleteContainer(dbConn *sql.DB, id string) error {
 	return nil
 }
 
+// UpdateContainer updates a given container
 func UpdateContainer(dbConn *sql.DB, container types.Container) error {
 	queryStr := fmt.Sprintf("update container set ( name, clusterid, serverid, role, image) = ('%s', %s, %s, '%s', '%s') where id = %s returning id", container.Name, container.ClusterID, container.ServerID, container.Role, container.Image, container.ID)
 	logit.Info.Println("admindb:UpdateContainer:" + queryStr)
@@ -606,6 +624,7 @@ func UpdateContainer(dbConn *sql.DB, container types.Container) error {
 
 }
 
+// GetAllServers returns a list of all server objects
 func GetAllServers(dbConn *sql.DB) ([]types.Server, error) {
 	logit.Info.Println("admindb:GetAllServer:called")
 	var rows *sql.Rows
@@ -630,6 +649,7 @@ func GetAllServers(dbConn *sql.DB) ([]types.Server, error) {
 	return servers, nil
 }
 
+// GetAllServersByClassByCount returns a list of server objects with a node count for each server included
 func GetAllServersByClassByCount(dbConn *sql.DB) ([]types.Server, error) {
 	//select s.id, s.name, s.serverclass, count(n) from server s left join node n on  s.id = n.serverid  group by s.id order by s.serverclass, count(n);
 
@@ -656,6 +676,7 @@ func GetAllServersByClassByCount(dbConn *sql.DB) ([]types.Server, error) {
 	return servers, nil
 }
 
+// UpdateServer updates a given server
 func UpdateServer(dbConn *sql.DB, server types.Server) error {
 	logit.Info.Println("admindb:UpdateServer:called")
 	queryStr := fmt.Sprintf("update server set ( name, ipaddress, pgdatapath, serverclass, dockerbip) = ('%s', '%s', '%s', '%s', '%s') where id = %s returning id", server.Name, server.IPAddress, server.PGDataPath, server.ServerClass, server.DockerBridgeIP, server.ID)
@@ -672,6 +693,8 @@ func UpdateServer(dbConn *sql.DB, server types.Server) error {
 	return nil
 
 }
+
+// InsertServer inserts a new server object
 func InsertServer(dbConn *sql.DB, server types.Server) (int, error) {
 	//logit.Info.Println("admindb:InsertServer:called")
 	queryStr := fmt.Sprintf("insert into server ( name, ipaddress, pgdatapath, serverclass, dockerbip, createdt) values ( '%s', '%s', '%s', '%s', '%s', now()) returning id", server.Name, server.IPAddress, server.PGDataPath, server.ServerClass, server.DockerBridgeIP)
@@ -690,6 +713,7 @@ func InsertServer(dbConn *sql.DB, server types.Server) (int, error) {
 	return serverid, nil
 }
 
+// DeleteServer deletes a server object
 func DeleteServer(dbConn *sql.DB, id string) error {
 	queryStr := fmt.Sprintf("delete from server where  id=%s returning id", id)
 	logit.Info.Println("admindb:DeleteServer:" + queryStr)
@@ -705,6 +729,7 @@ func DeleteServer(dbConn *sql.DB, id string) error {
 	return nil
 }
 
+// GetAllGeneralSettings returns a list of all settings of 'general' types
 func GetAllGeneralSettings(dbConn *sql.DB) ([]types.Setting, error) {
 	var rows *sql.Rows
 	var err error
@@ -731,6 +756,7 @@ func GetAllGeneralSettings(dbConn *sql.DB) ([]types.Setting, error) {
 	return settings, nil
 }
 
+// GetAllSettings returns a list of all settings
 func GetAllSettings(dbConn *sql.DB) ([]types.Setting, error) {
 	//logit.Info.Println("admindb:GetAllSettings: called")
 	var rows *sql.Rows
@@ -758,6 +784,7 @@ func GetAllSettings(dbConn *sql.DB) ([]types.Setting, error) {
 	return settings, nil
 }
 
+// GetSetting returns a particular setting based on it's key
 func GetSetting(dbConn *sql.DB, key string) (types.Setting, error) {
 	//logit.Info.Println("admindb:GetSetting:called")
 	setting := types.Setting{}
@@ -793,6 +820,7 @@ func InsertSetting(dbConn *sql.DB, setting types.Setting) error {
 	return nil
 }
 
+// UpdateSetting updates a given setting value
 func UpdateSetting(dbConn *sql.DB, setting types.Setting) error {
 	logit.Info.Println("admindb:UpdateSetting:called")
 	queryStr := fmt.Sprintf("update settings set ( value, updatedt) = ('%s', now()) where name = '%s'  returning name", setting.Value, setting.Name)
@@ -810,6 +838,7 @@ func UpdateSetting(dbConn *sql.DB, setting types.Setting) error {
 
 }
 
+// GetAllSettingsMap returns a map of all settings
 func GetAllSettingsMap(dbConn *sql.DB) (map[string]string, error) {
 	logit.Info.Println("admindb:GetAllSettingsMap: called")
 	m := make(map[string]string)
@@ -840,22 +869,7 @@ func GetAllSettingsMap(dbConn *sql.DB) (map[string]string, error) {
 	return m, nil
 }
 
-func Test() {
-	logit.Info.Println("hi from Test")
-}
-
-func GetDomain(dbConn *sql.DB) (string, error) {
-	tmp, err := GetSetting(dbConn, "DOMAIN-NAME")
-
-	if err != nil {
-		return "", err
-	}
-	//we trim off any leading . characters
-	domain := strings.Trim(tmp.Value, ".")
-
-	return domain, nil
-}
-
+// AddContainerUser inserts a new database user for a given container and returns the new ID
 func AddContainerUser(dbConn *sql.DB, s types.ContainerUser) (int, error) {
 
 	//logit.Info.Println("AddContainerUser called")
@@ -887,6 +901,7 @@ func AddContainerUser(dbConn *sql.DB, s types.ContainerUser) (int, error) {
 	return theID, nil
 }
 
+// DeleteContainerUser deletes a container database user
 func DeleteContainerUser(dbConn *sql.DB, containername string, rolname string) error {
 	queryStr := fmt.Sprintf("delete from containeruser where  containername='%s'  and usename = '%s' returning id", containername, rolname)
 	logit.Info.Println("admindb:DeleteContainerUser:" + queryStr)
@@ -902,6 +917,7 @@ func DeleteContainerUser(dbConn *sql.DB, containername string, rolname string) e
 	return nil
 }
 
+// GetContainerUser returns a container user for a given container and user name
 func GetContainerUser(dbConn *sql.DB, containername string, usename string) (types.ContainerUser, error) {
 	var user types.ContainerUser
 	var err error
@@ -927,6 +943,7 @@ func GetContainerUser(dbConn *sql.DB, containername string, usename string) (typ
 	return user, nil
 }
 
+// UpdateContainerUser updates a given container database user
 func UpdateContainerUser(dbConn *sql.DB, user types.ContainerUser) error {
 	logit.Info.Println("admindb:UpdateContainerUser encrypting password of " + user.Passwd)
 	encrypted, err := sec.EncryptPassword(user.Passwd)
@@ -945,6 +962,7 @@ func UpdateContainerUser(dbConn *sql.DB, user types.ContainerUser) error {
 
 }
 
+// GetProject returns a given project object
 func GetProject(dbConn *sql.DB, id string) (types.Project, error) {
 	//logit.Info.Println("GetProject called with id=" + id)
 	project := types.Project{}
@@ -987,6 +1005,7 @@ func GetProject(dbConn *sql.DB, id string) (types.Project, error) {
 	return project, nil
 }
 
+// GetAllProjects returns a list of all project objects
 func GetAllProjects(dbConn *sql.DB) ([]types.Project, error) {
 	//logit.Info.Println("admindb:GetAllProjects: called")
 	var rows *sql.Rows
@@ -1054,6 +1073,7 @@ func GetAllProjects(dbConn *sql.DB) ([]types.Project, error) {
 	return projects, nil
 }
 
+// UpdateProject updates a given project object
 func UpdateProject(dbConn *sql.DB, project types.Project) error {
 	//logit.Info.Println("admindb:UpdateProject:called")
 	queryStr := fmt.Sprintf("update project set ( name, description, updatedt) = ('%s', '%s', now()) where id = %s returning id", project.Name, project.Desc, project.ID)
@@ -1071,6 +1091,7 @@ func UpdateProject(dbConn *sql.DB, project types.Project) error {
 
 }
 
+// DeleteProject deletes a given project
 func DeleteProject(dbConn *sql.DB, id string) error {
 	queryStr := fmt.Sprintf("delete from project where  id=%s returning id", id)
 	//logit.Info.Println("admindb:DeleteProject:" + queryStr)
@@ -1086,6 +1107,7 @@ func DeleteProject(dbConn *sql.DB, id string) error {
 	return nil
 }
 
+// InsertProject inserts a new project object
 func InsertProject(dbConn *sql.DB, project types.Project) (int, error) {
 	//logit.Info.Println("admindb:InsertProject:called")
 	queryStr := fmt.Sprintf("insert into project ( name, description, updatedt) values ( '%s', '%s', now()) returning id", project.Name, project.Desc)
@@ -1104,6 +1126,7 @@ func InsertProject(dbConn *sql.DB, project types.Project) (int, error) {
 	return projectid, nil
 }
 
+// GetAllProxiesForProject returns a list of proxy objects for a given project
 func GetAllProxiesForProject(dbConn *sql.DB, projectID string) ([]types.Proxy, error) {
 	var rows *sql.Rows
 	var err error
@@ -1128,6 +1151,7 @@ func GetAllProxiesForProject(dbConn *sql.DB, projectID string) ([]types.Proxy, e
 	return proxies, nil
 }
 
+// GetProxy returns a given proxy object by container name
 func GetProxy(dbConn *sql.DB, containername string) (types.Proxy, error) {
 	var rows *sql.Rows
 	proxy := types.Proxy{}
@@ -1159,6 +1183,7 @@ func GetProxy(dbConn *sql.DB, containername string) (types.Proxy, error) {
 	return proxy, nil
 }
 
+// GetProxyByContainerID returns a proxy object by container ID
 func GetProxyByContainerID(dbConn *sql.DB, containerID string) (types.Proxy, error) {
 	var rows *sql.Rows
 	proxy := types.Proxy{}
@@ -1207,6 +1232,7 @@ func GetProxyByContainerID(dbConn *sql.DB, containerID string) (types.Proxy, err
 	return proxy, nil
 }
 
+// GetDatabaseStatus returns a simple status of a container database
 func GetDatabaseStatus(dbConn *sql.DB, containerid string) (string, error) {
 	node, err := GetContainer(dbConn, containerid)
 	if err != nil {

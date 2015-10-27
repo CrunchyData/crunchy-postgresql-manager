@@ -23,23 +23,8 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/types"
 )
 
+// ProvisionRestoreJob creates a docker container to orchestrate a restore job
 func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
-
-	//get node
-	/**
-	node, err := admindb.GetContainerByName(dbConn, args.ContainerName)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return err
-	}
-
-	var credential types.Credential
-	credential, err = admindb.GetUserCredentials(dbConn, &node)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return err
-	}
-	*/
 
 	logit.Info.Println("task.ProvisionRestoreJob called")
 	logit.Info.Println("with scheduleid=" + args.ScheduleID)

@@ -32,6 +32,7 @@ type DBMetric struct {
 	Timestamp  time.Time
 }
 
+// CollectDBSize collect and persist the database size metric into the prometheus db
 func CollectDBSize(gauge *prometheus.GaugeVec) error {
 	var dbConn *sql.DB
 	var err error
@@ -103,7 +104,7 @@ func process(node *types.Container, credential *types.Credential, gauge *prometh
 
 }
 
-//database size in megabytes
+// pg2 calculate the database size in megabytes and return the metrics
 func pg2(databaseConn *sql.DB) ([]DBMetric, error) {
 	values := []DBMetric{}
 

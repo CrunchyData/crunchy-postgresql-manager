@@ -25,6 +25,7 @@ import (
 	"time"
 )
 
+// ProvisionBackupJob creates a Docker container that performs the backup on a db
 func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 
 	//get node

@@ -21,6 +21,8 @@ import (
 	"os"
 )
 
+// GetConnection get a database connection to a given database name, uses environment variables to
+// get the hostname, user, password, and port numbers returns a database connection
 func GetConnection(database string) (*sql.DB, error) {
 	var dbHost, dbUser, dbPort, dbPassword string
 	dbHost = os.Getenv("DB_HOST")
@@ -51,7 +53,7 @@ func GetConnection(database string) (*sql.DB, error) {
 	return dbConn, err
 }
 
-//used by monitoring
+// GetMonitoringConnection used by monitoring to connect to a container database returns a database connection
 func GetMonitoringConnection(dbHost string, dbUser string, dbPort string, database string, dbPassword string) (*sql.DB, error) {
 
 	var dbConn *sql.DB

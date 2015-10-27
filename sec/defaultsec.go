@@ -29,6 +29,7 @@ import (
 type DefaultSec struct {
 }
 
+// Login perform a login using a password and user id returning the security token if successful
 func (d DefaultSec) Login(dbConn *sql.DB, id string, psw string) (string, error) {
 	logit.Info.Println("DefaultSec.Login")
 	var uuid string
@@ -76,6 +77,7 @@ func (d DefaultSec) Login(dbConn *sql.DB, id string, psw string) (string, error)
 	return uuid, nil
 }
 
+// Logout logout the user using the security token
 func (d DefaultSec) Logout(dbConn *sql.DB, uuid string) error {
 	logit.Info.Println("DefaultSec.Logout")
 	err := DBDeleteSession(dbConn, uuid)
@@ -87,6 +89,7 @@ func (d DefaultSec) Logout(dbConn *sql.DB, uuid string) error {
 	return nil
 }
 
+// UpdateUser update the user object
 func (d DefaultSec) UpdateUser(dbConn *sql.DB, user User) error {
 	logit.Info.Println("DefaultSec.UpdateUser")
 	err := DBUpdateUser(dbConn, user)
@@ -98,6 +101,7 @@ func (d DefaultSec) UpdateUser(dbConn *sql.DB, user User) error {
 	return nil
 }
 
+// AddUser create a new user object
 func (d DefaultSec) AddUser(dbConn *sql.DB, user User) error {
 	logit.Info.Println("DefaultSec.AddUser")
 	encryptedPsw, err := EncryptPassword(user.Password)
@@ -115,6 +119,7 @@ func (d DefaultSec) AddUser(dbConn *sql.DB, user User) error {
 	return nil
 }
 
+// GetUser return a given user by ID
 func (d DefaultSec) GetUser(dbConn *sql.DB, id string) (User, error) {
 	logit.Info.Println("DefaultSec.GetUser id=" + id)
 	user, err := DBGetUser(dbConn, id)
@@ -130,6 +135,7 @@ func (d DefaultSec) GetUser(dbConn *sql.DB, id string) (User, error) {
 	return user, nil
 }
 
+// GetAllUsers return a list of all users
 func (d DefaultSec) GetAllUsers(dbConn *sql.DB) ([]User, error) {
 	logit.Info.Println("DefaultSec.GetAllUsers")
 	var users []User
@@ -142,6 +148,7 @@ func (d DefaultSec) GetAllUsers(dbConn *sql.DB) ([]User, error) {
 	return users, err
 }
 
+// DeleteUser delete a user
 func (d DefaultSec) DeleteUser(dbConn *sql.DB, id string) error {
 	logit.Info.Println("DefaultSec.DeleteUser id=" + id)
 	err := DBDeleteUser(dbConn, id)
@@ -152,6 +159,7 @@ func (d DefaultSec) DeleteUser(dbConn *sql.DB, id string) error {
 	return nil
 }
 
+// UpdateRole update a role
 func (d DefaultSec) UpdateRole(dbConn *sql.DB, role Role) error {
 	logit.Info.Println("DefaultSec.UpdateRole")
 	err := DBUpdateRole(dbConn, role)
@@ -162,6 +170,7 @@ func (d DefaultSec) UpdateRole(dbConn *sql.DB, role Role) error {
 	return nil
 }
 
+// AddRole add a role
 func (d DefaultSec) AddRole(dbConn *sql.DB, role Role) error {
 	logit.Info.Println("DefaultSec.AddRole")
 	err := DBAddRole(dbConn, role)
@@ -172,6 +181,7 @@ func (d DefaultSec) AddRole(dbConn *sql.DB, role Role) error {
 	return nil
 }
 
+// DeleteRole delete a role by name
 func (d DefaultSec) DeleteRole(dbConn *sql.DB, name string) error {
 	logit.Info.Println("DefaultSec.DeleteRole name=" + name)
 	err := DBDeleteRole(dbConn, name)
@@ -182,6 +192,7 @@ func (d DefaultSec) DeleteRole(dbConn *sql.DB, name string) error {
 	return nil
 }
 
+// GetAllRoles return a list of all roles
 func (d DefaultSec) GetAllRoles(dbConn *sql.DB) ([]Role, error) {
 	logit.Info.Println("DefaultSec.GetAllRoles")
 	roles := []Role{}
@@ -195,6 +206,7 @@ func (d DefaultSec) GetAllRoles(dbConn *sql.DB) ([]Role, error) {
 	return roles, nil
 }
 
+// GetRole return a role by name
 func (d DefaultSec) GetRole(dbConn *sql.DB, name string) (Role, error) {
 	logit.Info.Println("DefaultSec.GetRole Name=" + name)
 	permissions := make(map[string]string)
@@ -203,6 +215,7 @@ func (d DefaultSec) GetRole(dbConn *sql.DB, name string) (Role, error) {
 	return role, nil
 }
 
+// LogRole print to stdout a role
 func (d DefaultSec) LogRole(role Role) {
 	logit.Info.Println("***role***")
 	logit.Info.Println("role=" + role.Name + " Selected=" + fmt.Sprintf("%t", role.Selected))
@@ -213,6 +226,7 @@ func (d DefaultSec) LogRole(role Role) {
 
 }
 
+// LogUser print to stdout a user
 func (d DefaultSec) LogUser(user User) {
 	logit.Info.Println("***user***")
 	logit.Info.Println("user.Name=" + user.Name + " user.Password=" + user.Password)
@@ -228,6 +242,7 @@ func (d DefaultSec) LogUser(user User) {
 
 }
 
+// Authorize perform an authorization based on a security token and requested action
 func (d DefaultSec) Authorize(dbConn *sql.DB, token string, action string) error {
 	var err error
 
@@ -285,6 +300,7 @@ func (d DefaultSec) Authorize(dbConn *sql.DB, token string, action string) error
 	return err
 }
 
+// ChangePassword change a users password
 func (d DefaultSec) ChangePassword(dbConn *sql.DB, username string, newpass string) error {
 	encryptedPsw, err := EncryptPassword(newpass)
 	if err != nil {
@@ -301,6 +317,7 @@ func (d DefaultSec) ChangePassword(dbConn *sql.DB, username string, newpass stri
 	return nil
 }
 
+// CompareUserToToken test to see if a token matches a user id
 func (d DefaultSec) CompareUserToToken(dbConn *sql.DB, username string, token string) (bool, error) {
 	var err error
 	var session Session

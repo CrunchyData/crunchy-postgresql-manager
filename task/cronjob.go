@@ -24,7 +24,7 @@ type DefaultJob struct {
 	request TaskRequest
 }
 
-//this is the func that implements the cron Job interface
+// Run this is the func that implements the cron Job interface
 func (t DefaultJob) Run() {
 	logit.Info.Println("running ScheduleID:" + t.request.ScheduleID)
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)

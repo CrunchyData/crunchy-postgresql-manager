@@ -24,6 +24,7 @@ import (
 	"strconv"
 )
 
+// GetHealthCheck return the current set of healthcheck metrics that are persisted
 func GetHealthCheck(dbConn *sql.DB) ([]types.HealthCheck, error) {
 	var rows *sql.Rows
 	var err error
@@ -59,6 +60,7 @@ func GetHealthCheck(dbConn *sql.DB) ([]types.HealthCheck, error) {
 	return checks, nil
 }
 
+// InsertHealthCheck insert a health check metric into the database, return the key
 func InsertHealthCheck(dbConn *sql.DB, hc types.HealthCheck) (int, error) {
 	queryStr := fmt.Sprintf(
 		"insert into healthcheck ( "+
@@ -83,6 +85,7 @@ func InsertHealthCheck(dbConn *sql.DB, hc types.HealthCheck) (int, error) {
 	return id, nil
 }
 
+// DeleteHealthCheck deleles the entire set of health check metrics that are persisted
 func DeleteHealthCheck(dbConn *sql.DB) error {
 	queryStr := fmt.Sprintf("delete from healthcheck")
 	logit.Info.Println(queryStr)

@@ -15,8 +15,7 @@ type Metric struct {
 	Timestamp  time.Time
 }
 
-//last minute load average of all cpu(s)
-//range returned is 0.00 - 0.99
+// Collectpu return the last minute load average of all cpu(s) range returned is 0.00 - 0.99 for a given server
 func Collectcpu(serverName string) (Metric, error) {
 	values := Metric{}
 	var err error
@@ -41,8 +40,7 @@ func Collectcpu(serverName string) (Metric, error) {
 	return values, err
 }
 
-//percent memory utilization
-//range returned is 1-100
+// Collectmem return the percent memory utilization range returned is 1-100 for a given server
 func Collectmem(serverName string) (Metric, error) {
 	values := Metric{}
 	var err error

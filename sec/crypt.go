@@ -28,6 +28,7 @@ import (
 var key = "opensesame123456" // 16 bytes!
 var ciphertext = []byte("abcdef1234567890")
 
+// EncryptPassword encrypt a cleartext password returning the encrypted password
 func EncryptPassword(inputPassword string) (string, error) {
 	var err error
 	var encryptedRaw []byte
@@ -51,6 +52,7 @@ func EncryptPassword(inputPassword string) (string, error) {
 
 }
 
+// DecryptPassword decrypt the encrypted password returning the cleartext password
 func DecryptPassword(encodedHexPassword string) (string, error) {
 	var encryptedPassword []byte
 	var err error

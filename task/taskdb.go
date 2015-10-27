@@ -23,6 +23,7 @@ import (
 	"strconv"
 )
 
+// AddStatus writes new status info to the database
 func AddStatus(dbConn *sql.DB, status *TaskStatus) (string, error) {
 
 	logit.Info.Println("AddStatus called")
@@ -55,6 +56,7 @@ func AddStatus(dbConn *sql.DB, status *TaskStatus) (string, error) {
 	return strvalue, nil
 }
 
+// UpdateStatus updates status info in the database for a job
 func UpdateStatus(dbConn *sql.DB, status *TaskStatus) error {
 
 	logit.Info.Println("backup.UpdateStatus called")
@@ -78,6 +80,7 @@ func UpdateStatus(dbConn *sql.DB, status *TaskStatus) error {
 	return nil
 }
 
+// AddSchedule writes a new schedule to the database
 func AddSchedule(dbConn *sql.DB, s TaskSchedule) (string, error) {
 
 	logit.Info.Println("AddSchedule called")
@@ -119,6 +122,7 @@ func AddSchedule(dbConn *sql.DB, s TaskSchedule) (string, error) {
 	return theID, nil
 }
 
+// UpdateSchedule updates a schedule in the database
 func UpdateSchedule(dbConn *sql.DB, s TaskSchedule) error {
 
 	logit.Info.Println("backup.UpdateSchedule called")
@@ -153,6 +157,7 @@ func UpdateSchedule(dbConn *sql.DB, s TaskSchedule) error {
 	return nil
 }
 
+// DeleteSchedule deletes a schedule from the database
 func DeleteSchedule(dbConn *sql.DB, id string) error {
 	queryStr := fmt.Sprintf("delete from taskschedule where id=%s returning id", id)
 	logit.Info.Println("backup:DeleteSchedule:" + queryStr)
@@ -168,6 +173,7 @@ func DeleteSchedule(dbConn *sql.DB, id string) error {
 	return nil
 }
 
+// GetSchedule returns a schedule from the database by id
 func GetSchedule(dbConn *sql.DB, id string) (TaskSchedule, error) {
 	logit.Info.Println("GetSchedule called with id=" + id)
 	s := TaskSchedule{}
@@ -189,6 +195,7 @@ func GetSchedule(dbConn *sql.DB, id string) (TaskSchedule, error) {
 	return s, nil
 }
 
+// GetAllSchedules returns a list of all schedules for a given container
 func GetAllSchedules(dbConn *sql.DB, containerid string) ([]TaskSchedule, error) {
 	logit.Info.Println("GetAllSchedules called with id=" + containerid)
 	var rows *sql.Rows
@@ -235,6 +242,7 @@ func GetAllSchedules(dbConn *sql.DB, containerid string) ([]TaskSchedule, error)
 	return schedules, nil
 }
 
+// GetAllStatus returns a list of task status for given schedule
 func GetAllStatus(dbConn *sql.DB, scheduleid string) ([]TaskStatus, error) {
 	logit.Info.Println("GetAllStatus called with scheduleid=" + scheduleid)
 	var rows *sql.Rows
@@ -272,6 +280,7 @@ func GetAllStatus(dbConn *sql.DB, scheduleid string) ([]TaskStatus, error) {
 	return stats, nil
 }
 
+// GetStatus returns task status for a given task
 func GetStatus(dbConn *sql.DB, id string) (TaskStatus, error) {
 	logit.Info.Println("GetStatus called with id=" + id)
 	s := TaskStatus{}
@@ -290,6 +299,7 @@ func GetStatus(dbConn *sql.DB, id string) (TaskStatus, error) {
 	return s, nil
 }
 
+// GetSchedules returns a list of all task schedules
 func GetSchedules(dbConn *sql.DB) ([]TaskSchedule, error) {
 	logit.Info.Println("GetSchedules called")
 	var rows *sql.Rows

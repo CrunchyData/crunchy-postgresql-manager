@@ -104,7 +104,7 @@ var CRONInstance *cron.Cron
 
 const CLUSTERADMIN_DB = "clusteradmin"
 
-//called by backup jobs as they execute
+// StatusAdd called by backup jobs as they execute to write new status info
 func StatusAdd(w rest.ResponseWriter, r *rest.Request) {
 
 	logit.Info.Println("StatusAdd called")
@@ -139,7 +139,7 @@ func StatusAdd(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
-//called by backup jobs as they execute
+// StatusUpdate called by backup jobs as they execute
 func StatusUpdate(w rest.ResponseWriter, r *rest.Request) {
 
 	request := TaskStatus{}
@@ -174,7 +174,7 @@ func StatusUpdate(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
-//called by admin do perform an adhoc task
+// ExecuteNow called by admin do perform an adhoc task
 func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 	request := TaskRequest{}
 	err := r.DecodeJsonPayload(&request)
@@ -223,7 +223,7 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
-//called by admin to cause a reload of the cron jobs
+// Reload called by admin to cause a reload of the cron jobs
 func Reload(w rest.ResponseWriter, r *rest.Request) {
 
 	logit.Info.Println("Reload called")
@@ -240,6 +240,7 @@ func Reload(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
+// LoadSchedules loads the initial set of task schedules
 func LoadSchedules() error {
 
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)

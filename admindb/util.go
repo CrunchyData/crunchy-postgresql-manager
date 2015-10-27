@@ -24,6 +24,7 @@ import (
 const CPMTEST_DB = "cpmtest"
 const CPMTEST_USER = "cpmtest"
 
+// GetUserCredentials return the set of database credentials stored for a given container
 func GetUserCredentials(dbConn *sql.DB, node *types.Container) (types.Credential, error) {
 	var err error
 	cred := types.Credential{}

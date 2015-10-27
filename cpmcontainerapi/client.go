@@ -1,3 +1,9 @@
+//
+// example of calling one of these
+//
+// request := &cpmcontainerapi.RemovewritefileRequest{"something", "yes"}
+// response, err := cpmcontainerapi.RemoteWritefileClient("http://localhost:10001", request)
+//
 package cpmcontainerapi
 
 import (
@@ -10,12 +16,7 @@ import (
 
 const PORT = ":10001"
 
-//
-// example of calling one of these
-//
-// request := &cpmcontainerapi.RemovewritefileRequest{"something", "yes"}
-// response, err := cpmcontainerapi.RemoteWritefileClient("http://localhost:10001", request)
-//
+// RemoteWritefileClient client for remotely writing a file to a given container
 func RemoteWritefileClient(path string, contents string, ipaddress string) (RemoteWritefileResponse, error) {
 	var req = RemoteWritefileRequest{}
 	response := RemoteWritefileResponse{}
@@ -44,6 +45,7 @@ func RemoteWritefileClient(path string, contents string, ipaddress string) (Remo
 	return response, err
 }
 
+// InitdbClient client for invoking initdb on a given container
 func InitdbClient(host string) (InitdbResponse, error) {
 	var err error
 	req := InitdbRequest{}
@@ -60,6 +62,7 @@ func InitdbClient(host string) (InitdbResponse, error) {
 	return response, err
 }
 
+// StartPGClient client for starting a database on a given container
 func StartPGClient(host string) (StartPGResponse, error) {
 	var err error
 	req := StartPGRequest{}
@@ -76,6 +79,7 @@ func StartPGClient(host string) (StartPGResponse, error) {
 	return response, err
 }
 
+// StartPGOnStandbyClient client for starting a database on a given standby container
 func StartPGOnStandbyClient(host string) (StartPGOnStandbyResponse, error) {
 	var err error
 	req := StartPGOnStandbyRequest{}
@@ -92,6 +96,7 @@ func StartPGOnStandbyClient(host string) (StartPGOnStandbyResponse, error) {
 	return response, err
 }
 
+// StopPGClient client for stopping a database on a given container
 func StopPGClient(host string) (StopPGResponse, error) {
 	var err error
 	req := StopPGRequest{}
@@ -108,6 +113,7 @@ func StopPGClient(host string) (StopPGResponse, error) {
 	return response, err
 }
 
+// StartPgpoolClient client for starting a pgpool on a given container
 func StartPgpoolClient(host string) (StartPgpoolResponse, error) {
 	var err error
 	req := StartPgpoolRequest{}
@@ -124,6 +130,7 @@ func StartPgpoolClient(host string) (StartPgpoolResponse, error) {
 	return response, err
 }
 
+// StopPgpoolClient client for stopping pgpool on a given container
 func StopPgpoolClient(host string) (StopPgpoolResponse, error) {
 	var err error
 	req := StopPgpoolRequest{}
@@ -140,6 +147,7 @@ func StopPgpoolClient(host string) (StopPgpoolResponse, error) {
 	return response, err
 }
 
+// BasebackupClient client for performing a base backup on a given container
 func BasebackupClient(master string, standby string, username string, password string) (BasebackupResponse, error) {
 	var err error
 	req := BasebackupRequest{}
@@ -159,6 +167,7 @@ func BasebackupClient(master string, standby string, username string, password s
 	return response, err
 }
 
+// FailoverClient client for triggering a failover on a given container
 func FailoverClient(host string) (FailoverResponse, error) {
 	var err error
 	req := FailoverRequest{}
@@ -175,6 +184,7 @@ func FailoverClient(host string) (FailoverResponse, error) {
 	return response, err
 }
 
+// SeedClient client for performing a database seed on a given container
 func SeedClient(host string) (SeedResponse, error) {
 	var err error
 	req := SeedRequest{}
@@ -190,6 +200,7 @@ func SeedClient(host string) (SeedResponse, error) {
 	return response, err
 }
 
+// ControldataClient client for invoking pg_control on a given container and returning the results
 func ControldataClient(host string) (ControldataResponse, error) {
 	var err error
 	req := ControldataRequest{}
@@ -205,6 +216,7 @@ func ControldataClient(host string) (ControldataResponse, error) {
 	return response, err
 }
 
+// BadgerGenerateClient client for invoking pgbadger on a given container
 func BadgerGenerateClient(host string) (BadgerGenerateResponse, error) {
 	var err error
 	req := BadgerGenerateRequest{}
@@ -221,6 +233,7 @@ func BadgerGenerateClient(host string) (BadgerGenerateResponse, error) {
 	return response, err
 }
 
+// StatusClient client for getting the current database status of a container
 func StatusClient(host string) (StatusResponse, error) {
 	response := StatusResponse{}
 	url := "http://" + host + PORT + "/api/status"
@@ -237,6 +250,7 @@ func StatusClient(host string) (StatusResponse, error) {
 	return response, err
 }
 
+// RestoreClient client for invoking a backrest restore on a given container
 func RestoreClient(host string, req *RestoreRequest) (RestoreResponse, error) {
 	var err error
 	req.ContainerName = host
@@ -252,6 +266,8 @@ func RestoreClient(host string, req *RestoreRequest) (RestoreResponse, error) {
 	return response, err
 }
 
+// RemoveDataClient client for
+/**
 func RemoveDataClient(host string) (RemoveDataResponse, error) {
 	var err error
 	req := RemoveDataRequest{}
@@ -267,3 +283,4 @@ func RemoveDataClient(host string) (RemoveDataResponse, error) {
 	//fmt.Println(string(rawresponse))
 	return response, err
 }
+*/

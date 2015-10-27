@@ -31,6 +31,7 @@ type BadgerGenerateResponse struct {
 	Status string
 }
 
+// BadgerGenerate perform a pgbadger to create the HTML output file
 func BadgerGenerate(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("cpmcontainerapi: BadgerGenerate called")
 	req := BadgerGenerateRequest{}
@@ -74,6 +75,7 @@ type RestoreResponse struct {
 	Status string
 }
 
+// Restore perform a backrest restore
 func Restore(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("cpmcontainerapi: Restore called")
 	req := RestoreRequest{}

@@ -47,6 +47,7 @@ type SwitchPathResponse struct {
 	Status string
 }
 
+// DiskProvision cause a data directory to be created on the server
 func DiskProvision(w rest.ResponseWriter, r *rest.Request) {
 	req := DiskProvisionRequest{}
 	err := r.DecodeJsonPayload(&req)
@@ -76,6 +77,7 @@ func DiskProvision(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// DiskDelete delete a data directory on a server
 func DiskDelete(w rest.ResponseWriter, r *rest.Request) {
 	req := DiskDeleteRequest{}
 	err := r.DecodeJsonPayload(&req)

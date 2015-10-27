@@ -572,6 +572,7 @@ func GetAllClustersForProject(w rest.ResponseWriter, r *rest.Request) {
 }
 
 // TODO
+/**
 func GetAllClusters(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -608,6 +609,7 @@ func GetAllClusters(w rest.ResponseWriter, r *rest.Request) {
 
 	w.WriteJson(&clusters)
 }
+*/
 
 // PostCluster updates or inserts a new cluster definition
 func PostCluster(w rest.ResponseWriter, r *rest.Request) {

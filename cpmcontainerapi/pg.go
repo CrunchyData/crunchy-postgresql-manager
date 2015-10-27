@@ -90,6 +90,8 @@ type SeedResponse struct {
 	Output string
 	Status string
 }
+
+/**
 type RemoveDataRequest struct {
 	ContainerName string
 }
@@ -98,6 +100,7 @@ type RemoveDataResponse struct {
 	Stderr string
 	Status string
 }
+*/
 type ControldataRequest struct {
 	Path string
 }
@@ -106,6 +109,7 @@ type ControldataResponse struct {
 	Status string
 }
 
+// RemoteWritefile writes a file
 func RemoteWritefile(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("cpmcontainerapi: RemoteWritefile called")
 	req := RemoteWritefileRequest{}
@@ -152,6 +156,7 @@ func RemoteWritefile(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// Initdb performs a postgresql initdb
 func Initdb(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("cpmcontainerapi: Initdb called")
 	req := InitdbRequest{}
@@ -181,6 +186,7 @@ func Initdb(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// StartPG performs a postgres start
 func StartPG(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("cpmcontainerapi: StartPG called")
 	req := StartPGRequest{}
@@ -210,6 +216,7 @@ func StartPG(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// StopPG performs a postgres stop
 func StopPG(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("cpmcontainerapi: StopPG called")
 	req := StopPGRequest{}
@@ -239,6 +246,7 @@ func StopPG(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// Basebackup performs a pg_basebackup
 func Basebackup(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("cpmcontainerapi: Basebackup called")
 	req := BasebackupRequest{}
@@ -281,6 +289,7 @@ func Basebackup(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// Failover triggers a postgres failover
 func Failover(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("cpmcontainerapi: Failover called")
 	req := FailoverRequest{}
@@ -315,6 +324,7 @@ func Failover(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// Seed runs the seed sql script to build the base CPM container objects
 func Seed(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("cpmcontainerapi: Seed called")
 	req := SeedRequest{}
@@ -344,6 +354,7 @@ func Seed(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// StartPGOnStandby performs a postgres start
 func StartPGOnStandby(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("cpmcontainerapi: StartPGOnStandby called")
 	req := StartPGOnStandbyRequest{}
@@ -373,6 +384,7 @@ func StartPGOnStandby(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// Controldata performs a postgres pg_control
 func Controldata(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("cpmcontainerapi: Controldata called")
 	req := ControldataRequest{}
@@ -402,6 +414,7 @@ func Controldata(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+// Status a simple ping that lets us know if the container api is running
 func Status(w rest.ResponseWriter, r *rest.Request) {
 	response := StatusResponse{}
 	response.Status = "RUNNING"
@@ -409,6 +422,7 @@ func Status(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&response)
 }
 
+/**
 func RemoveData(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("cpmcontainerapi: RemoveData called")
 	req := RemoveDataRequest{}
@@ -438,3 +452,4 @@ func RemoveData(w rest.ResponseWriter, r *rest.Request) {
 	response.Status = "OK"
 	w.WriteJson(&response)
 }
+*/
