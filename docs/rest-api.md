@@ -77,7 +77,7 @@ curl  http://cpm-admin.crunchy.lab:13001/sec/getusers/1efbfd50-9b2-43a0-8c91-b6f
 
 delete a user DeleteUser
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/sec/deleteuser/1.jkjkjadkjkajdkfjakdfjkad
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###POST /sec/updaterole
@@ -285,6 +285,34 @@ return all containers
 curl  http://cpm-admin.crunchy.lab:13001/nodes/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
+## Proxy Information
+
+###POST /provisionproxy
+
+create a proxy container
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl --data @provisionproxy.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/provisionproxy
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###GET /proxy/getbycontainerid/:ContainerID.:Token
+
++ ContainerID : the container ID of the proxy
++ Token : the generated auth token for this session
+
+return proxy information
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl  http://cpm-admin.crunchy.lab:13001/proxy/getbycontainerid/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###POST /proxy/update
+
+update a proxy container
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl --data @proxyupdate.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/proxy/update
+~~~~~~~~~~~~~~~~~~~~~~~~
+
 ## Access Rule Information
 
 ###GET /rules/get/:ID.:Token
@@ -314,6 +342,40 @@ curl  http://cpm-admin.crunchy.lab:13001/rules/getall/1efbfd50-9bb2-43a0-8c91-b6
  delete an access rule
 ~~~~~~~~~~~~~~~~~~~~~~~~
 curl  http://cpm-admin.crunchy.lab:13001/rules/delete/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###POST /rules/update
+
+update an access rule
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl --data @ruleupdate.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/rules/update
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###POST /rules/insert
+
+insert an access rule
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl --data @ruleinsert.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/rules/insert
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###GET /containerrules/getall/:ID.:Token
+
++ ID : the container ID
++ Token : the generated auth token for this session
+
+get all accessrules for a container
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl  http://cpm-admin.crunchy.lab:13001/containerrules/getall/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+###POST /containerrules/update
+
+update accessrules for a container
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl --data @containerrulesupdate.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/containerrules/update
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Server Information
@@ -365,7 +427,7 @@ curl  http://cpm-admin.crunchy.lab:13001/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d
 
 delete a server
 ~~~~~~~~~~~~~~~~~~~~~~~~
-curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
+curl  http://cpm-admin.crunchy.lab:13001/deleteserver/1.jkjakdjfkjadkfjkajdf
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###GET /servers/:Token
@@ -670,17 +732,7 @@ curl  http://cpm-admin.crunchy.lab:13001/task/nodes/kjakjfjkadjfkjkajdf
 
 ###POST /saveprofiles
 
-+ LargeMEM : large memory value
-+ LargeCPU : large cpu value
-+ MediumCPU : medium cpu value
-+ MediumMEM : medium memory value
-+ SmallMEM : small memory value
-+ SmallCPU : small cpu value
-+ Token : the generated auth token for this session
-
 saves profiles
-
-
 ~~~~~~~~~~~~~~~~~~~~~~~~
 curl --data @saveprofiles.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/saveprofiles
@@ -688,18 +740,7 @@ http://cpm-admin:13001/saveprofiles
 
 ###POST /saveclusterprofiles
 
-+ Size : 
-+ Count : 
-+ Algo : 
-+ MasterProfile : 
-+ StandbyProfile : 
-+ MasterServer : 
-+ StandbyServer : 
-+ Token : the generated auth token for this session
-
 saves cluster profiles
-
-
 ~~~~~~~~~~~~~~~~~~~~~~~~
 curl --data @saveclusterprofiles.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/saveclusterprofiles
@@ -802,106 +843,6 @@ perform a load test and return the results
 ~~~~~~~~~~~~~~~~~~~~~~~~
 curl  http://cpm-admin:13001/monior/container/loadtest/1.1000.9a8f9a1e-9c81-4e4f-9f52-01d2ea6cd741
 ~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-###GET /mon/server/:Metric.:ServerID.:Interval.:Token
-
-+ Token : the generated auth token for this session
-
-GetServerMetrics
-
-
-~~~~~~~~~~~~~~~~~~~~~~~~
-curl  http://cpm-admin.crunchy.lab:13001/mon/server/cpu.1.1w.18c0bb2a-2fa2-422e-a583-9df68948802f
-[
-  {
-    "name": "cpu",
-    "columns": [
-      "time",
-      "sequence_number",
-      "server",
-      "value"
-    ],
-    "points": [
-      [
-        1.424206259245e+12,
-        150001,
-        "espresso",
-        0.21
-      ],
-      [
-        1.424206559231e+12,
-        340001,
-        "espresso",
-        1.21
-      ],
-
-     ]
-  }
-]
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-###GET /mon/container/pg2/:Name.:Interval.:Token
-
-+ Token : the generated auth token for this session
-
-GetPG2 - container database sizes
-
-
-~~~~~~~~~~~~~~~~~~~~~~~~
-curl  http://cpm-admin.crunchy.lab:13001/mon/container/pg2/pga.1w.a1459da5-8db1-48ac-b1f0-3bb3427f96e2
-[
- {
-    "Color": "#c05020",
-    "Data": [
-      {
-        "name": "pg2",
-        "columns": [
-          "time",
-          "sequence_number",
-          "database",
-          "value"
-        ],
-        "points": [
-
-          [
-            1.424221017122e+12,
-            9.080001e+06,
-            "cpmtest",
-            9
-          ]
-        ]
-      }
-    ],
-    "Name": "cpmtest"
-  },
- {
-    "Color": "#c05020",
-    "Data": [
-      {
-        "name": "pg2",
-        "columns": [
-          "time",
-          "sequence_number",
-          "database",
-          "value"
-        ],
-        "points": [
-
-          [
-            1.424221017122e+12,
-            9.080001e+06,
-            "postgres",
-            9
-          ]
-        ]
-      }
-    ],
-    "Name": "postgres"
-  }
-]
-~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 ###GET /version
 
