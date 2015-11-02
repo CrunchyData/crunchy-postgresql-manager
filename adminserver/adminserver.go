@@ -151,6 +151,7 @@ func main() {
 		// join a standby container to a cluster
 		&rest.Route{"GET", "/event/join-cluster/:IDList.:MasterID.:ClusterID.:Token", adminapi.EventJoinCluster},
 		// perform a CPM user login
+
 		&rest.Route{"GET", "/sec/login/:ID.:PSW", adminapi.Login},
 		// perform a CPM user logout
 		&rest.Route{"GET", "/sec/logout/:Token", adminapi.Logout},
@@ -176,6 +177,7 @@ func main() {
 		&rest.Route{"GET", "/sec/getroles/:Token", adminapi.GetAllRoles},
 		// get a CPM role
 		&rest.Route{"GET", "/sec/getrole/:Name.:Token", adminapi.GetRole},
+
 		// execute a task schedule immediately
 		&rest.Route{"POST", "/task/executenow", adminapi.ExecuteNow},
 		// add a new task schedule for a given container
@@ -196,10 +198,13 @@ func main() {
 		&rest.Route{"GET", "/task/nodes/:Token", adminapi.GetBackupNodes},
 		//&rest.Route{"GET", "/mon/server/:Metric.:ServerID.:Interval.:Token", adminapi.GetServerMetrics},
 		//&rest.Route{"GET", "/mon/container/pg2/:Name.:Interval.:Token", adminapi.GetPG2},
+
 		// get the current CPM system health check output
 		&rest.Route{"GET", "/mon/healthcheck/:Token", adminapi.GetHealthCheck},
+
 		// get the current CPM version
 		&rest.Route{"GET", "/version", GetVersion},
+
 		// add a database user to a given container
 		&rest.Route{"POST", "/dbuser/add", adminapi.AddContainerUser},
 		// update a database user for a given container
@@ -210,6 +215,7 @@ func main() {
 		&rest.Route{"GET", "/dbuser/get/:ContainerID.:Rolname.:Token", adminapi.GetContainerUser},
 		// get all database users for a given container
 		&rest.Route{"GET", "/dbuser/getall/:ID.:Token", adminapi.GetAllUsersForContainer},
+
 		// add a CPM project
 		&rest.Route{"POST", "/project/add", adminapi.AddProject},
 		// update a CPM project
@@ -220,6 +226,7 @@ func main() {
 		&rest.Route{"GET", "/project/getall/:Token", adminapi.GetAllProjects},
 		// delete a CPM project
 		&rest.Route{"GET", "/project/delete/:ID.:Token", adminapi.DeleteProject},
+
 		// get an access rule
 		&rest.Route{"GET", "/rules/get/:ID.:Token", adminapi.RulesGet},
 		// get all access rules
@@ -234,6 +241,7 @@ func main() {
 		&rest.Route{"GET", "/containerrules/getall/:ID.:Token", adminapi.ContainerAccessRuleGetAll},
 		// update accessrules for a container
 		&rest.Route{"POST", "/containerrules/update", adminapi.ContainerAccessRuleUpdate},
+
 		// create a proxy container
 		&rest.Route{"POST", "/provisionproxy", adminapi.ProvisionProxy},
 		// get a proxy
