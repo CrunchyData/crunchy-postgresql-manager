@@ -32,8 +32,11 @@ Centos/RHEL this is done by adding -H tcp://0.0.0.0:2375 in the /etc/sysconfig/d
 file:
 ~~~~~~~~~~~~~~~~~~~~~~~~
 export SWARM_PORT=2375
-/usr/bin/docker -d --selinux-enabled -H tcp://0.0.0.0:$SWARM_PORT
+/usr/bin/docker -d --selinux-enabled -H tcp://0.0.0.0:$SWARM_PORT --label storage=ssd --label hostname=espresso.crunchy.lab --label profile=small
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+Notice that we assign labels to the docker daemon, these labels are used by CPM (via Swarm)
+to figure out the correct server to deploy containers upon.
 
 ###Startup
 On each server in your cluster, Start the swarm server agent listening to the local Docker API:
