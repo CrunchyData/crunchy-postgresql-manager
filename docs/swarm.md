@@ -43,6 +43,14 @@ export SWARM_PORT=2375
 swarm join --addr=$LOCAL_HOST:$SWARM_PORT token://7b9fb5037919f89bd52c3c4888586be3
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
+On one server in your cluster, Start the swarm manager that listens to CPM
+requests:
+~~~~~~~~~~~~~~~~~~~~~~~~
+export MANAGER_HOST=192.168.0.103
+export MANAGER_PORT=8000
+swarm manage --host $MANAGER_HOST:$MANAGER_PORT token://7b9fb5037919f89bd52c3c4888586be3
+~~~~~~~~~~~~~~~~~~~~~~~~
+
 ###Test
 
 To see what servers are include in the swarm:
