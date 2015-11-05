@@ -74,6 +74,7 @@ func DiskDeleteClient(serverName string, req *DiskDeleteRequest) (DiskDeleteResp
 	return response, err
 }
 
+/**
 // DockerInspectClient client for performing a Docker inspect command
 func DockerInspectClient(serverName string, req *DockerInspectRequest) (DockerInspectResponse, error) {
 	var err error
@@ -156,6 +157,7 @@ func DockerRunClient(serverName string, req *DockerRunRequest) (DockerRunRespons
 	//fmt.Println(string(rawresponse))
 	return response, err
 }
+*/
 
 // MetricCPUClient client for getting the cpu metrics
 func MetricCPUClient(serverName string, req *MetricCPURequest) (MetricCPUResponse, error) {

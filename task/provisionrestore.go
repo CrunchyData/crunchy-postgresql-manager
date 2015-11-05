@@ -18,8 +18,8 @@ package task
 import (
 	"database/sql"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/swarmapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/types"
 )
 
@@ -34,8 +34,8 @@ func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 	logit.Info.Println("with containername=" + args.ContainerName)
 	logit.Info.Println("with profilename=" + args.ProfileName)
 
-	params := &cpmserverapi.DockerRunRequest{}
-	params.Image = "crunchydata/cpm-restore-job"
+	params := &swarmapi.DockerRunRequest{}
+	params.Image = "cpm-restore-job"
 	params.ServerID = args.ServerID
 	restorecontainername := args.ContainerName + "-restore-job"
 	params.ContainerName = restorecontainername
@@ -85,15 +85,15 @@ func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 	params.EnvVars["RestorePGPort"] = setting.Value
 
 	//run the container
-	params.CommandPath = "docker-run-restore.sh"
-	var response cpmserverapi.DockerRunResponse
-	var url = "http://" + server.IPAddress + ":10001"
-	response, err = cpmserverapi.DockerRunClient(url, params)
+	//params.CommandPath = "docker-run-restore.sh"
+	var response swarmapi.DockerRunResponse
+	//var url = "http://" + server.IPAddress + ":10001"
+	response, err = swarmapi.DockerRun(params)
 	if err != nil {
-		logit.Error.Println(response.Output)
+		logit.Error.Println(response.ID)
 		return err
 	}
-	logit.Info.Println("docker-run-restore.sh output=" + response.Output)
+	logit.Info.Println("docker-run-restore.sh output=" + response.ID)
 
 	return nil
 }

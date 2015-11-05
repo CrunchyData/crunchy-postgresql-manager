@@ -23,12 +23,12 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/swarmapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/template"
 	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -43,7 +43,7 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer dbConn.Close()
 
-	params := cpmserverapi.DockerRunRequest{}
+	params := swarmapi.DockerRunRequest{}
 	err = r.DecodeJsonPayload(&params)
 	if err != nil {
 		logit.Error.Println("error in decode" + err.Error())
@@ -124,7 +124,7 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
-func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, standby bool) (string, error) {
+func provisionImpl(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standby bool) (string, error) {
 	logit.Info.Println("PROFILE: provisionImpl starts 1")
 
 	var errorStr string
@@ -181,9 +181,9 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, standb
 
 	//remove any existing docker containers with this name
 	logit.Info.Println("PROFILE provisionImpl remove old container start")
-	rreq := &cpmserverapi.DockerRemoveRequest{}
+	rreq := &swarmapi.DockerRemoveRequest{}
 	rreq.ContainerName = params.ContainerName
-	_, err = cpmserverapi.DockerRemoveClient(server.Name, rreq)
+	_, err = swarmapi.DockerRemove(rreq)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return "", err
@@ -204,23 +204,26 @@ func provisionImpl(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, standb
 		params.EnvVars["RestoreSet"] = params.RestoreSet
 	}
 
-	logit.Info.Println("PROFILE provisionImpl remove old container end")
-	params.CommandPath = "docker-run.sh"
-	var resp cpmserverapi.DockerRunResponse
-	resp, err = cpmserverapi.DockerRunClient(server.Name, params)
+	//
+	runReq := swarmapi.DockerRunRequest{}
+	runReq.PGDataPath = params.PGDataPath
+	runReq.Image = params.Image
+	runReq.ContainerName = params.ContainerName
+	runReq.EnvVars = params.EnvVars
+	logit.Info.Println("CPU=" + params.CPU)
+	logit.Info.Println("MEM=" + params.MEM)
+	runReq.CPU = "0"
+	runReq.MEM = "0"
+	var runResp swarmapi.DockerRunResponse
+	runResp, err = swarmapi.DockerRun(&runReq)
 	if err != nil {
 		logit.Error.Println(err.Error())
-		logit.Error.Println(resp.Output)
 		return "", err
 	}
-	logit.Info.Println("docker-run.sh output=[" + resp.Output + "]")
-	logit.Info.Println("docker-run.sh trimmed output=[" + strings.TrimSpace(resp.Output) + "]")
-	logit.Info.Println("PROFILE provisionImpl end of docker-run")
-	if strings.TrimSpace(resp.Output) != "0" {
-		err = errors.New("bad return code from docker-run.sh")
-		logit.Error.Println(err.Error())
-		return "", err
-	}
+	logit.Info.Println("PROFILE provisionImpl created container " + runResp.ID)
+	//
+
+	logit.Info.Println("PROFILE provisionImpl remove old container end")
 
 	dbnode := types.Container{}
 	dbnode.ID = ""
@@ -315,7 +318,7 @@ func createDBUsers(dbConn *sql.DB, dbnode types.Container) error {
 	return err
 }
 
-func provisionImplInit(dbConn *sql.DB, params *cpmserverapi.DockerRunRequest, standby bool) error {
+func provisionImplInit(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standby bool) error {
 	//go get the domain name from the settings
 	var domainname types.Setting
 	var pgport types.Setting

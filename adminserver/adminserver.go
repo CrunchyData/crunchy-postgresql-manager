@@ -259,5 +259,5 @@ func main() {
 
 func GetVersion(w rest.ResponseWriter, r *rest.Request) {
 
-	w.(http.ResponseWriter).Write([]byte("0.9.6"))
+	w.(http.ResponseWriter).Write([]byte("0.9.8"))
 }

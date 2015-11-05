@@ -29,4 +29,4 @@ env > /tmp/envvars.out
 
 source /var/cpm/bin/setenv.sh
 
-taskserver  > /cpmlogs/taskserver.log
+taskserver  > /cpmlogs/taskserver.log 2> /cpmlogs/taskserver.err

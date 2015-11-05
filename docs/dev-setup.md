@@ -145,6 +145,13 @@ to specify your local IP address, then run the skybridge container:
 sudo ./sbin/run-skybridge.sh
 ~~~~~~~~~~~~~~~~~~~~
 
+Configure and Start Swarm
+-------------------------
+A swarm guide is available at:
+[docs/swarm.md](docs/swarm.md)
+
+Follow the swarm guide to setup and install a running Docker Swarm cluster
+on your development machine prior to running CPM.
 
 Start CPM Server Agent
 ----------------------
@@ -265,3 +272,67 @@ browse to the CPM API documentation:
 go get golang.org/x/tools/cmd/godoc
 godoc -http=:6060
 ~~~~~~~~~~~~~~~~~~~~
+
+
+Packaging
+=================
+
+
+Compile
+-------
+compile all the CPM source using
+~~~~~~~~~~~~~
+make build
+~~~~~~~~~~~~~~
+
+Build Images
+--------------------
+~~~~~~~~~~~~~
+make buildimages
+~~~~~~~~~~~~~~
+
+Pushing Images to DockerHub
+-------------------------------
+You have to tag the images you want to push, find the image tag, then
+run these commands, currently this is a manual step:
+~~~~~~~~~~~~~~~~~~~~~~~~~
+sudo docker tag -f c91ba0d8cb98 crunchydata/cpm-dashboard:0.9.7
+sudo docker push crunchydata/cpm-dashboard:0.9.7
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Build Archives
+-------------------------------
+run the sbin/basic-user-install-package.sh script, it will create an archive
+file for CPM, then upload it to the S3 site:
+~~~~~~~~~~~~~~~~~
+https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.7-linux-amd64.tar.gz
+~~~~~~~~~~~~~~~~~
+
+
+Logging
+=========================
+
+The CPM services log into the /var/cpm/logs directory on
+your docker host.
+
+This directory is initially created by the run-cpm.sh script.
+
+Logs are written to this directory by the following
+containers:
+
++ cpm
++ cpm-admin
++ cpm-collect
++ cpm-task
+
+Each container mounts 
+````````````
+/cpmlogs
+````````````
+
+Each startup script for the services now writes to /cpmlogs which gets
+mapped by Docker to /var/cpm/logs on the Docker host.
+
+
+
+

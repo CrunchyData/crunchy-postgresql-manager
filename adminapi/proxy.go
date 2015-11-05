@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/swarmapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
@@ -127,7 +127,7 @@ func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("ContainerName=" + proxyrequest.ContainerName)
 	logit.Info.Println("Standalone=" + proxyrequest.Standalone)
 
-	params := &cpmserverapi.DockerRunRequest{}
+	params := &swarmapi.DockerRunRequest{}
 	params.Image = proxyrequest.Image
 	params.ServerID = proxyrequest.ServerID
 	params.ProjectID = proxyrequest.ProjectID

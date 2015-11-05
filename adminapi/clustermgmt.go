@@ -24,6 +24,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/swarmapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/template"
 	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
@@ -91,7 +92,7 @@ func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Printf("standbyCnt ends at %d\n", standbyCnt)
 
 	//provision new container
-	params := new(cpmserverapi.DockerRunRequest)
+	params := new(swarmapi.DockerRunRequest)
 	params.Image = "cpm-node"
 	//TODO make the server choice smart
 	params.ServerID = containers[0].ServerID
@@ -731,10 +732,10 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		//outside of us, so we let it pass that we can't remove
 		//it
 		//err = removeContainer(server.IPAddress, containers[i].Name)
-		dremreq := &cpmserverapi.DockerRemoveRequest{}
+		dremreq := &swarmapi.DockerRemoveRequest{}
 		dremreq.ContainerName = containers[i].Name
 		logit.Info.Println("will attempt to delete container " + dremreq.ContainerName)
-		_, err = cpmserverapi.DockerRemoveClient(server.Name, dremreq)
+		_, err = swarmapi.DockerRemove(dremreq)
 		if err != nil {
 			logit.Error.Println("error when trying to remove container" + err.Error())
 		}
@@ -1070,7 +1071,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//create master container
-	dockermaster := cpmserverapi.DockerRunRequest{}
+	dockermaster := swarmapi.DockerRunRequest{}
 	dockermaster.Image = "cpm-node"
 	dockermaster.ContainerName = params.Name + "-master"
 	dockermaster.ServerID = masterServer.ID
@@ -1135,7 +1136,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	dockerstandby := make([]cpmserverapi.DockerRunRequest, count)
+	dockerstandby := make([]swarmapi.DockerRunRequest, count)
 	for i := 0; i < count; i++ {
 		logit.Info.Println("working on standby ....")
 		//	loop - provision standby
@@ -1173,7 +1174,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("AUTO CLUSTER PROFILE standbys created")
 	//create pgpool container
 	//	provision
-	dockerpgpool := cpmserverapi.DockerRunRequest{}
+	dockerpgpool := swarmapi.DockerRunRequest{}
 	dockerpgpool.ContainerName = params.Name + "-pgpool"
 	dockerpgpool.Image = "cpm-pgpool"
 	dockerpgpool.ServerID = chosenServers[count].ID
@@ -1337,7 +1338,7 @@ func roundRobin(dbConn *sql.DB, profile types.ClusterProfiles) (types.Server, []
 	return masterServer, chosen, nil
 }
 
-func waitTillAllReady(dockermaster cpmserverapi.DockerRunRequest, dockerpgpool cpmserverapi.DockerRunRequest, dockerstandby []cpmserverapi.DockerRunRequest, sleepTime time.Duration) error {
+func waitTillAllReady(dockermaster swarmapi.DockerRunRequest, dockerpgpool swarmapi.DockerRunRequest, dockerstandby []swarmapi.DockerRunRequest, sleepTime time.Duration) error {
 	err := waitTillReady(dockermaster.ContainerName, sleepTime)
 	if err != nil {
 		logit.Error.Println("time out waiting for " + dockermaster.ContainerName)
@@ -1400,10 +1401,11 @@ func StartCluster(w rest.ResponseWriter, r *rest.Request) {
 	i := 0
 
 	i = 0
-	var response cpmserverapi.DockerStartResponse
-	server := types.Server{}
+	var response swarmapi.DockerStartResponse
+	//server := types.Server{}
 	for i = range containers {
 
+		/**
 		//go get the docker server IPAddress
 		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
 		if err != nil {
@@ -1411,13 +1413,13 @@ func StartCluster(w rest.ResponseWriter, r *rest.Request) {
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-
 		logit.Info.Println("StartCluster: got server IP " + server.IPAddress)
+		*/
 
-		req := &cpmserverapi.DockerStartRequest{}
+		req := &swarmapi.DockerStartRequest{}
 		req.ContainerName = containers[i].Name
 		logit.Info.Println("will attempt to start container " + req.ContainerName)
-		response, err = cpmserverapi.DockerStartClient(server.Name, req)
+		response, err = swarmapi.DockerStart(req)
 		if err != nil {
 			logit.Error.Println("StartCluster: error when trying to start container" + err.Error())
 		}
@@ -1473,10 +1475,11 @@ func StopCluster(w rest.ResponseWriter, r *rest.Request) {
 	i := 0
 
 	i = 0
-	var response cpmserverapi.DockerStopResponse
-	server := types.Server{}
+	var response swarmapi.DockerStopResponse
+	//server := types.Server{}
 	for i = range containers {
 
+		/**
 		//go get the docker server IPAddress
 		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
 		if err != nil {
@@ -1486,11 +1489,12 @@ func StopCluster(w rest.ResponseWriter, r *rest.Request) {
 		}
 
 		logit.Info.Println("StopCluster: got server IP " + server.IPAddress)
+		*/
 
-		req := &cpmserverapi.DockerStopRequest{}
+		req := &swarmapi.DockerStopRequest{}
 		req.ContainerName = containers[i].Name
 		logit.Info.Println("will attempt to stop container " + req.ContainerName)
-		response, err = cpmserverapi.DockerStopClient(server.Name, req)
+		response, err = swarmapi.DockerStop(req)
 		if err != nil {
 			logit.Error.Println("StopCluster: error when trying to stop container" + err.Error())
 		}

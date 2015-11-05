@@ -21,6 +21,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/swarmapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"time"
 )
@@ -50,8 +51,8 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 	logit.Info.Println("with containername=" + args.ContainerName)
 	logit.Info.Println("with profilename=" + args.ProfileName)
 
-	params := &cpmserverapi.DockerRunRequest{}
-	params.Image = "crunchydata/cpm-backup-job"
+	params := &swarmapi.DockerRunRequest{}
+	params.Image = "cpm-backup-job"
 	params.ServerID = args.ServerID
 	backupcontainername := args.ContainerName + "-backup"
 	params.ContainerName = backupcontainername
@@ -115,14 +116,14 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 	}
 
 	//run the container
-	params.CommandPath = "docker-run-backup.sh"
-	var response cpmserverapi.DockerRunResponse
-	response, err = cpmserverapi.DockerRunClient(server.Name, params)
+	//params.CommandPath = "docker-run-backup.sh"
+	var response swarmapi.DockerRunResponse
+	response, err = swarmapi.DockerRun(params)
 	if err != nil {
-		logit.Error.Println(response.Output)
+		logit.Error.Println(response.ID)
 		return err
 	}
-	logit.Info.Println("docker-run-backup.sh output=" + response.Output)
+	logit.Info.Println("docker-run-backup.sh output=" + response.ID)
 
 	return nil
 }

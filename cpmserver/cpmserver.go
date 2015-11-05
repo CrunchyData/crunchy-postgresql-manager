@@ -44,11 +44,6 @@ func main() {
 		&rest.Route{"POST", "/metrics/df", cpmserverapi.MetricDf},
 		&rest.Route{"POST", "/metrics/mem", cpmserverapi.MetricMEM},
 		&rest.Route{"POST", "/metrics/cpu", cpmserverapi.MetricCPU},
-		&rest.Route{"POST", "/docker/inspect", cpmserverapi.DockerInspect},
-		&rest.Route{"POST", "/docker/remove", cpmserverapi.DockerRemove},
-		&rest.Route{"POST", "/docker/start", cpmserverapi.DockerStart},
-		&rest.Route{"POST", "/docker/stop", cpmserverapi.DockerStop},
-		&rest.Route{"POST", "/docker/run", cpmserverapi.DockerRun},
 		&rest.Route{"POST", "/disk/provision", cpmserverapi.DiskProvision},
 		&rest.Route{"POST", "/disk/delete", cpmserverapi.DiskDelete},
 	)

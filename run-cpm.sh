@@ -60,6 +60,7 @@ docker run -e DB_HOST=cpm-admin \
 	--hostname="cpm-admin" \
 	-p 192.168.56.103:14001:13001 \
 	-e DOMAIN=crunchy.lab \
+	-e SWARM_MANAGER_URL=tcp://192.168.0.106:8000 \
 	-e CPMBASE=/var/cpm \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cpm-admin -d  \
@@ -74,6 +75,7 @@ docker rm cpm-task
 docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-v $LOGDIR:/cpmlogs \
 	-e CPMBASE=/var/cpm \
+	-e SWARM_MANAGER_URL=tcp://192.168.0.106:8000 \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cpm-task -d crunchydata/cpm-task:latest
 

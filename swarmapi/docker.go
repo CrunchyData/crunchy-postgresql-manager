@@ -20,7 +20,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	dockerapi "github.com/fsouza/go-dockerclient"
 	"os"
-	"strconv"
+	//"strconv"
 )
 
 type DockerInspectRequest struct {
@@ -250,18 +250,20 @@ func DockerRun(req *DockerRunRequest) (DockerRunResponse, error) {
 	options.HostConfig = &hostConfig
 	options.Name = req.ContainerName
 	options.Config.Env = envvars
-	options.Config.Image = "crunchydata/" + req.ContainerType
+	options.Config.Image = "crunchydata/" + req.Image
+	logit.Info.Println("swarmapi using " + options.Config.Image + " as the image name")
 	options.Config.Volumes = make(map[string]struct{})
-	options.HostConfig.CPUShares, err = strconv.ParseInt(req.CPU, 0, 64)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return response, err
-	}
-	options.HostConfig.Memory, err = strconv.ParseInt(req.MEM, 0, 64)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return response, err
-	}
+
+	//TODO figure out cpu shares and memory settings, these are different
+	//than what I was using before due to me using the docker api directly
+	//with this swarm implementation...use the defaults for now
+
+	//options.HostConfig.CPUShares, err = strconv.ParseInt(req.CPU, 0, 64)
+	//if err != nil {
+	//logit.Error.Println(err.Error())
+	//return response, err
+	//}
+	//options.HostConfig.Memory = req.MEM
 
 	options.HostConfig.Binds = make([]string, 2)
 	options.HostConfig.Binds[0] = req.PGDataPath + ":/pgdata"

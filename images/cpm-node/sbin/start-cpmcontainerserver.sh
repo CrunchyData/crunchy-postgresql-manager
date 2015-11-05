@@ -22,7 +22,7 @@ source /var/cpm/bin/setenv.sh
 # when the container starts, see if there is a pg instance we can start up
 if [ -f /pgdata/postgresql.conf ]; then
 	rm /pgdata/postmaster.pid
-	pg_ctl -D /pgdata start
+	su - postgres -c 'source /var/cpm/bin/setenv.sh && pg_ctl -D /pgdata start'
 fi
 
 cpmcontainerserver 

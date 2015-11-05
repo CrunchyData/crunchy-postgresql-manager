@@ -24,6 +24,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/swarmapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
@@ -73,6 +74,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	var currentStatus = "UNKNOWN"
 
 	//go get the docker server IPAddress
+	/**
 	server := types.Server{}
 	server, err = admindb.GetServer(dbConn, node.ServerID)
 	if err != nil {
@@ -80,10 +82,11 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	*/
 
-	request := &cpmserverapi.DockerInspectRequest{}
+	request := &swarmapi.DockerInspectRequest{}
 	request.ContainerName = node.Name
-	_, err = cpmserverapi.DockerInspectClient(server.Name, request)
+	_, err = swarmapi.DockerInspect(request)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		currentStatus = CONTAINER_NOT_FOUND
@@ -357,9 +360,9 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 	//outside of us, so we let it pass that we can't remove
 	//it
 
-	request := &cpmserverapi.DockerRemoveRequest{}
+	request := &swarmapi.DockerRemoveRequest{}
 	request.ContainerName = dbNode.Name
-	_, err = cpmserverapi.DockerRemoveClient(server.Name, request)
+	_, err = swarmapi.DockerRemove(request)
 	if err != nil {
 		logit.Error.Println(err.Error())
 	}
@@ -414,14 +417,7 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	server, err2 := admindb.GetServer(dbConn, serverID)
-	if err2 != nil {
-		logit.Error.Println(err2.Error())
-		rest.Error(w, err2.Error(), http.StatusBadRequest)
-		return
-	}
-
-	var response cpmserverapi.DockerInspectResponse
+	var response swarmapi.DockerInspectResponse
 	var e error
 	nodes := make([]types.ClusterNode, len(results))
 	i := 0
@@ -438,9 +434,9 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].ServerName = results[i].ServerName
 		nodes[i].Status = "down"
 
-		request := &cpmserverapi.DockerInspectRequest{}
+		request := &swarmapi.DockerInspectRequest{}
 		request.ContainerName = results[i].Name
-		response, e = cpmserverapi.DockerInspectClient(server.Name, request)
+		response, e = swarmapi.DockerInspect(request)
 		logit.Info.Println("GetAllNodesForServer:" + results[i].Name + " " + response.IPAddress + " " + response.RunningState)
 		if e != nil {
 			logit.Error.Println(e.Error())
@@ -489,6 +485,7 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	/**
 	server := types.Server{}
 	server, err = admindb.GetServer(dbConn, node.ServerID)
 	if err != nil {
@@ -496,11 +493,12 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	*/
 
-	var response cpmserverapi.DockerStartResponse
-	request := &cpmserverapi.DockerStartRequest{}
+	var response swarmapi.DockerStartResponse
+	request := &swarmapi.DockerStartRequest{}
 	request.ContainerName = node.Name
-	response, err = cpmserverapi.DockerStartClient(server.Name, request)
+	response, err = swarmapi.DockerStart(request)
 	if err != nil {
 		logit.Error.Println(err.Error())
 	}
@@ -545,6 +543,7 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	/**
 	server := types.Server{}
 	server, err = admindb.GetServer(dbConn, node.ServerID)
 	if err != nil {
@@ -552,10 +551,11 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	*/
 
-	request := &cpmserverapi.DockerStopRequest{}
+	request := &swarmapi.DockerStopRequest{}
 	request.ContainerName = node.Name
-	_, err = cpmserverapi.DockerStopClient(server.Name, request)
+	_, err = swarmapi.DockerStop(request)
 	if err != nil {
 		logit.Error.Println(err.Error())
 	}
@@ -638,6 +638,7 @@ func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	//can be removed outside of CPM's control
 
 	for i := range containers {
+		/**
 		//fetch the server
 		server := types.Server{}
 		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
@@ -646,13 +647,14 @@ func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+		*/
 
 		//start the container
-		var response cpmserverapi.DockerStartResponse
+		var response swarmapi.DockerStartResponse
 		var err error
-		request := &cpmserverapi.DockerStartRequest{}
+		request := &swarmapi.DockerStartRequest{}
 		request.ContainerName = containers[i].Name
-		response, err = cpmserverapi.DockerStartClient(server.Name, request)
+		response, err = swarmapi.DockerStart(request)
 		if err != nil {
 			logit.Error.Println("AdminStartServerContainers: error when trying to start container " + err.Error())
 		}
@@ -703,6 +705,7 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 
 	//for each, get server, stop container
 	for i := range containers {
+		/**
 		server := types.Server{}
 		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
 		if err != nil {
@@ -710,6 +713,7 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+		*/
 
 		//send stop command before stopping container
 		if containers[i].Role == "pgpool" {
@@ -731,9 +735,9 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 		time.Sleep(sleepTime)
 
 		//stop container
-		request := &cpmserverapi.DockerStopRequest{}
+		request := &swarmapi.DockerStopRequest{}
 		request.ContainerName = containers[i].Name
-		_, err = cpmserverapi.DockerStopClient(server.Name, request)
+		_, err = swarmapi.DockerStop(request)
 		if err != nil {
 			logit.Error.Println("AdminStopServerContainers: error when trying to start container " + err.Error())
 		}
