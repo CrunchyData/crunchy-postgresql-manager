@@ -18,6 +18,7 @@ package main
 import (
 	"fmt"
 	"github.com/crunchydata/crunchy-postgresql-manager/swarmapi"
+	"os"
 )
 
 func main() {
@@ -25,6 +26,11 @@ func main() {
 	fmt.Println("at top of testswarm main")
 
 	var err error
+
+	//var infoResponse swarmapi.DockerInfoResponse
+	_, err = swarmapi.DockerInfo()
+	os.Exit(0)
+
 	inspectReq := swarmapi.DockerInspectRequest{}
 	inspectReq.ContainerName = "cpm"
 	var inspectResp swarmapi.DockerInspectResponse

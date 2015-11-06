@@ -16,6 +16,7 @@
 package swarmapi
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	dockerapi "github.com/fsouza/go-dockerclient"
@@ -46,6 +47,10 @@ type DockerStopRequest struct {
 	ContainerName string
 }
 type DockerStopResponse struct {
+	Output string
+}
+
+type DockerInfoResponse struct {
 	Output string
 }
 
@@ -312,5 +317,54 @@ func DockerRun(req *DockerRunRequest) (DockerRunResponse, error) {
 	//req.Image, req.CPU, req.MEM, allEnvVars)
 
 	response.ID = container.ID
+	return response, nil
+}
+
+type NameValue struct {
+	Name  string
+	Value string
+}
+
+type Thing struct {
+	Things []NameValue
+}
+
+func DockerInfo() (DockerInfoResponse, error) {
+	response := DockerInfoResponse{}
+	var err error
+	swarmURL := os.Getenv("SWARM_MANAGER_URL")
+	if swarmURL == "" {
+		logit.Error.Println("SWARM_MANAGER_URL not set")
+		return response, errors.New("SWARM_MANAGER_URL not set")
+	}
+
+	logit.Info.Println("DockerInfo called")
+
+	docker, err := dockerapi.NewClient(swarmURL)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return response, err
+	}
+
+	env, err4 := docker.Info()
+	if err4 != nil {
+		logit.Error.Println(err4.Error())
+		return response, nil
+	}
+	envs := env.Map()
+	for k, v := range envs {
+		logit.Info.Printf("%s=%q\n", k, v)
+	}
+	driverStatus := env.Get("DriverStatus")
+	logit.Info.Println("DriverStatus is " + driverStatus)
+
+	b := []byte(driverStatus)
+	mylist := make([][]string, 0)
+	json.Unmarshal(b, &mylist)
+	logit.Info.Print("mylist len is %d\n", len(mylist))
+	for index, each := range mylist {
+		logit.Info.Printf("index=%d each=%s\n", index, each)
+	}
+
 	return response, nil
 }
