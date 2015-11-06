@@ -269,7 +269,6 @@ angular.module('uiRouterSample.servers', [
                                 newserver.ID = '0';
                                 newserver.Name = 'newserver';
                                 newserver.IPAddress = '1.1.1.1';
-                                newserver.DockerBridgeIP = '172.17.42.1';
                                 newserver.ServerClass = 'low';
                                 newserver.CreateDate = '00';
                                 $scope.server = newserver;

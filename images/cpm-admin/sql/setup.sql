@@ -115,6 +115,7 @@ insert into secroleperm values ('superuser', 'perm-backup');
 insert into secroleperm values ('superuser', 'perm-user');
 
 
+insert into settings (name, value, description, updatedt) values ('DOCKER-BRIDGES', '172.17.42.1:172.18.42.1', 'docker bridges to allow in the pg_hba.conf', now());
 insert into settings (name, value, description, updatedt) values ('PG-DATA-PATH', '/var/cpm/data/pgsql', 'file path root of PG data files', now());
 insert into settings (name, value, description, updatedt) values ('S-DOCKER-PROFILE-CPU', '256', 'small Docker profile CPU shares', now());
 insert into settings (name, value, description, updatedt) values ('S-DOCKER-PROFILE-MEM', '512m', 'small Docker profile Memory limit', now());

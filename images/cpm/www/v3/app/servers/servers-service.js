@@ -90,13 +90,11 @@ angular.module('uiRouterSample.servers.service', ['ngCookies'])
     serversFactory.add = function(server) {
 
         var cleanip = server.IPAddress.replace(/\./g, "_");
-        var cleandockerip = server.DockerBridgeIP.replace(/\./g, "_");
 
         var url = $cookieStore.get('AdminURL') + '/addserver/' +
             server.ID + '.' +
             server.Name + '.' +
             cleanip + '.' +
-            cleandockerip + '.' +
             server.ServerClass + '.' + $cookieStore.get('cpm_token');
         console.log(url);
 

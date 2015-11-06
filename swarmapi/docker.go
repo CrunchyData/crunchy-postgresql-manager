@@ -78,19 +78,16 @@ type DockerRunResponse struct {
 	ID string
 }
 
-var swarmURL string
-
-func init() {
-	swarmURL = os.Getenv("SWARM_MANAGER_URL")
-	if swarmURL == "" {
-		logit.Error.Println("SWARM_MANAGER_URL is not set")
-	}
-}
-
 // DockerInspect perform a Docker inspect
 func DockerInspect(req *DockerInspectRequest) (DockerInspectResponse, error) {
 	response := DockerInspectResponse{}
 	var err error
+	swarmURL := os.Getenv("SWARM_MANAGER_URL")
+	if swarmURL == "" {
+		logit.Error.Println("SWARM_MANAGER_URL not set")
+		return response, errors.New("SWARM_MANAGER_URL not set")
+	}
+
 	logit.Info.Println("DockerInspect called")
 
 	if req.ContainerName == "" {
@@ -137,6 +134,11 @@ func DockerRemove(req *DockerRemoveRequest) (DockerRemoveResponse, error) {
 	response := DockerRemoveResponse{}
 	var err error
 	logit.Info.Println("DockerRemove called")
+	swarmURL := os.Getenv("SWARM_MANAGER_URL")
+	if swarmURL == "" {
+		logit.Error.Println("SWARM_MANAGER_URL not set")
+		return response, errors.New("SWARM_MANAGER_URL not set")
+	}
 
 	//if a container exists with that name, then we need
 	//to stop it first and then remove it
@@ -162,7 +164,7 @@ func DockerRemove(req *DockerRemoveRequest) (DockerRemoveResponse, error) {
 		err3 = docker.StopContainer(req.ContainerName, 10)
 		if err3 != nil {
 			logit.Error.Println("can't stop container " + req.ContainerName)
-			return response, err3
+			logit.Error.Println(err3.Error())
 		}
 		logit.Info.Println("during remove....container stopped ")
 		opts := dockerapi.RemoveContainerOptions{ID: req.ContainerName}
@@ -184,6 +186,11 @@ func DockerStart(req *DockerStartRequest) (DockerStartResponse, error) {
 	var response DockerStartResponse
 
 	logit.Info.Println("DockerStart called")
+	swarmURL := os.Getenv("SWARM_MANAGER_URL")
+	if swarmURL == "" {
+		logit.Error.Println("SWARM_MANAGER_URL not set")
+		return response, errors.New("SWARM_MANAGER_URL not set")
+	}
 
 	docker, err := dockerapi.NewClient(swarmURL)
 	if err != nil {
@@ -204,6 +211,11 @@ func DockerStart(req *DockerStartRequest) (DockerStartResponse, error) {
 func DockerStop(req *DockerStopRequest) (DockerStopResponse, error) {
 	var response DockerStopResponse
 	logit.Info.Println("DockerStop called")
+	swarmURL := os.Getenv("SWARM_MANAGER_URL")
+	if swarmURL == "" {
+		logit.Error.Println("SWARM_MANAGER_URL not set")
+		return response, errors.New("SWARM_MANAGER_URL not set")
+	}
 
 	docker, err := dockerapi.NewClient(swarmURL)
 	if err != nil {
@@ -224,6 +236,11 @@ func DockerStop(req *DockerStopRequest) (DockerStopResponse, error) {
 func DockerRun(req *DockerRunRequest) (DockerRunResponse, error) {
 	response := DockerRunResponse{}
 	logit.Info.Println("DockerRun called")
+	swarmURL := os.Getenv("SWARM_MANAGER_URL")
+	if swarmURL == "" {
+		logit.Error.Println("SWARM_MANAGER_URL not set")
+		return response, errors.New("SWARM_MANAGER_URL not set")
+	}
 
 	var envvars []string
 	var i = 0

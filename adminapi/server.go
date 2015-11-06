@@ -54,7 +54,7 @@ func GetServer(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	server := types.Server{results.ID, results.Name, results.IPAddress,
-		results.DockerBridgeIP, results.ServerClass, results.CreateDate, ""}
+		results.ServerClass, results.CreateDate, ""}
 	logit.Info.Println("GetServer: results=" + results.ID)
 
 	w.WriteJson(&server)
@@ -79,10 +79,9 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	CreateDate := ""
-	server := types.Server{r.PathParam("ID"), r.PathParam("Name"), r.PathParam("IPAddress"), r.PathParam("DockerBridgeIP"), r.PathParam("ServerClass"), CreateDate, ""}
+	server := types.Server{r.PathParam("ID"), r.PathParam("Name"), r.PathParam("IPAddress"), r.PathParam("ServerClass"), CreateDate, ""}
 
 	server.IPAddress = strings.Replace(server.IPAddress, "_", ".", -1)
-	server.DockerBridgeIP = strings.Replace(server.DockerBridgeIP, "_", ".", -1)
 
 	if server.Name == "" {
 		logit.Error.Println("AddServer: error server name required")
@@ -108,14 +107,10 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 			rest.Error(w, "IP Address already used by another server", http.StatusBadRequest)
 			return
 		}
-		if servers[i].DockerBridgeIP == server.DockerBridgeIP {
-			rest.Error(w, "Docker Bridge IP Address already used by another server", http.StatusBadRequest)
-			return
-		}
 	}
 
 	dbserver := types.Server{server.ID, server.Name, server.IPAddress,
-		server.DockerBridgeIP, server.ServerClass, CreateDate, ""}
+		server.ServerClass, CreateDate, ""}
 	if dbserver.ID == "0" {
 		strid, err := admindb.InsertServer(dbConn, dbserver)
 		newid := strconv.Itoa(strid)
@@ -231,7 +226,6 @@ func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 		servers[i].ID = results[i].ID
 		servers[i].Name = results[i].Name
 		servers[i].IPAddress = results[i].IPAddress
-		servers[i].DockerBridgeIP = results[i].DockerBridgeIP
 		servers[i].ServerClass = results[i].ServerClass
 		servers[i].CreateDate = results[i].CreateDate
 		i++

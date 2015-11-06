@@ -116,6 +116,12 @@ func Hba(dbConn *sql.DB, mode string, hostname string, port string, clusterid st
 	hbaInfo.ADMIN_HOST = "cpm-admin." + domainname
 	hbaInfo.RULES_LIST = cars
 
+	bridges, err := admindb.GetSetting(dbConn, "DOCKER-BRIDGES")
+	if err != nil {
+		logit.Error.Println("Hba:" + err.Error())
+		return "", err
+	}
+
 	servers, err := admindb.GetAllServers(dbConn)
 	if err != nil {
 		logit.Error.Println("Hba:" + err.Error())
@@ -124,15 +130,16 @@ func Hba(dbConn *sql.DB, mode string, hostname string, port string, clusterid st
 
 	i := 0
 	var allservers = ""
-	var allbridges = ""
+	//TODO make this configurable as a setting value
+	var allbridges = bridges.Value
 	for i = range servers {
 		logit.Info.Println("Hba:" + servers[i].IPAddress)
 		if allservers == "" {
 			allservers = servers[i].IPAddress
-			allbridges = servers[i].DockerBridgeIP
+			//allbridges = servers[i].DockerBridgeIP
 		} else {
 			allservers = allservers + ":" + servers[i].IPAddress
-			allbridges = allbridges + ":" + servers[i].DockerBridgeIP
+			//allbridges = allbridges + ":" + servers[i].DockerBridgeIP
 		}
 	}
 	logit.Info.Println("Hba:processing serverlist=" + allservers)

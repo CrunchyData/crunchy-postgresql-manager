@@ -41,13 +41,12 @@ type Settings struct {
 	Token          string
 }
 type Server struct {
-	ID             string //unique key
-	Name           string //server name
-	IPAddress      string //server ip address
-	DockerBridgeIP string //the docker bridge IP range that is assigned to this server
-	ServerClass    string //the class of the server, small, medium, large
-	CreateDate     string
-	NodeCount      string //calculated value of the number of containers assigned to this server
+	ID          string //unique key
+	Name        string //server name
+	IPAddress   string //server ip address
+	ServerClass string //the class of the server, small, medium, large
+	CreateDate  string
+	NodeCount   string //calculated value of the number of containers assigned to this server
 }
 
 type Project struct {

@@ -36,6 +36,7 @@ func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 	restorecontainername := args.ContainerName + "-restore-job"
 	params.ContainerName = restorecontainername
 	params.Standalone = "false"
+	params.Profile = "small"
 
 	schedule, err := GetSchedule(dbConn, args.ScheduleID)
 	if err != nil {

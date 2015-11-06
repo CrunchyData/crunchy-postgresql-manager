@@ -33,7 +33,7 @@ func GetServer(dbConn *sql.DB, id string) (types.Server, error) {
 	//logit.Info.Println("GetServer called with id=" + id)
 	server := types.Server{}
 
-	err := dbConn.QueryRow(fmt.Sprintf("select id, name, ipaddress, dockerbip,  serverclass, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from server where id=%s", id)).Scan(&server.ID, &server.Name, &server.IPAddress, &server.DockerBridgeIP, &server.ServerClass, &server.CreateDate)
+	err := dbConn.QueryRow(fmt.Sprintf("select id, name, ipaddress, serverclass, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from server where id=%s", id)).Scan(&server.ID, &server.Name, &server.IPAddress, &server.ServerClass, &server.CreateDate)
 	switch {
 	case err == sql.ErrNoRows:
 		logit.Info.Println("admindb:GetServer:no server with that id")
@@ -601,7 +601,7 @@ func GetAllServers(dbConn *sql.DB) ([]types.Server, error) {
 	logit.Info.Println("admindb:GetAllServer:called")
 	var rows *sql.Rows
 	var err error
-	rows, err = dbConn.Query("select id, name, ipaddress, dockerbip,  serverclass, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from server order by name")
+	rows, err = dbConn.Query("select id, name, ipaddress, serverclass, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from server order by name")
 	if err != nil {
 		return nil, err
 	}
@@ -610,7 +610,7 @@ func GetAllServers(dbConn *sql.DB) ([]types.Server, error) {
 	for rows.Next() {
 		server := types.Server{}
 		if err = rows.Scan(&server.ID, &server.Name,
-			&server.IPAddress, &server.DockerBridgeIP, &server.ServerClass, &server.CreateDate); err != nil {
+			&server.IPAddress, &server.ServerClass, &server.CreateDate); err != nil {
 			return nil, err
 		}
 		servers = append(servers, server)
@@ -627,7 +627,7 @@ func GetAllServersByClassByCount(dbConn *sql.DB) ([]types.Server, error) {
 	logit.Info.Println("admindb:GetAllServerByClassByCount:called")
 	var rows *sql.Rows
 	var err error
-	rows, err = dbConn.Query("select s.id, s.name, s.ipaddress, s.dockerbip,  s.serverclass, to_char(s.createdt, 'MM-DD-YYYY HH24:MI:SS'), count(n) from server s left join container n on s.id = n.serverid group by s.id  order by s.serverclass, count(n)")
+	rows, err = dbConn.Query("select s.id, s.name, s.ipaddress, s.serverclass, to_char(s.createdt, 'MM-DD-YYYY HH24:MI:SS'), count(n) from server s left join container n on s.id = n.serverid group by s.id  order by s.serverclass, count(n)")
 	if err != nil {
 		return nil, err
 	}
@@ -636,7 +636,7 @@ func GetAllServersByClassByCount(dbConn *sql.DB) ([]types.Server, error) {
 	for rows.Next() {
 		server := types.Server{}
 		if err = rows.Scan(&server.ID, &server.Name,
-			&server.IPAddress, &server.DockerBridgeIP, &server.ServerClass, &server.CreateDate, &server.NodeCount); err != nil {
+			&server.IPAddress, &server.ServerClass, &server.CreateDate, &server.NodeCount); err != nil {
 			return nil, err
 		}
 		servers = append(servers, server)
@@ -650,7 +650,7 @@ func GetAllServersByClassByCount(dbConn *sql.DB) ([]types.Server, error) {
 // UpdateServer updates a given server
 func UpdateServer(dbConn *sql.DB, server types.Server) error {
 	logit.Info.Println("admindb:UpdateServer:called")
-	queryStr := fmt.Sprintf("update server set ( name, ipaddress,  serverclass, dockerbip) = ('%s', '%s', '%s', '%s', '%s') where id = %s returning id", server.Name, server.IPAddress, server.ServerClass, server.DockerBridgeIP, server.ID)
+	queryStr := fmt.Sprintf("update server set ( name, ipaddress,  serverclass ) = ('%s', '%s', '%s', '%s') where id = %s returning id", server.Name, server.IPAddress, server.ServerClass, server.ID)
 
 	logit.Info.Println("admindb:UpdateServer:update str=" + queryStr)
 	var serverid int
@@ -668,7 +668,7 @@ func UpdateServer(dbConn *sql.DB, server types.Server) error {
 // InsertServer inserts a new server object
 func InsertServer(dbConn *sql.DB, server types.Server) (int, error) {
 	//logit.Info.Println("admindb:InsertServer:called")
-	queryStr := fmt.Sprintf("insert into server ( name, ipaddress,  serverclass, dockerbip, createdt) values ( '%s', '%s', '%s', '%s', now()) returning id", server.Name, server.IPAddress, server.ServerClass, server.DockerBridgeIP)
+	queryStr := fmt.Sprintf("insert into server ( name, ipaddress,  serverclass, createdt) values ( '%s', '%s', '%s',  now()) returning id", server.Name, server.IPAddress, server.ServerClass)
 
 	logit.Info.Println("admindb:InsertServer:" + queryStr)
 	var serverid int

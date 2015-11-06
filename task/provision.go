@@ -53,6 +53,14 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 	backupcontainername := args.ContainerName + "-backup"
 	params.ContainerName = backupcontainername
 	params.Standalone = "false"
+	params.Profile = "small"
+
+	//remove the prior backup job if it exists
+	removeParams := &swarmapi.DockerRemoveRequest{}
+	removeParams.ContainerName = params.ContainerName
+	var removeResponse swarmapi.DockerRemoveResponse
+	removeResponse, err = swarmapi.DockerRemove(removeParams)
+	logit.Info.Println("docker remove response " + removeResponse.Output)
 
 	var pgdatapath types.Setting
 	pgdatapath, err = admindb.GetSetting(dbConn, "PG-DATA-PATH")
