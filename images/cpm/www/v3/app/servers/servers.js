@@ -270,7 +270,6 @@ angular.module('uiRouterSample.servers', [
                                 newserver.Name = 'newserver';
                                 newserver.IPAddress = '1.1.1.1';
                                 newserver.DockerBridgeIP = '172.17.42.1';
-                                newserver.PGDataPath = '/var/cpm/data/pgsql';
                                 newserver.ServerClass = 'low';
                                 newserver.CreateDate = '00';
                                 $scope.server = newserver;

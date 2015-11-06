@@ -102,8 +102,8 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 		logit.Info.Println("pinging db finished")
 	}
 
-	clusternode := types.ClusterNode{node.ID, node.ClusterID, node.ServerID,
-		node.Name, node.Role, node.Image, node.CreateDate, currentStatus, node.ProjectID, node.ProjectName, node.ServerName, node.ClusterName}
+	clusternode := types.ClusterNode{node.ID, node.ClusterID,
+		node.Name, node.Role, node.Image, node.CreateDate, currentStatus, node.ProjectID, node.ProjectName, node.ClusterName}
 
 	w.WriteJson(clusternode)
 }
@@ -144,13 +144,11 @@ func GetAllNodesForProject(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].ID = results[i].ID
 		nodes[i].Name = results[i].Name
 		nodes[i].ClusterID = results[i].ClusterID
-		nodes[i].ServerID = results[i].ServerID
 		nodes[i].Role = results[i].Role
 		nodes[i].Image = results[i].Image
 		nodes[i].CreateDate = results[i].CreateDate
 		nodes[i].ProjectID = results[i].ProjectID
 		nodes[i].ProjectName = results[i].ProjectName
-		nodes[i].ServerName = results[i].ServerName
 		nodes[i].ClusterName = results[i].ClusterName
 		//nodes[i].Status = "UNKNOWN"
 		i++
@@ -189,13 +187,11 @@ func GetAllNodes(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].ID = results[i].ID
 		nodes[i].Name = results[i].Name
 		nodes[i].ClusterID = results[i].ClusterID
-		nodes[i].ServerID = results[i].ServerID
 		nodes[i].Role = results[i].Role
 		nodes[i].Image = results[i].Image
 		nodes[i].CreateDate = results[i].CreateDate
 		nodes[i].ProjectID = results[i].ProjectID
 		nodes[i].ProjectName = results[i].ProjectName
-		nodes[i].ServerName = results[i].ServerName
 		nodes[i].ClusterName = results[i].ClusterName
 		//nodes[i].Status = "UNKNOWN"
 		i++
@@ -234,13 +230,11 @@ func GetAllNodesNotInCluster(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].ID = results[i].ID
 		nodes[i].Name = results[i].Name
 		nodes[i].ClusterID = results[i].ClusterID
-		nodes[i].ServerID = results[i].ServerID
 		nodes[i].Role = results[i].Role
 		nodes[i].Image = results[i].Image
 		nodes[i].CreateDate = results[i].CreateDate
 		nodes[i].ProjectID = results[i].ProjectID
 		nodes[i].ProjectName = results[i].ProjectName
-		nodes[i].ServerName = results[i].ServerName
 		nodes[i].ClusterName = results[i].ClusterName
 		//nodes[i].Status = "UNKNOWN"
 		i++
@@ -286,13 +280,11 @@ func GetAllNodesForCluster(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].ID = results[i].ID
 		nodes[i].Name = results[i].Name
 		nodes[i].ClusterID = results[i].ClusterID
-		nodes[i].ServerID = results[i].ServerID
 		nodes[i].Role = results[i].Role
 		nodes[i].Image = results[i].Image
 		nodes[i].CreateDate = results[i].CreateDate
 		nodes[i].ProjectID = results[i].ProjectID
 		nodes[i].ProjectName = results[i].ProjectName
-		nodes[i].ServerName = results[i].ServerName
 		nodes[i].ClusterName = results[i].ClusterName
 		//nodes[i].Status = "UNKNOWN"
 		i++
@@ -338,9 +330,15 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	//go get the docker server IPAddress
-	server := types.Server{}
-	server, err = admindb.GetServer(dbConn, dbNode.ServerID)
+	var servers []types.Server
+	servers, err = admindb.GetAllServers(dbConn)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	var pgdatapath types.Setting
+	pgdatapath, err = admindb.GetSetting(dbConn, "PG-DATA-PATH")
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -353,8 +351,6 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	logit.Info.Println("got server IP " + server.IPAddress)
 
 	//it is possible that someone can remove a container
 	//outside of us, so we let it pass that we can't remove
@@ -369,10 +365,12 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 
 	//send the server a deletevolume command
 	request2 := &cpmserverapi.DiskDeleteRequest{}
-	request2.Path = server.PGDataPath + "/" + dbNode.Name
-	_, err = cpmserverapi.DiskDeleteClient(server.Name, request2)
-	if err != nil {
-		fmt.Println(err.Error())
+	request2.Path = pgdatapath.Value + "/" + dbNode.Name
+	for _, each := range servers {
+		_, err = cpmserverapi.DiskDeleteClient(each.Name, request2)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 	}
 
 	//we should not have to delete the DNS entries because
@@ -425,13 +423,11 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 		nodes[i].ID = results[i].ID
 		nodes[i].Name = results[i].Name
 		nodes[i].ClusterID = results[i].ClusterID
-		nodes[i].ServerID = results[i].ServerID
 		nodes[i].Role = results[i].Role
 		nodes[i].Image = results[i].Image
 		nodes[i].CreateDate = results[i].CreateDate
 		nodes[i].ProjectID = results[i].ProjectID
 		nodes[i].ProjectName = results[i].ProjectName
-		nodes[i].ServerName = results[i].ServerName
 		nodes[i].Status = "down"
 
 		request := &swarmapi.DockerInspectRequest{}

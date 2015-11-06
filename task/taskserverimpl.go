@@ -38,8 +38,6 @@ type TaskStatus struct {
 	StartTime     string
 	TaskName      string
 	ProfileName   string
-	ServerName    string
-	ServerIP      string
 	ScheduleID    string
 	Path          string
 	ElapsedTime   string
@@ -50,18 +48,12 @@ type TaskStatus struct {
 
 type TaskRequest struct {
 	ScheduleID    string
-	ServerID      string
-	ServerName    string
 	ProfileName   string
-	ServerIP      string
 	ContainerName string
 }
 
 type TaskSchedule struct {
 	ID                string
-	ServerID          string
-	ServerName        string
-	ServerIP          string
 	ContainerName     string
 	ProfileName       string
 	Name              string
@@ -281,9 +273,6 @@ func LoadSchedules() error {
 			x := DefaultJob{}
 			x.request = TaskRequest{}
 			x.request.ScheduleID = schedules[i].ID
-			x.request.ServerID = schedules[i].ServerID
-			x.request.ServerName = schedules[i].ServerName
-			x.request.ServerIP = schedules[i].ServerIP
 			x.request.ContainerName = schedules[i].ContainerName
 			x.request.ProfileName = schedules[i].ProfileName
 

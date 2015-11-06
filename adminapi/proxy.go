@@ -74,13 +74,6 @@ func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 
 	errorStr := ""
 
-	if proxyrequest.ServerID == "" {
-		logit.Error.Println("ProvisionProxy error serverid required")
-		errorStr = "ServerID required"
-		rest.Error(w, errorStr, http.StatusBadRequest)
-		return
-	}
-
 	if proxyrequest.ProjectID == "" {
 		logit.Error.Println("ProvisionProxy error ProjectID required")
 		errorStr = "ProjectID required"
@@ -122,14 +115,12 @@ func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 
 	logit.Info.Println("Image=" + proxyrequest.Image)
 	logit.Info.Println("Profile=" + proxyrequest.Profile)
-	logit.Info.Println("ServerID=" + proxyrequest.ServerID)
 	logit.Info.Println("ProjectID=" + proxyrequest.ProjectID)
 	logit.Info.Println("ContainerName=" + proxyrequest.ContainerName)
 	logit.Info.Println("Standalone=" + proxyrequest.Standalone)
 
 	params := &swarmapi.DockerRunRequest{}
 	params.Image = proxyrequest.Image
-	params.ServerID = proxyrequest.ServerID
 	params.ProjectID = proxyrequest.ProjectID
 	params.ContainerName = proxyrequest.ContainerName
 	params.Standalone = proxyrequest.Standalone

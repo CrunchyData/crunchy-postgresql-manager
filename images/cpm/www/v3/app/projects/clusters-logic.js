@@ -126,9 +126,9 @@ var ClusterAutoClusterController = function($scope, $stateParams, $state, cluste
             .success(function(data) {
                 $scope.results = data;
                 usSpinnerService.stop('spinner-1');
-                $state.go('projects.detail.details', $stateParams, {
+                $state.go('projects.container', $stateParams, {
                     reload: true,
-                    inherit: false
+                    inherit: true
                 });
                 $scope.alerts = [{
                     type: 'success',

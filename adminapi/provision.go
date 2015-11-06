@@ -66,12 +66,6 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, errorStr, http.StatusBadRequest)
 		return
 	}
-	if params.ServerID == "" {
-		logit.Error.Println("Provision error serverid required")
-		errorStr = "ServerID required"
-		rest.Error(w, errorStr, http.StatusBadRequest)
-		return
-	}
 	if params.ProjectID == "" {
 		logit.Error.Println("Provision error ProjectID required")
 		errorStr = "ProjectID required"
@@ -90,18 +84,11 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, errorStr, http.StatusBadRequest)
 		return
 	}
-	if params.Standalone == "" {
-		logit.Error.Println("Provision error standalone flag required")
-		errorStr = "Standalone required"
-		rest.Error(w, errorStr, http.StatusBadRequest)
-		return
-	}
 	logit.Info.Println("params.Image=" + params.Image)
 	logit.Info.Println("params.Profile=" + params.Profile)
 	logit.Info.Println("params.ServerID=" + params.ServerID)
 	logit.Info.Println("params.ProjectID=" + params.ProjectID)
 	logit.Info.Println("params.ContainerName=" + params.ContainerName)
-	logit.Info.Println("params.Standalone=" + params.Standalone)
 
 	var newid string
 	newid, err = provisionImpl(dbConn, &params, false)
@@ -129,10 +116,10 @@ func provisionImpl(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standby bo
 
 	var errorStr string
 	//make sure the container name is not already taken
-	_, err2 := admindb.GetContainerByName(dbConn, params.ContainerName)
-	if err2 != nil {
-		if err2 != sql.ErrNoRows {
-			return "", err2
+	_, err := admindb.GetContainerByName(dbConn, params.ContainerName)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			return "", err
 		}
 	} else {
 		errorStr = "container name" + params.ContainerName + " already used can't provision"
@@ -140,34 +127,44 @@ func provisionImpl(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standby bo
 		return "", errors.New(errorStr)
 	}
 
-	//go get the IPAddress
-	server, err := admindb.GetServer(dbConn, params.ServerID)
+	//get the pg data path
+	var pgdatapath types.Setting
+	pgdatapath, err = admindb.GetSetting(dbConn, "PG-DATA-PATH")
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return "", err
 	}
 
-	logit.Info.Println("provisioning on server " + server.IPAddress)
+	//go get the IPAddress
+	var servers []types.Server
+	servers, err = admindb.GetAllServers(dbConn)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return "", err
+	}
 
 	//for database nodes, on the target server, we need to allocate
-	//a disk volume for the /pgdata container volume to work with
+	//a disk volume on all CPM servers for the /pgdata container volume to work with
 	//this causes a volume to be created with the directory
 	//named the same as the container name
 
-	var responseStr string
+	params.PGDataPath = pgdatapath.Value + "/" + params.ContainerName
 
-	params.PGDataPath = server.PGDataPath + "/" + params.ContainerName
-
-	logit.Info.Println("PROFILE provisionImpl 2 about to provision volume")
+	logit.Info.Println("PROFILE provisionImpl 2 about to provision volume " + params.PGDataPath)
 	if params.Image != "cpm-pgpool" {
 		preq := &cpmserverapi.DiskProvisionRequest{}
 		preq.Path = params.PGDataPath
-		_, err = cpmserverapi.DiskProvisionClient(server.Name, preq)
-		if err != nil {
-			logit.Error.Println(err.Error())
-			return "", err
+		var response cpmserverapi.DiskProvisionResponse
+		for _, each := range servers {
+			logit.Info.Println("Provision: provisionvolume on server " + each.Name)
+			response, err = cpmserverapi.DiskProvisionClient(each.Name, preq)
+			if err != nil {
+				logit.Info.Println("Provision: provisionvolume error" + err.Error())
+				logit.Error.Println(err.Error())
+				return "", err
+			}
+			logit.Info.Println("Provision: provisionvolume call response=" + response.Status)
 		}
-		logit.Info.Println("Provision: provisionvolume call response=" + responseStr)
 	}
 	logit.Info.Println("PROFILE provisionImpl 3 provision volume completed")
 
@@ -179,14 +176,25 @@ func provisionImpl(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standby bo
 		return "", err
 	}
 
-	//remove any existing docker containers with this name
-	logit.Info.Println("PROFILE provisionImpl remove old container start")
-	rreq := &swarmapi.DockerRemoveRequest{}
-	rreq.ContainerName = params.ContainerName
-	_, err = swarmapi.DockerRemove(rreq)
+	//inspect and remove any existing container
+	logit.Info.Println("PROFILE provisionImpl inspect 4")
+	inspectReq := &swarmapi.DockerInspectRequest{}
+	inspectReq.ContainerName = params.ContainerName
+	var inspectResponse swarmapi.DockerInspectResponse
+	inspectResponse, err = swarmapi.DockerInspect(inspectReq)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return "", err
+	}
+	if inspectResponse.RunningState != "not-found" {
+		logit.Info.Println("PROFILE provisionImpl remove existing container 4a")
+		rreq := &swarmapi.DockerRemoveRequest{}
+		rreq.ContainerName = params.ContainerName
+		_, err = swarmapi.DockerRemove(rreq)
+		if err != nil {
+			logit.Error.Println(err.Error())
+			return "", err
+		}
 	}
 
 	//pass any restore env vars to the new container
@@ -207,6 +215,7 @@ func provisionImpl(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standby bo
 	//
 	runReq := swarmapi.DockerRunRequest{}
 	runReq.PGDataPath = params.PGDataPath
+	runReq.Profile = params.Profile
 	runReq.Image = params.Image
 	runReq.ContainerName = params.ContainerName
 	runReq.EnvVars = params.EnvVars
@@ -220,10 +229,10 @@ func provisionImpl(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standby bo
 		logit.Error.Println(err.Error())
 		return "", err
 	}
-	logit.Info.Println("PROFILE provisionImpl created container " + runResp.ID)
+	logit.Info.Println("PROFILE provisionImpl created container 5 " + runResp.ID)
 	//
 
-	logit.Info.Println("PROFILE provisionImpl remove old container end")
+	logit.Info.Println("PROFILE provisionImpl remove old container end 6")
 
 	dbnode := types.Container{}
 	dbnode.ID = ""
@@ -231,7 +240,6 @@ func provisionImpl(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standby bo
 	dbnode.Image = params.Image
 	dbnode.ClusterID = "-1"
 	dbnode.ProjectID = params.ProjectID
-	dbnode.ServerID = params.ServerID
 
 	if params.Standalone == "true" {
 		dbnode.Role = "standalone"

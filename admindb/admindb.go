@@ -33,7 +33,7 @@ func GetServer(dbConn *sql.DB, id string) (types.Server, error) {
 	//logit.Info.Println("GetServer called with id=" + id)
 	server := types.Server{}
 
-	err := dbConn.QueryRow(fmt.Sprintf("select id, name, ipaddress, dockerbip, pgdatapath, serverclass, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from server where id=%s", id)).Scan(&server.ID, &server.Name, &server.IPAddress, &server.DockerBridgeIP, &server.PGDataPath, &server.ServerClass, &server.CreateDate)
+	err := dbConn.QueryRow(fmt.Sprintf("select id, name, ipaddress, dockerbip,  serverclass, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from server where id=%s", id)).Scan(&server.ID, &server.Name, &server.IPAddress, &server.DockerBridgeIP, &server.ServerClass, &server.CreateDate)
 	switch {
 	case err == sql.ErrNoRows:
 		logit.Info.Println("admindb:GetServer:no server with that id")
@@ -244,8 +244,8 @@ func GetContainer(dbConn *sql.DB, id string) (types.Container, error) {
 	//logit.Info.Println("admindb:GetContainer:called")
 	container := types.Container{}
 
-	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from container c, project p, server s where c.id=%s and p.id = c.projectid and c.serverid = s.id", id)
-	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName)
+	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name from container c, project p where c.id=%s and p.id = c.projectid ", id)
+	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName)
 	switch {
 	case err == sql.ErrNoRows:
 		logit.Info.Println("admindb:GetContainer:no container with that id " + id)
@@ -271,8 +271,8 @@ func GetContainerByName(dbConn *sql.DB, name string) (types.Container, error) {
 	//logit.Info.Println("admindb:GetNodeByName:called")
 	container := types.Container{}
 
-	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s, container c where c.name='%s' and c.projectid = p.id and c.serverid = s.id", name)
-	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName)
+	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name from project p, container c where c.name='%s' and c.projectid = p.id ", name)
+	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName)
 	switch {
 	case err == sql.ErrNoRows:
 		logit.Info.Println("admindb:GetContainerByName:no container with that name " + name)
@@ -298,9 +298,9 @@ func GetContainerOldestInCluster(dbConn *sql.DB, clusterid string) (types.Contai
 	//logit.Info.Println("admindb:GetNodeOldestInCluster:called")
 	container := types.Container{}
 
-	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s, container c where  c.projectid = p.id and c.serverid = s.id and c.createdt = (select max(createdt) from container where clusterid = %s)", clusterid)
+	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid,  c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, container c where  c.projectid = p.id and c.createdt = (select max(createdt) from container where clusterid = %s)", clusterid)
 	logit.Info.Println("admindb:GetNodeOldestInCluster:" + queryStr)
-	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName)
+	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName)
 	switch {
 	case err == sql.ErrNoRows:
 		logit.Info.Println("admindb:GetContainerOldestInCluster: no container with that clusterid " + clusterid)
@@ -327,9 +327,9 @@ func GetContainerMaster(dbConn *sql.DB, clusterid string) (types.Container, erro
 	//logit.Info.Println("admindb:GetContainerMaster:called")
 	container := types.Container{}
 
-	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s, container c   where c.role = 'master' and c.clusterid = %s and c.projectid = p.id and c.serverid = s.id", clusterid)
+	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name from project p, container c  where c.role = 'master' and c.clusterid = %s and c.projectid = p.id ", clusterid)
 	logit.Info.Println("admindb:GetContainerMaster:" + queryStr)
-	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName)
+	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName)
 	switch {
 	case err == sql.ErrNoRows:
 		logit.Info.Println("admindb:GetContainerMaster: no master container with that clusterid " + clusterid)
@@ -357,9 +357,9 @@ func GetContainerPgpool(dbConn *sql.DB, clusterid string) (types.Container, erro
 	//logit.Info.Println("admindb:GetContainerMaster:called")
 	container := types.Container{}
 
-	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s, container c  where c.serverid = s.id and c.role = 'pgpool' and c.clusterid = %s and c.projectid = p.id", clusterid)
+	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name from project p, container c  where c.role = 'pgpool' and c.clusterid = %s and c.projectid = p.id", clusterid)
 	logit.Info.Println("admindb:GetContainerPgpool:" + queryStr)
-	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName)
+	err := dbConn.QueryRow(queryStr).Scan(&container.ID, &container.Name, &container.ClusterID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName)
 	switch {
 	case err == sql.ErrNoRows:
 		logit.Info.Println("admindb:GetContainerPgpool: no pgpool container with that clusterid " + clusterid)
@@ -386,7 +386,7 @@ func GetContainerPgpool(dbConn *sql.DB, clusterid string) (types.Container, erro
 func GetAllStandbyContainers(dbConn *sql.DB, clusterid string) ([]types.Container, error) {
 	var rows *sql.Rows
 	var err error
-	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s, container c  where c.role = 'standby' and c.clusterid = %s and c.projectid = p.id and c.serverid = s.id", clusterid)
+	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name from project p, container c  where c.role = 'standby' and c.clusterid = %s and c.projectid = p.id ", clusterid)
 	logit.Info.Println("admindb:GetAllStandbyContainers:" + queryStr)
 	rows, err = dbConn.Query(queryStr)
 	if err != nil {
@@ -397,7 +397,7 @@ func GetAllStandbyContainers(dbConn *sql.DB, clusterid string) ([]types.Containe
 	containers := make([]types.Container, 0)
 	for rows.Next() {
 		container := types.Container{}
-		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName); err != nil {
+		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName); err != nil {
 			return nil, err
 		}
 		if container.ClusterID != "-1" {
@@ -418,35 +418,7 @@ func GetAllStandbyContainers(dbConn *sql.DB, clusterid string) ([]types.Containe
 
 // GetAllContainersForServer returns a list of container objects for a given server
 func GetAllContainersForServer(dbConn *sql.DB, serverID string) ([]types.Container, error) {
-	var rows *sql.Rows
-	var err error
-	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s, container c where c.serverid = %s  and c.projectid = p.id  and c.serverid = s.id order by c.name", serverID)
-	logit.Info.Println("admindb:GetAllContainersForServer:" + queryStr)
-	rows, err = dbConn.Query(queryStr)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var clustername string
 	containers := make([]types.Container, 0)
-	for rows.Next() {
-		container := types.Container{}
-		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName); err != nil {
-			return nil, err
-		}
-		if container.ClusterID != "-1" {
-			clustername, err = GetClusterName(dbConn, container.ClusterID)
-			if err != nil {
-				logit.Info.Println("admindb:GetContainerForServer:error " + err.Error())
-				return nil, err
-			}
-			container.ClusterName = clustername
-		}
-		containers = append(containers, container)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
 	return containers, nil
 }
 
@@ -454,7 +426,7 @@ func GetAllContainersForServer(dbConn *sql.DB, serverID string) ([]types.Contain
 func GetAllContainersForCluster(dbConn *sql.DB, clusterID string) ([]types.Container, error) {
 	var rows *sql.Rows
 	var err error
-	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s, container c  where c.clusterid = %s  and c.projectid = p.id and c.serverid = s.id order by c.name", clusterID)
+	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name from project p, container c  where c.clusterid = %s  and c.projectid = p.id order by c.name", clusterID)
 	logit.Info.Println("admindb:GetAllContainersForCluster:" + queryStr)
 	rows, err = dbConn.Query(queryStr)
 	if err != nil {
@@ -465,7 +437,7 @@ func GetAllContainersForCluster(dbConn *sql.DB, clusterID string) ([]types.Conta
 	containers := make([]types.Container, 0)
 	for rows.Next() {
 		container := types.Container{}
-		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName); err != nil {
+		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName); err != nil {
 			return nil, err
 		}
 		if container.ClusterID != "-1" {
@@ -514,7 +486,7 @@ func GetAllContainersForProject(dbConn *sql.DB, projectID string) ([]types.Conta
 func GetAllContainersNotInCluster(dbConn *sql.DB) ([]types.Container, error) {
 	var rows *sql.Rows
 	var err error
-	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name, l.name from project p, server s , container c left join cluster l on c.clusterid = l.id where c.role != 'standalone' and c.clusterid = -1 and c.projectid = p.id  and c.serverid = s.id order by c.name")
+	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, l.name from project p, container c left join cluster l on c.clusterid = l.id where c.role != 'standalone' and c.clusterid = -1 and c.projectid = p.id  order by c.name")
 	logit.Info.Println("admindb:GetAllContainersNotInCluster:" + queryStr)
 	rows, err = dbConn.Query(queryStr)
 	if err != nil {
@@ -524,7 +496,7 @@ func GetAllContainersNotInCluster(dbConn *sql.DB) ([]types.Container, error) {
 	containers := make([]types.Container, 0)
 	for rows.Next() {
 		container := types.Container{}
-		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName, &container.ClusterName); err != nil {
+		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ClusterName); err != nil {
 			return nil, err
 		}
 		container.ClusterName = container.ClusterID
@@ -540,7 +512,7 @@ func GetAllContainersNotInCluster(dbConn *sql.DB) ([]types.Container, error) {
 func GetAllContainers(dbConn *sql.DB) ([]types.Container, error) {
 	var rows *sql.Rows
 	var err error
-	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.serverid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name, s.name from project p, server s , container c where c.projectid = p.id  and c.serverid = s.id order by c.name")
+	queryStr := fmt.Sprintf("select c.id, c.name, c.clusterid, c.role, c.image, to_char(c.createdt, 'MM-DD-YYYY HH24:MI:SS'), p.id, p.name from project p, container c where c.projectid = p.id   order by c.name")
 	logit.Info.Println("admindb:GetAllContainers:" + queryStr)
 	rows, err = dbConn.Query(queryStr)
 	if err != nil {
@@ -551,7 +523,7 @@ func GetAllContainers(dbConn *sql.DB) ([]types.Container, error) {
 	containers := make([]types.Container, 0)
 	for rows.Next() {
 		container := types.Container{}
-		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.ServerID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName, &container.ServerName); err != nil {
+		if err = rows.Scan(&container.ID, &container.Name, &container.ClusterID, &container.Role, &container.Image, &container.CreateDate, &container.ProjectID, &container.ProjectName); err != nil {
 			return nil, err
 		}
 
@@ -574,7 +546,7 @@ func GetAllContainers(dbConn *sql.DB) ([]types.Container, error) {
 
 // InsertContainer inserts a new container object and returns the container id
 func InsertContainer(dbConn *sql.DB, container types.Container) (int, error) {
-	queryStr := fmt.Sprintf("insert into container ( name, clusterid, serverid, role, image, createdt, projectid) values ( '%s', %s, %s, '%s','%s', now(), %s) returning id", container.Name, container.ClusterID, container.ServerID, container.Role, container.Image, container.ProjectID)
+	queryStr := fmt.Sprintf("insert into container ( name, clusterid, role, image, createdt, projectid) values ( '%s', %s,  '%s','%s', now(), %s) returning id", container.Name, container.ClusterID, container.Role, container.Image, container.ProjectID)
 
 	logit.Info.Println("admindb:InsertContainer:" + queryStr)
 	var nodeid int
@@ -609,7 +581,7 @@ func DeleteContainer(dbConn *sql.DB, id string) error {
 
 // UpdateContainer updates a given container
 func UpdateContainer(dbConn *sql.DB, container types.Container) error {
-	queryStr := fmt.Sprintf("update container set ( name, clusterid, serverid, role, image) = ('%s', %s, %s, '%s', '%s') where id = %s returning id", container.Name, container.ClusterID, container.ServerID, container.Role, container.Image, container.ID)
+	queryStr := fmt.Sprintf("update container set ( name, clusterid, role, image) = ('%s', %s, '%s', '%s') where id = %s returning id", container.Name, container.ClusterID, container.Role, container.Image, container.ID)
 	logit.Info.Println("admindb:UpdateContainer:" + queryStr)
 
 	var nodeid int
@@ -629,7 +601,7 @@ func GetAllServers(dbConn *sql.DB) ([]types.Server, error) {
 	logit.Info.Println("admindb:GetAllServer:called")
 	var rows *sql.Rows
 	var err error
-	rows, err = dbConn.Query("select id, name, ipaddress, dockerbip, pgdatapath, serverclass, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from server order by name")
+	rows, err = dbConn.Query("select id, name, ipaddress, dockerbip,  serverclass, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from server order by name")
 	if err != nil {
 		return nil, err
 	}
@@ -638,7 +610,7 @@ func GetAllServers(dbConn *sql.DB) ([]types.Server, error) {
 	for rows.Next() {
 		server := types.Server{}
 		if err = rows.Scan(&server.ID, &server.Name,
-			&server.IPAddress, &server.DockerBridgeIP, &server.PGDataPath, &server.ServerClass, &server.CreateDate); err != nil {
+			&server.IPAddress, &server.DockerBridgeIP, &server.ServerClass, &server.CreateDate); err != nil {
 			return nil, err
 		}
 		servers = append(servers, server)
@@ -651,12 +623,11 @@ func GetAllServers(dbConn *sql.DB) ([]types.Server, error) {
 
 // GetAllServersByClassByCount returns a list of server objects with a node count for each server included
 func GetAllServersByClassByCount(dbConn *sql.DB) ([]types.Server, error) {
-	//select s.id, s.name, s.serverclass, count(n) from server s left join node n on  s.id = n.serverid  group by s.id order by s.serverclass, count(n);
 
 	logit.Info.Println("admindb:GetAllServerByClassByCount:called")
 	var rows *sql.Rows
 	var err error
-	rows, err = dbConn.Query("select s.id, s.name, s.ipaddress, s.dockerbip, s.pgdatapath, s.serverclass, to_char(s.createdt, 'MM-DD-YYYY HH24:MI:SS'), count(n) from server s left join container n on s.id = n.serverid group by s.id  order by s.serverclass, count(n)")
+	rows, err = dbConn.Query("select s.id, s.name, s.ipaddress, s.dockerbip,  s.serverclass, to_char(s.createdt, 'MM-DD-YYYY HH24:MI:SS'), count(n) from server s left join container n on s.id = n.serverid group by s.id  order by s.serverclass, count(n)")
 	if err != nil {
 		return nil, err
 	}
@@ -665,7 +636,7 @@ func GetAllServersByClassByCount(dbConn *sql.DB) ([]types.Server, error) {
 	for rows.Next() {
 		server := types.Server{}
 		if err = rows.Scan(&server.ID, &server.Name,
-			&server.IPAddress, &server.DockerBridgeIP, &server.PGDataPath, &server.ServerClass, &server.CreateDate, &server.NodeCount); err != nil {
+			&server.IPAddress, &server.DockerBridgeIP, &server.ServerClass, &server.CreateDate, &server.NodeCount); err != nil {
 			return nil, err
 		}
 		servers = append(servers, server)
@@ -679,7 +650,7 @@ func GetAllServersByClassByCount(dbConn *sql.DB) ([]types.Server, error) {
 // UpdateServer updates a given server
 func UpdateServer(dbConn *sql.DB, server types.Server) error {
 	logit.Info.Println("admindb:UpdateServer:called")
-	queryStr := fmt.Sprintf("update server set ( name, ipaddress, pgdatapath, serverclass, dockerbip) = ('%s', '%s', '%s', '%s', '%s') where id = %s returning id", server.Name, server.IPAddress, server.PGDataPath, server.ServerClass, server.DockerBridgeIP, server.ID)
+	queryStr := fmt.Sprintf("update server set ( name, ipaddress,  serverclass, dockerbip) = ('%s', '%s', '%s', '%s', '%s') where id = %s returning id", server.Name, server.IPAddress, server.ServerClass, server.DockerBridgeIP, server.ID)
 
 	logit.Info.Println("admindb:UpdateServer:update str=" + queryStr)
 	var serverid int
@@ -697,7 +668,7 @@ func UpdateServer(dbConn *sql.DB, server types.Server) error {
 // InsertServer inserts a new server object
 func InsertServer(dbConn *sql.DB, server types.Server) (int, error) {
 	//logit.Info.Println("admindb:InsertServer:called")
-	queryStr := fmt.Sprintf("insert into server ( name, ipaddress, pgdatapath, serverclass, dockerbip, createdt) values ( '%s', '%s', '%s', '%s', '%s', now()) returning id", server.Name, server.IPAddress, server.PGDataPath, server.ServerClass, server.DockerBridgeIP)
+	queryStr := fmt.Sprintf("insert into server ( name, ipaddress,  serverclass, dockerbip, createdt) values ( '%s', '%s', '%s', '%s', now()) returning id", server.Name, server.IPAddress, server.ServerClass, server.DockerBridgeIP)
 
 	logit.Info.Println("admindb:InsertServer:" + queryStr)
 	var serverid int

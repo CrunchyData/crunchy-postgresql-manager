@@ -45,7 +45,6 @@ type Server struct {
 	Name           string //server name
 	IPAddress      string //server ip address
 	DockerBridgeIP string //the docker bridge IP range that is assigned to this server
-	PGDataPath     string //the root directory to provision container data volumes into
 	ServerClass    string //the class of the server, small, medium, large
 	CreateDate     string
 	NodeCount      string //calculated value of the number of containers assigned to this server
@@ -65,8 +64,6 @@ type Project struct {
 type Container struct {
 	ID          string //unique key
 	ClusterID   string //foreign key to cluster
-	ServerID    string //foreigh key to server
-	ServerName  string //server name this container is on
 	Name        string //container name, also used as the host name
 	Role        string //role of this container (master, standby, standalone)
 	Image       string //docker image this container is based on
@@ -155,7 +152,6 @@ type Profiles struct {
 type ClusterNode struct {
 	ID          string //unique key
 	ClusterID   string //foreign key to cluster
-	ServerID    string //foreign key to server
 	Name        string //cluster name
 	Role        string //role of node in cluster
 	Image       string //docker image of node
@@ -163,7 +159,6 @@ type ClusterNode struct {
 	Status      string
 	ProjectID   string //foreign key to project
 	ProjectName string //project name
-	ServerName  string //server name
 	ClusterName string //cluster name
 }
 

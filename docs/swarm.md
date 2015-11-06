@@ -13,7 +13,7 @@ on 192.168.0.103:8000
 
 The Swarm agent is started to listen to 0.0.0.0:2375
 
-###Installation
+### Installation
 Swarm is provided by Docker at https://github.com/docker/swarm.  Use the
 instructions at the Swarm github page to install a binary version
 of Swarm into the /usr/local/bin directory of all the servers you
@@ -26,7 +26,7 @@ swarm create
 7b9fb5037919f89bd52c3c4888586be3
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-###Docker Configuration
+### Docker Configuration
 Docker is configured on each server to listen to 0.0.0.0:2375 for API events.  On
 Centos/RHEL this is done by adding -H tcp://0.0.0.0:2375 in the /etc/sysconfig/docker
 file:
@@ -36,9 +36,9 @@ export SWARM_PORT=2375
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Notice that we assign labels to the docker daemon, these labels are used by CPM (via Swarm)
-to figure out the correct server to deploy containers upon.
+to figure out the correct server to deploy containers upon.  CPM requires you classify a server with a label key of 'profile' and value of 'SM', 'MED', or 'LG'.  This label value is used to determine where a container will be placed during the provisioning process.  Also, a label key of hostname is used to provide the user a way to provision a container upon a specific host.  The value of the hostname key is the fully qualified host name of the server.
 
-###Startup
+### Startup
 On each server in your cluster, Start the swarm server agent listening to the local Docker API:
 ~~~~~~~~~~~~~~~~~~~~~~~~
 export LOCAL_HOST=192.168.0.103
@@ -54,7 +54,7 @@ export MANAGER_PORT=8000
 swarm manage --host $MANAGER_HOST:$MANAGER_PORT token://7b9fb5037919f89bd52c3c4888586be3
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-###Test
+### Test
 
 To see what servers are include in the swarm:
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,4 +73,3 @@ docker -H tcp://$MANAGER_HOST:$MANAGER_PORT run
 docker -H tcp://$MANAGER_HOST:$MANAGER_PORT ps
 docker -H tcp://$MANAGER_HOST:$MANAGER_PORT logs
 ~~~~~~~~~~~~~~~~~~~~~
-

@@ -95,7 +95,6 @@ func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
 	params := new(swarmapi.DockerRunRequest)
 	params.Image = "cpm-node"
 	//TODO make the server choice smart
-	params.ServerID = containers[0].ServerID
 	params.ProjectID = cluster.ProjectID
 	params.ContainerName = cluster.Name + "-" + STANDBY + "-" + fmt.Sprintf("%d", standbyCnt)
 	params.Standalone = "false"
@@ -714,17 +713,23 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	i := 0
 
+	var servers []types.Server
+	servers, err = admindb.GetAllServers(dbConn)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	var pgdatapath types.Setting
+	pgdatapath, err = admindb.GetSetting(dbConn, "PG-DATA-PATH")
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	i = 0
 	server := types.Server{}
 	for i = range containers {
-
-		//go get the docker server IPAddress
-		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
-		if err != nil {
-			logit.Error.Println(err.Error())
-			rest.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
 
 		logit.Info.Println("DeleteCluster: got server IP " + server.IPAddress)
 
@@ -740,12 +745,14 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 			logit.Error.Println("error when trying to remove container" + err.Error())
 		}
 
-		//send the server a deletevolume command
+		//send all the servers a deletevolume command
 		ddreq := &cpmserverapi.DiskDeleteRequest{}
-		ddreq.Path = server.PGDataPath + "/" + containers[i].Name
-		_, err = cpmserverapi.DiskDeleteClient(server.Name, ddreq)
-		if err != nil {
-			logit.Error.Println("error when trying to remove disk volume" + err.Error())
+		ddreq.Path = pgdatapath.Value + "/" + containers[i].Name
+		for _, each := range servers {
+			_, err = cpmserverapi.DiskDeleteClient(each.Name, ddreq)
+			if err != nil {
+				logit.Error.Println("error when trying to remove disk volume" + err.Error())
+			}
 		}
 
 		i++
@@ -1060,10 +1067,10 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var masterServer types.Server
-	var chosenServers []types.Server
+	//var masterServer types.Server
+	//var chosenServers []types.Server
 	if profile.Algo == "round-robin" {
-		masterServer, chosenServers, err2 = roundRobin(dbConn, profile)
+		//masterServer, chosenServers, err2 = roundRobin(dbConn, profile)
 	} else {
 		logit.Error.Println("AutoCluster: error-unsupported algorithm request")
 		rest.Error(w, "AutoCluster error: unsupported algorithm", http.StatusBadRequest)
@@ -1074,7 +1081,6 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	dockermaster := swarmapi.DockerRunRequest{}
 	dockermaster.Image = "cpm-node"
 	dockermaster.ContainerName = params.Name + "-master"
-	dockermaster.ServerID = masterServer.ID
 	dockermaster.ProjectID = params.ProjectID
 	dockermaster.Standalone = "false"
 	dockermaster.Profile = profile.MasterProfile
@@ -1140,7 +1146,6 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	for i := 0; i < count; i++ {
 		logit.Info.Println("working on standby ....")
 		//	loop - provision standby
-		dockerstandby[i].ServerID = chosenServers[i].ID
 		dockerstandby[i].ProjectID = params.ProjectID
 		dockerstandby[i].Image = "cpm-node"
 		dockerstandby[i].ContainerName = params.Name + "-" + STANDBY + "-" + strconv.Itoa(i)
@@ -1177,7 +1182,6 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	dockerpgpool := swarmapi.DockerRunRequest{}
 	dockerpgpool.ContainerName = params.Name + "-pgpool"
 	dockerpgpool.Image = "cpm-pgpool"
-	dockerpgpool.ServerID = chosenServers[count].ID
 	dockerpgpool.ProjectID = params.ProjectID
 	dockerpgpool.Standalone = "false"
 	dockerpgpool.Profile = profile.StandbyProfile
@@ -1402,19 +1406,7 @@ func StartCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	i = 0
 	var response swarmapi.DockerStartResponse
-	//server := types.Server{}
 	for i = range containers {
-
-		/**
-		//go get the docker server IPAddress
-		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
-		if err != nil {
-			logit.Error.Println(err.Error())
-			rest.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		logit.Info.Println("StartCluster: got server IP " + server.IPAddress)
-		*/
 
 		req := &swarmapi.DockerStartRequest{}
 		req.ContainerName = containers[i].Name
@@ -1478,18 +1470,6 @@ func StopCluster(w rest.ResponseWriter, r *rest.Request) {
 	var response swarmapi.DockerStopResponse
 	//server := types.Server{}
 	for i = range containers {
-
-		/**
-		//go get the docker server IPAddress
-		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
-		if err != nil {
-			logit.Error.Println(err.Error())
-			rest.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		logit.Info.Println("StopCluster: got server IP " + server.IPAddress)
-		*/
 
 		req := &swarmapi.DockerStopRequest{}
 		req.ContainerName = containers[i].Name

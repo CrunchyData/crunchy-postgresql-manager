@@ -107,7 +107,7 @@ func DockerInspect(req *DockerInspectRequest) (DockerInspectResponse, error) {
 
 	//if we can't inspect the container, then we give up
 	//on trying to stop it
-	response.RunningState = "down"
+	response.RunningState = "not-found"
 	response.IPAddress = ""
 
 	container, err3 := docker.InspectContainer(req.ContainerName)
@@ -226,16 +226,23 @@ func DockerRun(req *DockerRunRequest) (DockerRunResponse, error) {
 	logit.Info.Println("DockerRun called")
 
 	var envvars []string
+	var i = 0
 	if req.EnvVars != nil {
-		envvars = make([]string, len(req.EnvVars))
-		var i = 0
+		envvars = make([]string, len(req.EnvVars)+1)
 		for k, v := range req.EnvVars {
 			envvars[i] = k + "=" + v
 			i++
 		}
 	} else {
-		envvars = make([]string, 0)
+		envvars = make([]string, 1)
 	}
+
+	if req.Profile == "" {
+		return response, errors.New("Profile was empty and should not be")
+	}
+
+	//always add the profile constraint env var
+	envvars[i] = "constraint:profile==~" + req.Profile
 
 	docker, err := dockerapi.NewClient(swarmURL)
 	if err != nil {

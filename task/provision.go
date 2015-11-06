@@ -45,27 +45,18 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 
 	logit.Info.Println("backup.Provision called")
 	logit.Info.Println("with scheduleid=" + args.ScheduleID)
-	logit.Info.Println("with serverid=" + args.ServerID)
-	logit.Info.Println("with servername=" + args.ServerName)
-	logit.Info.Println("with serverip=" + args.ServerIP)
 	logit.Info.Println("with containername=" + args.ContainerName)
 	logit.Info.Println("with profilename=" + args.ProfileName)
 
 	params := &swarmapi.DockerRunRequest{}
 	params.Image = "cpm-backup-job"
-	params.ServerID = args.ServerID
 	backupcontainername := args.ContainerName + "-backup"
 	params.ContainerName = backupcontainername
 	params.Standalone = "false"
 
-	//get server info
-	server, err := admindb.GetServer(dbConn, params.ServerID)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return err
-	}
-
-	params.PGDataPath = server.PGDataPath + "/" + backupcontainername + "/" + getFormattedDate()
+	var pgdatapath types.Setting
+	pgdatapath, err = admindb.GetSetting(dbConn, "PG-DATA-PATH")
+	params.PGDataPath = pgdatapath.Value + "/" + backupcontainername + "/" + getFormattedDate()
 
 	//get the docker profile settings
 	var setting types.Setting
@@ -77,8 +68,6 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 	params.EnvVars = make(map[string]string)
 
 	params.EnvVars["BACKUP_NAME"] = backupcontainername
-	params.EnvVars["BACKUP_SERVERNAME"] = server.Name
-	params.EnvVars["BACKUP_SERVERIP"] = server.IPAddress
 	params.EnvVars["BACKUP_SCHEDULEID"] = args.ScheduleID
 	params.EnvVars["BACKUP_PROFILENAME"] = args.ProfileName
 	params.EnvVars["BACKUP_CONTAINERNAME"] = args.ContainerName
@@ -106,13 +95,21 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 	params.EnvVars["BACKUP_USER"] = "postgres"
 	params.EnvVars["BACKUP_SERVER_URL"] = "cpm-task:13001"
 
-	//provision the volume
-	request := &cpmserverapi.DiskProvisionRequest{"/tmp/foo"}
-	request.Path = params.PGDataPath
-	_, err = cpmserverapi.DiskProvisionClient(server.Name, request)
+	//provision the volume on all CPM servers
+	var servers []types.Server
+	servers, err = admindb.GetAllServers(dbConn)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return err
+	}
+	request := &cpmserverapi.DiskProvisionRequest{"/tmp/foo"}
+	request.Path = params.PGDataPath
+	for _, each := range servers {
+		_, err = cpmserverapi.DiskProvisionClient(each.Name, request)
+		if err != nil {
+			logit.Error.Println(err.Error())
+			return err
+		}
 	}
 
 	//run the container

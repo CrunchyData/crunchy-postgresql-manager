@@ -80,7 +80,7 @@ func main() {
 		// get all the general settings
 		&rest.Route{"GET", "/generalsettings/:Token", adminapi.GetAllGeneralSettings},
 		// define a new CPM server
-		&rest.Route{"GET", "/addserver/:ID.:Name.:IPAddress.:DockerBridgeIP.:PGDataPath.:ServerClass.:Token", adminapi.AddServer},
+		&rest.Route{"GET", "/addserver/:ID.:Name.:IPAddress.:DockerBridgeIP.:ServerClass.:Token", adminapi.AddServer},
 		// get a CPM server
 		&rest.Route{"GET", "/server/:ID.:Token", adminapi.GetServer},
 		// get a cluster

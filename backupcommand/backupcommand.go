@@ -172,9 +172,7 @@ func backupfunc(str string) {
 
 func sendStats(stats *task.TaskStatus) error {
 	stats.ContainerName = backupContainerName
-	stats.ServerName = backupServerName
 	stats.ScheduleID = scheduleID
-	stats.ServerIP = backupServerIP
 	stats.ProfileName = backupProfileName
 	stats.Path = backupPath
 	stats.TaskName = backupHost

@@ -81,11 +81,6 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	if postMsg.ServerID == "" {
-		logit.Error.Println("node ServerID required")
-		rest.Error(w, "server ID required", 400)
-		return
-	}
 	if postMsg.ProfileName == "" {
 		logit.Error.Println("node ProfileName required")
 		rest.Error(w, "ProfileName required", 400)
@@ -105,21 +100,9 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	//get the server details for where the backup should be made
-	server := types.Server{}
-	server, err = admindb.GetServer(dbConn, postMsg.ServerID)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), 400)
-		return
-	}
-
 	request := task.TaskRequest{}
 	request.ScheduleID = postMsg.ScheduleID
-	request.ServerID = server.ID
 	request.ContainerName = schedule.ContainerName
-	request.ServerName = server.Name
-	request.ServerIP = server.IPAddress
 	request.ProfileName = postMsg.ProfileName
 	output, err := task.ExecuteNowClient(&request)
 	if err != nil {
@@ -153,12 +136,6 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	if postMsg.ServerID == "" {
-		logit.Error.Println("node ServerID required")
-		rest.Error(w, "server ID required", 400)
-		return
-	}
-
 	if postMsg.ContainerName == "" {
 		logit.Error.Println("node ContainerName required")
 		rest.Error(w, "ContainerName required", 400)
@@ -184,7 +161,6 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 
 	s := task.TaskSchedule{}
 
-	s.ServerID = postMsg.ServerID
 	s.ContainerName = postMsg.ContainerName
 	s.ProfileName = postMsg.ProfileName
 	s.Name = postMsg.Name
@@ -453,11 +429,6 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, "schedule ID required", 400)
 		return
 	}
-	if postMsg.ServerID == "" {
-		logit.Error.Println("ServerID required")
-		rest.Error(w, "schedule ID required", 400)
-		return
-	}
 	if postMsg.Enabled == "" {
 		logit.Error.Println("Enabled required")
 		rest.Error(w, "Enabled required", 400)
@@ -496,7 +467,6 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 
 	s := task.TaskSchedule{}
 	s.ID = postMsg.ID
-	s.ServerID = postMsg.ServerID
 	s.Minutes = postMsg.Minutes
 	s.Hours = postMsg.Hours
 	s.Enabled = postMsg.Enabled
@@ -567,12 +537,10 @@ func GetBackupNodes(w rest.ResponseWriter, r *rest.Request) {
 			n.ID = results[i].ID
 			n.Name = results[i].Name
 			n.ClusterID = results[i].ClusterID
-			n.ServerID = results[i].ServerID
 			n.Role = results[i].Role
 			n.Image = results[i].Image
 			n.CreateDate = results[i].CreateDate
 			n.ProjectName = results[i].ProjectName
-			n.ServerName = results[i].ServerName
 			n.Status = "UNKNOWN"
 			nodes = append(nodes, n)
 		}

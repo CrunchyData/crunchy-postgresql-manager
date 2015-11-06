@@ -54,7 +54,7 @@ func GetServer(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	server := types.Server{results.ID, results.Name, results.IPAddress,
-		results.DockerBridgeIP, results.PGDataPath, results.ServerClass, results.CreateDate, ""}
+		results.DockerBridgeIP, results.ServerClass, results.CreateDate, ""}
 	logit.Info.Println("GetServer: results=" + results.ID)
 
 	w.WriteJson(&server)
@@ -79,11 +79,10 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	CreateDate := ""
-	server := types.Server{r.PathParam("ID"), r.PathParam("Name"), r.PathParam("IPAddress"), r.PathParam("DockerBridgeIP"), r.PathParam("PGDataPath"), r.PathParam("ServerClass"), CreateDate, ""}
+	server := types.Server{r.PathParam("ID"), r.PathParam("Name"), r.PathParam("IPAddress"), r.PathParam("DockerBridgeIP"), r.PathParam("ServerClass"), CreateDate, ""}
 
 	server.IPAddress = strings.Replace(server.IPAddress, "_", ".", -1)
 	server.DockerBridgeIP = strings.Replace(server.DockerBridgeIP, "_", ".", -1)
-	server.PGDataPath = strings.Replace(server.PGDataPath, "_", "/", -1)
 
 	if server.Name == "" {
 		logit.Error.Println("AddServer: error server name required")
@@ -93,11 +92,6 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 	if server.IPAddress == "" {
 		logit.Error.Println("AddServer: error ipaddress required")
 		rest.Error(w, "server IPAddress required", http.StatusBadRequest)
-		return
-	}
-	if server.PGDataPath == "" {
-		logit.Error.Println("AddServer: error pgdatapath required")
-		rest.Error(w, "server PGDataPath required", http.StatusBadRequest)
 		return
 	}
 
@@ -121,7 +115,7 @@ func AddServer(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	dbserver := types.Server{server.ID, server.Name, server.IPAddress,
-		server.DockerBridgeIP, server.PGDataPath, server.ServerClass, CreateDate, ""}
+		server.DockerBridgeIP, server.ServerClass, CreateDate, ""}
 	if dbserver.ID == "0" {
 		strid, err := admindb.InsertServer(dbConn, dbserver)
 		newid := strconv.Itoa(strid)
@@ -238,7 +232,6 @@ func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 		servers[i].Name = results[i].Name
 		servers[i].IPAddress = results[i].IPAddress
 		servers[i].DockerBridgeIP = results[i].DockerBridgeIP
-		servers[i].PGDataPath = results[i].PGDataPath
 		servers[i].ServerClass = results[i].ServerClass
 		servers[i].CreateDate = results[i].CreateDate
 		i++

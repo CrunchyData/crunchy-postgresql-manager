@@ -814,10 +814,7 @@ var ContainerAddController = function($scope, $stateParams, $state, serversFacto
             newcontainer.ID = 0;
             newcontainer.Name = 'newcontainer';
             newcontainer.Image = 'cpm-node';
-            newcontainer.ServerID = $scope.servers[0].ID;
-            $scope.selectedServer = $scope.servers[0];
             $scope.dockerprofile = 'SM';
-            $scope.standalone = false;
             $scope.container = newcontainer;
         })
         .error(function(error) {
@@ -829,12 +826,11 @@ var ContainerAddController = function($scope, $stateParams, $state, serversFacto
 
     $scope.add = function() {
         usSpinnerService.spin('spinner-1');
-        $scope.container.ServerID = $scope.selectedServer.ID;
         $scope.container.ProjectID = $stateParams.projectId;
 
         $scope.container.ID = 0; //0 means to do an insert
 
-        containersFactory.add($scope.container, $scope.standalone, $scope.dockerprofile)
+        containersFactory.add($scope.container, $scope.dockerprofile)
             .success(function(data) {
                 usSpinnerService.stop('spinner-1');
                 $state.go('projects.container', $stateParams, {

@@ -28,25 +28,14 @@ func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 
 	logit.Info.Println("task.ProvisionRestoreJob called")
 	logit.Info.Println("with scheduleid=" + args.ScheduleID)
-	logit.Info.Println("with serverid=" + args.ServerID)
-	logit.Info.Println("with servername=" + args.ServerName)
-	logit.Info.Println("with serverip=" + args.ServerIP)
 	logit.Info.Println("with containername=" + args.ContainerName)
 	logit.Info.Println("with profilename=" + args.ProfileName)
 
 	params := &swarmapi.DockerRunRequest{}
 	params.Image = "cpm-restore-job"
-	params.ServerID = args.ServerID
 	restorecontainername := args.ContainerName + "-restore-job"
 	params.ContainerName = restorecontainername
 	params.Standalone = "false"
-
-	//get server info
-	server, err := admindb.GetServer(dbConn, params.ServerID)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return err
-	}
 
 	schedule, err := GetSchedule(dbConn, args.ScheduleID)
 	if err != nil {
@@ -73,8 +62,6 @@ func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 	params.EnvVars["RestoreSet"] = schedule.RestoreSet
 	params.EnvVars["RestoreContainerName"] = args.ContainerName
 	params.EnvVars["RestoreScheduleID"] = args.ScheduleID
-	params.EnvVars["RestoreServerName"] = server.Name
-	params.EnvVars["RestoreServerIP"] = server.IPAddress
 	params.EnvVars["RestoreProfileName"] = args.ProfileName
 
 	setting, err = admindb.GetSetting(dbConn, "PG-PORT")

@@ -36,7 +36,6 @@ angular.module('uiRouterSample.proxy.service', ['ngCookies'])
  	return $http.post(url, {
             'Profile': dockerprofile,
             'Image': 'cpm-node-proxy',
-            'ServerID': container.ServerID,
             'ProjectID': container.ProjectID,
             'ContainerName': container.Name,
             'Standalone': 'false',

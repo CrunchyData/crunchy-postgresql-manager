@@ -192,9 +192,7 @@ func sendStats(stats *task.TaskStatus) error {
 	logit.Info.Println(stats.Status)
 
 	stats.ContainerName = restoreContainerName
-	stats.ServerName = restoreServerName
 	stats.ScheduleID = restoreScheduleID
-	stats.ServerIP = restoreServerIP
 	stats.ProfileName = "pg_backrest_restore"
 	stats.Path = restoreContainerName
 	stats.TaskName = restoreContainerName

@@ -26,8 +26,7 @@ A description of the REST API is at:
 
 CPM consists of the following containers:
 
-* cpm - cpm.crunchy.lab - the nginx server that hosts the CPM
-   	      web app, http://cpm.crunchy.lab:13001
+* cpm - cpm.crunchy.lab - the nginx server that hosts the CPM web app, http://cpm.crunchy.lab:13001
 
 * cpm-admin - cpm-admin.crunchy.lab - the REST API for CPM, http://cpm-admin.crunchy.lab:13001
 

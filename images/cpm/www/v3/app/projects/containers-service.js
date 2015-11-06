@@ -51,17 +51,16 @@ angular.module('uiRouterSample.containers.service', ['ngCookies'])
         return $http.get(url);
     };
 
-    containersFactory.add = function(container, standalone, dockerprofile) {
+    containersFactory.add = function(container, dockerprofile) {
         var url = $cookieStore.get('AdminURL') + '/provision' ;
         console.log(url);
 
         return $http.post(url, {
             'Profile': dockerprofile,
-            'Image': container.Image,
-            'ServerID': container.ServerID,
+            'Image': 'cpm-node',
             'ProjectID': container.ProjectID,
             'ContainerName': container.Name,
-            'Standalone': standalone.toString(),
+            'Standalone': 'true',
             'Token': $cookieStore.get('cpm_token')
 	});
     };

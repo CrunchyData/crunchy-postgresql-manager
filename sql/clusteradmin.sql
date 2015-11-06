@@ -26,7 +26,6 @@ create table server (
 	name varchar(20) unique not null,
 	ipaddress varchar(20) unique not null,
 	dockerbip varchar(20) unique not null,
-	pgdatapath varchar(40) not null,
 	serverclass varchar(20) not null,
 	createdt timestamp not null,
 	constraint valid_server_class check (
@@ -53,7 +52,6 @@ create table container (
 	id serial primary key,
 	name varchar(30) unique not null,
 	clusterid int,
-	serverid int references server (id) on delete cascade,
 	projectid int references project (id) on delete cascade,
 	role varchar(10) not null,
 	image varchar(30) not null,
@@ -117,6 +115,7 @@ insert into secroleperm values ('superuser', 'perm-backup');
 insert into secroleperm values ('superuser', 'perm-user');
 
 
+insert into settings (name, value, description, updatedt) values ('PG-DATA-PATH', '/var/cpm/data/pgsql', 'file path root of PG data files', now());
 insert into settings (name, value, description, updatedt) values ('S-DOCKER-PROFILE-CPU', '256', 'small Docker profile CPU shares', now());
 insert into settings (name, value, description, updatedt) values ('S-DOCKER-PROFILE-MEM', '512m', 'small Docker profile Memory limit', now());
 insert into settings (name, value, description, updatedt) values ('M-DOCKER-PROFILE-CPU', '512', 'medium Docker profile CPU shares', now());
@@ -162,7 +161,6 @@ insert into taskprofile (name) values ('backrest-backup');
 
 create table taskschedule (
 	id serial primary key,
-	serverid int references server (id) on delete cascade not null,
 	containername varchar(20) references container (name) on delete cascade not null,
 	profilename varchar(30) references taskprofile (name) not null,
 	name varchar(30) not null,
