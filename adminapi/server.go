@@ -20,6 +20,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/swarmapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
@@ -46,16 +47,10 @@ func GetServer(w rest.ResponseWriter, r *rest.Request) {
 	ID := r.PathParam("ID")
 	logit.Info.Println("in GetServer with ID=" + ID)
 
-	results, err := admindb.GetServer(dbConn, ID)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	//currently no state about a server is maintained other than IP and port number
+	//which we use for the ID, Name, and IPAddress values
 
-	server := types.Server{results.ID, results.Name, results.IPAddress,
-		results.ServerClass, results.CreateDate, ""}
-	logit.Info.Println("GetServer: results=" + results.ID)
+	server := types.Server{ID, ID, ID, "", "", ""}
 
 	w.WriteJson(&server)
 }
@@ -144,25 +139,20 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	ServerID := r.PathParam("ServerID")
 	Metric := r.PathParam("Metric")
 
+	ServerID := r.PathParam("ServerID")
 	if ServerID == "" {
 		logit.Error.Println("error ServerID required")
 		rest.Error(w, "ServerID required", http.StatusBadRequest)
 		return
 	}
+	cleanIP := strings.Replace(ServerID, "_", ".", -1)
+	logit.Info.Println("ServerID=" + ServerID)
+	logit.Info.Println("cleanIP=" + cleanIP)
 	if Metric == "" {
 		logit.Error.Println("MonitorServerGetInfo: error metric required")
 		rest.Error(w, "Metric required", http.StatusBadRequest)
-		return
-	}
-
-	//go get the IPAddress
-	server, err := admindb.GetServer(dbConn, ServerID)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -170,7 +160,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	if Metric == "cpmiostat" {
 		iostatreq := cpmserverapi.MetricIostatRequest{}
 		var iostatResp cpmserverapi.MetricIostatResponse
-		iostatResp, err = cpmserverapi.MetricIostatClient(server.Name, &iostatreq)
+		iostatResp, err = cpmserverapi.MetricIostatClient(cleanIP, &iostatreq)
 		if err != nil {
 			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), 400)
@@ -180,7 +170,7 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 	} else if Metric == "cpmdf" {
 		dfreq := cpmserverapi.MetricDfRequest{}
 		var dfResp cpmserverapi.MetricDfResponse
-		dfResp, err = cpmserverapi.MetricDfClient(server.Name, &dfreq)
+		dfResp, err = cpmserverapi.MetricDfClient(cleanIP, &dfreq)
 		if err != nil {
 			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), 400)
@@ -215,19 +205,36 @@ func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	//use swarm to get the list of servers
+
+	var infoResponse swarmapi.DockerInfoResponse
+	infoResponse, err = swarmapi.DockerInfo()
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for x := 0; x < len(infoResponse.Output); {
+		logit.Info.Println("got back " + infoResponse.Output[x])
+		x++
+	}
+
+	/**
 	results, err := admindb.GetAllServers(dbConn)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	servers := make([]types.Server, len(results))
+	*/
+	servers := make([]types.Server, len(infoResponse.Output))
 	i := 0
-	for i = range results {
-		servers[i].ID = results[i].ID
-		servers[i].Name = results[i].Name
-		servers[i].IPAddress = results[i].IPAddress
-		servers[i].ServerClass = results[i].ServerClass
-		servers[i].CreateDate = results[i].CreateDate
+	for i = range infoResponse.Output {
+		servers[i].ID = infoResponse.Output[i]
+		servers[i].Name = infoResponse.Output[i]
+		servers[i].IPAddress = infoResponse.Output[i]
+		//servers[i].ServerClass = results[i].ServerClass
+		//servers[i].CreateDate = results[i].CreateDate
 		i++
 	}
 

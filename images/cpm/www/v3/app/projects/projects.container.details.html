@@ -15,7 +15,7 @@
 		<div class="form-group">
 			<label for="inputServer" class="control-label col-xs-2">Server</label>
 			<div class="col-xs-5">
-				<a ui-sref="servers.detail({{container.ServerID}})">{{container.ServerName}}</a>
+				<a ui-sref="servers.detail.details({serverId:container.ServerID})">{{container.ServerID}}</a>
 			</div>
 		</div>
 		<div class="form-group" ng-show="container.ClusterID != '-1'">

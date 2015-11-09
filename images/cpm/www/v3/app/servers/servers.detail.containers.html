@@ -6,14 +6,25 @@
 
 <div ui-view class="slide"></div>
 
- <ul>
-	 <li ng-repeat="container in containers"> 
-
-  	<a ng-if="container.Image == 'cpm-node-proxy'" ui-sref="projects.detail.gotoproxy({containerName:container.Name,projectId:container.ProjectID,containerId:container.ID})">{{container.Name}}</a>
-	<a ng-if="container.Image == 'cpm-node'" ui-sref="projects.detail.gotocontainer({projectId:container.ProjectID,containerId:container.ID})">{{container.Name}}</a>
-	<a ng-if="container.Image == 'cpm-pgpool'" ui-sref="projects.detail.gotocontainer({projectId:container.ProjectID,containerId:container.ID})">{{container.Name}}</a>
-
-	 </li>
-</ul>
+	<table class="table table-striped">
+		    <thead>
+			          <tr>
+					          <th>Name</th>
+						          <th>Image</th>
+							          <th>Status</th>
+								        </tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="container in containers">
+				<td>
+  	<a ng-if="container.Image == 'crunchydata/cpm-node-proxy'" ui-sref="projects.detail.gotoproxy({containerName:container.Name,projectId:container.ProjectID,containerId:container.ID})">{{container.Name}}</a>
+	<a ng-if="container.Image == 'crunchydata/cpm-node'" ui-sref="projects.detail.gotocontainer({projectId:container.ProjectID,containerId:container.ID})">{{container.Name}}</a>
+	<a ng-if="container.Image == 'crunchydata/cpm-pgpool'" ui-sref="projects.detail.gotocontainer({projectId:container.ProjectID,containerId:container.ID})">{{container.Name}}</a>
+				</td>
+				<td>{{container.Image}}</td>
+				<td>{{container.Status}}</td>
+			</tr>
+		</tbody>
+	</table>
 
 

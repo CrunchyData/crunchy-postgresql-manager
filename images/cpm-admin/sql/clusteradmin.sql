@@ -190,8 +190,6 @@ create table taskstatus (
 	scheduleid int references taskschedule (id) on delete cascade not null ,
 	starttime timestamp not null,
 	taskname varchar(30) not null,
-	servername varchar(20) not null,
-	serverip varchar(20) not null,
 	path varchar(80) not null,
 	elapsedtime varchar(30) not null,
 	tasksize varchar(30) not null,

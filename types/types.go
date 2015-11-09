@@ -159,6 +159,7 @@ type ClusterNode struct {
 	ProjectID   string //foreign key to project
 	ProjectName string //project name
 	ClusterName string //cluster name
+	ServerID    string //server info
 }
 
 type ProvisionStatus struct {

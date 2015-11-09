@@ -29,8 +29,8 @@ angular.module('uiRouterSample.servers', [
                         ]
                     },
 
-                    controller: ['$scope', '$state', '$cookieStore', 'utils', 'servers',
-                        function($scope, $state, $cookieStore, utils, servers) {
+                    controller: ['$scope', '$state', '$stateParams', '$cookieStore', 'utils', 'servers',
+                        function($scope, $state, $stateParams, $cookieStore, utils, servers) {
 
                             if (!$cookieStore.get('cpm_token')) {
                                 $state.go('login', {
@@ -50,6 +50,13 @@ angular.module('uiRouterSample.servers', [
                                     });
                                 }
                             };
+
+				console.log('before goToFirst with serverId=' + $stateParams.serverId);
+				if ($stateParams.serverId === undefined) {
+					console.log('serverId is undefined here jeff');
+				} else {
+					console.log('serverId is defined here jeff');
+				}
                             $scope.goToFirst();
                         }
                     ]
@@ -124,9 +131,9 @@ angular.module('uiRouterSample.servers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 };
 
@@ -155,9 +162,9 @@ angular.module('uiRouterSample.servers', [
                                         .error(function(error) {
                                             $scope.alerts = [{
                                                 type: 'danger',
-                                                msg: error.message
+                                                msg: error.Error
                                             }];
-                                            console.log('here is an error ' + error.message);
+                                            console.log('here is an error ' + error.Error);
                                         });
                                 };
 
@@ -207,7 +214,7 @@ angular.module('uiRouterSample.servers', [
 
             .state('servers.detail', {
 
-                url: '/{serverId:[0-9]{1,4}}',
+                url: '/:serverId',
 
                 views: {
 
@@ -215,6 +222,8 @@ angular.module('uiRouterSample.servers', [
                         templateUrl: 'app/servers/servers.detail.html',
                         controller: ['$scope', '$state', '$cookieStore', '$stateParams', 'serversFactory', 'utils',
                             function($scope, $state, $cookieStore, $stateParams, serversFactory, utils) {
+			    	console.log('in servers.detail with stateParams = ' + JSON.stringify($stateParams));
+			    	console.log('in servers.detail with serverId = ' + $stateParams.serverId);
                                 if (!$cookieStore.get('cpm_token')) {
                                     console.log('cpm_token not defined in servers');
                                     $state.go('login', {
@@ -222,13 +231,14 @@ angular.module('uiRouterSample.servers', [
                                     });
                                 }
 
-                                if ($scope.servers.data.length > 0) {
-                                    angular.forEach($scope.servers.data, function(item) {
-                                        if (item.ID == $stateParams.serverId) {
-                                            $scope.server = item;
-                                        }
-                                    });
-                                }
+				//$scope.server = serversFactory.get($stateParams.serverId);
+				if ($scope.servers.data.length > 0) {
+				 	angular.forEach($scope.servers.data, function(item) {
+						if (item.ID == $stateParams.serverId) {
+							$scope.server = item;
+						}
+					});
+				}
 
                             }
                         ]
@@ -376,6 +386,7 @@ angular.module('uiRouterSample.servers', [
                                     serversFactory.containers($stateParams.serverId)
                                         .success(function(data) {
                                             $scope.containers = data;
+                                            //console.log('successful get in list =' + JSON.stringify(data));
                                         })
                                         .error(function(error) {
                                             $scope.alerts = [{

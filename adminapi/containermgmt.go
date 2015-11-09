@@ -29,6 +29,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
 	"os/exec"
+	"strings"
 	"time"
 )
 
@@ -85,8 +86,9 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	*/
 
 	request := &swarmapi.DockerInspectRequest{}
+	var inspectInfo swarmapi.DockerInspectResponse
 	request.ContainerName = node.Name
-	_, err = swarmapi.DockerInspect(request)
+	inspectInfo, err = swarmapi.DockerInspect(request)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		currentStatus = CONTAINER_NOT_FOUND
@@ -103,7 +105,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	clusternode := types.ClusterNode{node.ID, node.ClusterID,
-		node.Name, node.Role, node.Image, node.CreateDate, currentStatus, node.ProjectID, node.ProjectName, node.ClusterName}
+		node.Name, node.Role, node.Image, node.CreateDate, currentStatus, node.ProjectID, node.ProjectName, node.ClusterName, inspectInfo.ServerID}
 
 	w.WriteJson(clusternode)
 }
@@ -408,40 +410,22 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	results, err := admindb.GetAllContainersForServer(dbConn, serverID)
+	serverIPAddress := strings.Replace(serverID, "_", ".", -1)
+
+	results, err := swarmapi.DockerPs(serverIPAddress)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	var response swarmapi.DockerInspectResponse
-	var e error
-	nodes := make([]types.ClusterNode, len(results))
+	nodes := make([]types.ClusterNode, len(results.Output))
 	i := 0
-	for i = range results {
-		nodes[i].ID = results[i].ID
-		nodes[i].Name = results[i].Name
-		nodes[i].ClusterID = results[i].ClusterID
-		nodes[i].Role = results[i].Role
-		nodes[i].Image = results[i].Image
-		nodes[i].CreateDate = results[i].CreateDate
-		nodes[i].ProjectID = results[i].ProjectID
-		nodes[i].ProjectName = results[i].ProjectName
-		nodes[i].Status = "down"
-
-		request := &swarmapi.DockerInspectRequest{}
-		request.ContainerName = results[i].Name
-		response, e = swarmapi.DockerInspect(request)
-		logit.Info.Println("GetAllNodesForServer:" + results[i].Name + " " + response.IPAddress + " " + response.RunningState)
-		if e != nil {
-			logit.Error.Println(e.Error())
-			nodes[i].Status = "notfound"
-		} else {
-			logit.Info.Println("GetAllNodesForServer: setting " + results[i].Name + " to " + response.RunningState)
-			nodes[i].Status = response.RunningState
-		}
-
+	for _, each := range results.Output {
+		fmt.Println("got back Name:" + each.Name + " Status:" + each.Status + " Image:" + each.Image)
+		nodes[i].Name = each.Name
+		nodes[i].Status = each.Status
+		nodes[i].Image = each.Image
 		i++
 	}
 

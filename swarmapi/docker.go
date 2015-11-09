@@ -16,12 +16,12 @@
 package swarmapi
 
 import (
-	"encoding/json"
 	"errors"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	dockerapi "github.com/fsouza/go-dockerclient"
+	"github.com/samalba/dockerclient"
 	"os"
-	//"strconv"
+	"strings"
 )
 
 type DockerInspectRequest struct {
@@ -30,6 +30,7 @@ type DockerInspectRequest struct {
 type DockerInspectResponse struct {
 	IPAddress    string
 	RunningState string
+	ServerID     string
 }
 type DockerRemoveRequest struct {
 	ContainerName string
@@ -51,7 +52,16 @@ type DockerStopResponse struct {
 }
 
 type DockerInfoResponse struct {
-	Output string
+	Output []string
+}
+
+type DockerPsInfo struct {
+	Name   string
+	Status string
+	Image  string
+}
+type DockerPsResponse struct {
+	Output []DockerPsInfo
 }
 
 type DockerRunRequest struct {
@@ -130,6 +140,8 @@ func DockerInspect(req *DockerInspectRequest) (DockerInspectResponse, error) {
 			logit.Info.Println("container status is down")
 		}
 	}
+
+	response.ServerID = container.Node.Addr
 
 	return response, nil
 }
@@ -320,15 +332,6 @@ func DockerRun(req *DockerRunRequest) (DockerRunResponse, error) {
 	return response, nil
 }
 
-type NameValue struct {
-	Name  string
-	Value string
-}
-
-type Thing struct {
-	Things []NameValue
-}
-
 func DockerInfo() (DockerInfoResponse, error) {
 	response := DockerInfoResponse{}
 	var err error
@@ -340,30 +343,75 @@ func DockerInfo() (DockerInfoResponse, error) {
 
 	logit.Info.Println("DockerInfo called")
 
-	docker, err := dockerapi.NewClient(swarmURL)
+	docker, err := dockerclient.NewDockerClient(swarmURL, nil)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return response, err
 	}
 
-	env, err4 := docker.Info()
-	if err4 != nil {
-		logit.Error.Println(err4.Error())
+	var info *dockerclient.Info
+	info, err = docker.Info()
+	if err != nil {
+		logit.Error.Println(err.Error())
 		return response, nil
 	}
-	envs := env.Map()
-	for k, v := range envs {
-		logit.Info.Printf("%s=%q\n", k, v)
-	}
-	driverStatus := env.Get("DriverStatus")
-	logit.Info.Println("DriverStatus is " + driverStatus)
 
-	b := []byte(driverStatus)
-	mylist := make([][]string, 0)
-	json.Unmarshal(b, &mylist)
-	logit.Info.Print("mylist len is %d\n", len(mylist))
-	for index, each := range mylist {
-		logit.Info.Printf("index=%d each=%s\n", index, each)
+	var colonLoc int
+	response.Output = make([]string, 0)
+	for x := 0; x < len(info.DriverStatus); {
+		//fmt.Printf("index %d  [%s]\n", x, info.DriverStatus[x])
+		trimmedStr := strings.TrimSpace(info.DriverStatus[x][1])
+		//fmt.Printf("trimmed [%s]\n", strings.TrimSpace(info.DriverStatus[x][1]))
+
+		colonLoc = strings.Index(trimmedStr, ":")
+		//fmt.Printf("colonLoc=%d\n", colonLoc)
+		if colonLoc > 0 {
+			logit.Info.Println("found " + trimmedStr)
+			//parts := strings.Split(trimmedStr, ":")
+			//response.Output = append(response.Output, parts[0])
+			response.Output = append(response.Output, trimmedStr)
+		}
+		x++
+	}
+
+	return response, nil
+}
+
+func DockerPs(serveripport string) (DockerPsResponse, error) {
+	response := DockerPsResponse{}
+	var err error
+
+	logit.Info.Println("DockerPs called")
+
+	docker, err := dockerapi.NewClient("tcp://" + serveripport)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return response, err
+	}
+
+	var info []dockerapi.APIContainers
+	options := dockerapi.ListContainersOptions{}
+	options.All = true
+
+	info, err = docker.ListContainers(options)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return response, nil
+	}
+
+	response.Output = make([]DockerPsInfo, 0)
+
+	var apicontainer dockerapi.APIContainers
+	for x := range info {
+		apicontainer = info[x]
+		if strings.Index(apicontainer.Image, "cpm-node") > 0 ||
+			strings.Index(apicontainer.Image, "cpm-pgpool") > 0 {
+			cinfo := DockerPsInfo{}
+			cinfo.Name = strings.Trim(apicontainer.Names[0], "/")
+			cinfo.Status = apicontainer.Status
+			cinfo.Image = apicontainer.Image
+			response.Output = append(response.Output, cinfo)
+		}
 	}
 
 	return response, nil

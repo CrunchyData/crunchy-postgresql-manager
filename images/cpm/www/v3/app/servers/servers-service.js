@@ -35,7 +35,8 @@ angular.module('uiRouterSample.servers.service', ['ngCookies'])
 
     serversFactory.get = function(serverid) {
 
-        var url = $cookieStore.get('AdminURL') + '/server/' + serverid + '.' + $cookieStore.get('cpm_token');
+        var cleanip = serverid.replace(/\./g, "_");
+        var url = $cookieStore.get('AdminURL') + '/server/' + cleanip + '.' + $cookieStore.get('cpm_token');
         console.log(url);
 
         return $http.get(url);
@@ -67,21 +68,24 @@ angular.module('uiRouterSample.servers.service', ['ngCookies'])
 
     serversFactory.iostat = function(serverid) {
 
-        var url = $cookieStore.get('AdminURL') + '/monitor/server-getinfo/' + serverid + '.cpmiostat.' + $cookieStore.get('cpm_token');
+        var cleanip = serverid.replace(/\./g, "_");
+        var url = $cookieStore.get('AdminURL') + '/monitor/server-getinfo/' + cleanip + '.cpmiostat.' + $cookieStore.get('cpm_token');
         console.log(url);
 
         return $http.get(url);
     };
     serversFactory.df = function(serverid) {
 
-        var url = $cookieStore.get('AdminURL') + '/monitor/server-getinfo/' + serverid + '.cpmdf.' + $cookieStore.get('cpm_token');
+        var cleanip = serverid.replace(/\./g, "_");
+        var url = $cookieStore.get('AdminURL') + '/monitor/server-getinfo/' + cleanip + '.cpmdf.' + $cookieStore.get('cpm_token');
         console.log(url);
 
         return $http.get(url);
     };
     serversFactory.containers = function(serverid) {
 
-        var url = $cookieStore.get('AdminURL') + '/nodes/forserver/' + serverid + '.' + $cookieStore.get('cpm_token');
+        var cleanip = serverid.replace(/\./g, "_");
+        var url = $cookieStore.get('AdminURL') + '/nodes/forserver/' + cleanip + '.' + $cookieStore.get('cpm_token');
         console.log(url);
 
         return $http.get(url);

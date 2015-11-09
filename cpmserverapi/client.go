@@ -9,38 +9,53 @@ package cpmserverapi
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	//"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
-const URL = "http://cpm-"
+const URL = "http://"
 const PORT = ":10001"
 
 // MetricIostatClient perform an iostat on the host and return the results of it
-func MetricIostatClient(serverName string, req *MetricIostatRequest) (MetricIostatResponse, error) {
+func MetricIostatClient(serverID string, req *MetricIostatRequest) (MetricIostatResponse, error) {
 	var err error
-	var url = URL + serverName + PORT
+	response := MetricIostatResponse{}
+	serverParts := strings.Split(serverID, ":")
+	var url = URL + serverParts[0] + PORT
+	logit.Info.Println("MetricIostatClient url is " + url)
 
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
-	r, _ := http.Post(url+"/metrics/iostat", "application/json", body)
+	r, err := http.Post(url+"/metrics/iostat", "application/json", body)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return response, err
+	}
+
 	rawresponse, _ := ioutil.ReadAll(r.Body)
-	response := MetricIostatResponse{}
 	err = json.Unmarshal(rawresponse, &response)
 	//fmt.Println(string(rawresponse))
 	return response, err
 }
 
 // MetricDfClient perform a df command on the host and return the results of it
-func MetricDfClient(serverName string, req *MetricDfRequest) (MetricDfResponse, error) {
+func MetricDfClient(serverID string, req *MetricDfRequest) (MetricDfResponse, error) {
 	var err error
-	var url = URL + serverName + PORT
+	response := MetricDfResponse{}
+	serverParts := strings.Split(serverID, ":")
+	var url = URL + serverParts[0] + PORT
+	logit.Info.Println("MetricDfClient url is " + url)
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
-	r, _ := http.Post(url+"/metrics/df", "application/json", body)
+	r, err := http.Post(url+"/metrics/df", "application/json", body)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return response, err
+	}
 	rawresponse, _ := ioutil.ReadAll(r.Body)
-	response := MetricDfResponse{}
 	err = json.Unmarshal(rawresponse, &response)
 	//fmt.Println(string(rawresponse))
 	return response, err
@@ -49,12 +64,16 @@ func MetricDfClient(serverName string, req *MetricDfRequest) (MetricDfResponse, 
 // DiskProvisionClient client for provisioning a new directory on the host
 func DiskProvisionClient(serverName string, req *DiskProvisionRequest) (DiskProvisionResponse, error) {
 	var err error
+	response := DiskProvisionResponse{}
 	var url = URL + serverName + PORT
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
-	r, _ := http.Post(url+"/disk/provision", "application/json", body)
+	r, err := http.Post(url+"/disk/provision", "application/json", body)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return response, err
+	}
 	rawresponse, _ := ioutil.ReadAll(r.Body)
-	response := DiskProvisionResponse{}
 	err = json.Unmarshal(rawresponse, &response)
 	//fmt.Println(string(rawresponse))
 	return response, err
