@@ -179,28 +179,38 @@ func DockerRunClient(serverName string, req *DockerRunRequest) (DockerRunRespons
 */
 
 // MetricCPUClient client for getting the cpu metrics
-func MetricCPUClient(serverName string, req *MetricCPURequest) (MetricCPUResponse, error) {
-	var err error
-	var url = URL + serverName + PORT
+func MetricCPUClient(serverID string, req *MetricCPURequest) (MetricCPUResponse, error) {
+	response := MetricCPUResponse{}
+	serverParts := strings.Split(serverID, ":")
+	var url = URL + serverParts[0] + PORT
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
-	r, _ := http.Post(url+"/metrics/cpu", "application/json", body)
+	logit.Info.Println("calling cpu with url " + url)
+	r, err := http.Post(url+"/metrics/cpu", "application/json", body)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return response, err
+	}
 	rawresponse, _ := ioutil.ReadAll(r.Body)
-	response := MetricCPUResponse{}
 	err = json.Unmarshal(rawresponse, &response)
 	//fmt.Println(string(rawresponse))
 	return response, err
 }
 
 // MetricMEMClient client for getting the memory metrics
-func MetricMEMClient(serverName string, req *MetricMEMRequest) (MetricMEMResponse, error) {
-	var err error
-	var url = URL + serverName + PORT
+func MetricMEMClient(serverID string, req *MetricMEMRequest) (MetricMEMResponse, error) {
+	response := MetricMEMResponse{}
+	serverParts := strings.Split(serverID, ":")
+	var url = URL + serverParts[0] + PORT
+	logit.Info.Println("calling mem with url " + url)
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
-	r, _ := http.Post(url+"/metrics/mem", "application/json", body)
+	r, err := http.Post(url+"/metrics/mem", "application/json", body)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return response, err
+	}
 	rawresponse, _ := ioutil.ReadAll(r.Body)
-	response := MetricMEMResponse{}
 	err = json.Unmarshal(rawresponse, &response)
 	//fmt.Println(string(rawresponse))
 	return response, err

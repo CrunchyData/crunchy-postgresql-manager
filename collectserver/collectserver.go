@@ -1,19 +1,15 @@
 package main
 
 import (
-	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/collect"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
-	"github.com/crunchydata/crunchy-postgresql-manager/types"
-	"github.com/crunchydata/crunchy-postgresql-manager/util"
+	"github.com/crunchydata/crunchy-postgresql-manager/swarmapi"
 	"github.com/prometheus/client_golang/prometheus"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
 )
-
-const CLUSTERADMIN_DB = "clusteradmin"
 
 //var gauges = make([]prometheus.Gauge, 3)
 var (
@@ -78,33 +74,29 @@ func main() {
 			})
 		prometheus.MustRegister(gaugeMem)
 
-		//get servers
-		dbConn, err2 := util.GetConnection(CLUSTERADMIN_DB)
-		if err2 != nil {
-			logit.Error.Println(err2.Error())
-		}
-		var servers []types.Server
-		servers, err = admindb.GetAllServers(dbConn)
+		var serverinfo swarmapi.DockerInfoResponse
+		serverinfo, err = swarmapi.DockerInfo()
 		if err != nil {
 			logit.Error.Println(err.Error())
 		}
-		dbConn.Close()
+		logit.Info.Printf("got %d servers\n", len(serverinfo.Output))
 
 		var metric collect.Metric
 
 		for {
 			//get metrics for each server
-			i := 0
-			for i = range servers {
+			for x := 0; x < len(serverinfo.Output); {
 				//v := rand.Float64() * 100.00
-				metric, err = collect.Collectcpu(servers[i].Name)
-				gauge.WithLabelValues(servers[i].Name).Set(metric.Value)
-				logit.Info.Println("setting cpu metric for " + servers[i].Name + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
-				metric, err = collect.Collectmem(servers[i].Name)
-				gaugeMem.WithLabelValues(servers[i].Name).Set(metric.Value)
-				logit.Info.Println("setting mem metric for " + servers[i].Name + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
-				i++
+				metric, err = collect.Collectcpu(serverinfo.Output[x])
+				gauge.WithLabelValues(serverinfo.Output[x]).Set(metric.Value)
+				logit.Info.Println("setting cpu metric for " + serverinfo.Output[x] + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
+				metric, err = collect.Collectmem(serverinfo.Output[x])
+				gaugeMem.WithLabelValues(serverinfo.Output[x]).Set(metric.Value)
+				logit.Info.Println("setting mem metric for " + serverinfo.Output[x] + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
+				x++
 			}
+
+			logit.Info.Println("sleeping in the server metrics ....")
 
 			time.Sleep(time.Duration(SERVER_POLL_INT) * time.Minute)
 		}

@@ -121,6 +121,7 @@ docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-e HC_POLL_INT=4 \
 	-e CPMBASE=/var/cpm \
 	-e DB_PORT=5432 -e DB_USER=postgres \
+	-e SWARM_MANAGER_URL=tcp://192.168.0.106:8000 \
 	-v $LOGDIR:/cpmlogs \
 	-d --name=cpm-collect crunchydata/cpm-collect:latest 
 
