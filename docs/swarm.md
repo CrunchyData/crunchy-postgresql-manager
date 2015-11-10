@@ -47,11 +47,12 @@ swarm join --addr=$LOCAL_HOST:$SWARM_PORT token://7b9fb5037919f89bd52c3c4888586b
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 On one server in your cluster, Start the swarm manager that listens to CPM
-requests:
+requests, in this example I specify two servers that will act as the cluster nodes, this is one simple form of Swarm Discovery:
 ~~~~~~~~~~~~~~~~~~~~~~~~
 export MANAGER_HOST=192.168.0.103
 export MANAGER_PORT=8000
-swarm manage --host $MANAGER_HOST:$MANAGER_PORT token://7b9fb5037919f89bd52c3c4888586be3
+swarm manage --host $MANAGER_HOST:$MANAGER_PORT
+nodes://192.168.0.107:2375,192.168.0.106:2375
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Test
