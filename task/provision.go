@@ -104,12 +104,24 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 	params.EnvVars["BACKUP_SERVER_URL"] = "cpm-task:13001"
 
 	//provision the volume on all CPM servers
-	var servers []types.Server
-	servers, err = admindb.GetAllServers(dbConn)
+	var infoResponse swarmapi.DockerInfoResponse
+
+	infoResponse, err = swarmapi.DockerInfo()
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return err
 	}
+
+	servers := make([]types.Server, len(infoResponse.Output))
+
+	i := 0
+	for i = range infoResponse.Output {
+		servers[i].ID = infoResponse.Output[i]
+		servers[i].Name = infoResponse.Output[i]
+		servers[i].IPAddress = infoResponse.Output[i]
+		i++
+	}
+
 	request := &cpmserverapi.DiskProvisionRequest{"/tmp/foo"}
 	request.Path = params.PGDataPath
 	for _, each := range servers {

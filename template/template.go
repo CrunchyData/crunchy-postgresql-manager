@@ -22,6 +22,7 @@ import (
 	"flag"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/swarmapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"io/ioutil"
@@ -122,13 +123,23 @@ func Hba(dbConn *sql.DB, mode string, hostname string, port string, clusterid st
 		return "", err
 	}
 
-	servers, err := admindb.GetAllServers(dbConn)
+	var infoResponse swarmapi.DockerInfoResponse
+
+	infoResponse, err = swarmapi.DockerInfo()
 	if err != nil {
 		logit.Error.Println("Hba:" + err.Error())
 		return "", err
 	}
 
+	servers := make([]types.Server, len(infoResponse.Output))
 	i := 0
+	for i = range infoResponse.Output {
+		parts := strings.Split(infoResponse.Output[i], ":")
+		servers[i].IPAddress = parts[0]
+		i++
+	}
+
+	i = 0
 	var allservers = ""
 	//TODO make this configurable as a setting value
 	var allbridges = bridges.Value

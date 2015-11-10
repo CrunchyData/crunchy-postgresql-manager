@@ -18,10 +18,8 @@ package adminapi
 import (
 	"bytes"
 	"database/sql"
-	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
-	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/swarmapi"
@@ -30,7 +28,6 @@ import (
 	"net/http"
 	"os/exec"
 	"strings"
-	"time"
 )
 
 const CONTAINER_NOT_FOUND = "CONTAINER NOT FOUND"
@@ -332,13 +329,23 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	var servers []types.Server
-	servers, err = admindb.GetAllServers(dbConn)
+	var infoResponse swarmapi.DockerInfoResponse
+	infoResponse, err = swarmapi.DockerInfo()
 	if err != nil {
 		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	servers := make([]types.Server, len(infoResponse.Output))
+	i := 0
+	for i = range infoResponse.Output {
+		servers[i].ID = infoResponse.Output[i]
+		servers[i].Name = infoResponse.Output[i]
+		servers[i].IPAddress = infoResponse.Output[i]
+		i++
+	}
+
 	var pgdatapath types.Setting
 	pgdatapath, err = admindb.GetSetting(dbConn, "PG-DATA-PATH")
 	if err != nil {
@@ -354,6 +361,7 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	logit.Info.Println("remove 1")
 	//it is possible that someone can remove a container
 	//outside of us, so we let it pass that we can't remove
 	//it
@@ -365,15 +373,17 @@ func DeleteNode(w rest.ResponseWriter, r *rest.Request) {
 		logit.Error.Println(err.Error())
 	}
 
+	logit.Info.Println("remove 2")
 	//send the server a deletevolume command
 	request2 := &cpmserverapi.DiskDeleteRequest{}
 	request2.Path = pgdatapath.Value + "/" + dbNode.Name
 	for _, each := range servers {
 		_, err = cpmserverapi.DiskDeleteClient(each.Name, request2)
 		if err != nil {
-			fmt.Println(err.Error())
+			logit.Error.Println(err.Error())
 		}
 	}
+	logit.Info.Println("remove 3")
 
 	//we should not have to delete the DNS entries because
 	//of the dnsbridge, it should remove them when we remove
@@ -422,7 +432,7 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 	nodes := make([]types.ClusterNode, len(results.Output))
 	i := 0
 	for _, each := range results.Output {
-		fmt.Println("got back Name:" + each.Name + " Status:" + each.Status + " Image:" + each.Image)
+		logit.Info.Println("got back Name:" + each.Name + " Status:" + each.Status + " Image:" + each.Image)
 		nodes[i].Name = each.Name
 		nodes[i].Status = each.Status
 		nodes[i].Image = each.Image
@@ -606,7 +616,9 @@ func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	containers, err := admindb.GetAllContainersForServer(dbConn, serverid)
+	cleanIP := strings.Replace(serverid, "_", ".", -1)
+
+	containers, err := swarmapi.DockerPs(cleanIP)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -617,23 +629,14 @@ func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	//use a 'best effort' approach here since containers
 	//can be removed outside of CPM's control
 
-	for i := range containers {
-		/**
-		//fetch the server
-		server := types.Server{}
-		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
-		if err != nil {
-			logit.Error.Println(err.Error())
-			rest.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		*/
+	for _, each := range containers.Output {
 
 		//start the container
 		var response swarmapi.DockerStartResponse
 		var err error
 		request := &swarmapi.DockerStartRequest{}
-		request.ContainerName = containers[i].Name
+		logit.Info.Println("trying to start " + each.Name)
+		request.ContainerName = each.Name
 		response, err = swarmapi.DockerStart(request)
 		if err != nil {
 			logit.Error.Println("AdminStartServerContainers: error when trying to start container " + err.Error())
@@ -675,8 +678,9 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	//fetch the server
-	containers, err := admindb.GetAllContainersForServer(dbConn, serverid)
+	cleanIP := strings.Replace(serverid, "_", ".", -1)
+
+	containers, err := swarmapi.DockerPs(cleanIP)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -684,39 +688,11 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//for each, get server, stop container
-	for i := range containers {
-		/**
-		server := types.Server{}
-		server, err = admindb.GetServer(dbConn, containers[i].ServerID)
-		if err != nil {
-			logit.Error.Println(err.Error())
-			rest.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		*/
-
-		//send stop command before stopping container
-		if containers[i].Role == "pgpool" {
-			var stoppoolResp cpmcontainerapi.StopPgpoolResponse
-			stoppoolResp, err = cpmcontainerapi.StopPgpoolClient(containers[i].Name)
-			logit.Info.Println("AdminStoppg:" + stoppoolResp.Output)
-		} else {
-			var stopResp cpmcontainerapi.StopPGResponse
-			stopResp, err = cpmcontainerapi.StopPGClient(containers[i].Name)
-			logit.Info.Println("AdminStoppg:" + stopResp.Output)
-		}
-		if err != nil {
-			logit.Error.Println(err.Error())
-			rest.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		sleepTime, _ := time.ParseDuration("2s")
-		time.Sleep(sleepTime)
+	for _, each := range containers.Output {
 
 		//stop container
 		request := &swarmapi.DockerStopRequest{}
-		request.ContainerName = containers[i].Name
+		request.ContainerName = each.Name
 		_, err = swarmapi.DockerStop(request)
 		if err != nil {
 			logit.Error.Println("AdminStopServerContainers: error when trying to start container " + err.Error())

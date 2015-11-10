@@ -17,14 +17,12 @@ package adminapi
 
 import (
 	"github.com/ant0ine/go-json-rest/rest"
-	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/swarmapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -52,74 +50,6 @@ func GetServer(w rest.ResponseWriter, r *rest.Request) {
 
 	server := types.Server{ID, ID, ID, "", "", ""}
 
-	w.WriteJson(&server)
-}
-
-// AddServer updating and inserting a server
-func AddServer(w rest.ResponseWriter, r *rest.Request) {
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), 400)
-		return
-
-	}
-	defer dbConn.Close()
-
-	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-server")
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	CreateDate := ""
-	server := types.Server{r.PathParam("ID"), r.PathParam("Name"), r.PathParam("IPAddress"), r.PathParam("ServerClass"), CreateDate, ""}
-
-	server.IPAddress = strings.Replace(server.IPAddress, "_", ".", -1)
-
-	if server.Name == "" {
-		logit.Error.Println("AddServer: error server name required")
-		rest.Error(w, "server name required", http.StatusBadRequest)
-		return
-	}
-	if server.IPAddress == "" {
-		logit.Error.Println("AddServer: error ipaddress required")
-		rest.Error(w, "server IPAddress required", http.StatusBadRequest)
-		return
-	}
-
-	var servers []types.Server
-	servers, err = admindb.GetAllServers(dbConn)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	for i := range servers {
-		if servers[i].IPAddress == server.IPAddress {
-			rest.Error(w, "IP Address already used by another server", http.StatusBadRequest)
-			return
-		}
-	}
-
-	dbserver := types.Server{server.ID, server.Name, server.IPAddress,
-		server.ServerClass, CreateDate, ""}
-	if dbserver.ID == "0" {
-		strid, err := admindb.InsertServer(dbConn, dbserver)
-		newid := strconv.Itoa(strid)
-		if err != nil {
-			logit.Error.Println(err.Error())
-			rest.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		server.ID = newid
-	} else {
-		admindb.UpdateServer(dbConn, dbserver)
-	}
-
-	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&server)
 }
 
@@ -220,57 +150,14 @@ func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 		x++
 	}
 
-	/**
-	results, err := admindb.GetAllServers(dbConn)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-	}
-	*/
 	servers := make([]types.Server, len(infoResponse.Output))
 	i := 0
 	for i = range infoResponse.Output {
 		servers[i].ID = infoResponse.Output[i]
 		servers[i].Name = infoResponse.Output[i]
 		servers[i].IPAddress = infoResponse.Output[i]
-		//servers[i].ServerClass = results[i].ServerClass
-		//servers[i].CreateDate = results[i].CreateDate
 		i++
 	}
 
 	w.WriteJson(&servers)
-}
-
-// DeleteServer delete a given server
-func DeleteServer(w rest.ResponseWriter, r *rest.Request) {
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), 400)
-		return
-
-	}
-	defer dbConn.Close()
-
-	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-server")
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	ID := r.PathParam("ID")
-	if ID == "" {
-		logit.Error.Println("DeleteServer: error server id required")
-		rest.Error(w, "Server ID required", http.StatusBadRequest)
-		return
-	}
-
-	err = admindb.DeleteServer(dbConn, ID)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-	}
-
-	w.WriteHeader(http.StatusOK)
 }

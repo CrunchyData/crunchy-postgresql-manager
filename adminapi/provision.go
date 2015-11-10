@@ -135,12 +135,15 @@ func provisionImpl(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standby bo
 		return "", err
 	}
 
-	//go get the IPAddress
-	var servers []types.Server
-	servers, err = admindb.GetAllServers(dbConn)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return "", err
+	var infoResponse swarmapi.DockerInfoResponse
+	infoResponse, err = swarmapi.DockerInfo()
+	servers := make([]types.Server, len(infoResponse.Output))
+	i := 0
+	for i = range infoResponse.Output {
+		servers[i].ID = infoResponse.Output[i]
+		servers[i].Name = infoResponse.Output[i]
+		servers[i].IPAddress = infoResponse.Output[i]
+		i++
 	}
 
 	//for database nodes, on the target server, we need to allocate
@@ -389,6 +392,11 @@ func provisionImplInit(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standb
 			var mode = "standalone"
 
 			data, err = template.Postgresql(mode, pgport.Value, "")
+			if err != nil {
+				logit.Error.Println(err.Error())
+				return err
+			}
+			logit.Info.Println("provision chkpt 4")
 
 			//place postgresql.conf on new node
 			_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/postgresql.conf", data, fqdn)
@@ -396,6 +404,7 @@ func provisionImplInit(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standb
 				logit.Error.Println(err.Error())
 				return err
 			}
+			logit.Info.Println("provision chkpt 5")
 			//create pg_hba.conf
 			rules := make([]template.Rule, 0)
 			data, err = template.Hba(dbConn, mode, params.ContainerName, pgport.Value, "", domainname.Value, rules)
@@ -403,6 +412,7 @@ func provisionImplInit(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standb
 				logit.Error.Println(err.Error())
 				return err
 			}
+			logit.Info.Println("provision chkpt 6")
 			//place pg_hba.conf on new node
 			_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/pg_hba.conf", data, fqdn)
 			if err != nil {

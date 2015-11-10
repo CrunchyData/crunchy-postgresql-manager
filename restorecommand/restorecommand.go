@@ -80,24 +80,6 @@ func main() {
 	//wait for postgres to quit
 	time.Sleep(sleepTime)
 
-	/**
-	stats("removing previous data files...")
-	//remove previous pgdata files
-	var removeResponse cpmcontainerapi.RemoveDataResponse
-	removeResponse, err = cpmcontainerapi.RemoveDataClient(restoreContainerName)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		s.Status = "error in removePG"
-		sendStats(&s)
-		os.Exit(1)
-	}
-	logit.Info.Println("RemoveData....")
-	logit.Info.Println(removeResponse.Output)
-	logit.Info.Println(removeResponse.Stderr)
-	logit.Info.Println(removeResponse.Status)
-	logit.Info.Println("End of RemoveData....")
-	*/
-
 	stats("performing the restore...")
 	//perform the restore
 	restoreRequest := cpmcontainerapi.RestoreRequest{}

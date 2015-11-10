@@ -46,6 +46,7 @@ func main() {
 		&rest.Route{"POST", "/metrics/cpu", cpmserverapi.MetricCPU},
 		&rest.Route{"POST", "/disk/provision", cpmserverapi.DiskProvision},
 		&rest.Route{"POST", "/disk/delete", cpmserverapi.DiskDelete},
+		&rest.Route{"GET", "/status", cpmserverapi.Status},
 	)
 	if err != nil {
 		log.Fatal(err)

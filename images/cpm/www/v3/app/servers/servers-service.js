@@ -44,23 +44,16 @@ angular.module('uiRouterSample.servers.service', ['ngCookies'])
 
     serversFactory.startall = function(serverid) {
 
-        var url = $cookieStore.get('AdminURL') + '/admin/startall/' + serverid + '.' + $cookieStore.get('cpm_token');
+        var cleanip = serverid.replace(/\./g, "_");
+        var url = $cookieStore.get('AdminURL') + '/admin/startall/' + cleanip + '.' + $cookieStore.get('cpm_token');
         console.log(url);
 
         return $http.get(url);
     };
     serversFactory.stopall = function(serverid) {
 
-        var url = $cookieStore.get('AdminURL') + '/admin/stopall/' + serverid + '.' + $cookieStore.get('cpm_token');
-        console.log(url);
-
-        return $http.get(url);
-    };
-
-
-    serversFactory.delete = function(serverid) {
-
-        var url = $cookieStore.get('AdminURL') + '/deleteserver/' + serverid + '.' + $cookieStore.get('cpm_token');
+        var cleanip = serverid.replace(/\./g, "_");
+        var url = $cookieStore.get('AdminURL') + '/admin/stopall/' + cleanip + '.' + $cookieStore.get('cpm_token');
         console.log(url);
 
         return $http.get(url);
@@ -86,20 +79,6 @@ angular.module('uiRouterSample.servers.service', ['ngCookies'])
 
         var cleanip = serverid.replace(/\./g, "_");
         var url = $cookieStore.get('AdminURL') + '/nodes/forserver/' + cleanip + '.' + $cookieStore.get('cpm_token');
-        console.log(url);
-
-        return $http.get(url);
-    };
-
-    serversFactory.add = function(server) {
-
-        var cleanip = server.IPAddress.replace(/\./g, "_");
-
-        var url = $cookieStore.get('AdminURL') + '/addserver/' +
-            server.ID + '.' +
-            server.Name + '.' +
-            cleanip + '.' +
-            server.ServerClass + '.' + $cookieStore.get('cpm_token');
         console.log(url);
 
         return $http.get(url);

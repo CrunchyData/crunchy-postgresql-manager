@@ -9,7 +9,7 @@
 				<li ng-repeat="rule in rules.data" ui-sref-active="active">
 
 				<!-- Here's a ui-sref that is also providing necessary parameters -->
-				<a ui-sref="rules.detail({ruleId:rule.Name})">{{rule.Name}}</a>
+				<a ui-sref="rules.detail.details({ruleId:rule.Name})">{{rule.Name}}</a>
 				</li>
 			</ul>
 			<hr>

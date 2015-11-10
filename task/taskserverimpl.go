@@ -21,8 +21,10 @@ import (
 
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/robfig/cron"
+	"log"
 	"net/http"
 )
 
@@ -185,7 +187,9 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 
 	}
 	defer dbConn.Close()
-	logit.Info.Println("ExecuteNow.impl called profile=" + request.ProfileName)
+	log.Println("-log- ExecuteNow.impl called profile=" + request.ProfileName)
+	fmt.Println("-fmt- ExecuteNow.impl called profile=" + request.ProfileName)
+	logit.Info.Println("-logit- ExecuteNow.impl called profile=" + request.ProfileName)
 
 	if request.ProfileName == "pg_basebackup" {
 		err = ProvisionBackupJob(dbConn, &request)

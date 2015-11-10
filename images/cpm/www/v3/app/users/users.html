@@ -9,7 +9,7 @@
 				<li ng-repeat="user in users.data" ui-sref-active="active">
 
 				<!-- Here's a ui-sref that is also providing necessary parameters -->
-				<a ui-sref="users.detail({userId:user.Name})">{{user.Name}}</a>
+				<a ui-sref="users.detail.details({userId:user.Name})">{{user.Name}}</a>
 				</li>
 			</ul>
 			<hr>

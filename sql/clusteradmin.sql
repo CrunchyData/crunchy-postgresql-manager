@@ -21,18 +21,6 @@ create table project (
 
 insert into project (name, description, updatedt) values ('default', 'default project', now());
 
-create table server (
-	id serial primary key,
-	name varchar(20) unique not null,
-	ipaddress varchar(20) unique not null,
-	dockerbip varchar(20) unique not null,
-	serverclass varchar(20) not null,
-	createdt timestamp not null,
-	constraint valid_server_class check (
-		serverclass in ('low', 'medium', 'high')
-	)
-);
-
 create table cluster (
 	id serial primary key,
 	name varchar(20) unique not null,

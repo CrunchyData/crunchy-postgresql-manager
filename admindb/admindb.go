@@ -25,28 +25,7 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	_ "github.com/lib/pq"
 	"strconv"
-	//"strings"
 )
-
-// GetServer returns a server object from the database for a given server
-func GetServer(dbConn *sql.DB, id string) (types.Server, error) {
-	//logit.Info.Println("GetServer called with id=" + id)
-	server := types.Server{}
-
-	err := dbConn.QueryRow(fmt.Sprintf("select id, name, ipaddress, serverclass, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from server where id=%s", id)).Scan(&server.ID, &server.Name, &server.IPAddress, &server.ServerClass, &server.CreateDate)
-	switch {
-	case err == sql.ErrNoRows:
-		logit.Info.Println("admindb:GetServer:no server with that id")
-		return server, err
-	case err != nil:
-		logit.Info.Println("admindb:GetServer:" + err.Error())
-		return server, err
-	default:
-		logit.Info.Println("admindb:GetServer: server name returned is " + server.Name)
-	}
-
-	return server, nil
-}
 
 // GetClusterName returns the name of a cluster based for a given cluster ID
 func GetClusterName(dbConn *sql.DB, id string) (string, error) {
@@ -141,50 +120,6 @@ func GetAllClustersForProject(dbConn *sql.DB, projectId string) ([]types.Cluster
 	}
 	return clusters, nil
 }
-
-// GetAllClusters returns a list of all cluster objects
-/**
-func GetAllClusters(dbConn *sql.DB) ([]types.Cluster, error) {
-	//logit.Info.Println("admindb:GetAllClusters: called")
-	var rows *sql.Rows
-	var err error
-	rows, err = dbConn.Query("select id, projectid, name, clustertype, status, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from cluster order by name")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var containers []types.Container
-	clusters := make([]types.Cluster, 0)
-	for rows.Next() {
-		cluster := types.Cluster{}
-		if err = rows.Scan(
-			&cluster.ID,
-			&cluster.ProjectID,
-			&cluster.Name,
-			&cluster.ClusterType,
-			&cluster.Status, &cluster.CreateDate); err != nil {
-			return nil, err
-		}
-
-		cluster.Containers = make(map[string]string)
-		containers, err = GetAllContainersForCluster(dbConn, cluster.ID)
-		if err != nil {
-			logit.Info.Println("admindb:GetCluster:" + err.Error())
-		}
-
-		for i := range containers {
-			cluster.Containers[containers[i].ID] = containers[i].Name
-			logit.Info.Println("admindb:GetCluster: add to map " + cluster.Containers[containers[i].ID])
-		}
-
-		clusters = append(clusters, cluster)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-	return clusters, nil
-}
-*/
 
 // UpdateCluster updates a given cluster object in the database
 func UpdateCluster(dbConn *sql.DB, cluster types.Cluster) error {
@@ -594,110 +529,6 @@ func UpdateContainer(dbConn *sql.DB, container types.Container) error {
 	}
 	return nil
 
-}
-
-// GetAllServers returns a list of all server objects
-func GetAllServers(dbConn *sql.DB) ([]types.Server, error) {
-	logit.Info.Println("admindb:GetAllServer:called")
-	var rows *sql.Rows
-	var err error
-	rows, err = dbConn.Query("select id, name, ipaddress, serverclass, to_char(createdt, 'MM-DD-YYYY HH24:MI:SS') from server order by name")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	servers := make([]types.Server, 0)
-	for rows.Next() {
-		server := types.Server{}
-		if err = rows.Scan(&server.ID, &server.Name,
-			&server.IPAddress, &server.ServerClass, &server.CreateDate); err != nil {
-			return nil, err
-		}
-		servers = append(servers, server)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-	return servers, nil
-}
-
-// GetAllServersByClassByCount returns a list of server objects with a node count for each server included
-func GetAllServersByClassByCount(dbConn *sql.DB) ([]types.Server, error) {
-
-	logit.Info.Println("admindb:GetAllServerByClassByCount:called")
-	var rows *sql.Rows
-	var err error
-	rows, err = dbConn.Query("select s.id, s.name, s.ipaddress, s.serverclass, to_char(s.createdt, 'MM-DD-YYYY HH24:MI:SS'), count(n) from server s left join container n on s.id = n.serverid group by s.id  order by s.serverclass, count(n)")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	servers := make([]types.Server, 0)
-	for rows.Next() {
-		server := types.Server{}
-		if err = rows.Scan(&server.ID, &server.Name,
-			&server.IPAddress, &server.ServerClass, &server.CreateDate, &server.NodeCount); err != nil {
-			return nil, err
-		}
-		servers = append(servers, server)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-	return servers, nil
-}
-
-// UpdateServer updates a given server
-func UpdateServer(dbConn *sql.DB, server types.Server) error {
-	logit.Info.Println("admindb:UpdateServer:called")
-	queryStr := fmt.Sprintf("update server set ( name, ipaddress,  serverclass ) = ('%s', '%s', '%s', '%s') where id = %s returning id", server.Name, server.IPAddress, server.ServerClass, server.ID)
-
-	logit.Info.Println("admindb:UpdateServer:update str=" + queryStr)
-	var serverid int
-	err := dbConn.QueryRow(queryStr).Scan(&serverid)
-	switch {
-	case err != nil:
-		return err
-	default:
-		logit.Info.Println("admindb:UpdateServer:server updated " + server.ID)
-	}
-	return nil
-
-}
-
-// InsertServer inserts a new server object
-func InsertServer(dbConn *sql.DB, server types.Server) (int, error) {
-	//logit.Info.Println("admindb:InsertServer:called")
-	queryStr := fmt.Sprintf("insert into server ( name, ipaddress,  serverclass, createdt) values ( '%s', '%s', '%s',  now()) returning id", server.Name, server.IPAddress, server.ServerClass)
-
-	logit.Info.Println("admindb:InsertServer:" + queryStr)
-	var serverid int
-	err := dbConn.QueryRow(queryStr).Scan(&serverid)
-	switch {
-	case err != nil:
-		logit.Info.Println("admindb:InsertServer:" + err.Error())
-		return -1, err
-	default:
-		logit.Info.Println("admindb:InsertServer: server inserted returned is " + strconv.Itoa(serverid))
-	}
-
-	return serverid, nil
-}
-
-// DeleteServer deletes a server object
-func DeleteServer(dbConn *sql.DB, id string) error {
-	queryStr := fmt.Sprintf("delete from server where  id=%s returning id", id)
-	logit.Info.Println("admindb:DeleteServer:" + queryStr)
-
-	var serverid int
-	err := dbConn.QueryRow(queryStr).Scan(&serverid)
-	switch {
-	case err != nil:
-		return err
-	default:
-		logit.Info.Println("admindb:DeleteServer:server deleted " + id)
-	}
-	return nil
 }
 
 // GetAllGeneralSettings returns a list of all settings of 'general' types

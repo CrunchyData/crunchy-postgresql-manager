@@ -48,14 +48,16 @@ func ReloadClient() (ReloadResponse, error) {
 
 // ExecuteNowClient client for the execute now function which runs a task immediately
 func ExecuteNowClient(req *TaskRequest) (ExecuteNowResponse, error) {
-	var err error
+	response := ExecuteNowResponse{}
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
 	url := URL + "/api/executenow"
 	logit.Info.Println("executenow about to post to " + url)
-	r, _ := http.Post(url, "application/json", body)
+	r, err := http.Post(url, "application/json", body)
+	if err != nil {
+		return response, err
+	}
 	rawresponse, _ := ioutil.ReadAll(r.Body)
-	response := ExecuteNowResponse{}
 	err = json.Unmarshal(rawresponse, &response)
 	//fmt.Println(string(rawresponse))
 	return response, err
@@ -63,14 +65,16 @@ func ExecuteNowClient(req *TaskRequest) (ExecuteNowResponse, error) {
 
 // StatusUpdateClient is the client to the StatusUpdate function
 func StatusUpdateClient(req *TaskStatus) (StatusUpdateResponse, error) {
-	var err error
+	response := StatusUpdateResponse{}
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
 	url := URL + "/api/status/update"
 	logit.Info.Println("statusupdate client about to post to " + url)
-	r, _ := http.Post(url, "application/json", body)
+	r, err := http.Post(url, "application/json", body)
+	if err != nil {
+		return response, err
+	}
 	rawresponse, _ := ioutil.ReadAll(r.Body)
-	response := StatusUpdateResponse{}
 	err = json.Unmarshal(rawresponse, &response)
 	//fmt.Println(string(rawresponse))
 	return response, err
@@ -79,14 +83,16 @@ func StatusUpdateClient(req *TaskStatus) (StatusUpdateResponse, error) {
 // StatusAddClient is the client to the StatusAdd function which allows
 // for the addition of new status info
 func StatusAddClient(req *TaskStatus) (StatusAddResponse, error) {
-	var err error
+	response := StatusAddResponse{}
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
 	url := URL + "/api/status/add"
 	logit.Info.Println("statusadd client about to post to " + url)
-	r, _ := http.Post(url, "application/json", body)
+	r, err := http.Post(url, "application/json", body)
+	if err != nil {
+		return response, err
+	}
 	rawresponse, _ := ioutil.ReadAll(r.Body)
-	response := StatusAddResponse{}
 	err = json.Unmarshal(rawresponse, &response)
 	//fmt.Println(string(rawresponse))
 	return response, err

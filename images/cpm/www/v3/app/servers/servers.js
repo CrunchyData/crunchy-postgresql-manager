@@ -424,13 +424,18 @@ angular.module('uiRouterSample.servers', [
 
                     '': {
                         templateUrl: 'app/servers/servers.detail.containers.start.html',
-                        controller: ['$scope', '$stateParams', '$state', 'serversFactory', 'utils',
-                            function($scope, $stateParams, $state, serversFactory, utils) {
+                        controller: ['$scope', '$stateParams', '$state', 'serversFactory', 'utils', 'spinnerService',
+                            function($scope, $stateParams, $state, serversFactory, utils, spinnerService) {
 
                                 $scope.start = function() {
+					spinnerService.show('startallspinner');
                                     serversFactory.startall($scope.server.ID)
                                         .success(function(data) {
                                             //console.log('successful get in list =' + JSON.stringify(data));
+                                            $state.go('servers.list', $stateParams, {
+                                                reload: true,
+                                                inherit: false
+                                            });
                                         })
                                         .error(function(error) {
                                             $scope.alerts = [{
@@ -438,7 +443,10 @@ angular.module('uiRouterSample.servers', [
                                                 msg: error.message
                                             }];
                                             console.log('here is an error ' + error.message);
-                                        });
+                                        })
+					.finally(function() {
+						spinnerService.hide('startallspinner');
+					});
 
                                 };
                             }
@@ -453,13 +461,18 @@ angular.module('uiRouterSample.servers', [
 
                     '': {
                         templateUrl: 'app/servers/servers.detail.containers.stop.html',
-                        controller: ['$scope', '$stateParams', '$state', 'serversFactory', 'utils',
-                            function($scope, $stateParams, $state, serversFactory, utils) {
+                        controller: ['$scope', '$stateParams', '$state', 'serversFactory', 'utils', 'spinnerService',
+                            function($scope, $stateParams, $state, serversFactory, utils, spinnerService) {
 
                                 $scope.stop = function() {
+					spinnerService.show('stopallspinner');
                                     serversFactory.stopall($scope.server.ID)
                                         .success(function(data) {
                                             //console.log('successful get in list =' + JSON.stringify(data));
+                                            $state.go('servers.list', $stateParams, {
+                                                reload: true,
+                                                inherit: false
+                                            });
                                         })
                                         .error(function(error) {
                                             $scope.alerts = [{
@@ -467,7 +480,10 @@ angular.module('uiRouterSample.servers', [
                                                 msg: error.message
                                             }];
                                             console.log('here is an error ' + error.message);
-                                        });
+                                        })
+					.finally(function() {
+						spinnerService.hide('stopallspinner');
+					});
                                 };
                             }
                         ]

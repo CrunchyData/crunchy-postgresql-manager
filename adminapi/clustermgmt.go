@@ -571,46 +571,6 @@ func GetAllClustersForProject(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&clusters)
 }
 
-// TODO
-/**
-func GetAllClusters(w rest.ResponseWriter, r *rest.Request) {
-	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), 400)
-		return
-
-	}
-	defer dbConn.Close()
-	err = secimpl.Authorize(dbConn, r.PathParam("Token"), "perm-read")
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	results, err := admindb.GetAllClusters(dbConn)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-	}
-	clusters := make([]types.Cluster, len(results))
-	i := 0
-	for i = range results {
-		clusters[i].ID = results[i].ID
-		clusters[i].ProjectID = results[i].ProjectID
-		clusters[i].Name = results[i].Name
-		clusters[i].ClusterType = results[i].ClusterType
-		clusters[i].Status = results[i].Status
-		clusters[i].CreateDate = results[i].CreateDate
-		clusters[i].Containers = results[i].Containers
-		i++
-	}
-
-	w.WriteJson(&clusters)
-}
-*/
-
 // PostCluster updates or inserts a new cluster definition
 func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
@@ -711,15 +671,23 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	i := 0
+	var infoResponse swarmapi.DockerInfoResponse
 
-	var servers []types.Server
-	servers, err = admindb.GetAllServers(dbConn)
+	infoResponse, err = swarmapi.DockerInfo()
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	i := 0
+	servers := make([]types.Server, len(infoResponse.Output))
+	for i = range infoResponse.Output {
+		servers[i].ID = infoResponse.Output[i]
+		servers[i].Name = infoResponse.Output[i]
+		servers[i].IPAddress = infoResponse.Output[i]
+		i++
+	}
+
 	var pgdatapath types.Setting
 	pgdatapath, err = admindb.GetSetting(dbConn, "PG-DATA-PATH")
 	if err != nil {
@@ -1249,6 +1217,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 //  to promote least used servers, incoming servers list
 //  should be sorted by class and least used order
 //  returns the master server and the list of standby servers
+/**
 func roundRobin(dbConn *sql.DB, profile types.ClusterProfiles) (types.Server, []types.Server, error) {
 	var masterServer types.Server
 	count, err := strconv.Atoi(profile.Count)
@@ -1341,6 +1310,7 @@ func roundRobin(dbConn *sql.DB, profile types.ClusterProfiles) (types.Server, []
 	}
 	return masterServer, chosen, nil
 }
+*/
 
 func waitTillAllReady(dockermaster swarmapi.DockerRunRequest, dockerpgpool swarmapi.DockerRunRequest, dockerstandby []swarmapi.DockerRunRequest, sleepTime time.Duration) error {
 	err := waitTillReady(dockermaster.ContainerName, sleepTime)

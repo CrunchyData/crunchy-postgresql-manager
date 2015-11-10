@@ -9,7 +9,7 @@
 				<li ng-repeat="role in roles.data" ui-sref-active="active">
 
 				<!-- Here's a ui-sref that is also providing necessary parameters -->
-				<a ui-sref="roles.detail({roleId:role.Name})">{{role.Name}}</a>
+				<a ui-sref="roles.detail.details({roleId:role.Name})">{{role.Name}}</a>
 				</li>
 			</ul>
 			<hr>

@@ -161,14 +161,14 @@ Agent.  The server agent is run within the cpm-server container on each
 server host that will be configured to be used in CPM.
 
 Each container needs to be started with skybridge running and also
-have its container name set to 'cpm-servername' where servername is
-the server name you have given the server in the CPM server page once
-CPM is running.
+have its port 10001 mapped to the local host port 10001.  CPM will
+attempt to communicate to each host using this port.  
 
 For this example, I will name the CPM server, newserver.
 
 So, edit the sbin/run-cpmserver.sh script, and modify the server
-name to newserver.
+ip address to be that of the host you are running the CPM server
+upon.
 
 Then run the script which will create a running cpm-server named
 cpm-newserver.
@@ -177,10 +177,10 @@ sudo ./run-cpmserver.sh
 ping cpm-newserver
 ~~~~~~~~~~~~~~~
 
-If your networking and skybridge are all correct, then you should be able 
-to ping the cpm-server container as follows:
+If you have the server running, you can test it by doing a GET
+to it:
 ~~~~~~~~~~~~~~~
-ping cpm-newserver
+curl http://192.168.0.106:10001/status
 ~~~~~~~~~~~~~~~
 
 Running CPM

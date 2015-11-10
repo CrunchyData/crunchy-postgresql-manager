@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"net/http"
 	"os/exec"
 )
@@ -105,4 +106,12 @@ func DiskDelete(w rest.ResponseWriter, r *rest.Request) {
 	response.Output = out.String()
 	response.Status = "OK"
 	w.WriteJson(&response)
+}
+
+func Status(w rest.ResponseWriter, r *rest.Request) {
+	w.WriteHeader(http.StatusOK)
+	status := types.SimpleStatus{}
+	status.Status = "OK"
+	w.WriteJson(&status)
+
 }

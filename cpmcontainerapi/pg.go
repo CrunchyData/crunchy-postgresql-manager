@@ -91,16 +91,6 @@ type SeedResponse struct {
 	Status string
 }
 
-/**
-type RemoveDataRequest struct {
-	ContainerName string
-}
-type RemoveDataResponse struct {
-	Output string
-	Stderr string
-	Status string
-}
-*/
 type ControldataRequest struct {
 	Path string
 }
@@ -421,35 +411,3 @@ func Status(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&response)
 }
-
-/**
-func RemoveData(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("cpmcontainerapi: RemoveData called")
-	req := RemoveDataRequest{}
-	err := r.DecodeJsonPayload(&req)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	var cmd *exec.Cmd
-	cmd = exec.Command("removedata.sh", req.ContainerName)
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-	err = cmd.Run()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), 400)
-		return
-	}
-
-	var response RemoveDataResponse
-	response.Output = out.String()
-	response.Stderr = stderr.String()
-	response.Status = "OK"
-	w.WriteJson(&response)
-}
-*/

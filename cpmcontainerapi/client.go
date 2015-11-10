@@ -265,22 +265,3 @@ func RestoreClient(host string, req *RestoreRequest) (RestoreResponse, error) {
 	//fmt.Println(string(rawresponse))
 	return response, err
 }
-
-// RemoveDataClient client for
-/**
-func RemoveDataClient(host string) (RemoveDataResponse, error) {
-	var err error
-	req := RemoveDataRequest{}
-	req.ContainerName = host
-	buf, _ := json.Marshal(req)
-	body := bytes.NewBuffer(buf)
-	url := "http://" + host + PORT + "/api/removedata"
-	logit.Info.Println("removedata client about to post to " + url)
-	r, _ := http.Post(url, "application/json", body)
-	rawresponse, _ := ioutil.ReadAll(r.Body)
-	response := RemoveDataResponse{}
-	err = json.Unmarshal(rawresponse, &response)
-	//fmt.Println(string(rawresponse))
-	return response, err
-}
-*/

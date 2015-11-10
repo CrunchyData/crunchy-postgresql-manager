@@ -10,7 +10,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
-	//"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -65,7 +64,8 @@ func MetricDfClient(serverID string, req *MetricDfRequest) (MetricDfResponse, er
 func DiskProvisionClient(serverName string, req *DiskProvisionRequest) (DiskProvisionResponse, error) {
 	var err error
 	response := DiskProvisionResponse{}
-	var url = URL + serverName + PORT
+	serverParts := strings.Split(serverName, ":")
+	var url = URL + serverParts[0] + PORT
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
 	r, err := http.Post(url+"/disk/provision", "application/json", body)
@@ -81,102 +81,22 @@ func DiskProvisionClient(serverName string, req *DiskProvisionRequest) (DiskProv
 
 // DiskDeleteClient client for deleting a directory on the  host
 func DiskDeleteClient(serverName string, req *DiskDeleteRequest) (DiskDeleteResponse, error) {
-	var err error
-	var url = URL + serverName + PORT
-	buf, _ := json.Marshal(req)
-	body := bytes.NewBuffer(buf)
-	r, _ := http.Post(url+"/disk/delete", "application/json", body)
-	rawresponse, _ := ioutil.ReadAll(r.Body)
 	response := DiskDeleteResponse{}
-	err = json.Unmarshal(rawresponse, &response)
-	//fmt.Println(string(rawresponse))
-	return response, err
-}
-
-/**
-// DockerInspectClient client for performing a Docker inspect command
-func DockerInspectClient(serverName string, req *DockerInspectRequest) (DockerInspectResponse, error) {
-	var err error
-	var url = URL + serverName + PORT
+	serverParts := strings.Split(serverName, ":")
+	var url = URL + serverParts[0] + PORT
+	logit.Info.Println("deleting disk client with url=" + url)
 	buf, _ := json.Marshal(req)
 	body := bytes.NewBuffer(buf)
-	r, _ := http.Post(url+"/docker/inspect", "application/json", body)
+	r, err := http.Post(url+"/disk/delete", "application/json", body)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return response, err
+	}
 	rawresponse, _ := ioutil.ReadAll(r.Body)
-	response := DockerInspectResponse{}
 	err = json.Unmarshal(rawresponse, &response)
 	//fmt.Println(string(rawresponse))
 	return response, err
 }
-
-// DockerRemoveClient client for performing a Docker remove command
-func DockerRemoveClient(serverName string, req *DockerRemoveRequest) (DockerRemoveResponse, error) {
-	var err error
-	var url = URL + serverName + PORT
-	buf, _ := json.Marshal(req)
-	body := bytes.NewBuffer(buf)
-	r, _ := http.Post(url+"/docker/remove", "application/json", body)
-	rawresponse, _ := ioutil.ReadAll(r.Body)
-	response := DockerRemoveResponse{}
-	err = json.Unmarshal(rawresponse, &response)
-	//fmt.Println(string(rawresponse))
-	return response, err
-}
-
-// DockerStartClient client for performing a Docker start command
-func DockerStartClient(serverName string, req *DockerStartRequest) (DockerStartResponse, error) {
-	var err error
-	var url = URL + serverName + PORT
-	buf, _ := json.Marshal(req)
-	body := bytes.NewBuffer(buf)
-	r, _ := http.Post(url+"/docker/start", "application/json", body)
-	rawresponse, _ := ioutil.ReadAll(r.Body)
-	response := DockerStartResponse{}
-	err = json.Unmarshal(rawresponse, &response)
-	//fmt.Println(string(rawresponse))
-	return response, err
-}
-
-// DockerStopClient client for performing a Docker stop command
-func DockerStopClient(serverName string, req *DockerStopRequest) (DockerStopResponse, error) {
-	var err error
-	var url = URL + serverName + PORT
-	buf, _ := json.Marshal(req)
-	body := bytes.NewBuffer(buf)
-	r, _ := http.Post(url+"/docker/stop", "application/json", body)
-	rawresponse, _ := ioutil.ReadAll(r.Body)
-	response := DockerStopResponse{}
-	err = json.Unmarshal(rawresponse, &response)
-	//fmt.Println(string(rawresponse))
-	return response, err
-}
-
-// DockerRunClient client for performing a Docker run command
-// example:
-//
-//request := &cpmserverapi.DockerRunRequest{}
-//request.CommandPath = "docker-run.sh"
-//request.CPU = "0"
-//request.MEM = "0"
-//request.Image = "cpm-node"
-//request.PGDataPath = "/tmp/foo"
-//request.ContainerName = "testpoo"
-//envvars := make(map[string]string)
-//envvars["one"] = "uno"
-//request.EnvVars = envvars
-//
-func DockerRunClient(serverName string, req *DockerRunRequest) (DockerRunResponse, error) {
-	var err error
-	var url = URL + serverName + PORT
-	buf, _ := json.Marshal(req)
-	body := bytes.NewBuffer(buf)
-	r, _ := http.Post(url+"/docker/run", "application/json", body)
-	rawresponse, _ := ioutil.ReadAll(r.Body)
-	response := DockerRunResponse{}
-	err = json.Unmarshal(rawresponse, &response)
-	//fmt.Println(string(rawresponse))
-	return response, err
-}
-*/
 
 // MetricCPUClient client for getting the cpu metrics
 func MetricCPUClient(serverID string, req *MetricCPURequest) (MetricCPUResponse, error) {
