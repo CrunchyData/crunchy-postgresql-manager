@@ -21,7 +21,7 @@
 set -e
 
 # set the istall directory
-export VERSION=0.9.6
+export VERSION=0.9.8
 export WORKDIR=$GOPATH/src/github.com/crunchydata/crunchy-postgresql-manager
 export TMPDIR=/tmp/var/cpm
 export ARCHIVE=/tmp/cpm.$VERSION-linux-amd64.tar.gz
@@ -69,12 +69,6 @@ pushImages () {
 	sudo docker push -f crunchydata/cpm-admin:$VERSION
 	sudo docker push -f crunchydata/cpm-admin:latest
 
-	echo "saving cpm-base image"
-	sudo docker tag -f cpm-base crunchydata/cpm-base:$VERSION
-	sudo docker tag -f cpm-base crunchydata/cpm-base:latest
-	sudo docker push -f crunchydata/cpm-base:$VERSION
-	sudo docker push -f crunchydata/cpm-base:
-
 	echo "saving cpm-collect image"
 	sudo docker tag -f cpm-collect crunchydata/cpm-collect:$VERSION
 	sudo docker tag -f cpm-collect crunchydata/cpm-collect:latest
@@ -92,6 +86,13 @@ pushImages () {
 	sudo docker tag -f cpm-backup-job crunchydata/cpm-backup-job:latest
 	sudo docker push -f crunchydata/cpm-backup-job:$VERSION
 	sudo docker push -f crunchydata/cpm-backup-job:latest
+
+	echo "saving cpm-restore-job image"
+	sudo docker tag -f cpm-restore-job crunchydata/cpm-restore-job:$VERSION
+	sudo docker tag -f cpm-restore-job crunchydata/cpm-restore-job:latest
+	sudo docker push -f crunchydata/cpm-restore-job:$VERSION
+	sudo docker push -f crunchydata/cpm-restore-job:latest
+
 
 	echo "saving cpm-node image"
 	sudo docker tag -f cpm-node crunchydata/cpm-node:$VERSION
@@ -118,7 +119,7 @@ saveImages () {
 	sudo docker save crunchydata/cpm-admin > /tmp/cpm-admin.tar
 
 	echo "saving cpm-base image"
-	sudo docker save crunchydata/cpm-base > /tmp/cpm-base.tar
+	sudo docker save crunchydata/cpm-restore-job > /tmp/cpm-restore-job.tar
 
 	echo "saving cpm-collect image"
 	sudo docker save crunchydata/cpm-collect > /tmp/cpm-collect.tar
