@@ -87,12 +87,18 @@ var ContainerStartController = function($scope, $stateParams, $state, containers
 
     $scope.start = function() {
         usSpinnerService.spin('spinner-1');
+	console.log('jeff state is ' + JSON.stringify($stateParams))
         containersFactory.start($stateParams.containerId)
             .success(function(data) {
-                $state.go('projects.container.details', $stateParams, {
-                    reload: true,
-                    inherit: false
-                });
+                //$state.go('projects.container.details', $stateParams, {
+                    //reload: true,
+                    //inherit: false
+                //});
+		$state.go('projects.container.details', {
+			containerId: $stateParams.containerId,
+			projectId: $stateParams.projectId
+		});
+
                 usSpinnerService.stop('spinner-1');
             })
             .error(function(error) {

@@ -60,8 +60,11 @@ angular.module('uiRouterSample.projects', [
                             $scope.dataForTheTree = projects.data;
                             //$scope.loadTree(projects.data);
 
+
                             $scope.showSelected = function(node) {
-                                //console.log('tree ' + node.name + ' selected id=' + node.id + ' type=' + node.type + ' projectid=' + node.projectid);
+			    	$scope.lastselectednode = node;
+                                console.log('tree ' + node.name + ' selected id=' + node.id + ' type=' + node.type + ' projectid=' + node.projectid);
+                                console.log('currently selected=' + $scope.node1);
                                 if (node.type == 'database') {
                                     $state.go('projects.container.details', {
                                         containerId: node.id,

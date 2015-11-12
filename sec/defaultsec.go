@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/rs/xid"
 )
 
 //this is the default security implementation for CPM, others
@@ -59,11 +60,15 @@ func (d DefaultSec) Login(dbConn *sql.DB, id string, psw string) (string, error)
 	}
 	logit.Info.Println("Login checkpoint 2")
 
+	/**
 	uuid, err = newUUID()
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return "", err
 	}
+	*/
+	guid := xid.New()
+	uuid = guid.String()
 
 	logit.Info.Println("Login checkpoint 3")
 	//register the session
