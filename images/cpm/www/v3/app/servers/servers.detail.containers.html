@@ -17,7 +17,7 @@
 		<tbody>
 			<tr ng-repeat="container in containers">
 				<td>
-  	<a ng-if="container.Image == 'crunchydata/cpm-node-proxy'" ui-sref="projects.detail.gotoproxy({containerName:container.Name,projectId:container.ProjectID,containerId:container.ID})">{{container.Name}}</a>
+					<a ng-if="container.Image == 'crunchydata/cpm-node-proxy'" ui-sref="projects.detail.gotoproxy({containerName:container.Name,projectId:container.ProjectID,containerId:container.ID})">{{container.Name}}</a>
 	<a ng-if="container.Image == 'crunchydata/cpm-node'" ui-sref="projects.detail.gotocontainer({projectId:container.ProjectID,containerId:container.ID})">{{container.Name}}</a>
 	<a ng-if="container.Image == 'crunchydata/cpm-pgpool'" ui-sref="projects.detail.gotocontainer({projectId:container.ProjectID,containerId:container.ID})">{{container.Name}}</a>
 				</td>

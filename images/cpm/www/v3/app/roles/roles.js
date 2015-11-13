@@ -236,7 +236,7 @@ angular.module('uiRouterSample.roles', [
             })
 
             .state('roles.add', {
-                url: '/add/:itemId',
+                url: '/add',
                 views: {
                     '': {
                         templateUrl: 'app/roles/roles.detail.add.html',
@@ -335,7 +335,7 @@ angular.module('uiRouterSample.roles', [
             // Settings > Detail > delete //
             //////////////////////////////
             .state('roles.detail.delete', {
-                url: '/delete/:itemId',
+                url: '/delete',
                 views: {
                     '': {
                         templateUrl: 'app/roles/roles.detail.delete.html',

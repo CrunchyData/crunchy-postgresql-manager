@@ -115,7 +115,7 @@ angular.module('uiRouterSample.servers', [
             })
 
             .state('servers.detail.monitor.iostat', {
-                url: '/monitor/iostat/:itemId',
+                url: '/iostat',
                 views: {
 
                     '': {
@@ -146,7 +146,7 @@ angular.module('uiRouterSample.servers', [
             })
 
             .state('servers.detail.monitor.df', {
-                url: '/monitor/df/:itemId',
+                url: '/df',
                 views: {
 
                     '': {
@@ -177,7 +177,7 @@ angular.module('uiRouterSample.servers', [
             })
 
             .state('servers.detail.monitor.cpu', {
-                url: '/monitor/cpu/:itemId',
+                url: '/cpu',
                 views: {
 
                     '': {
@@ -197,7 +197,7 @@ angular.module('uiRouterSample.servers', [
             })
 
             .state('servers.detail.monitor.mem', {
-                url: '/monitor/mem/:itemId',
+                url: '/mem',
                 views: {
 
                     '': {
@@ -307,7 +307,7 @@ angular.module('uiRouterSample.servers', [
             })
 
             .state('servers.detail.details', {
-                url: '/details/:itemId',
+                url: '/details',
                 views: {
 
                     '': {
@@ -372,7 +372,7 @@ angular.module('uiRouterSample.servers', [
             })
 
             .state('servers.detail.containers', {
-                url: '/containers/:itemId',
+                url: '/containers',
                 views: {
 
                     '': {
@@ -406,7 +406,7 @@ angular.module('uiRouterSample.servers', [
             })
 
             .state('servers.detail.monitor', {
-                url: '/monitor/:itemId',
+                url: '/monitor',
                 views: {
 
                     '': {
@@ -419,7 +419,7 @@ angular.module('uiRouterSample.servers', [
             })
 
             .state('servers.detail.containers.start', {
-                url: '/start/:itemId',
+                url: '/start',
                 views: {
 
                     '': {
@@ -456,7 +456,7 @@ angular.module('uiRouterSample.servers', [
             })
 
             .state('servers.detail.containers.stop', {
-                url: '/stop/:itemId',
+                url: '/stop',
                 views: {
 
                     '': {

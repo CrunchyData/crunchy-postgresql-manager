@@ -172,8 +172,8 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
-            .state('projects.container.add', {
-                url: '/add/:projectId',
+            .state('projects.detail.addcontainer', {
+                url: '/addcontainer',
                 views: {
 
                     '': {
@@ -182,7 +182,6 @@ angular.module('uiRouterSample.projects', [
                     },
                 }
             })
-
 
             .state('projects.container.details', {
                 url: '/details',
@@ -301,7 +300,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.delete', {
-                url: '/delete/:itemId',
+                url: '/delete',
                 views: {
 
                     '': {
@@ -323,7 +322,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.stop', {
-                url: '/stop/:itemId',
+                url: '/stop',
                 views: {
 
                     '': {
@@ -345,7 +344,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.taskschedules.delete', {
-                url: '/taskschedules/:scheduleID',
+                url: '/delete',
                 views: {
 
                     '': {
@@ -356,7 +355,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.accessrules', {
-                url: '/accessrules/:itemId',
+                url: '/accessrules',
                 views: {
 
                     '': {
@@ -367,7 +366,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.users', {
-                url: '/users/:itemId',
+                url: '/users',
                 views: {
 
                     '': {
@@ -378,7 +377,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.users.edit', {
-                url: '/users/:itemId',
+                url: '/edit',
                 views: {
 
                     '': {
@@ -400,7 +399,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.users.delete', {
-                url: '/users/delete/:itemId',
+                url: '/delete',
                 views: {
 
                     '': {
@@ -425,7 +424,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.monitor.pgstatdatabase', {
-                url: '/pgstatdatabase/:itemId',
+                url: '/pgstatdatabase',
                 views: {
 
                     '': {
@@ -436,7 +435,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.monitor.bgwriter', {
-                url: '/bgwriter/:itemId',
+                url: '/bgwriter',
                 views: {
 
                     '': {
@@ -458,7 +457,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.monitor.pgstatreplication', {
-                url: '/pgstatreplication/:itemId',
+                url: '/pgstatreplication',
                 views: {
 
                     '': {
@@ -469,7 +468,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.monitor.pgsettings', {
-                url: '/pgsettings/:itemId',
+                url: '/pgsettings',
                 views: {
 
                     '': {
@@ -480,7 +479,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.monitor.pgstatstatements', {
-                url: '/pgstatements/:itemId',
+                url: '/pgstatements',
                 views: {
 
                     '': {
@@ -492,7 +491,7 @@ angular.module('uiRouterSample.projects', [
 
 
             .state('projects.container.monitor.pgcontroldata', {
-                url: '/pgcontroldata/:itemId',
+                url: '/pgcontroldata',
                 views: {
 
                     '': {
@@ -504,7 +503,7 @@ angular.module('uiRouterSample.projects', [
 
 
             .state('projects.container.monitor.loadtest', {
-                url: '/loadtest/:itemId',
+                url: '/loadtest',
                 views: {
 
                     '': {
@@ -515,7 +514,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.monitor.databasesize', {
-                url: '/databasesize/:itemId',
+                url: '/databasesize',
                 views: {
 
                     '': {
@@ -561,7 +560,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.cluster.details', {
-                url: '/details/:itemId',
+                url: '/details',
                 views: {
 
                     '': {
@@ -573,7 +572,7 @@ angular.module('uiRouterSample.projects', [
 
             .state('projects.cluster.delete', {
 
-                url: '/delete/:itemId',
+                url: '/delete',
                 views: {
                     '': {
                         templateUrl: 'app/projects/projects.cluster.delete.html',
@@ -584,7 +583,7 @@ angular.module('uiRouterSample.projects', [
 
             .state('projects.cluster.start', {
 
-                url: '/start/:itemId',
+                url: '/start',
                 views: {
                     '': {
                         templateUrl: 'app/projects/projects.cluster.start.html',
@@ -595,7 +594,7 @@ angular.module('uiRouterSample.projects', [
 
             .state('projects.cluster.stop', {
 
-                url: '/stop/:itemId',
+                url: '/stop',
                 views: {
                     '': {
                         templateUrl: 'app/projects/projects.cluster.stop.html',
@@ -606,7 +605,7 @@ angular.module('uiRouterSample.projects', [
 
             .state('projects.cluster.scale', {
 
-                url: '/scale/:itemId',
+                url: '/scale',
                 views: {
                     '': {
                         templateUrl: 'app/projects/projects.cluster.scale.html',
@@ -855,7 +854,7 @@ angular.module('uiRouterSample.projects', [
                 }
             })
             .state('projects.proxy.loadtest', {
-                url: '/loadtest/:itemId',
+                url: '/loadtest',
                 views: {
 
                     '': {
@@ -865,7 +864,7 @@ angular.module('uiRouterSample.projects', [
                 }
             })
             .state('projects.proxy.pgsettings', {
-                url: '/pgsettings/:itemId',
+                url: '/pgsettings',
                 views: {
 
                     '': {
@@ -875,7 +874,7 @@ angular.module('uiRouterSample.projects', [
                 }
             })
             .state('projects.proxy.pgstatdatabase', {
-                url: '/pgstatdatabase/:itemId',
+                url: '/pgstatdatabase',
                 views: {
 
                     '': {
@@ -885,7 +884,7 @@ angular.module('uiRouterSample.projects', [
                 }
             })
             .state('projects.proxy.pgstatstatements', {
-                url: '/pgstatements/:itemId',
+                url: '/pgstatements',
                 views: {
 
                     '': {
@@ -918,8 +917,8 @@ angular.module('uiRouterSample.projects', [
             })
 
 
-            .state('projects.addproxy', {
-                url: '/addproxy/:projectId',
+            .state('projects.detail.addproxy', {
+                url: '/addproxy',
                 views: {
 
                     '': {
@@ -975,6 +974,7 @@ angular.module('uiRouterSample.projects', [
                     },
                 }
             })
+
             .state('projects.detail.gotoproxy', {
 
                 url: '/container/{containerId}',
@@ -988,7 +988,7 @@ angular.module('uiRouterSample.projects', [
 
             .state('projects.detail.autocluster', {
 
-                url: '/autocluster/:itemId',
+                url: '/autocluster',
                 views: {
                     '': {
                         templateUrl: 'app/projects/projects.detail.autocluster.html',
@@ -1013,8 +1013,8 @@ angular.module('uiRouterSample.projects', [
                 }
             })
 
-            .state('projects.detail.add', {
-                url: '/add/:itemId',
+            .state('projects.detail.addproject', {
+                url: '/addproject',
                 views: {
                     '': {
                         templateUrl: 'app/projects/projects.detail.add.html',
@@ -1055,7 +1055,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.detail.delete', {
-                url: '/delete/:itemId',
+                url: '/delete',
                 views: {
                     '': {
                         templateUrl: 'app/projects/projects.detail.delete.html',

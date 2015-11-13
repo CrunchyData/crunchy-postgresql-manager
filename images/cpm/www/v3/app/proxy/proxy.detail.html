@@ -39,7 +39,7 @@
 		<div class="form-group">
 			<label for="inputServer" class="control-label col-xs-3">Server</label>
 			<div class="col-xs-5">
-				<input disabled type="text" class="form-control" id="inputServer" ng-model="proxy.ServerName">
+				 <a ui-sref="servers.detail.details({serverId:proxy.ServerName})">{{proxy.ServerName}}</a>
 			</div>
 		</div>
 		<div class="form-group">

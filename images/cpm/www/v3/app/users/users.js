@@ -205,7 +205,7 @@ angular.module('uiRouterSample.users', [
             })
 
             .state('users.detail.details', {
-                url: '/details/:itemId',
+                url: '/details',
                 views: {
                     '': {
                         templateUrl: 'app/users/users.detail.details.html',
@@ -236,7 +236,7 @@ angular.module('uiRouterSample.users', [
             // Settings > Detail > add //
             //////////////////////////////
             .state('users.add', {
-                url: '/add/:itemId',
+                url: '/add',
                 views: {
                     '': {
                         templateUrl: 'app/users/users.detail.add.html',
@@ -271,7 +271,7 @@ angular.module('uiRouterSample.users', [
             })
 
             .state('users.detail.changepassword', {
-                url: '/changepassword/:itemId',
+                url: '/changepassword',
                 views: {
                     '': {
                         templateUrl: 'app/users/users.detail.changepassword.html',
@@ -308,7 +308,7 @@ angular.module('uiRouterSample.users', [
             // Settings > Detail > delete //
             //////////////////////////////
             .state('users.detail.delete', {
-                url: '/delete/:itemId',
+                url: '/delete',
                 views: {
                     '': {
                         templateUrl: 'app/users/users.detail.delete.html',

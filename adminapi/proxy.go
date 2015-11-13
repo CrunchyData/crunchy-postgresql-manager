@@ -235,6 +235,17 @@ func GetProxyByContainerID(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	request := &swarmapi.DockerInspectRequest{}
+	var inspectInfo swarmapi.DockerInspectResponse
+	request.ContainerName = proxy.ContainerName
+	inspectInfo, err = swarmapi.DockerInspect(request)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	proxy.ServerName = inspectInfo.ServerID
+
 	w.WriteJson(&proxy)
 }
 

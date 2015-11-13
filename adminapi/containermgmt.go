@@ -71,17 +71,6 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 
 	var currentStatus = "UNKNOWN"
 
-	//go get the docker server IPAddress
-	/**
-	server := types.Server{}
-	server, err = admindb.GetServer(dbConn, node.ServerID)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		rest.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	*/
-
 	request := &swarmapi.DockerInspectRequest{}
 	var inspectInfo swarmapi.DockerInspectResponse
 	request.ContainerName = node.Name
@@ -431,9 +420,21 @@ func GetAllNodesForServer(w rest.ResponseWriter, r *rest.Request) {
 
 	nodes := make([]types.ClusterNode, len(results.Output))
 	i := 0
+	var container types.Container
+
 	for _, each := range results.Output {
 		logit.Info.Println("got back Name:" + each.Name + " Status:" + each.Status + " Image:" + each.Image)
 		nodes[i].Name = each.Name
+		container, err = admindb.GetContainerByName(dbConn, each.Name)
+		if err != nil {
+			logit.Error.Println(err.Error())
+			nodes[i].ID = "unknown"
+			nodes[i].ProjectID = "unknown"
+		} else {
+			nodes[i].ID = container.ID
+			nodes[i].ProjectID = container.ProjectID
+		}
+
 		nodes[i].Status = each.Status
 		nodes[i].Image = each.Image
 		i++

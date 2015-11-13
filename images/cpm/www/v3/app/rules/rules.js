@@ -182,7 +182,7 @@ angular.module('uiRouterSample.rules', [
             })
 
             .state('rules.add', {
-                url: '/add/:itemId',
+                url: '/add',
                 views: {
                     '': {
                         templateUrl: 'app/rules/rules.detail.add.html',
@@ -218,7 +218,7 @@ angular.module('uiRouterSample.rules', [
             })
 
             .state('rules.detail.delete', {
-                url: '/delete/:itemId',
+                url: '/delete',
                 views: {
                     '': {
                         templateUrl: 'app/rules/rules.detail.delete.html',

@@ -791,6 +791,8 @@ var ContainerScheduleEditController = function($scope, $filter, $stateParams, $s
 var ContainerScheduleDeleteController = function($scope, $stateParams, $state, tasksFactory, utils) {
 
 
+	$scope.scheduleID = $stateParams.scheduleID;
+
     $scope.delete = function() {
         tasksFactory.deleteschedule($stateParams.scheduleID)
             .success(function(data) {
