@@ -44,6 +44,7 @@ angular.module('uiRouterSample.projects', [
                             $scope.treeOptions = {
                                     nodeChildren: "children",
                                     dirSelectable: true,
+                                    multiSelection: false,
                                     injectClasses: {
                                         ul: "a1",
                                         li: "a2",
@@ -64,7 +65,7 @@ angular.module('uiRouterSample.projects', [
                             $scope.showSelected = function(node) {
 			    	$scope.lastselectednode = node;
                                 console.log('tree ' + node.name + ' selected id=' + node.id + ' type=' + node.type + ' projectid=' + node.projectid);
-                                console.log('currently selected=' + $scope.node1);
+                                console.log('currently selected=' + JSON.stringify($scope.node1));
                                 if (node.type == 'database') {
                                     $state.go('projects.container.details', {
                                         containerId: node.id,

@@ -68,33 +68,37 @@
 <body>
     <!--div class="navbar navbar-fixed-top"-->
     <div class="navbar navbar-default navbar-static-top">
-        <div class="container">
+        <div class="container-fluid">
 
-            <a class="navbar-brand" ui-sref="home.detail"><img src="images/logo.png" /></a>
-            <ul class="nav navbar-nav">
-                <li ng-class="{active: $state.includes('projects')}"><a ui-sref="projects.list">Projects</a></li>
-		<li ng-class="{active: $state.includes('servers')}"><a ui-sref="servers.list">Servers</a></li>
-	    </ul>
-	    <ul class="nav navbar-nav navbar-right">
-                <li ng-class="{active: $state.includes('authn')}">
-                    <li class="dropdown" dropdown on-toggle="toggled(open)">
-                        <a href class="dropdown-toggle" dropdown-toggle><i class="fa fa-bars fa-2x"></i></a>
-                        <ul class="dropdown-menu">
-                            <li ng-if="!$cookieStore.get('cpm_token')" ng-class="{active: $state.includes('login')}"><a ui-sref="login">Login</a></li>
-                            <li ng-if="$cookieStore.get('cpm_token')" ng-class="{active: $state.includes('logout')}"><a ui-sref="logout">Logout</a></li>
-                            <li ng-class="{active: $state.includes('about')}"><a ui-sref="about">About</a></li>
-                            <li ng-class="{active: $state.includes('settings')}"><a ui-sref="settings.list">Settings</a></li>
-                            <li ng-class="{active: $state.includes('users')}"><a ui-sref="users.list">Users</a></li>
-                            <li ng-class="{active: $state.includes('rules')}"><a ui-sref="rules.list">Access Rules</a></li>
-                            <li ng-class="{active: $state.includes('roles')}"><a ui-sref="roles.list">Roles</a></li>
-                        </ul>
-                    </li>
-            </ul>
+            <div class="navbar-header">
+                <a class="navbar-brand" ui-sref="home.detail"><img src="images/logo.png" /></a>
+            </div>
+	    <div class="collapse navbar-collapse">
+		    <ul class="nav navbar-nav navbar-left">
+                    <li ng-class="{active: $state.includes('projects')}"><a ui-sref="projects.list">Projects</a></li>
+		    <li ng-class="{active: $state.includes('servers')}"><a ui-sref="servers.list">Servers</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li ng-class="{active: $state.includes('authn')}">
+                        <li class="dropdown" dropdown on-toggle="toggled(open)">
+                            <a href class="dropdown-toggle" dropdown-toggle><i class="fa fa-bars fa-2x"></i></a>
+                            <ul class="dropdown-menu">
+                                <li ng-if="!$cookieStore.get('cpm_token')" ng-class="{active: $state.includes('login')}"><a ui-sref="login">Login</a></li>
+                                <li ng-if="$cookieStore.get('cpm_token')" ng-class="{active: $state.includes('logout')}"><a ui-sref="logout">Logout</a></li>
+                                <li ng-class="{active: $state.includes('about')}"><a ui-sref="about">About</a></li>
+                                <li ng-class="{active: $state.includes('settings')}"><a ui-sref="settings.list">Settings</a></li>
+                                <li ng-class="{active: $state.includes('users')}"><a ui-sref="users.list">Users</a></li>
+                                <li ng-class="{active: $state.includes('rules')}"><a ui-sref="rules.list">Access Rules</a></li>
+                                <li ng-class="{active: $state.includes('roles')}"><a ui-sref="roles.list">Roles</a></li>
+                            </ul>
+                        </li>
+                </ul>
+            </div>
 
         </div>
     </div>
-    <div ui-view class="container-fluid slide" style="padding-top: 10px;"></div>
-
+    <div ui-view class="container-fluid slide" style="padding-top: 10px;">
+    </div>
 
     <!--
     <hr>
@@ -104,6 +108,7 @@
     <div collapse="isCollapsed">
         <div class="well well-lg">debug content
             <pre>
+      $scope.node1 = {{$scope.node1.name}}
       $state = {{$state.current.name}}
       $rootScope.projectId = {{projectId}}
       $stateParams = {{$stateParams}}
@@ -115,7 +120,7 @@
     </pre>
         </div>
 </div>
--->
+	<-->
 </body>
 
 </html>
