@@ -840,11 +840,20 @@ var ContainerAddController = function($scope, $stateParams, $state, serversFacto
 
         containersFactory.add($scope.container, $scope.dockerprofile)
             .success(function(data) {
+	    	console.log('data from add is ' + JSON.stringify(data));
+	    	console.log('current projectid is ' +  $stateParams.projectId);
                 usSpinnerService.stop('spinner-1');
+		$state.go('projects.container.details', {
+			containerId: data.ID,
+			projectId: $stateParams.projectId
+		});
+
+		/**
                 $state.go('projects.container', $stateParams, {
                     reload: true,
                     inherit: false
                 });
+		*/
             })
             .error(function(error) {
                 $scope.alerts = [{
