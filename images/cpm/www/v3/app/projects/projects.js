@@ -102,7 +102,7 @@ angular.module('uiRouterSample.projects', [
                                         projectId: randId
                                     });
                             };
-                            $scope.goToFirst();
+                            //$scope.goToFirst();
                         }
                     ]
                 })

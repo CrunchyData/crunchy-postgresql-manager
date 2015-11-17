@@ -842,13 +842,20 @@ var ContainerAddController = function($scope, $stateParams, $state, serversFacto
             .success(function(data) {
 	    	console.log('data from add is ' + JSON.stringify(data));
 	    	console.log('current projectid is ' +  $stateParams.projectId);
+		$state.transitionTo('projects.container.details', {
+			containerId: data.ID,
+			projectId: $stateParams.projectId
+		}, {
+		reload:true,
+                    inherit: false
+		});
                 usSpinnerService.stop('spinner-1');
+		/**
 		$state.go('projects.container.details', {
 			containerId: data.ID,
 			projectId: $stateParams.projectId
 		});
 
-		/**
                 $state.go('projects.container', $stateParams, {
                     reload: true,
                     inherit: false
