@@ -367,7 +367,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.users', {
-                url: '/users',
+                url: '/users/:itemId',
                 views: {
 
                     '': {
