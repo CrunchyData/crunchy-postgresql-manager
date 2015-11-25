@@ -61,11 +61,13 @@ make build
 Edit the docker configuration by editing the OPTIONS parameter as follows:
 ~~~~~~~~~~~~~~~~~~~~~~~~
 vi /etc/sysconfig/docker
-OPTIONS='--selinux-enabled --bip=172.17.42.1/16 --dns-search=crunchy.lab --dns=192.168.0.107 --dns=192.168.0.1 -H unix:///var/run/docker.sock -H tcp://192.168.0.107:2375'
+OPTIONS='--selinux-enabled --bip=172.17.42.1/16 --dns-search=crunchy.lab --dns=192.168.0.107 --dns=192.168.0.1 -H unix:///var/run/docker.sock -H tcp://0.0.0.0:2375  --label hostname=coffee.crunchy.lab --label profile=small'
 systemctl enable docker.service
 systemctl start docker.service
 docker info
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+In the above example, labels are added for Swarm, including the hostname and a CPM server profile of small to indicate this is a small server in terms of capacity.
 
 ### Build CPM Docker Images ###
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -146,11 +148,29 @@ sudo ./sbin/run-skybridge.sh
 
 Configure and Start Swarm
 -------------------------
+
+Download the swarm binary as follows, within a new swarm go project:
+~~~~~~~~
+export GOPATH=~/swarmproject
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:$GOPATH/bin
+mkdir -p $GOPATH/src/github.com/docker/
+cd $GOPATH/src/github.com/docker/
+git clone https://github.com/docker/swarm
+cd swarm
+$GOPATH/bin/godep go install
+~~~~~~~~
+
+Start swarm up as follows, as root user:
+~~~~~~
+swarm create
+swarm manage --host 192.168.0.107:8000 nodes://192.168.0.107:2375
+swarm join --addr=192.168.0.107:2375 token://<<<insert your swarm generated token here>>>
+~~~~~~
+
 A swarm guide is available at:
 [docs/swarm.md](swarm.md)
 
-Follow the swarm guide to setup and install a running Docker Swarm cluster
-on your development machine prior to running CPM.
 
 Start CPM Server Agent
 ----------------------
@@ -179,7 +199,7 @@ ping cpm-newserver
 If you have the server running, you can test it by doing a GET
 to it:
 ~~~~~~~~~~~~~~~
-curl http://192.168.0.106:10001/status
+curl http://cpm-newserver:10001/status
 ~~~~~~~~~~~~~~~
 
 Running CPM
