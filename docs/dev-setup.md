@@ -147,7 +147,7 @@ sudo ./sbin/run-skybridge.sh
 Configure and Start Swarm
 -------------------------
 A swarm guide is available at:
-[docs/swarm.md](./docs/swarm.md)
+[docs/swarm.md](swarm.md)
 
 Follow the swarm guide to setup and install a running Docker Swarm cluster
 on your development machine prior to running CPM.
