@@ -1,7 +1,7 @@
 Developer Setup
 =================
 
-Here are the steps required to set up a CPM development environment on a 
+Here are the steps required to set up a CPM development environment on a
 clean RHEL or Centos 7.1 minimal installation.
 
 This instruction assumes you are using a static IP address of
@@ -15,7 +15,8 @@ subscription-manager repos --enable=rhel-7-server-optional-rpms
 ~~~~~~~~~~~~~~~
 
 ### Install Dependencies development machine ####
-Note that I like to use the PGDG postgres distro instead of the redhat provided postgres!
+Note that I like to use the PGDG postgres distro instead of the redhat provided postgres!  Here is an example of installing postgres on a Centos 7 box,
+replace 'centos' with 'redhat' if installing on a Redhat box:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 sudo yum -y install net-tools bind-utils install golang git docker mercurial sysstat
@@ -186,8 +187,8 @@ curl http://192.168.0.106:10001/status
 Running CPM
 --------------
 
-Modify the run-cpm.sh script by updating the INSTALLDIR 
-variable to the path on your host that you are installing CPM 
+Modify the run-cpm.sh script by updating the INSTALLDIR
+variable to the path on your host that you are installing CPM
 from.
 
 Also, edit or remove the local host port mapping that is
@@ -233,7 +234,7 @@ If you are running the CPM user interface from outside the dev host
 (e.g.  from your vbox host browser), you will need to update
 a couple of javascript files with the promdash URL.  By default
 these are specified in the javascript as cpm-promdash:3000, this will
-not be accessible from your vbox host unless you specify the 
+not be accessible from your vbox host unless you specify the
 skybridge DNS server.
 
 The js files to change are:
@@ -266,7 +267,7 @@ http://axilleas.me/en/blog/2013/selinux-policy-for-nginx-and-gitlab-unix-socket-
 
 ###Godocs
 
-To see the godocs, install godoc, and start up the godoc server, then 
+To see the godocs, install godoc, and start up the godoc server, then
 browse to the CPM API documentation:
 ~~~~~~~~~~~~~~~~~~~~
 go get golang.org/x/tools/cmd/godoc
@@ -325,14 +326,10 @@ containers:
 + cpm-collect
 + cpm-task
 
-Each container mounts 
+Each container mounts
 ````````````
 /cpmlogs
 ````````````
 
 Each startup script for the services now writes to /cpmlogs which gets
 mapped by Docker to /var/cpm/logs on the Docker host.
-
-
-
-

@@ -19,6 +19,9 @@ A user guide is available at:
 A developer guide is available at:
 [docs/dev-setup.md](docs/dev-setup.md)
 
+An install guide is available at:
+[docs/install.md](docs/install.md)
+
 An installation guide is available at:
 [docs/install.md](docs/install.md)
 

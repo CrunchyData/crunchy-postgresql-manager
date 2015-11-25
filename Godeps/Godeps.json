@@ -31,6 +31,11 @@
 			"Rev": "b965b613227fddccbfffe13eae360ed3fa822f8d"
 		},
 		{
+			"ImportPath": "github.com/docker/docker/pkg/units",
+			"Comment": "v1.4.1-7250-gb96e076",
+			"Rev": "b96e076af9478f37c5efd3f56e5f0aa42c846b66"
+		},
+		{
 			"ImportPath": "github.com/fsouza/go-dockerclient",
 			"Rev": "cc8cb2dcad73aa53c5f6b5b7927699e9941e6dbe"
 		},
@@ -73,6 +78,14 @@
 			"ImportPath": "github.com/robfig/cron",
 			"Comment": "v1-2-g67823cd",
 			"Rev": "67823cd24dece1b04cced3a0a0b3ca2bc84d875e"
+		},
+		{
+			"ImportPath": "github.com/rs/xid",
+			"Rev": "000a63f01e5054a4eb21f2fc6c16a10294a2e266"
+		},
+		{
+			"ImportPath": "github.com/samalba/dockerclient",
+			"Rev": "a3241e22d7230854778614ebca9c7f869776c5f0"
 		}
 	]
 }
