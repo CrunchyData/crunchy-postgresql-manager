@@ -52,8 +52,6 @@ cd src/github.com/crunchydata/crunchy-postgresql-manager
 godep restore
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-make build
-~~~~~~~~~~~~~~~~~~~~~~~~
 ### Compile CPM ###
 ~~~~~~~~~~~~~~~~~~~~~~~~
 make build
@@ -63,7 +61,7 @@ make build
 Edit the docker configuration by editing the OPTIONS parameter as follows:
 ~~~~~~~~~~~~~~~~~~~~~~~~
 vi /etc/sysconfig/docker
-OPTIONS='--selinux-enabled --bip=172.17.42.1/16 --dns-search=crunchy.lab --dns=192.168.0.107 --dns=192.168.0.1'
+OPTIONS='--selinux-enabled --bip=172.17.42.1/16 --dns-search=crunchy.lab --dns=192.168.0.107 --dns=192.168.0.1 -H unix:///var/run/docker.sock -H tcp://192.168.0.107:2375'
 systemctl enable docker.service
 systemctl start docker.service
 docker info

@@ -24,6 +24,7 @@ INSTALLDIR=`pwd`
 MYHOSTIP=192.168.0.106
 MYDOMAIN=crunchy.lab
 DATADIR=/var/cpm/data/etcd
+mkdir -p $DATADIR
 rm -rf $DATADIR/*
 #	-e DOCKER_HOST=http://192.168.0.106:5000 \
 
