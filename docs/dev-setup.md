@@ -185,7 +185,7 @@ attempt to communicate to each host using this port.
 
 For this example, I will name the CPM server, newserver.
 
-So, edit the sbin/run-cpmserver.sh script, and modify the server
+So, edit the images/cpm-server/run-cpmserver.sh script, and modify the server
 ip address to be that of the host you are running the CPM server
 upon.
 
@@ -200,28 +200,28 @@ If you have the server running, you can test it by doing a GET
 to it:
 ~~~~~~~~~~~~~~~
 curl http://cpm-newserver:10001/status
+curl http://192.168.0.107:10001/status
 ~~~~~~~~~~~~~~~
 
 Running CPM
 --------------
 
-Modify the run-cpm.sh script by updating the INSTALLDIR
-variable to the path on your host that you are installing CPM
-from.
+Modify the run-cpm.sh script by updating the following
+environment variable references:
+* INSTALLDIR - the location of your build directory
+* SWARM_MANAGER_URL - the IP address of your dev box
 
 Also, edit or remove the local host port mapping that is
 provided in the example to meet your local requirements
 for accessing CPM.
+
 
 You can run CPM by running the following script:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 sudo ./run-cpm.sh
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This script will start several Docker containers that make up CPM.  You will
-need to edit the run-cpm.sh script to specify your IP address of your
-server as well as your CPM installation directory path.  You can
-also adjust or remove the local port bindings if you want.
+This script will start several Docker containers that make up CPM.  
 
 On the dev host, the following URLs are useful:
 
@@ -351,3 +351,38 @@ Each container mounts
 
 Each startup script for the services now writes to /cpmlogs which gets
 mapped by Docker to /var/cpm/logs on the Docker host.
+
+Port Mapping
+=========================
+You will likely want to map the CPM addresses to a host IP addressto allow
+access from outside of the Docker assigned IP addresses.  To do this you
+will add some port mapping to the startup script, run-cpm.sh.
+
+For example, to allow the cpm web interface you would add the following
+to the docker run command for the cpm web container:
+````````````
+-p 192.168.0.107:13001:13001
+````````````
+
+And for the cpm admin container, you would need to map port 13001 to
+the local 14001 port:
+~~~~~
+-p 192.168.0.107:14001:13001
+~~~~
+
+Also, for the prometheus dashboard to work, you will need to map its
+port to the local host:
+~~~~~
+-p 192.168.0.107:3000:3000
+~~~~
+
+and also map the prometheus port to the local host:
+~~~~~
+-p 192.168.0.107:9090:9090
+~~~~
+
+You can add the cpm service names to your DNS system to resolve
+or to your /etc/hosts files to resolve.
+
+You will then need to enter these IP addresses and port numbers in
+the cpm web login screen and browser from a remote host.
