@@ -86,6 +86,7 @@ sleep 2
 export DATADIR=/var/cpm/data/promdash
 mkdir -p  $DATADIR
 chmod 777 $DATADIR
+cp $INSTALLDIR/config/file.sqlite3 $DATADIR
 chcon -Rt svirt_sandbox_file_t $DATADIR
 
 docker stop cpm-promdash
