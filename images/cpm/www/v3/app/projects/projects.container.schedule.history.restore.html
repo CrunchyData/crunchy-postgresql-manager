@@ -1,0 +1,32 @@
+<p><strong>Restore Backup to New Database</strong></p>
+
+<div>
+	<form class="form-horizontal">
+		<div class="form-group">
+			<label for="inputName" class="control-label col-xs-2">Name</label>
+			<div class="col-xs-5">
+				<input type="text" class="form-control" id="inputName" ng-model="container.Name">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="inputDockerProfile" class="control-label col-xs-2">DockerProfile</label>
+			<div class="col-xs-5">
+				<select class="form-control" id="inputDockerProfile" ng-model="dockerprofile">
+					<option value="SM" selected>small</option>
+					<option value="MED">medium</option>
+					<option value="LG">large</option>
+				</select>
+			</div>
+		</div>
+		<span us-spinner spinner-key="spinner-1"></span>
+		<div class="form-group">
+			<div class="col-xs-offset-2 col-xs-5">
+				<button type="submit" ng-click="add()" class="btn btn-primary">Create</button>
+			</div>
+		</div>
+
+	</form>
+	<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+	<div ui-view class="slide">
+	</div>
+</div>

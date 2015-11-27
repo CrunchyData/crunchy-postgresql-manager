@@ -4,7 +4,11 @@
     <li ng-repeat="stat in stats">
         Started {{stat.StartTime}} - {{stat.Status}} - Elapsed {{stat.ElapsedTime}} - Size
         {{stat.TaskSize}}
-        <a nc-click="deletehistory()"><i class="fa fa-trash fa-fw"></i></a>
-        <a ng-click="refresh()"><i class="fa fa-refresh fa-fw"></i></a>
+	<a tooltip-placement="right" tooltip="delete" ng-click="deletehistory()"><i class="fa fa-trash fa-fw"></i></a>
+        <a tooltip="refresh" ng-click="refresh()"><i class="fa fa-refresh fa-fw"></i></a>
+	<a tooltip-placement="right" tooltip="restore" ui-sref="projects.container.schedule.history.restore()"><i class="fa fa-life-saver fa-fw"></i></a>
     </li>
 </ul>
+
+<div ui-view class="slide"></div>
+

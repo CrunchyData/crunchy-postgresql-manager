@@ -1,6 +1,7 @@
 angular.module('uiRouterSample.projects', [
     'ui.router',
     'ngCookies',
+    'ngAnimate',
     'ui.bootstrap',
     'angularSpinners'
 ])
@@ -268,7 +269,7 @@ angular.module('uiRouterSample.projects', [
 
 
             .state('projects.container.schedule.execute', {
-                url: '/schedule/:scheduleID',
+                url: '/executenow',
                 views: {
 
                     '': {
@@ -279,12 +280,22 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.schedule.history', {
-                url: '/schedule/:scheduleID',
+                url: '/history',
                 views: {
 
                     '': {
                         templateUrl: 'app/projects/projects.container.schedule.history.html',
                         controller: ContainerScheduleHistoryController
+                    },
+                }
+            })
+            .state('projects.container.schedule.history.restore', {
+                url: '/restore',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.schedule.history.restore.html',
+                        controller: ContainerScheduleHistoryRestoreController
                     },
                 }
             })
@@ -713,6 +724,17 @@ angular.module('uiRouterSample.projects', [
                     '': {
                         templateUrl: 'app/projects/projects.container.schedule.history.html',
                         controller: ContainerScheduleHistoryController
+                    },
+                }
+            })
+
+            .state('projects.proxy.schedule.history.restore', {
+                url: '/restore',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.schedule.history.restore.html',
+                        controller: ContainerScheduleHistoryRestoreController
                     },
                 }
             })

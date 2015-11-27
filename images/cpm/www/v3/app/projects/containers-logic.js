@@ -19,6 +19,10 @@ var GotocontainerController = function($scope, $state, $cookieStore, $stateParam
 
 var ContainerTaskSchedulesController = function($scope, $stateParams, $state, containersFactory, utils) {
 
+    $scope.restore = function() {
+    	console.log('restore is called with params ' + JSON.stringify($stateParams));
+    }
+
     $scope.refresh = function() {
         containersFactory.schedules($stateParams.containerId)
             .success(function(data) {
@@ -34,6 +38,8 @@ var ContainerTaskSchedulesController = function($scope, $stateParams, $state, co
     };
 
     $scope.refresh();
+
+
 };
 
 var ContainerUsersController = function($scope, $stateParams, $state, containersFactory, utils) {
@@ -537,6 +543,25 @@ var ContainerScheduleExecuteController = function($scope, $stateParams, $state, 
         });
 };
 
+var ContainerScheduleHistoryRestoreController = function($scope, $stateParams, $state, tasksFactory, utils) {
+
+	console.log('in schedule history restore controller');
+	console.log('params = ' + JSON.stringify($stateParams));
+	console.log('scope container = ' + JSON.stringify($scope.container));
+	console.log('scope container = ' + $scope.container["Name"]);
+
+    var newcontainer = {};
+            newcontainer.ID = 0;
+            newcontainer.Name = 'newcontainer';
+            newcontainer.Image = 'cpm-node';
+            $scope.dockerprofile = 'SM';
+            $scope.container["Name"] = $scope.container["Name"] + '-restored';
+
+    $scope.add = function() {
+        console.log('add called to restore backup');
+    };
+};
+
 var ContainerScheduleHistoryController = function($scope, $stateParams, $state, tasksFactory, utils) {
 
     $scope.edit = function() {
@@ -544,7 +569,11 @@ var ContainerScheduleHistoryController = function($scope, $stateParams, $state, 
     };
 
     $scope.deletehistory = function() {
-    	console.log('not implemented yet');
+    	console.log('deletehistory not implemented yet');
+    };
+
+    $scope.restore = function() {
+    	console.log('restore not implemented yet params=' + JSON.stringify($stateParams));
     };
 
     $scope.refresh = function() {
