@@ -381,8 +381,20 @@ and also map the prometheus port to the local host:
 -p 192.168.0.107:9090:9090
 ~~~~
 
-You can add the cpm service names to your DNS system to resolve
+You can add the cpm service names to your remote DNS system to resolve
 or to your /etc/hosts files to resolve.
 
 You will then need to enter these IP addresses and port numbers in
 the cpm web login screen and browser from a remote host.
+
+### Connecting to Containers Remotely
+You can connect to a container's database from a remote server
+by adding a static route to the CPM servers Docker bridge range
+as follows:
+~~~~
+ip route add 172.17.0.0/16 via 192.168.0.107 dev ens3
+~~~~
+
+With this route in place, you can now access a running container's
+database on a remote host.  Make sure that your remote host is not
+running Docker on the same Docker bridge IP range.
