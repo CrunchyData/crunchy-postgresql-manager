@@ -38,7 +38,7 @@ create table cluster (
 
 create table container (
 	id serial primary key,
-	name varchar(30) unique not null,
+	name varchar(60) unique not null,
 	clusterid int,
 	projectid int references project (id) on delete cascade,
 	role varchar(10) not null,
@@ -150,7 +150,7 @@ insert into taskprofile (name) values ('backrest-backup');
 
 create table taskschedule (
 	id serial primary key,
-	containername varchar(20) references container (name) on delete cascade not null,
+	containername varchar(60) references container (name) on delete cascade not null,
 	profilename varchar(30) references taskprofile (name) not null,
 	name varchar(30) not null,
 	enabled varchar(3) not null,
@@ -174,7 +174,7 @@ create table taskschedule (
 
 create table taskstatus (
 	id serial primary key,
-	containername varchar(30) not null,
+	containername varchar(60) not null,
 	profilename varchar(30) not null,
 	scheduleid int references taskschedule (id) on delete cascade not null ,
 	starttime timestamp not null,
@@ -218,7 +218,7 @@ insert into monmetric values ('hc1', 'healthck', 's1');
 
 create table containeruser (
 	id serial primary key,
-	containername varchar(20) references container (name) on delete cascade not null,
+	containername varchar(60) references container (name) on delete cascade not null,
 	usename varchar(30) not null,
 	passwd varchar(30) not null,
 	updatedt timestamp not null,
@@ -245,7 +245,7 @@ create table healthcheck (
 	id serial primary key,
 	projectname varchar(20) not null,
 	projectid int references project (id) on delete cascade,
-	containername varchar(20) not null,
+	containername varchar(60) not null,
 	containerid int references container (id) on delete cascade,
 	containerrole varchar(10) not null,
 	containerimage varchar(30) not null,

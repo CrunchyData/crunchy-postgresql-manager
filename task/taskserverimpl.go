@@ -200,6 +200,14 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 			return
 		}
 	} else if request.ProfileName == "pg_backrest_restore" {
+		logit.Info.Println("doing pg_backrest_restore job on...")
+		err = ProvisionBackrestRestoreJob(dbConn, &request)
+		if err != nil {
+			logit.Error.Println(err.Error())
+			rest.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else if request.ProfileName == "restore" {
 		logit.Info.Println("doing restore job on...")
 		err = ProvisionRestoreJob(dbConn, &request)
 		if err != nil {
