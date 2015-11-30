@@ -21,6 +21,8 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 INSTALLDIR=/home/jeffmc/devproject/src/github.com/crunchydata/crunchy-postgresql-manager
+SWARM_MANAGER_URL=tcp://192.168.0.106:8000 
+LOCAL_IP=192.168.0.106
 
 echo "setting up log dir..."
 LOGDIR=/var/cpm/logs
@@ -43,7 +45,7 @@ docker stop cpm
 docker rm cpm
 chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v3
 docker run --name=cpm -d \
-	-p 192.168.56.103:13001:13001 \
+	-p $LOCAL_IP:13001:13001 \
 	-v $LOGDIR:/cpmlogs \
 	-v $KEYSDIR:/cpmkeys \
 	-v $INSTALLDIR/images/cpm/www/v3:/www crunchydata/cpm:latest
@@ -58,9 +60,9 @@ chown postgres:postgres $DBDIR
 chcon -Rt svirt_sandbox_file_t $DBDIR
 docker run -e DB_HOST=cpm-admin \
 	--hostname="cpm-admin" \
-	-p 192.168.56.103:14001:13001 \
+	-p $LOCAL_IP:14001:13001 \
 	-e DOMAIN=crunchy.lab \
-	-e SWARM_MANAGER_URL=tcp://192.168.0.106:8000 \
+	-e SWARM_MANAGER_URL=$SWARM_MANAGER_URL \
 	-e CPMBASE=/var/cpm \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cpm-admin -d  \
@@ -75,7 +77,7 @@ docker rm cpm-task
 docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-v $LOGDIR:/cpmlogs \
 	-e CPMBASE=/var/cpm \
-	-e SWARM_MANAGER_URL=tcp://192.168.0.106:8000 \
+	-e SWARM_MANAGER_URL=$SWARM_MANAGER_URL \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cpm-task -d crunchydata/cpm-task:latest
 
@@ -93,7 +95,7 @@ docker stop cpm-promdash
 docker rm cpm-promdash
 docker run  \
 	-v $DATADIR:/tmp/prom \
-	-p 192.168.56.103:15000:3000 \
+	-p $LOCAL_IP:3000:3000 \
 	-e DATABASE_URL=sqlite3:/tmp/prom/file.sqlite3 \
 	--name=cpm-promdash -d prom/promdash
 ###############
@@ -107,7 +109,7 @@ docker stop cpm-prometheus
 docker rm cpm-prometheus
 docker run  \
 	-v $PROMCONFIG:/etc/prometheus/prometheus.yml \
-	-p 192.168.56.103:16000:9090 \
+	-p $LOCAL_IP:9090:9090 \
 	--name=cpm-prometheus -d prom/prometheus:latest
 ##############
 
@@ -122,7 +124,7 @@ docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-e HC_POLL_INT=4 \
 	-e CPMBASE=/var/cpm \
 	-e DB_PORT=5432 -e DB_USER=postgres \
-	-e SWARM_MANAGER_URL=tcp://192.168.0.106:8000 \
+	-e SWARM_MANAGER_URL=$SWARM_MANAGER_URL \
 	-v $LOGDIR:/cpmlogs \
 	-d --name=cpm-collect crunchydata/cpm-collect:latest 
 

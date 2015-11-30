@@ -165,6 +165,7 @@ create table taskschedule (
 	restoreremoteuser varchar(30) not null,
 	restoredbuser varchar(80) not null,
 	restoredbpass varchar(80) not null,
+	serverip varchar(80) not null,
 	updatedt timestamp not null,
 	constraint valid_enabled check (
 		enabled in ('YES', 'NO')

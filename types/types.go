@@ -44,6 +44,7 @@ type Server struct {
 	ID          string //unique key
 	Name        string //server name
 	IPAddress   string //server ip address
+	Port        string //swarm port
 	ServerClass string //the class of the server, small, medium, large
 	CreateDate  string
 	NodeCount   string //calculated value of the number of containers assigned to this server

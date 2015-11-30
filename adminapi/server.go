@@ -48,7 +48,7 @@ func GetServer(w rest.ResponseWriter, r *rest.Request) {
 	//currently no state about a server is maintained other than IP and port number
 	//which we use for the ID, Name, and IPAddress values
 
-	server := types.Server{ID, ID, ID, "", "", ""}
+	server := types.Server{ID, ID, ID, ID, "", "", ""}
 
 	w.WriteJson(&server)
 }
@@ -153,9 +153,11 @@ func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 	servers := make([]types.Server, len(infoResponse.Output))
 	i := 0
 	for i = range infoResponse.Output {
+		parts := strings.Split(infoResponse.Output[i], ":")
 		servers[i].ID = infoResponse.Output[i]
-		servers[i].Name = infoResponse.Output[i]
-		servers[i].IPAddress = infoResponse.Output[i]
+		servers[i].Name = parts[0]
+		servers[i].IPAddress = parts[0]
+		servers[i].Port = parts[1]
 		i++
 	}
 

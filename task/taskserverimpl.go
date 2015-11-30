@@ -72,6 +72,7 @@ type TaskSchedule struct {
 	RestoreRemoteUser string
 	RestoreDbUser     string
 	RestoreDbPass     string
+	Serverip          string
 }
 
 type StatusAddResponse struct {

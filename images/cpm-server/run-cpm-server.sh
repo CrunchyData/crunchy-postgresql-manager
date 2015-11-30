@@ -20,6 +20,8 @@ if [[ $EUID -ne 0 ]]; then
 	      exit 1
 fi
 
+LOCAL_IP=192.168.0.107
+
 echo "setting up log dir..."
 LOGDIR=/var/cpm/logs
 mkdir -p $LOGDIR
@@ -31,7 +33,7 @@ docker stop cpm-newserver
 docker rm cpm-newserver
 docker run --name=cpm-newserver -d \
 	--privileged \
-	-p 192.168.0.106:10001:10001 \
+	-p $LOCAL_IP:10001:10001 \
 	-v /var/cpm/logs:/cpmlogs \
 	-v /:/rootfs \
 	-v /var/cpm/data/pgsql:/var/cpm/data/pgsql \

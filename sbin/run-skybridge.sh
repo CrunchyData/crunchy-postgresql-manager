@@ -21,7 +21,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 INSTALLDIR=`pwd`
-MYHOSTIP=192.168.0.106
+MYHOSTIP=192.168.0.107
 MYDOMAIN=crunchy.lab
 DATADIR=/var/cpm/data/etcd
 mkdir -p $DATADIR

@@ -35,7 +35,7 @@ type BackupNowPost struct {
 type AddSchedulePost struct {
 	ID                string
 	Token             string
-	ServerID          string
+	Serverip          string
 	ProfileName       string
 	Name              string
 	Enabled           string
@@ -152,6 +152,8 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	logit.Info.Println("in adminapi.backupmgmt.AddSchedule got serverIP of " + postMsg.Serverip)
+
 	err = secimpl.Authorize(dbConn, postMsg.Token, "perm-backup")
 	if err != nil {
 		logit.Error.Println("validate token error " + err.Error())
@@ -178,6 +180,7 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 	s.RestoreRemoteUser = postMsg.RestoreRemoteUser
 	s.RestoreDbUser = postMsg.RestoreDbUser
 	s.RestoreDbPass = postMsg.RestoreDbPass
+	s.Serverip = postMsg.Serverip
 
 	result, err := task.AddSchedule(dbConn, s)
 	if err != nil {
@@ -278,6 +281,7 @@ func GetSchedule(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), 400)
 		return
 	}
+	logit.Info.Println("GetSchedule api returns serverip of " + result.Serverip)
 
 	w.WriteJson(result)
 
@@ -480,6 +484,7 @@ func UpdateSchedule(w rest.ResponseWriter, r *rest.Request) {
 	s.RestoreRemoteUser = postMsg.RestoreRemoteUser
 	s.RestoreDbUser = postMsg.RestoreDbUser
 	s.RestoreDbPass = postMsg.RestoreDbPass
+	s.Serverip = postMsg.Serverip
 
 	err = task.UpdateSchedule(dbConn, s)
 	if err != nil {

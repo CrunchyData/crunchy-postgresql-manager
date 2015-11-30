@@ -83,7 +83,7 @@ func AddSchedule(dbConn *sql.DB, s TaskSchedule) (string, error) {
 
 	logit.Info.Println("AddSchedule called")
 
-	queryStr := fmt.Sprintf("insert into taskschedule ( containername, profilename, name, enabled, minutes, hours, dayofmonth, month, dayofweek, restoreset, restoreremotepath, restoreremotehost, restoreremoteuser, restoredbuser, restoredbpass, updatedt) values ( '%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s','%s','%s','%s','%s', '%s', '%s',  now()) returning id",
+	queryStr := fmt.Sprintf("insert into taskschedule ( containername, profilename, name, enabled, minutes, hours, dayofmonth, month, dayofweek, restoreset, restoreremotepath, restoreremotehost, restoreremoteuser, restoredbuser, restoredbpass, updatedt, serverip) values ( '%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s','%s','%s','%s','%s', '%s', '%s',  now(), '%s') returning id",
 		s.ContainerName,
 		s.ProfileName,
 		s.Name,
@@ -98,7 +98,8 @@ func AddSchedule(dbConn *sql.DB, s TaskSchedule) (string, error) {
 		s.RestoreRemoteHost,
 		s.RestoreRemoteUser,
 		s.RestoreDbUser,
-		s.RestoreDbPass)
+		s.RestoreDbPass,
+		s.Serverip)
 
 	logit.Info.Println("AddSchedule:" + queryStr)
 	var theID string
@@ -174,10 +175,10 @@ func GetSchedule(dbConn *sql.DB, id string) (TaskSchedule, error) {
 	logit.Info.Println("GetSchedule called with id=" + id)
 	s := TaskSchedule{}
 
-	err := dbConn.QueryRow(fmt.Sprintf("select a.id, a.containername, a.profilename, a.name, a.enabled, a.minutes, a.hours, a.dayofmonth, a.month, a.dayofweek, a.restoreset, a.restoreremotepath, a.restoreremotehost, a.restoreremoteuser, a.restoredbuser, a.restoredbpass, date_trunc('second', a.updatedt)::text from taskschedule a where a.id=%s ", id)).Scan(&s.ID, &s.ContainerName, &s.ProfileName, &s.Name, &s.Enabled, &s.Minutes, &s.Hours, &s.DayOfMonth, &s.Month, &s.DayOfWeek,
+	err := dbConn.QueryRow(fmt.Sprintf("select a.id, a.containername, a.profilename, a.name, a.enabled, a.minutes, a.hours, a.dayofmonth, a.month, a.dayofweek, a.restoreset, a.restoreremotepath, a.restoreremotehost, a.restoreremoteuser, a.restoredbuser, a.restoredbpass, date_trunc('second', a.updatedt)::text, a.serverip from taskschedule a where a.id=%s ", id)).Scan(&s.ID, &s.ContainerName, &s.ProfileName, &s.Name, &s.Enabled, &s.Minutes, &s.Hours, &s.DayOfMonth, &s.Month, &s.DayOfWeek,
 		&s.RestoreSet, &s.RestoreRemotePath, &s.RestoreRemoteHost,
 		&s.RestoreRemoteUser,
-		&s.RestoreDbUser, &s.RestoreDbPass, &s.UpdateDt)
+		&s.RestoreDbUser, &s.RestoreDbPass, &s.UpdateDt, &s.Serverip)
 	switch {
 	case err == sql.ErrNoRows:
 		logit.Error.Println("taskdb:GetSchedule:no schedule with that id")
@@ -188,6 +189,7 @@ func GetSchedule(dbConn *sql.DB, id string) (TaskSchedule, error) {
 	default:
 	}
 
+	logit.Info.Println("GetSchedule returns a serverip of " + s.Serverip)
 	return s, nil
 }
 
@@ -197,7 +199,7 @@ func GetAllSchedules(dbConn *sql.DB, containerid string) ([]TaskSchedule, error)
 	var rows *sql.Rows
 	var err error
 
-	rows, err = dbConn.Query(fmt.Sprintf("select a.id, a.containername, a.profilename, a.name, a.enabled, a.minutes, a.hours, a.dayofmonth, a.month, a.dayofweek, a.restoreset, a.restoreremotepath, a.restoreremotehost, a.restoreremoteuser, a.restoredbuser, a.restoredbpass, date_trunc('second', a.updatedt)::text from taskschedule a, container b where a.containername= b.name and b.id = %s ", containerid))
+	rows, err = dbConn.Query(fmt.Sprintf("select a.id, a.containername, a.profilename, a.name, a.enabled, a.minutes, a.hours, a.dayofmonth, a.month, a.dayofweek, a.restoreset, a.restoreremotepath, a.restoreremotehost, a.restoreremoteuser, a.restoredbuser, a.restoredbpass, date_trunc('second', a.updatedt)::text, a.serverip from taskschedule a, container b where a.containername= b.name and b.id = %s ", containerid))
 
 	if err != nil {
 		return nil, err
@@ -223,7 +225,8 @@ func GetAllSchedules(dbConn *sql.DB, containerid string) ([]TaskSchedule, error)
 			&s.RestoreRemoteUser,
 			&s.RestoreDbUser,
 			&s.RestoreDbPass,
-			&s.UpdateDt); err != nil {
+			&s.UpdateDt,
+			&s.Serverip); err != nil {
 			return nil, err
 		}
 		schedules = append(schedules, s)
@@ -296,7 +299,7 @@ func GetSchedules(dbConn *sql.DB) ([]TaskSchedule, error) {
 	var rows *sql.Rows
 	var err error
 
-	rows, err = dbConn.Query(fmt.Sprintf("select a.id, a.containername, a.profilename, a.name, a.enabled, a.minutes, a.hours, a.dayofmonth, a.month, a.dayofweek, a.restoreset, a.restoreremotepath, a.restoreremotehost, a.restoreremoteuser, a.restoredbuser, a.restoredbpass, date_trunc('second', a.updatedt)::text from taskschedule a "))
+	rows, err = dbConn.Query(fmt.Sprintf("select a.id, a.containername, a.profilename, a.name, a.enabled, a.minutes, a.hours, a.dayofmonth, a.month, a.dayofweek, a.restoreset, a.restoreremotepath, a.restoreremotehost, a.restoreremoteuser, a.restoredbuser, a.restoredbpass, date_trunc('second', a.updatedt)::text, a.serverip from taskschedule a "))
 
 	if err != nil {
 		return nil, err
@@ -323,7 +326,8 @@ func GetSchedules(dbConn *sql.DB) ([]TaskSchedule, error) {
 			&s.RestoreRemoteUser,
 			&s.RestoreDbUser,
 			&s.RestoreDbPass,
-			&s.UpdateDt); err != nil {
+			&s.UpdateDt,
+			&s.Serverip); err != nil {
 			return nil, err
 		}
 

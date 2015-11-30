@@ -93,7 +93,8 @@ angular.module('uiRouterSample.tasks.service', ['ngCookies'])
             'RestoreRemoteHost': schedule.RestoreRemoteHost,
             'RestoreRemoteUser': schedule.RestoreRemoteUser,
             'RestoreDbUser': schedule.RestoreDbUser,
-            'RestoreDbPass': schedule.RestoreDbPass
+            'RestoreDbPass': schedule.RestoreDbPass,
+            'Serverip': schedule.Serverip
         });
     };
 

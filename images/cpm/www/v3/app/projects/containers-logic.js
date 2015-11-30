@@ -682,7 +682,7 @@ var ContainerScheduleAddController = function($scope, $filter, $stateParams, $st
         if ($scope.schedule.DayOfWeek == '') {
             $scope.schedule.DayOfWeek = '*';
         }
-        $scope.schedule.ServerID = $scope.myServer;
+        $scope.schedule.Serverip = $scope.myServer;
         $scope.schedule.ProfileName = $scope.currentProfileName.name;
         console.log('adding schedule with schedule=' + JSON.stringify($scope.schedule));
         tasksFactory.addschedule($scope.schedule, $scope.container.Name)
@@ -720,6 +720,7 @@ var ContainerScheduleEditController = function($scope, $filter, $stateParams, $s
 
     tasksFactory.getschedule($stateParams.scheduleID)
         .success(function(data) {
+		console.log(JSON.stringify(data));
             $scope.schedule = data;
             if ($scope.schedule.Enabled == 'YES') {
                 $scope.thething.checked = true;
@@ -732,7 +733,9 @@ var ContainerScheduleEditController = function($scope, $filter, $stateParams, $s
             } else {
                 $scope.currentProfileName = $scope.profiles[1];
             }
-            $scope.setServer();
+            //$scope.setServer();
+	    console.log('setting server to ' + $scope.schedule.Serverip);
+            $scope.myServer = $scope.schedule.Serverip;
         })
         .error(function(error) {
             $scope.alerts = [{
