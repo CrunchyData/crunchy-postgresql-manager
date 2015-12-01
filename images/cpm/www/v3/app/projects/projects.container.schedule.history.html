@@ -6,7 +6,7 @@
         {{stat.TaskSize}}
 	<a tooltip-placement="right" tooltip="delete" ng-click="deletehistory()"><i class="fa fa-trash fa-fw"></i></a>
         <a tooltip="refresh" ng-click="refresh()"><i class="fa fa-refresh fa-fw"></i></a>
-	<a tooltip-placement="right" tooltip="restore" ui-sref="projects.container.schedule.history.restore()"><i class="fa fa-life-saver fa-fw"></i></a>
+	<a tooltip-placement="right" tooltip="restore" ui-sref="projects.container.schedule.history.restore({statusID:stat.ID})"><i class="fa fa-life-saver fa-fw"></i></a>
     </li>
 </ul>
 

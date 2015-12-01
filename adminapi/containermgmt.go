@@ -691,12 +691,15 @@ func AdminStopServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	//for each, get server, stop container
 	for _, each := range containers.Output {
 
-		//stop container
-		request := &swarmapi.DockerStopRequest{}
-		request.ContainerName = each.Name
-		_, err = swarmapi.DockerStop(request)
-		if err != nil {
-			logit.Error.Println("AdminStopServerContainers: error when trying to start container " + err.Error())
+		if strings.HasPrefix(each.Status, "Up") {
+			//stop container
+			request := &swarmapi.DockerStopRequest{}
+			request.ContainerName = each.Name
+			logit.Info.Println("stopping " + request.ContainerName)
+			_, err = swarmapi.DockerStop(request)
+			if err != nil {
+				logit.Error.Println("AdminStopServerContainers: error when trying to start container " + err.Error())
+			}
 		}
 	}
 

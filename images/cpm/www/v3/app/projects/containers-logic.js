@@ -575,6 +575,7 @@ var ContainerScheduleHistoryRestoreController = function($scope, $stateParams, $
 	postMessage.ProfileName = 'restore';
 	postMessage.DockerProfile = $scope.dockerprofile;
 	postMessage.ScheduleID = $scope.schedule.ID;
+	postMessage.StatusID = $stateParams.statusID;
         tasksFactory.execute(postMessage)
             .success(function(data) {
                 $scope.alerts = [{

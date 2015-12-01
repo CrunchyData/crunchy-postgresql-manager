@@ -42,7 +42,7 @@ angular.module('uiRouterSample.servers', [
 
                             $scope.goToFirst = function() {
                                 if ($scope.servers.data.length > 0) {
-                                    //console.log($scope.servers.data[0].ID);
+                                    console.log(JSON.stringify($scope.servers));
                                     var randId = $scope.servers.data[0].ID;
 
                                     $state.go('servers.detail.details', {

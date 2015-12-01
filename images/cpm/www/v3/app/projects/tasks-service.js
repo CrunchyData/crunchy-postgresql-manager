@@ -75,7 +75,8 @@ angular.module('uiRouterSample.tasks.service', ['ngCookies'])
             'ContainerName': postMessage.ContainerName,
             'ProfileName': postMessage.ProfileName,
             'DockerProfile': postMessage.DockerProfile,
-            'ScheduleID': postMessage.ScheduleID
+            'ScheduleID': postMessage.ScheduleID,
+            'StatusID': postMessage.StatusID
         });
     };
 

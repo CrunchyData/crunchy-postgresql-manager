@@ -280,7 +280,7 @@ angular.module('uiRouterSample.projects', [
             })
 
             .state('projects.container.schedule.history', {
-                url: '/history',
+                url: '/history/:statusID',
                 views: {
 
                     '': {

@@ -28,13 +28,10 @@ var startTime time.Time
 var startTimeString string
 var restoreRemotePath, restoreRemoteHost, restoreRemoteUser string
 var restoreDbUser, restoreDbPass, restoreSet string
-var restoreScheduleID string
-var restoreContainerName, repoRemotePath, backupSet string
+var restoreScheduleID, restoreStatusID string
+var restoreContainerName, repoRemotePath string
 var restoreServerName, restoreServerIP string
 
-var backupPort string
-var backupUser string
-var backupAgentURL string
 var StatusID = ""
 
 func main() {
@@ -208,48 +205,54 @@ func getEnvVars() error {
 		logit.Error.Println("RestoreRemotePath env var not set\n")
 		found = false
 	}
+	logit.Info.Println("RestoreRemotePath=[" + restoreRemotePath + "]")
 
 	restoreRemoteHost = os.Getenv("RestoreRemoteHost")
 	if restoreRemoteHost == "" {
 		logit.Error.Println("RestoreRemoteHost env var not set\n")
 		found = false
 	}
+	logit.Info.Println("RestoreRemoteHost=[" + restoreRemoteHost + "]")
 
 	restoreRemoteUser = os.Getenv("RestoreRemoteUser")
 	if restoreRemoteUser == "" {
 		logit.Error.Println("RestoreRemoteUser env var not set\n")
 		found = false
 	}
+	logit.Info.Println("RestoreRemoteUser=[" + restoreRemoteUser + "]")
 
 	restoreDbUser = os.Getenv("RestoreDbUser")
 	if restoreDbUser == "" {
 		logit.Error.Println("RestoreDbUser env var not set\n")
 		found = false
 	}
+	logit.Info.Println("RestoreDbUser=[" + restoreDbUser + "]")
 
 	restoreDbPass = os.Getenv("RestoreDbPass")
 	if restoreDbPass == "" {
 		logit.Error.Println("RestoreDbPass env var not set\n")
 		found = false
 	}
+	logit.Info.Println("RestoreDbPass=[" + restoreDbPass + "]")
 
-	restoreSet = os.Getenv("RestoreSet")
-	if restoreSet == "" {
-		logit.Error.Println("RestoreSet env var not set\n")
-		found = false
-	}
 	restoreContainerName = os.Getenv("RestoreContainerName")
 	if restoreContainerName == "" {
 		logit.Error.Println("RestoreContainerName env var not set\n")
 		found = false
 	}
+	logit.Info.Println("RestoreContainerName=[" + restoreContainerName + "]")
 	restoreScheduleID = os.Getenv("RestoreScheduleID")
 	if restoreScheduleID == "" {
 		logit.Error.Println("RestoreScheduleID env var not set\n")
 		found = false
 	}
-
-	backupSet = "--set=" + restoreSet
+	logit.Info.Println("RestoreScheduleID=[" + restoreScheduleID + "]")
+	restoreStatusID = os.Getenv("RestoreStatusID")
+	if restoreStatusID == "" {
+		logit.Error.Println("RestoreStatusID env var not set\n")
+		found = false
+	}
+	logit.Info.Println("RestoreStatusID=[" + restoreStatusID + "]")
 
 	if !found {
 		logit.Error.Println("restorecommand job missing required env vars")

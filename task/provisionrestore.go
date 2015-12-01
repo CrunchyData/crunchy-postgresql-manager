@@ -30,6 +30,7 @@ func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 	logit.Info.Println("with scheduleid=" + args.ScheduleID)
 	logit.Info.Println("with containername=" + args.ContainerName)
 	logit.Info.Println("with profilename=" + args.ProfileName)
+	logit.Info.Println("with statusid=" + args.StatusID)
 
 	params := &swarmapi.DockerRunRequest{}
 	params.Image = "cpm-restore-job"
@@ -62,10 +63,10 @@ func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 	params.EnvVars["RestoreRemoteUser"] = schedule.RestoreRemoteUser
 	params.EnvVars["RestoreDbUser"] = schedule.RestoreDbUser
 	params.EnvVars["RestoreDbPass"] = schedule.RestoreDbPass
-	params.EnvVars["RestoreSet"] = schedule.RestoreSet
 	params.EnvVars["RestoreContainerName"] = args.ContainerName
 	params.EnvVars["RestoreScheduleID"] = args.ScheduleID
 	params.EnvVars["RestoreProfileName"] = args.ProfileName
+	params.EnvVars["RestoreStatusID"] = args.StatusID
 
 	setting, err = admindb.GetSetting(dbConn, "PG-PORT")
 	if err != nil {

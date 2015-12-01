@@ -275,8 +275,16 @@ func DockerRun(req *DockerRunRequest) (DockerRunResponse, error) {
 		return response, errors.New("Profile was empty and should not be")
 	}
 
-	//always add the profile constraint env var
-	envvars[i] = "constraint:profile==~" + req.Profile
+	//typical case is to always add the profile constraint env var
+	//like SM, MED, LG, however in the case of a restore job, we
+	//use a hard constraint of the host ipaddress to pin
+	//the restored container to the same host as where the backup
+	//is stored
+	if req.IPAddress != "" {
+		envvars[i] = "constraint:host==~" + req.IPAddress
+	} else {
+		envvars[i] = "constraint:profile==~" + req.Profile
+	}
 
 	docker, err := dockerapi.NewClient(swarmURL)
 	if err != nil {
@@ -377,13 +385,13 @@ func DockerInfo() (DockerInfoResponse, error) {
 	return response, nil
 }
 
-func DockerPs(serveripport string) (DockerPsResponse, error) {
+func DockerPs(serverid string) (DockerPsResponse, error) {
 	response := DockerPsResponse{}
 	var err error
 
-	logit.Info.Println("DockerPs called")
+	logit.Info.Println("DockerPs called on " + serverid)
 
-	docker, err := dockerapi.NewClient("tcp://" + serveripport)
+	docker, err := dockerapi.NewClient("tcp://" + serverid)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return response, err
@@ -396,7 +404,7 @@ func DockerPs(serveripport string) (DockerPsResponse, error) {
 	info, err = docker.ListContainers(options)
 	if err != nil {
 		logit.Error.Println(err.Error())
-		return response, nil
+		return response, err
 	}
 
 	response.Output = make([]DockerPsInfo, 0)
@@ -404,15 +412,20 @@ func DockerPs(serveripport string) (DockerPsResponse, error) {
 	var apicontainer dockerapi.APIContainers
 	for x := range info {
 		apicontainer = info[x]
+		logit.Info.Printf("x=%d\n", x)
 		if strings.Index(apicontainer.Image, "cpm-node") > 0 ||
 			strings.Index(apicontainer.Image, "cpm-pgpool") > 0 {
 			cinfo := DockerPsInfo{}
-			cinfo.Name = strings.Trim(apicontainer.Names[0], "/")
+			if len(apicontainer.Names) > 0 {
+				cinfo.Name = strings.Trim(apicontainer.Names[0], "/")
+				logit.Info.Println("name=" + cinfo.Name + " status=" + apicontainer.Status)
+			}
 			cinfo.Status = apicontainer.Status
 			cinfo.Image = apicontainer.Image
 			response.Output = append(response.Output, cinfo)
 		}
 	}
 
+	logit.Info.Println("dockerps returning results")
 	return response, nil
 }

@@ -19,6 +19,7 @@ import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/swarmapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/task"
 	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
@@ -31,6 +32,7 @@ type BackupNowPost struct {
 	ContainerName string
 	ProfileName   string
 	ScheduleID    string
+	StatusID      string
 }
 
 type AddSchedulePost struct {
@@ -111,7 +113,44 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 		request.ContainerName = postMsg.ContainerName
 	}
 
+	//the restore command requires the task schedule statusID
+	request.StatusID = postMsg.StatusID
+
 	request.ProfileName = postMsg.ProfileName
+
+	//for restore jobs, we go ahead and create the new
+	//database container here, could possible move to the
+	//restore job task later on
+	if postMsg.ProfileName == "restore" {
+		var container types.Container
+		container, err2 = admindb.GetContainerByName(dbConn, postMsg.ContainerName)
+		if err2 != nil {
+			logit.Error.Println(err2.Error())
+			rest.Error(w, err2.Error(), 400)
+			return
+		}
+		var newid string
+		provisionParams := swarmapi.DockerRunRequest{}
+		provisionParams.Profile = "SM"
+		provisionParams.ProjectID = container.ProjectID
+		provisionParams.ContainerName = postMsg.ContainerName
+		provisionParams.Image = "cpm-node"
+		provisionParams.IPAddress = schedule.Serverip
+		logit.Info.Println("before restore provision with...")
+		logit.Info.Println("profile=" + provisionParams.Profile)
+		logit.Info.Println("projectid=" + provisionParams.ProjectID)
+		logit.Info.Println("containername=" + provisionParams.ContainerName)
+		logit.Info.Println("image=" + provisionParams.Image)
+		logit.Info.Println("ipaddress=" + provisionParams.IPAddress)
+		newid, err = provisionImpl(dbConn, &provisionParams, false)
+		if err != nil {
+			logit.Error.Println(err.Error())
+			rest.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		logit.Info.Printf("created node for restore job id = " + newid)
+	}
+
 	output, err := task.ExecuteNowClient(&request)
 	if err != nil {
 		logit.Error.Println(err.Error())
