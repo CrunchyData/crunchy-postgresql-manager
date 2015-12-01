@@ -26,10 +26,11 @@ import (
 )
 
 type BackupNowPost struct {
-	Token       string
-	ServerID    string
-	ProfileName string
-	ScheduleID  string
+	Token         string
+	ServerID      string
+	ContainerName string
+	ProfileName   string
+	ScheduleID    string
 }
 
 type AddSchedulePost struct {
@@ -102,7 +103,14 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 
 	request := task.TaskRequest{}
 	request.ScheduleID = postMsg.ScheduleID
-	request.ContainerName = schedule.ContainerName
+
+	//in the case of a restore job, the user can supply a new containername
+	if postMsg.ContainerName == "" {
+		request.ContainerName = schedule.ContainerName
+	} else {
+		request.ContainerName = postMsg.ContainerName
+	}
+
 	request.ProfileName = postMsg.ProfileName
 	output, err := task.ExecuteNowClient(&request)
 	if err != nil {

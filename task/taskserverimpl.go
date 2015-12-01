@@ -50,6 +50,7 @@ type TaskStatus struct {
 
 type TaskRequest struct {
 	ScheduleID    string
+	DockerProfile string
 	ProfileName   string
 	ContainerName string
 }

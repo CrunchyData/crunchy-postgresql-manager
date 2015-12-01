@@ -111,10 +111,14 @@ func Hba(dbConn *sql.DB, mode string, hostname string, port string, clusterid st
 
 	var hbaInfo HBAParameters
 
-	hbaInfo.PG_HOST_IP = hostname + "." + domainname
-	hbaInfo.BACKUP_HOST = hostname + "-backup." + domainname
-	hbaInfo.MONITOR_HOST = "cpm-mon." + domainname
-	hbaInfo.ADMIN_HOST = "cpm-admin." + domainname
+	//hbaInfo.PG_HOST_IP = hostname + "." + domainname
+	//hbaInfo.BACKUP_HOST = hostname + "-backup." + domainname
+	//hbaInfo.MONITOR_HOST = "cpm-mon." + domainname
+	//hbaInfo.ADMIN_HOST = "cpm-admin." + domainname
+	hbaInfo.PG_HOST_IP = hostname
+	hbaInfo.BACKUP_HOST = hostname + "-backup"
+	hbaInfo.MONITOR_HOST = "cpm-mon"
+	hbaInfo.ADMIN_HOST = "cpm-admin"
 	hbaInfo.RULES_LIST = cars
 
 	bridges, err := admindb.GetSetting(dbConn, "DOCKER-BRIDGES")

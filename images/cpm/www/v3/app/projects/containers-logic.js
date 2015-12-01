@@ -19,10 +19,6 @@ var GotocontainerController = function($scope, $state, $cookieStore, $stateParam
 
 var ContainerTaskSchedulesController = function($scope, $stateParams, $state, containersFactory, utils) {
 
-    $scope.restore = function() {
-    	console.log('restore is called with params ' + JSON.stringify($stateParams));
-    }
-
     $scope.refresh = function() {
         containersFactory.schedules($stateParams.containerId)
             .success(function(data) {
@@ -93,17 +89,17 @@ var ContainerStartController = function($scope, $stateParams, $state, containers
 
     $scope.start = function() {
         usSpinnerService.spin('spinner-1');
-	console.log('jeff state is ' + JSON.stringify($stateParams))
+        console.log('jeff state is ' + JSON.stringify($stateParams))
         containersFactory.start($stateParams.containerId)
             .success(function(data) {
                 //$state.go('projects.container.details', $stateParams, {
-                    //reload: true,
-                    //inherit: false
+                //reload: true,
+                //inherit: false
                 //});
-		$state.go('projects.container.details', {
-			containerId: $stateParams.containerId,
-			projectId: $stateParams.projectId
-		});
+                $state.go('projects.container.details', {
+                    containerId: $stateParams.containerId,
+                    projectId: $stateParams.projectId
+                });
 
                 usSpinnerService.stop('spinner-1');
             })
@@ -525,7 +521,13 @@ var ContainerScheduleExecuteController = function($scope, $stateParams, $state, 
 
     usSpinnerService.spin('spinner-1');
 
-    tasksFactory.execute($scope.schedule)
+	var postMessage = {};
+	postMessage.ServerID = $scope.schedule.ServerID;
+	postMessage.ContainerName = $scope.schedule.ContainerName;
+	postMessage.ProfileName = $scope.schedule.ProfileName;
+	postMessage.ScheduleID = $scope.schedule.ID;
+
+    tasksFactory.execute(postMessage)
         .success(function(data) {
             $scope.alerts = [{
                 type: 'success',
@@ -543,22 +545,52 @@ var ContainerScheduleExecuteController = function($scope, $stateParams, $state, 
         });
 };
 
-var ContainerScheduleHistoryRestoreController = function($scope, $stateParams, $state, tasksFactory, utils) {
+var ContainerScheduleHistoryRestoreController = function($scope, $stateParams, $state, tasksFactory, utils, usSpinnerService) {
 
-	console.log('in schedule history restore controller');
-	console.log('params = ' + JSON.stringify($stateParams));
-	console.log('scope container = ' + JSON.stringify($scope.container));
-	console.log('scope container = ' + $scope.container["Name"]);
+    console.log('in schedule history restore controller');
+    console.log('params = ' + JSON.stringify($stateParams));
+    console.log('scope container = ' + JSON.stringify($scope.container));
+    console.log('scope container = ' + $scope.container["Name"]);
 
     var newcontainer = {};
-            newcontainer.ID = 0;
-            newcontainer.Name = 'newcontainer';
-            newcontainer.Image = 'cpm-node';
-            $scope.dockerprofile = 'SM';
-            $scope.container["Name"] = $scope.container["Name"] + '-restored';
+    newcontainer.ID = 0;
+    newcontainer.Name = 'newcontainer';
+    newcontainer.Image = 'cpm-node';
+    $scope.dockerprofile = 'SM';
+    $scope.container["Name"] = $scope.container["Name"] + '-restored';
 
-    $scope.add = function() {
-        console.log('add called to restore backup');
+    $scope.restore = function() {
+        console.log('restore called to restore backup with schedule=' + $scope.schedule.ID);
+        console.log('dockerprofile=' + $scope.dockerprofile);
+        console.log('name=' + $scope.container.Name);
+
+        console.log(JSON.stringify($scope.schedule));
+        usSpinnerService.spin('spinner-1');
+
+	//need ServerID, ContainerName, ProfileName, ScheduleID
+	//
+	var postMessage = {};
+	postMessage.ServerID = '1';
+	postMessage.ContainerName = $scope.container.Name;
+	postMessage.ProfileName = 'restore';
+	postMessage.DockerProfile = $scope.dockerprofile;
+	postMessage.ScheduleID = $scope.schedule.ID;
+        tasksFactory.execute(postMessage)
+            .success(function(data) {
+                $scope.alerts = [{
+                    type: 'success',
+                    msg: 'success'
+                }];
+                usSpinnerService.stop('spinner-1');
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                usSpinnerService.stop('spinner-1');
+                console.log('here is an error ' + error.Error);
+            });
     };
 };
 
@@ -569,11 +601,11 @@ var ContainerScheduleHistoryController = function($scope, $stateParams, $state, 
     };
 
     $scope.deletehistory = function() {
-    	console.log('deletehistory not implemented yet');
+        console.log('deletehistory not implemented yet');
     };
 
     $scope.restore = function() {
-    	console.log('restore not implemented yet params=' + JSON.stringify($stateParams));
+        console.log('restore not implemented yet params=' + JSON.stringify($stateParams));
     };
 
     $scope.refresh = function() {
@@ -720,7 +752,7 @@ var ContainerScheduleEditController = function($scope, $filter, $stateParams, $s
 
     tasksFactory.getschedule($stateParams.scheduleID)
         .success(function(data) {
-		console.log(JSON.stringify(data));
+            console.log(JSON.stringify(data));
             $scope.schedule = data;
             if ($scope.schedule.Enabled == 'YES') {
                 $scope.thething.checked = true;
@@ -734,7 +766,7 @@ var ContainerScheduleEditController = function($scope, $filter, $stateParams, $s
                 $scope.currentProfileName = $scope.profiles[1];
             }
             //$scope.setServer();
-	    console.log('setting server to ' + $scope.schedule.Serverip);
+            console.log('setting server to ' + $scope.schedule.Serverip);
             $scope.myServer = $scope.schedule.Serverip;
         })
         .error(function(error) {
@@ -757,7 +789,13 @@ var ContainerScheduleEditController = function($scope, $filter, $stateParams, $s
 
     $scope.executenow = function() {
 
-        tasksFactory.execute($scope.schedule)
+	var postMessage = {};
+	postMessage.ServerID = $scope.ServerID;
+	postMessage.ContainerName = '';
+	postMessage.ProfileName = $scope.ProfileName;
+	postMessage.ScheduleID = $scope.ScheduleID;
+
+        tasksFactory.execute(postMessage)
             .success(function(data) {
                 console.log('successful post execute with data=' + data);
                 console.log(JSON.stringify(data));
@@ -823,7 +861,7 @@ var ContainerScheduleEditController = function($scope, $filter, $stateParams, $s
 var ContainerScheduleDeleteController = function($scope, $stateParams, $state, tasksFactory, utils) {
 
 
-	$scope.scheduleID = $stateParams.scheduleID;
+    $scope.scheduleID = $stateParams.scheduleID;
 
     $scope.delete = function() {
         tasksFactory.deleteschedule($stateParams.scheduleID)
@@ -872,17 +910,17 @@ var ContainerAddController = function($scope, $stateParams, $state, serversFacto
 
         containersFactory.add($scope.container, $scope.dockerprofile)
             .success(function(data) {
-	    	console.log('data from add is ' + JSON.stringify(data));
-	    	console.log('current projectid is ' +  $stateParams.projectId);
-		$state.transitionTo('projects.container.details', {
-			containerId: data.ID,
-			projectId: $stateParams.projectId
-		}, {
-		reload:true,
+                console.log('data from add is ' + JSON.stringify(data));
+                console.log('current projectid is ' + $stateParams.projectId);
+                $state.transitionTo('projects.container.details', {
+                    containerId: data.ID,
+                    projectId: $stateParams.projectId
+                }, {
+                    reload: true,
                     inherit: false
-		});
+                });
                 usSpinnerService.stop('spinner-1');
-		/**
+                /**
 		$state.go('projects.container.details', {
 			containerId: data.ID,
 			projectId: $stateParams.projectId

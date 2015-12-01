@@ -64,16 +64,18 @@ angular.module('uiRouterSample.tasks.service', ['ngCookies'])
         });
     };
 
-    tasksFactory.execute = function(schedule) {
+    tasksFactory.execute = function(postMessage) {
 
         var url = $cookieStore.get('AdminURL') + '/task/executenow';
         console.log(url);
 
         return $http.post(url, {
             'Token': $cookieStore.get('cpm_token'),
-            'ServerID': schedule.ServerID,
-            'ProfileName': schedule.ProfileName,
-            'ScheduleID': schedule.ID
+            'ServerID': postMessage.ServerID,
+            'ContainerName': postMessage.ContainerName,
+            'ProfileName': postMessage.ProfileName,
+            'DockerProfile': postMessage.DockerProfile,
+            'ScheduleID': postMessage.ScheduleID
         });
     };
 

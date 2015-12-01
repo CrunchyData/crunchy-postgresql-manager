@@ -44,6 +44,8 @@ func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 		return err
 	}
 
+	logit.Info.Println("schedule serverip is " + schedule.Serverip)
+
 	//params.PGDataPath = server.PGDataPath + "/" + restorecontainername + "/" + getFormattedDate()
 
 	//get the docker profile settings
@@ -81,7 +83,7 @@ func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 		logit.Error.Println(response.ID)
 		return err
 	}
-	logit.Info.Println("docker-run-restore.sh output=" + response.ID)
+	logit.Info.Println("docker run output=" + response.ID)
 
 	return nil
 }

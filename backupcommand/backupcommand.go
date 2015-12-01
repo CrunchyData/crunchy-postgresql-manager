@@ -157,6 +157,7 @@ func backupfunc(str string) {
 		io.WriteString(file, "doing proxy backup to "+backupHost+"\n")
 	}
 
+	fmt.Println("executing " + CPMBIN + "basebackup.sh with backupHost=" + backupHost + " backupUsername=" + backupUsername + " backupPassword=" + backupPassword)
 	cmd := exec.Command(CPMBIN+"basebackup.sh", backupHost, backupUsername, backupPassword)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
@@ -174,7 +175,9 @@ func backupfunc(str string) {
 	}
 
 	fmt.Println("basebackup output was " + out.String())
+	fmt.Println("basebackup err was " + stderr.String())
 	io.WriteString(file, "basebackup output was"+out.String()+"\n")
+	io.WriteString(file, "basebackup err was"+stderr.String()+"\n")
 	fmt.Println("basebackup is completed")
 	io.WriteString(file, " backups is completed\n")
 }
