@@ -684,7 +684,8 @@ var ContainerScheduleAddController = function($scope, $filter, $stateParams, $st
         'name': 'thething',
         'checked': false
     }];
-    $scope.myServer = servers.data[0].ID;
+    console.log(JSON.stringify(servers));
+    $scope.myServer = servers.data[0].IPAddress;
     $scope.servers = servers.data;
 
     $scope.updateCurrentSchedule = function() {

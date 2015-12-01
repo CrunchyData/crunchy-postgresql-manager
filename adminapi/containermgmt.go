@@ -91,7 +91,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	clusternode := types.ClusterNode{node.ID, node.ClusterID,
-		node.Name, node.Role, node.Image, node.CreateDate, currentStatus, node.ProjectID, node.ProjectName, node.ClusterName, inspectInfo.ServerID}
+		node.Name, node.Role, node.Image, node.CreateDate, currentStatus, node.ProjectID, node.ProjectName, node.ClusterName, inspectInfo.IPAddress}
 
 	w.WriteJson(clusternode)
 }
