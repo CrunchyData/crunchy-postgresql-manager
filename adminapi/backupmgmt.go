@@ -29,6 +29,7 @@ import (
 type BackupNowPost struct {
 	Token         string
 	ServerID      string
+	ProjectID     string
 	ContainerName string
 	ProfileName   string
 	ScheduleID    string
@@ -122,17 +123,10 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 	//database container here, could possible move to the
 	//restore job task later on
 	if postMsg.ProfileName == "restore" {
-		var container types.Container
-		container, err2 = admindb.GetContainerByName(dbConn, postMsg.ContainerName)
-		if err2 != nil {
-			logit.Error.Println(err2.Error())
-			rest.Error(w, err2.Error(), 400)
-			return
-		}
 		var newid string
 		provisionParams := swarmapi.DockerRunRequest{}
 		provisionParams.Profile = "SM"
-		provisionParams.ProjectID = container.ProjectID
+		provisionParams.ProjectID = postMsg.ProjectID
 		provisionParams.ContainerName = postMsg.ContainerName
 		provisionParams.Image = "cpm-node"
 		provisionParams.IPAddress = schedule.Serverip

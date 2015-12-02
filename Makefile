@@ -35,7 +35,7 @@ buildimages:
 		cd images/cpm-task && make
 		cd images/cpm-backup-job && make
 		cd images/cpm-restore-job && make
-		cd images/cpm-backrestrestore-job && make
+		cd images/cpm-backrest-restore-job && make
 		cd images/cpm-prometheus && make
 		cd images/cpm-collect && make
 

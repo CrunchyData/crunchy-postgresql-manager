@@ -182,7 +182,7 @@ create table taskstatus (
 	path varchar(80) not null,
 	elapsedtime varchar(30) not null,
 	tasksize varchar(30) not null,
-	status varchar(50) not null,
+	status varchar(200) not null,
 	updatedt timestamp not null,
 
 	unique (containername, starttime)

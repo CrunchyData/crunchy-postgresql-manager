@@ -32,9 +32,29 @@ func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 	logit.Info.Println("with profilename=" + args.ProfileName)
 	logit.Info.Println("with statusid=" + args.StatusID)
 
+	restorecontainername := args.ContainerName + "-restore-job"
+
+	//remove any existing container with the same name
+	inspectReq := &swarmapi.DockerInspectRequest{}
+	inspectReq.ContainerName = restorecontainername
+	inspectResponse, err := swarmapi.DockerInspect(inspectReq)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
+	if inspectResponse.RunningState != "not-found" {
+		rreq := &swarmapi.DockerRemoveRequest{}
+		rreq.ContainerName = restorecontainername
+		_, err = swarmapi.DockerRemove(rreq)
+		if err != nil {
+			logit.Error.Println(err.Error())
+			return err
+		}
+	}
+
+	//create the new container
 	params := &swarmapi.DockerRunRequest{}
 	params.Image = "cpm-restore-job"
-	restorecontainername := args.ContainerName + "-restore-job"
 	params.ContainerName = restorecontainername
 	params.Standalone = "false"
 	params.Profile = "small"
@@ -47,6 +67,13 @@ func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 
 	logit.Info.Println("schedule serverip is " + schedule.Serverip)
 
+	var taskstatus TaskStatus
+	taskstatus, err = GetStatus(dbConn, args.StatusID)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
+
 	//params.PGDataPath = server.PGDataPath + "/" + restorecontainername + "/" + getFormattedDate()
 
 	//get the docker profile settings
@@ -55,25 +82,23 @@ func ProvisionRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 	params.CPU = setting.Value
 	setting, err = admindb.GetSetting(dbConn, "S-DOCKER-PROFILE-MEM")
 	params.MEM = setting.Value
+	setting, err = admindb.GetSetting(dbConn, "PG-DATA-PATH")
+	var datapath string
+	datapath = setting.Value
+
+	//this gets mounted under /pgdata and allows us to access
+	//both the backup files and the restored containers files
+	params.PGDataPath = datapath
 
 	params.EnvVars = make(map[string]string)
 
-	params.EnvVars["RestoreRemotePath"] = schedule.RestoreRemotePath
-	params.EnvVars["RestoreRemoteHost"] = schedule.RestoreRemoteHost
-	params.EnvVars["RestoreRemoteUser"] = schedule.RestoreRemoteUser
-	params.EnvVars["RestoreDbUser"] = schedule.RestoreDbUser
-	params.EnvVars["RestoreDbPass"] = schedule.RestoreDbPass
+	params.EnvVars["RestoreServerip"] = schedule.Serverip
+	params.EnvVars["RestoreBackupPath"] = taskstatus.Path
+	params.EnvVars["RestorePath"] = args.ContainerName
 	params.EnvVars["RestoreContainerName"] = args.ContainerName
 	params.EnvVars["RestoreScheduleID"] = args.ScheduleID
 	params.EnvVars["RestoreProfileName"] = args.ProfileName
 	params.EnvVars["RestoreStatusID"] = args.StatusID
-
-	setting, err = admindb.GetSetting(dbConn, "PG-PORT")
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return err
-	}
-	params.EnvVars["RestorePGPort"] = setting.Value
 
 	//run the container
 	//params.CommandPath = "docker-run-restore.sh"

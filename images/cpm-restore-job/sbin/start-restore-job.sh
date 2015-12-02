@@ -29,4 +29,7 @@ echo ***end of Environment vars***
 
 env
 
+ls -l /
+ls -l /pgdata
+
 restorecommand

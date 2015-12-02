@@ -16,13 +16,12 @@
 package task
 
 import (
-	"github.com/crunchydata/crunchy-postgresql-manager/logit"
-	"github.com/crunchydata/crunchy-postgresql-manager/util"
-
 	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/ant0ine/go-json-rest/rest"
+	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"github.com/robfig/cron"
 	"log"
 	"net/http"

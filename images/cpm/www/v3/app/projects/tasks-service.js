@@ -72,6 +72,7 @@ angular.module('uiRouterSample.tasks.service', ['ngCookies'])
         return $http.post(url, {
             'Token': $cookieStore.get('cpm_token'),
             'ServerID': postMessage.ServerID,
+            'ProjectID': postMessage.ProjectID,
             'ContainerName': postMessage.ContainerName,
             'ProfileName': postMessage.ProfileName,
             'DockerProfile': postMessage.DockerProfile,

@@ -16,21 +16,26 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/task"
 	"os"
+	"os/exec"
 	"time"
 )
 
 var startTime time.Time
 var startTimeString string
-var restoreRemotePath, restoreRemoteHost, restoreRemoteUser string
-var restoreDbUser, restoreDbPass, restoreSet string
-var restoreScheduleID, restoreStatusID string
-var restoreContainerName, repoRemotePath string
-var restoreServerName, restoreServerIP string
+
+var restoreServerip string
+var restoreBackupPath string
+var restorePath string
+var restoreContainerName string
+var restoreScheduleID string
+var restoreProfileName string
+var restoreStatusID string
 
 var StatusID = ""
 
@@ -54,9 +59,9 @@ func main() {
 	s.TaskSize = "n/a"
 	sendStats(&s)
 
-	logit.Info.Println("giving DNS time to register the backup job....sleeping for 7 secs")
+	//	logit.Info.Println("giving DNS time to register the backup job....sleeping for 7 secs")
 	sleepTime, _ := time.ParseDuration("7s")
-	time.Sleep(sleepTime)
+	//	time.Sleep(sleepTime)
 
 	stats("restore job starting")
 
@@ -79,26 +84,51 @@ func main() {
 
 	stats("performing the restore...")
 	//perform the restore
-	restoreRequest := cpmcontainerapi.RestoreRequest{}
-	restoreRequest.RestoreRemotePath = restoreRemotePath
-	restoreRequest.RestoreRemoteHost = restoreRemoteHost
-	restoreRequest.RestoreRemoteUser = restoreRemoteUser
-	restoreRequest.RestoreDbUser = restoreDbUser
-	restoreRequest.RestoreDbPass = restoreDbPass
-	restoreRequest.RestoreSet = restoreSet
-
-	var restoreResponse cpmcontainerapi.RestoreResponse
-	restoreResponse, err = cpmcontainerapi.RestoreClient(restoreContainerName, &restoreRequest)
+	//remove anything left in the /pgdata on the receiving container
+	logit.Info.Println("removing any existing pgdata files")
+	var frompath string
+	frompath = "/pgdata/" + restorePath + "/*"
+	logit.Info.Println("/bin/rm -rf " + frompath)
+	var cmd *exec.Cmd
+	cmd = exec.Command("/bin/rm", "-rf", frompath)
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err = cmd.Run()
 	if err != nil {
 		logit.Error.Println(err.Error())
-		s.Status = "error in restore"
+		logit.Error.Println("rm stdout=" + out.String())
+		logit.Error.Println("rm stderr=" + stderr.String())
+		s.Status = "error in removing old files"
 		sendStats(&s)
 		os.Exit(1)
 	}
-	logit.Info.Println("Restore....")
-	logit.Info.Println(restoreResponse.Output)
-	logit.Info.Println(restoreResponse.Status)
-	logit.Info.Println("End of Restore....")
+	logit.Info.Println("remove was successful")
+
+	//I'm choosing to do the remove here this way since this restore
+	//might be a HUGE amount of data and the copy command could run a LONG
+	//time, longer than an http timeout might allow for, since restorecommand
+	//is running inside a container itself, this copy can run any amount of time
+
+	//copy from the backup path all files to the /pgdata on the receiving container
+	frompath = " /pgdata" + restoreBackupPath
+	topath := "  /pgdata/" + restorePath
+	logit.Info.Println("/var/cpm/bin/copyfiles.sh" + frompath + topath)
+	cmd = exec.Command("/var/cpm/bin/copyfiles.sh", frompath, topath)
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err = cmd.Run()
+	if err != nil {
+		logit.Error.Println(err.Error())
+		s.Status = "error in copying backup files"
+		logit.Error.Println("cp stdout=" + out.String())
+		logit.Error.Println("cp stderr=" + stderr.String())
+		sendStats(&s)
+		os.Exit(1)
+	}
+
+	logit.Info.Println("restore - copy of files was successful...")
 
 	stats("starting postgres after the restore...")
 
@@ -114,20 +144,6 @@ func main() {
 	logit.Info.Println(startResponse.Output)
 	logit.Info.Println(startResponse.Status)
 	logit.Info.Println("End of StartPG....")
-
-	stats("seeding the database...")
-	var seedResponse cpmcontainerapi.SeedResponse
-	seedResponse, err = cpmcontainerapi.SeedClient(restoreContainerName)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		s.Status = "error in Seed"
-		sendStats(&s)
-		os.Exit(1)
-	}
-	logit.Info.Println("Seed....")
-	logit.Info.Println(seedResponse.Output)
-	logit.Info.Println(seedResponse.Status)
-	logit.Info.Println("End of Seed....")
 
 	//send final stats to backup
 	finalstats("restore completed")
@@ -168,11 +184,12 @@ func finalstats(str string) {
 }
 
 func sendStats(stats *task.TaskStatus) error {
-	logit.Info.Println(stats.Status)
+	logit.Info.Println("restore - " + restoreBackupPath + " to " + restoreContainerName + " - " + stats.Status)
 
+	stats.Status = "restore - " + restoreBackupPath + " to " + restoreContainerName + " - " + stats.Status
 	stats.ContainerName = restoreContainerName
 	stats.ScheduleID = restoreScheduleID
-	stats.ProfileName = "pg_backrest_restore"
+	stats.ProfileName = "restore"
 	stats.Path = restoreContainerName
 	stats.TaskName = restoreContainerName
 	stats.ID = StatusID
@@ -200,40 +217,26 @@ func getEnvVars() error {
 	logit.Info.Println("getEnvVars called\n")
 	var found = true
 
-	restoreRemotePath = os.Getenv("RestoreRemotePath")
-	if restoreRemotePath == "" {
-		logit.Error.Println("RestoreRemotePath env var not set\n")
+	restoreServerip = os.Getenv("RestoreServerip")
+	if restoreServerip == "" {
+		logit.Error.Println("RestoreServerip env var not set\n")
 		found = false
 	}
-	logit.Info.Println("RestoreRemotePath=[" + restoreRemotePath + "]")
+	logit.Info.Println("RestoreServerip=[" + restoreServerip + "]")
 
-	restoreRemoteHost = os.Getenv("RestoreRemoteHost")
-	if restoreRemoteHost == "" {
-		logit.Error.Println("RestoreRemoteHost env var not set\n")
+	restoreBackupPath = os.Getenv("RestoreBackupPath")
+	if restoreBackupPath == "" {
+		logit.Error.Println("RestoreBackupPath env var not set\n")
 		found = false
 	}
-	logit.Info.Println("RestoreRemoteHost=[" + restoreRemoteHost + "]")
+	logit.Info.Println("RestoreBackupPath=[" + restoreBackupPath + "]")
 
-	restoreRemoteUser = os.Getenv("RestoreRemoteUser")
-	if restoreRemoteUser == "" {
-		logit.Error.Println("RestoreRemoteUser env var not set\n")
+	restorePath = os.Getenv("RestorePath")
+	if restorePath == "" {
+		logit.Error.Println("RestorePath env var not set\n")
 		found = false
 	}
-	logit.Info.Println("RestoreRemoteUser=[" + restoreRemoteUser + "]")
-
-	restoreDbUser = os.Getenv("RestoreDbUser")
-	if restoreDbUser == "" {
-		logit.Error.Println("RestoreDbUser env var not set\n")
-		found = false
-	}
-	logit.Info.Println("RestoreDbUser=[" + restoreDbUser + "]")
-
-	restoreDbPass = os.Getenv("RestoreDbPass")
-	if restoreDbPass == "" {
-		logit.Error.Println("RestoreDbPass env var not set\n")
-		found = false
-	}
-	logit.Info.Println("RestoreDbPass=[" + restoreDbPass + "]")
+	logit.Info.Println("RestorePath=[" + restorePath + "]")
 
 	restoreContainerName = os.Getenv("RestoreContainerName")
 	if restoreContainerName == "" {
@@ -241,12 +244,21 @@ func getEnvVars() error {
 		found = false
 	}
 	logit.Info.Println("RestoreContainerName=[" + restoreContainerName + "]")
+
 	restoreScheduleID = os.Getenv("RestoreScheduleID")
 	if restoreScheduleID == "" {
 		logit.Error.Println("RestoreScheduleID env var not set\n")
 		found = false
 	}
 	logit.Info.Println("RestoreScheduleID=[" + restoreScheduleID + "]")
+
+	restoreProfileName = os.Getenv("RestoreProfileName")
+	if restoreProfileName == "" {
+		logit.Error.Println("RestoreProfileName env var not set\n")
+		found = false
+	}
+	logit.Info.Println("RestoreProfileName=[" + restoreProfileName + "]")
+
 	restoreStatusID = os.Getenv("RestoreStatusID")
 	if restoreStatusID == "" {
 		logit.Error.Println("RestoreStatusID env var not set\n")

@@ -244,7 +244,7 @@ func GetAllStatus(dbConn *sql.DB, scheduleid string) ([]TaskStatus, error) {
 	var rows *sql.Rows
 	var err error
 
-	rows, err = dbConn.Query(fmt.Sprintf("select id, containername, date_trunc('second', starttime)::text, taskname, path, elapsedtime, tasksize, status, date_trunc('second', updatedt)::text from taskstatus where scheduleid=%s order by starttime", scheduleid))
+	rows, err = dbConn.Query(fmt.Sprintf("select id, profilename, containername, date_trunc('second', starttime)::text, taskname, path, elapsedtime, tasksize, status, date_trunc('second', updatedt)::text from taskstatus where scheduleid=%s order by starttime", scheduleid))
 
 	if err != nil {
 		return nil, err
@@ -255,6 +255,7 @@ func GetAllStatus(dbConn *sql.DB, scheduleid string) ([]TaskStatus, error) {
 		s := TaskStatus{}
 		if err = rows.Scan(
 			&s.ID,
+			&s.ProfileName,
 			&s.ContainerName,
 			&s.StartTime,
 			&s.TaskName,
@@ -279,7 +280,7 @@ func GetStatus(dbConn *sql.DB, id string) (TaskStatus, error) {
 	logit.Info.Println("GetStatus called with id=" + id)
 	s := TaskStatus{}
 
-	err := dbConn.QueryRow(fmt.Sprintf("select id, containername, date_trunc('second', starttime), taskname,  path, elapsedtime, tasksize, status, date_trunc('second', updatedt) from taskstatus where id=%s", id)).Scan(&s.ID, &s.ContainerName, &s.StartTime, &s.TaskName, &s.Path, &s.ElapsedTime, &s.TaskSize, &s.Status, &s.UpdateDt)
+	err := dbConn.QueryRow(fmt.Sprintf("select id, profilename, containername, date_trunc('second', starttime)::text, taskname,  path, elapsedtime, tasksize, status, date_trunc('second', updatedt)::text from taskstatus where id=%s", id)).Scan(&s.ID, &s.ProfileName, &s.ContainerName, &s.StartTime, &s.TaskName, &s.Path, &s.ElapsedTime, &s.TaskSize, &s.Status, &s.UpdateDt)
 	switch {
 	case err == sql.ErrNoRows:
 		logit.Error.Println("taskdb:GetStatus:no status with that id")

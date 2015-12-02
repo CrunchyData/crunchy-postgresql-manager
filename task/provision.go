@@ -79,7 +79,8 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 	params.EnvVars["BACKUP_SCHEDULEID"] = args.ScheduleID
 	params.EnvVars["BACKUP_PROFILENAME"] = args.ProfileName
 	params.EnvVars["BACKUP_CONTAINERNAME"] = args.ContainerName
-	params.EnvVars["BACKUP_PATH"] = params.PGDataPath
+	//params.EnvVars["BACKUP_PATH"] = params.PGDataPath
+	params.EnvVars["BACKUP_PATH"] = "/" + backupcontainername + "/" + getFormattedDate()
 	params.EnvVars["BACKUP_USERNAME"] = credential.Username
 	params.EnvVars["BACKUP_PASSWORD"] = credential.Password
 	params.EnvVars["BACKUP_HOST"] = args.ContainerName

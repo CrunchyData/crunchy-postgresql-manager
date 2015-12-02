@@ -526,6 +526,7 @@ var ContainerScheduleExecuteController = function($scope, $stateParams, $state, 
 	postMessage.ContainerName = $scope.schedule.ContainerName;
 	postMessage.ProfileName = $scope.schedule.ProfileName;
 	postMessage.ScheduleID = $scope.schedule.ID;
+	postMessage.ProjectID = $stateParams.projectId;
 
     tasksFactory.execute(postMessage)
         .success(function(data) {
@@ -565,12 +566,13 @@ var ContainerScheduleHistoryRestoreController = function($scope, $stateParams, $
         console.log('name=' + $scope.container.Name);
 
         console.log(JSON.stringify($scope.schedule));
-        usSpinnerService.spin('spinner-1');
+        usSpinnerService.spin('restore-spinner');
 
 	//need ServerID, ContainerName, ProfileName, ScheduleID
 	//
 	var postMessage = {};
-	postMessage.ServerID = '1';
+	postMessage.ServerID = $scope.container.ServerID;
+	postMessage.ProjectID = $scope.container.ProjectID;
 	postMessage.ContainerName = $scope.container.Name;
 	postMessage.ProfileName = 'restore';
 	postMessage.DockerProfile = $scope.dockerprofile;
@@ -582,14 +584,14 @@ var ContainerScheduleHistoryRestoreController = function($scope, $stateParams, $
                     type: 'success',
                     msg: 'success'
                 }];
-                usSpinnerService.stop('spinner-1');
+                usSpinnerService.stop('restore-spinner');
             })
             .error(function(error) {
                 $scope.alerts = [{
                     type: 'danger',
                     msg: error.Error
                 }];
-                usSpinnerService.stop('spinner-1');
+                usSpinnerService.stop('restore-spinner');
                 console.log('here is an error ' + error.Error);
             });
     };
@@ -613,6 +615,7 @@ var ContainerScheduleHistoryController = function($scope, $stateParams, $state, 
         tasksFactory.getallstatus($stateParams.scheduleID)
             .success(function(data) {
                 $scope.stats = data;
+		console.log(JSON.stringify(data));
             })
             .error(function(error) {
                 $scope.alerts = [{
@@ -795,7 +798,9 @@ var ContainerScheduleEditController = function($scope, $filter, $stateParams, $s
 	postMessage.ServerID = $scope.ServerID;
 	postMessage.ContainerName = '';
 	postMessage.ProfileName = $scope.ProfileName;
+	postMessage.ProjectID = $scope.ProjectID;
 	postMessage.ScheduleID = $scope.ScheduleID;
+	console.log('calling executenow with ProjectID=' + $scope.ProjectID);
 
         tasksFactory.execute(postMessage)
             .success(function(data) {
