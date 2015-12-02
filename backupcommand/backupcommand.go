@@ -69,7 +69,8 @@ func main() {
 	s := task.TaskStatus{}
 	eDuration := time.Since(startTime)
 	s.StartTime = startTimeString
-	s.ElapsedTime = eDuration.String()
+	//s.ElapsedTime = eDuration.String()
+	s.ElapsedTime = fmt.Sprintf("%.3fs", eDuration.Seconds())
 	s.Status = "initializing"
 	s.TaskSize = du()
 	sendStats(&s)
@@ -119,7 +120,8 @@ func stats(str string) {
 		stats := task.TaskStatus{}
 		eDuration := time.Since(startTime)
 		stats.StartTime = startTimeString
-		stats.ElapsedTime = eDuration.String()
+		//stats.ElapsedTime = eDuration.String()
+		stats.ElapsedTime = fmt.Sprintf("%.3fs", eDuration.Seconds())
 		stats.Status = "running"
 		stats.TaskSize = du()
 		sendStats(&stats)
@@ -134,7 +136,8 @@ func finalstats(str string) {
 	stats := task.TaskStatus{}
 	eDuration := time.Since(startTime)
 	stats.StartTime = startTimeString
-	stats.ElapsedTime = eDuration.String()
+	//stats.ElapsedTime = eDuration.String()
+	stats.ElapsedTime = fmt.Sprintf("%.3fs", eDuration.Seconds())
 	stats.Status = "completed"
 	stats.TaskSize = du()
 

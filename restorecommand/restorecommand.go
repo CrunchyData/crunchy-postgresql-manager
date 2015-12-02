@@ -18,6 +18,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/task"
@@ -54,7 +55,8 @@ func main() {
 	s := task.TaskStatus{}
 	eDuration := time.Since(startTime)
 	s.StartTime = startTimeString
-	s.ElapsedTime = eDuration.String()
+	//s.ElapsedTime = eDuration.String()
+	s.ElapsedTime = fmt.Sprintf("%.3fs", eDuration.Seconds())
 	s.Status = "initializing"
 	s.TaskSize = "n/a"
 	sendStats(&s)
@@ -161,7 +163,8 @@ func stats(str string) {
 	stats := task.TaskStatus{}
 	eDuration := time.Since(startTime)
 	stats.StartTime = startTimeString
-	stats.ElapsedTime = eDuration.String()
+	//stats.ElapsedTime = eDuration.String()
+	stats.ElapsedTime = fmt.Sprintf("%.3fs", eDuration.Seconds())
 	stats.Status = str
 	stats.TaskSize = "n/a"
 	sendStats(&stats)
@@ -175,7 +178,8 @@ func finalstats(str string) {
 	stats := task.TaskStatus{}
 	eDuration := time.Since(startTime)
 	stats.StartTime = startTimeString
-	stats.ElapsedTime = eDuration.String()
+	//stats.ElapsedTime = eDuration.String()
+	stats.ElapsedTime = fmt.Sprintf("%.3fs", eDuration.Seconds())
 	stats.Status = "completed"
 	stats.TaskSize = "n/a"
 
