@@ -3,7 +3,7 @@
 	<div class="navbar-inner"><div class="container">
 			<ul class="nav navbar-nav navbar-left">
 				<li>
-				<a ui-sref="projects.container.taskschedules()"><i class="fa fa-cogs fa-fw"></i>Schedules</a>
+				<a ng-show="container.Role != 'pgpool'" ui-sref="projects.container.taskschedules()"><i class="fa fa-cogs fa-fw"></i>Schedules</a>
 				</li>
 				<li>
 				<a ui-sref="projects.container.users()"><i class="fa fa-user fa-fw"></i>Users</a>
