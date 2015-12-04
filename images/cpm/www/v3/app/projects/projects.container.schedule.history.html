@@ -4,7 +4,7 @@
 
 <ul>
 	<li ng-repeat="stat in stats">
-		Started {{stat.StartTime}} - {{stat.Status}} - Elapsed {{stat.ElapsedTime}} <span ng-show="stat.TaskSize != 'n/a'">Size {{stat.TaskSize}}</span><a tooltip-placement="right" tooltip="delete" ng-click="deletehistory()"><i class="fa fa-trash fa-fw"></i></a> <a ng-show="stat.ProfileName == 'pg_basebackup'" tooltip-placement="right" tooltip="restore" ui-sref="projects.container.schedule.history.restore({statusID:stat.ID})"><i class="fa fa-life-saver fa-fw"></i></a>
+	ID {{stat.ID}} - Started {{stat.StartTime}} - {{stat.Status}} - Elapsed {{stat.ElapsedTime}} <span ng-show="stat.TaskSize != 'n/a'">Size {{stat.TaskSize}}</span><a tooltip-placement="right" tooltip="delete" ui-sref="projects.container.schedule.history.delete({statusID:stat.ID})"><i class="fa fa-trash fa-fw"></i></a> <a ng-show="stat.ProfileName == 'pg_basebackup'" tooltip-placement="right" tooltip="restore" ui-sref="projects.container.schedule.history.restore({statusID:stat.ID})"><i class="fa fa-life-saver fa-fw"></i></a>
     </li>
 </ul>
 

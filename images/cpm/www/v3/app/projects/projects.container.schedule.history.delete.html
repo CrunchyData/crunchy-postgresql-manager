@@ -1,0 +1,18 @@
+<p><strong>Delete Task History</strong></p>
+<p>You are about to delete the task history for task ID ({{deletestatusID}})</p>
+<p style="color:red;">This will permanently any backup files and history of this task.</p>
+
+<div>
+	<form class="form-horizontal">
+		<span us-spinner spinner-key="restore-spinner"></span>
+		<div class="form-group">
+			<div class="col-xs-offset-2 col-xs-5">
+				<button type="submit" ng-click="deletehistory()" class="btn btn-primary">Delete</button>
+			</div>
+		</div>
+
+	</form>
+	<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+	<div ui-view class="slide">
+	</div>
+</div>

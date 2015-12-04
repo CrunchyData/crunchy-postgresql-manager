@@ -244,7 +244,7 @@ func GetAllStatus(dbConn *sql.DB, scheduleid string) ([]TaskStatus, error) {
 	var rows *sql.Rows
 	var err error
 
-	rows, err = dbConn.Query(fmt.Sprintf("select id, profilename, containername, date_trunc('second', starttime)::text, taskname, path, elapsedtime, tasksize, status, date_trunc('second', updatedt)::text from taskstatus where scheduleid=%s order by starttime", scheduleid))
+	rows, err = dbConn.Query(fmt.Sprintf("select id, scheduleid, profilename, containername, date_trunc('second', starttime)::text, taskname, path, elapsedtime, tasksize, status, date_trunc('second', updatedt)::text from taskstatus where scheduleid=%s order by starttime", scheduleid))
 
 	if err != nil {
 		return nil, err
@@ -255,6 +255,7 @@ func GetAllStatus(dbConn *sql.DB, scheduleid string) ([]TaskStatus, error) {
 		s := TaskStatus{}
 		if err = rows.Scan(
 			&s.ID,
+			&s.ScheduleID,
 			&s.ProfileName,
 			&s.ContainerName,
 			&s.StartTime,
@@ -275,12 +276,28 @@ func GetAllStatus(dbConn *sql.DB, scheduleid string) ([]TaskStatus, error) {
 	return stats, nil
 }
 
+// DeleteStatus deletes a task status from the database
+func DeleteStatus(dbConn *sql.DB, id string) error {
+	queryStr := fmt.Sprintf("delete from taskstatus where id=%s returning id", id)
+	logit.Info.Println("backup:DeleteStatus:" + queryStr)
+
+	var theID int
+	err := dbConn.QueryRow(queryStr).Scan(&theID)
+	switch {
+	case err != nil:
+		return err
+	default:
+	}
+
+	return nil
+}
+
 // GetStatus returns task status for a given task
 func GetStatus(dbConn *sql.DB, id string) (TaskStatus, error) {
 	logit.Info.Println("GetStatus called with id=" + id)
 	s := TaskStatus{}
 
-	err := dbConn.QueryRow(fmt.Sprintf("select id, profilename, containername, date_trunc('second', starttime)::text, taskname,  path, elapsedtime, tasksize, status, date_trunc('second', updatedt)::text from taskstatus where id=%s", id)).Scan(&s.ID, &s.ProfileName, &s.ContainerName, &s.StartTime, &s.TaskName, &s.Path, &s.ElapsedTime, &s.TaskSize, &s.Status, &s.UpdateDt)
+	err := dbConn.QueryRow(fmt.Sprintf("select id, scheduleid, profilename, containername, date_trunc('second', starttime)::text, taskname,  path, elapsedtime, tasksize, status, date_trunc('second', updatedt)::text from taskstatus where id=%s", id)).Scan(&s.ID, &s.ScheduleID, &s.ProfileName, &s.ContainerName, &s.StartTime, &s.TaskName, &s.Path, &s.ElapsedTime, &s.TaskSize, &s.Status, &s.UpdateDt)
 	switch {
 	case err == sql.ErrNoRows:
 		logit.Error.Println("taskdb:GetStatus:no status with that id")

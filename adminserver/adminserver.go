@@ -192,6 +192,8 @@ func main() {
 		&rest.Route{"GET", "/task/getschedule/:ID.:Token", adminapi.GetSchedule},
 		// get the status of a given task schedule
 		&rest.Route{"GET", "/task/getstatus/:ID.:Token", adminapi.GetStatus},
+		// delete a task schedule history
+		&rest.Route{"POST", "/task/deletestatus", adminapi.DeleteTaskStatus},
 		// get all the status of a given task schedule
 		&rest.Route{"GET", "/task/getallstatus/:ID.:Token", adminapi.GetAllStatus},
 		// TODO

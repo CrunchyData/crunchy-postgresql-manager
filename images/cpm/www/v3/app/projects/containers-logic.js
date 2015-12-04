@@ -89,7 +89,7 @@ var ContainerStartController = function($scope, $stateParams, $state, containers
 
     $scope.start = function() {
         usSpinnerService.spin('spinner-1');
-        console.log('jeff state is ' + JSON.stringify($stateParams))
+        //console.log('jeff state is ' + JSON.stringify($stateParams))
         containersFactory.start($stateParams.containerId)
             .success(function(data) {
                 //$state.go('projects.container.details', $stateParams, {
@@ -597,6 +597,42 @@ var ContainerScheduleHistoryRestoreController = function($scope, $stateParams, $
     };
 };
 
+var ContainerScheduleHistoryDeleteController = function($scope, $stateParams, $state, tasksFactory, utils, usSpinnerService) {
+
+    console.log('in schedule history Delete controller');
+    console.log('params = ' + JSON.stringify($stateParams));
+    console.log('scope container = ' + JSON.stringify($scope.container));
+    console.log('scope container = ' + $scope.container["Name"]);
+    $scope.deletestatusID = $stateParams.statusID;
+
+    $scope.deletehistory = function() {
+        console.log('deletehistory called to restore backup with schedule=' + $scope.schedule.ID);
+        usSpinnerService.spin('restore-spinner');
+	var postMessage = {};
+	postMessage.StatusID = $scope.deletestatusID;
+	console.log('calling statusdelete with StatusID=' + postMessage.StatusID);
+
+        tasksFactory.deletetaskstatus(postMessage)
+            .success(function(data) {
+                console.log('successful post deletetaskstatus with data=' + data);
+		   $state.go('projects.container.schedule', $stateParams, {
+		      reload: false,
+		      inherit: false
+		      });
+		
+            })
+            .error(function(error) {
+                $scope.alerts = [{
+                    type: 'danger',
+                    msg: error.Error
+                }];
+                console.log('here is an error ' + error.Error);
+            });
+
+        usSpinnerService.stop('restore-spinner');
+    };
+};
+
 var ContainerScheduleHistoryController = function($scope, $stateParams, $state, tasksFactory, utils) {
 
     $scope.edit = function() {
@@ -608,14 +644,14 @@ var ContainerScheduleHistoryController = function($scope, $stateParams, $state, 
     };
 
     $scope.restore = function() {
-        console.log('restore not implemented yet params=' + JSON.stringify($stateParams));
+        //console.log('restore not implemented yet params=' + JSON.stringify($stateParams));
     };
 
     $scope.refresh = function() {
         tasksFactory.getallstatus($stateParams.scheduleID)
             .success(function(data) {
                 $scope.stats = data;
-		console.log(JSON.stringify(data));
+		//console.log(JSON.stringify(data));
             })
             .error(function(error) {
                 $scope.alerts = [{
@@ -688,7 +724,7 @@ var ContainerScheduleAddController = function($scope, $filter, $stateParams, $st
         'name': 'thething',
         'checked': false
     }];
-    console.log(JSON.stringify(servers));
+    //console.log(JSON.stringify(servers));
     $scope.myServer = servers.data[0].IPAddress;
     $scope.servers = servers.data;
 
@@ -721,7 +757,7 @@ var ContainerScheduleAddController = function($scope, $filter, $stateParams, $st
         }
         $scope.schedule.Serverip = $scope.myServer;
         $scope.schedule.ProfileName = $scope.currentProfileName.name;
-        console.log('adding schedule with schedule=' + JSON.stringify($scope.schedule));
+        //console.log('adding schedule with schedule=' + JSON.stringify($scope.schedule));
         tasksFactory.addschedule($scope.schedule, $scope.container.Name)
             .success(function(data) {
                 $state.go('projects.container.taskschedules', $stateParams, {
@@ -757,7 +793,7 @@ var ContainerScheduleEditController = function($scope, $filter, $stateParams, $s
 
     tasksFactory.getschedule($stateParams.scheduleID)
         .success(function(data) {
-            console.log(JSON.stringify(data));
+            //console.log(JSON.stringify(data));
             $scope.schedule = data;
             if ($scope.schedule.Enabled == 'YES') {
                 $scope.thething.checked = true;
@@ -805,7 +841,7 @@ var ContainerScheduleEditController = function($scope, $filter, $stateParams, $s
         tasksFactory.execute(postMessage)
             .success(function(data) {
                 console.log('successful post execute with data=' + data);
-                console.log(JSON.stringify(data));
+                //console.log(JSON.stringify(data));
             })
             .error(function(error) {
                 $scope.alerts = [{
@@ -917,7 +953,7 @@ var ContainerAddController = function($scope, $stateParams, $state, serversFacto
 
         containersFactory.add($scope.container, $scope.dockerprofile)
             .success(function(data) {
-                console.log('data from add is ' + JSON.stringify(data));
+                //console.log('data from add is ' + JSON.stringify(data));
                 console.log('current projectid is ' + $stateParams.projectId);
                 $state.transitionTo('projects.container.details', {
                     containerId: data.ID,

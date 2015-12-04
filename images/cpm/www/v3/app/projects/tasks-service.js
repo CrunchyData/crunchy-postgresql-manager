@@ -36,6 +36,19 @@ angular.module('uiRouterSample.tasks.service', ['ngCookies'])
         return $http.get(url);
     };
 
+    tasksFactory.deletetaskstatus = function(postmessage) {
+
+	console.log('deletetaskstatus called with StatusID ' + postmessage.StatusID);
+
+        var url = $cookieStore.get('AdminURL') + '/task/deletestatus';
+        console.log(url);
+
+        return $http.post(url, {
+            'Token': $cookieStore.get('cpm_token'),
+            'StatusID': postmessage.StatusID
+        });
+    };
+
     tasksFactory.updateschedule = function(schedule) {
 
 	console.log('jeff set is ' + schedule.RestoreSet);

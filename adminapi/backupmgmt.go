@@ -18,6 +18,7 @@ package adminapi
 import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
+	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
 	"github.com/crunchydata/crunchy-postgresql-manager/swarmapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/task"
@@ -55,6 +56,11 @@ type AddSchedulePost struct {
 	RestoreRemoteUser string
 	RestoreDbUser     string
 	RestoreDbPass     string
+}
+
+type DeleteStatusPost struct {
+	Token    string
+	StatusID string
 }
 
 const CLUSTERADMIN_DB = "clusteradmin"
@@ -365,6 +371,72 @@ func GetAllSchedules(w rest.ResponseWriter, r *rest.Request) {
 
 	w.WriteJson(schedules)
 
+}
+
+// DeleteTaskStatus deletes a task status and any related backup files
+func DeleteTaskStatus(w rest.ResponseWriter, r *rest.Request) {
+	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), 400)
+		return
+
+	}
+	defer dbConn.Close()
+
+	postMsg := DeleteStatusPost{}
+	err = r.DecodeJsonPayload(&postMsg)
+	if err != nil {
+		logit.Error.Println("decode" + err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = secimpl.Authorize(dbConn, postMsg.Token, "perm-backup")
+	if err != nil {
+		logit.Error.Println("validate token error " + err.Error())
+		rest.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	taskstatus, err := task.GetStatus(dbConn, postMsg.StatusID)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	var schedule task.TaskSchedule
+	schedule, err = task.GetSchedule(dbConn, taskstatus.ScheduleID)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//delete any backup files if necessary
+	if taskstatus.ProfileName == "pg_basebackup" {
+		deletereq := cpmserverapi.DiskDeleteRequest{}
+		deletereq.Path = taskstatus.Path
+		var deleteresp cpmserverapi.DiskDeleteResponse
+		deleteresp, err = cpmserverapi.DiskDeleteClient(schedule.Serverip, &deletereq)
+		if err != nil {
+			logit.Error.Println(err.Error())
+			rest.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if deleteresp.Status != "OK" {
+			logit.Error.Println("Status not OK in deletevolume " + deleteresp.Status)
+			rest.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	err = task.DeleteStatus(dbConn, postMsg.StatusID)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 // GetStatus returns the status of a given task schedule

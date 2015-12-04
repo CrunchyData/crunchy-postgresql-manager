@@ -42,7 +42,7 @@ angular.module('uiRouterSample.servers', [
 
                             $scope.goToFirst = function() {
                                 if ($scope.servers.data.length > 0) {
-                                    console.log(JSON.stringify($scope.servers));
+                                    //console.log(JSON.stringify($scope.servers));
                                     var randId = $scope.servers.data[0].ID;
 
                                     $state.go('servers.detail.details', {
@@ -53,9 +53,9 @@ angular.module('uiRouterSample.servers', [
 
 				console.log('before goToFirst with serverId=' + $stateParams.serverId);
 				if ($stateParams.serverId === undefined) {
-					console.log('serverId is undefined here jeff');
+					//console.log('serverId is undefined here jeff');
 				} else {
-					console.log('serverId is defined here jeff');
+					//console.log('serverId is defined here jeff');
 				}
                             $scope.goToFirst();
                         }

@@ -712,6 +712,14 @@ get a schedule job status GetStatus
 curl  http://cpm-admin.crunchy.lab:13001/task/getstatus/1.kjakdjfkajkdjfkjadfasdf
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
+###POST /task/deletestatus
+
+deletes a task schedule history
+~~~~~~~~~~~~~~~~~~~~~~~~
+curl --data @deletetaskstatus.json -H "Content-Type: application/json" -X POST \
+http://cpm-admin:13001/task/deletestatus
+~~~~~~~~~~~~~~~~~~~~~~~~
+
 ###GET /task/getallstatus/:ID.:Token
 
 + Token : the generated auth token for this session

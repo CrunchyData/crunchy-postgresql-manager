@@ -299,6 +299,16 @@ angular.module('uiRouterSample.projects', [
                     },
                 }
             })
+            .state('projects.container.schedule.history.delete', {
+                url: '/delete',
+                views: {
+
+                    '': {
+                        templateUrl: 'app/projects/projects.container.schedule.history.delete.html',
+                        controller: ContainerScheduleHistoryDeleteController
+                    },
+                }
+            })
 
             .state('projects.container.start', {
                 url: '/start/:itemId',
