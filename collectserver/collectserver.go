@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -87,12 +88,14 @@ func main() {
 			//get metrics for each server
 			for x := 0; x < len(serverinfo.Output); {
 				//v := rand.Float64() * 100.00
-				metric, err = collect.Collectcpu(serverinfo.Output[x])
-				gauge.WithLabelValues(serverinfo.Output[x]).Set(metric.Value)
-				logit.Info.Println("setting cpu metric for " + serverinfo.Output[x] + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
-				metric, err = collect.Collectmem(serverinfo.Output[x])
-				gaugeMem.WithLabelValues(serverinfo.Output[x]).Set(metric.Value)
-				logit.Info.Println("setting mem metric for " + serverinfo.Output[x] + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
+				parts := strings.Split(serverinfo.Output[x], ":")
+				ipaddress := parts[0]
+				metric, err = collect.Collectcpu(ipaddress)
+				gauge.WithLabelValues(ipaddress).Set(metric.Value)
+				logit.Info.Println("setting cpu metric for " + ipaddress + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
+				metric, err = collect.Collectmem(ipaddress)
+				gaugeMem.WithLabelValues(ipaddress).Set(metric.Value)
+				logit.Info.Println("setting mem metric for " + ipaddress + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
 				x++
 			}
 
