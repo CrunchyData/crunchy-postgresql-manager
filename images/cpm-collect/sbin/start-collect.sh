@@ -32,5 +32,5 @@ source /var/cpm/bin/setenv.sh
 
 sleep 4
 
-collectserver > /cpmlogs/collectserver.log
+collectserver
 

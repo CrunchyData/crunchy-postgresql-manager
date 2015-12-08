@@ -26,7 +26,9 @@ import (
 
 func main() {
 
+	//fmt.Fprintln(os.Stderr, "this is an error message to stderr using Fprintln")
 	logit.Info.Println("sleeping during startup to give DNS a chance")
+
 	sleepTime, _ := time.ParseDuration("7s")
 	time.Sleep(sleepTime)
 

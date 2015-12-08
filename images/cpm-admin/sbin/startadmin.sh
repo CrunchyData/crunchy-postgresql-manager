@@ -25,7 +25,7 @@ source /var/cpm/bin/setenv.sh
 start-pg-wrapper-admin.sh &
 export KUBE_URL=$KUBE_URL
 
-adminserver > /cpmlogs/adminserver.log
+adminserver
 
 #dummyserver > /tmp/dummyserver.log 
 

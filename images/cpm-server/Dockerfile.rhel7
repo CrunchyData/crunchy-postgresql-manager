@@ -10,9 +10,6 @@ RUN mkdir -p /var/cpm/bin
 ADD sbin /var/cpm/bin
 ADD bin /var/cpm/bin
 
-VOLUME ["/cpmlogs"]
-RUN chown -R postgres:postgres /cpmlogs
-
 EXPOSE 10001
 
 USER root

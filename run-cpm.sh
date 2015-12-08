@@ -24,12 +24,6 @@ INSTALLDIR=/home/jeffmc/devproject/src/github.com/crunchydata/crunchy-postgresql
 SWARM_MANAGER_URL=tcp://192.168.0.106:8000 
 LOCAL_IP=192.168.0.106
 
-echo "setting up log dir..."
-LOGDIR=/var/cpm/logs
-mkdir -p $LOGDIR
-chmod -R 777 $LOGDIR
-chcon -Rt svirt_sandbox_file_t $LOGDIR
-
 echo "setting up keys dir..."
 KEYSDIR=/var/cpm/keys
 mkdir $KEYSDIR
@@ -37,16 +31,12 @@ cp $INSTALLDIR/sbin/key.pem $KEYSDIR
 cp $INSTALLDIR/sbin/cert $KEYSDIR
 chcon -Rt svirt_sandbox_file_t $KEYSDIR
 
-echo "deleting all old log files...."
-rm -rf $LOGDIR/*
-
 echo "restarting cpm container..."
 docker stop cpm
 docker rm cpm
 chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v3
 docker run --name=cpm -d \
 	-p $LOCAL_IP:13001:13001 \
-	-v $LOGDIR:/cpmlogs \
 	-v $KEYSDIR:/cpmkeys \
 	-v $INSTALLDIR/images/cpm/www/v3:/www crunchydata/cpm:latest
 
@@ -67,7 +57,6 @@ docker run -e DB_HOST=cpm-admin \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cpm-admin -d  \
 	-v $KEYSDIR:/cpmkeys \
-	-v $LOGDIR:/cpmlogs \
 	-v $DBDIR:/pgdata crunchydata/cpm-admin:latest
 
 echo "restarting cpm-task container..."
@@ -75,7 +64,6 @@ sleep 2
 docker stop cpm-task
 docker rm cpm-task
 docker run -e DB_HOST=cpm-admin.crunchy.lab \
-	-v $LOGDIR:/cpmlogs \
 	-e CPMBASE=/var/cpm \
 	-e SWARM_MANAGER_URL=$SWARM_MANAGER_URL \
 	-e DB_PORT=5432 -e DB_USER=postgres \
@@ -125,7 +113,6 @@ docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	-e CPMBASE=/var/cpm \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	-e SWARM_MANAGER_URL=$SWARM_MANAGER_URL \
-	-v $LOGDIR:/cpmlogs \
 	-d --name=cpm-collect crunchydata/cpm-collect:latest 
 
 echo "testing containers for DNS resolution...."

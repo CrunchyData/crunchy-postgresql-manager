@@ -17,9 +17,6 @@ ADD bin/.bash_profile /var/lib/pgsql/
 VOLUME ["/pgdata"]
 RUN chown -R postgres:postgres /pgdata
 
-VOLUME ["/cpmlogs"]
-RUN chown -R postgres:postgres /cpmlogs
-
 ADD sql /var/cpm/bin/
 ADD bin /var/cpm/bin/
 ADD sbin /var/cpm/bin/

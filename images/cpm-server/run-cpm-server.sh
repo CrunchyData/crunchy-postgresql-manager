@@ -34,7 +34,6 @@ docker rm cpm-newserver
 docker run --name=cpm-newserver -d \
 	--privileged \
 	-p $LOCAL_IP:10001:10001 \
-	-v /var/cpm/logs:/cpmlogs \
 	-v /:/rootfs \
 	-v /var/cpm/data/pgsql:/var/cpm/data/pgsql \
 	-v /var/run/docker.sock:/var/run/docker.sock \

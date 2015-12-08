@@ -10,8 +10,6 @@ RUN mkdir -p /var/cpm/bin
 # set environment vars
 ENV PGROOT /usr/pgsql-9.4
 
-VOLUME ["/cpmlogs"]
-
 EXPOSE 13001
 
 ADD bin /var/cpm/bin
