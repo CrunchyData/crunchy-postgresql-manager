@@ -63,6 +63,9 @@ $ActionQueueType LinkedList
 $ActionResumeRetryCount -1
 *.* @@192.168.0.105:514
 
+Also, in /etc/rsyslog.d/listen.conf you have to comment out the
+line $SystemLogSocketName ....
+
 We then provide this rsyslogd.conf file to the container when it is
 provisioned and start up the rsyslogd in the containers startup script.
 

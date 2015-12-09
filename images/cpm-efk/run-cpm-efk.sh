@@ -22,11 +22,15 @@ fi
 
 LOCAL_IP=192.168.0.107
 
-echo "restarting cpm-server"
+# port 5140 is the syslog server port that fluentd listens on 
+# port 24224 is the fluentd listen port
+# port 5601  is the kibana http port
+echo "restarting cpm-efk"
 docker stop cpm-efk
 docker rm cpm-efk
 docker run --name=cpm-efk -d \
 	-p $LOCAL_IP:24224:24224 \
+	-p $LOCAL_IP:5140:5140 \
 	-p $LOCAL_IP:5601:5601 \
 	crunchydata/cpm-efk:latest
 

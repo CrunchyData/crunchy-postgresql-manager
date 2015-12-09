@@ -14,11 +14,11 @@
 # limitations under the License.
 
 # start elasticsearch
-/var/cpm/elasticsearch/elasticsearch-2.1.0/bin/elasticsearch &
+su elasticsearch -c /var/cpm/elasticsearch/elasticsearch-2.1.0/bin/elasticsearch &
 
 # start fluentd
 fluentd  -c /var/cpm/conf/fluentd-docker.conf &
 
 # start kibana
-kibana
+/var/cpm/kibana/kibana-4.3.0-linux-x64/bin/kibana
 
