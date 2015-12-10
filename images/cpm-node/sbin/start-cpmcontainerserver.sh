@@ -25,6 +25,12 @@ if [ -f /pgdata/postgresql.conf ]; then
 	su - postgres -c 'source /var/cpm/bin/setenv.sh && pg_ctl -D /pgdata start'
 fi
 
+# if the syslog config file is found, assume the user wants to start the syslog daemon
+if [ -f /syslogconfig/rsyslog.conf ]; then
+	cp /syslogconfig/listen.conf /etc/rsyslog.d/
+	rsyslogd -f /syslogconfig/rsyslog.conf
+fi
+
 cpmcontainerserver 
 
 #dummyserver

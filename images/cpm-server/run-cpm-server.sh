@@ -22,17 +22,14 @@ fi
 
 LOCAL_IP=192.168.0.107
 
-echo "setting up log dir..."
-LOGDIR=/var/cpm/logs
-mkdir -p $LOGDIR
-chmod -R 777 $LOGDIR
-chcon -Rt svirt_sandbox_file_t $LOGDIR
-
 echo "restarting cpm-server"
 docker stop cpm-newserver
 docker rm cpm-newserver
 docker run --name=cpm-newserver -d \
 	--privileged \
+	--log-driver=fluentd \
+	--log-opt fluentd-address=192.168.0.107:24224 \
+	--log-opt fluentd-tag=docker.cpm-newserver \
 	-p $LOCAL_IP:10001:10001 \
 	-v /:/rootfs \
 	-v /var/cpm/data/pgsql:/var/cpm/data/pgsql \

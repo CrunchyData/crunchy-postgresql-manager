@@ -331,26 +331,14 @@ https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.7-linux-amd64.tar.gz
 Logging
 =========================
 
-The CPM services log into the /var/cpm/logs directory on
-your docker host.
+Logging of the CPM product containers is as follows:
+- cpm-web - logs to /var/cpm/logs on the CPM host
+- cpm-admin - logs to fluentd (cpm-efk) by default
+- cpm-collect - logs to fluentd (cpm-efk) by default
+- cpm-task - logs to fluentd (cpm-efk) by default
+- postgres containers - logs to fluentd via syslog
 
-This directory is initially created by the run-cpm.sh script.
-
-Logs are written to this directory by the following
-containers:
-
-+ cpm
-+ cpm-admin
-+ cpm-collect
-+ cpm-task
-
-Each container mounts
-````````````
-/cpmlogs
-````````````
-
-Each startup script for the services now writes to /cpmlogs which gets
-mapped by Docker to /var/cpm/logs on the Docker host.
+see [log-aggregation.md](log-aggregation.md) for more details
 
 Port Mapping
 =========================

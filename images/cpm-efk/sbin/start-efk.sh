@@ -13,12 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# start rsyslogd
+rsyslogd -f /var/cpm/conf/rsyslog.conf
+
 # start elasticsearch
-su elasticsearch -c /var/cpm/elasticsearch/elasticsearch-2.1.0/bin/elasticsearch &
+su elasticsearch -c /elasticsearch/bin/elasticsearch &
 
 # start fluentd
 fluentd  -c /var/cpm/conf/fluentd-docker.conf &
 
 # start kibana
-/var/cpm/kibana/kibana-4.3.0-linux-x64/bin/kibana
+/kibana/bin/kibana
 

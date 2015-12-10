@@ -21,8 +21,14 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 INSTALLDIR=/home/jeffmc/devproject/src/github.com/crunchydata/crunchy-postgresql-manager
-SWARM_MANAGER_URL=tcp://192.168.0.106:8000 
-LOCAL_IP=192.168.0.106
+SWARM_MANAGER_URL=tcp://192.168.0.107:8000 
+LOCAL_IP=192.168.0.107
+FLUENT_URL=$LOCAL_IP:24224
+
+echo "setting up log dir..."
+KEYSDIR=/var/cpm/logs
+mkdir $LOGDIR
+chcon -Rt svirt_sandbox_file_t $LOGDIR
 
 echo "setting up keys dir..."
 KEYSDIR=/var/cpm/keys
@@ -32,13 +38,37 @@ cp $INSTALLDIR/sbin/cert $KEYSDIR
 chcon -Rt svirt_sandbox_file_t $KEYSDIR
 
 echo "restarting cpm container..."
-docker stop cpm
-docker rm cpm
+docker stop cpm-web
+docker rm cpm-web
 chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v3
-docker run --name=cpm -d \
+docker run --name=cpm-web -d \
 	-p $LOCAL_IP:13001:13001 \
+	-v $LOGDIR:/cpmlogs \
 	-v $KEYSDIR:/cpmkeys \
-	-v $INSTALLDIR/images/cpm/www/v3:/www crunchydata/cpm:latest
+	-v $INSTALLDIR/images/cpm/www/v3:/www \
+	crunchydata/cpm:latest
+
+echo "restarting cpm-efk container..."
+EFKDATADIR=/var/cpm/data/elasticsearch-data
+chcon -Rt svirt_sandbox_file_t $EFKDATADIR
+
+# port 24224 is the fluentd listen port
+FLUENTD_URL=$LOCAL_IP:24224
+# port 5140 is the syslog server port that fluentd listens on 
+EFK_SYSLOG_URL=$LOCAL_IP:5140
+# port 5601  is the kibana http port
+KIBANA_URL=$LOCAL_IP:5601
+
+docker stop cpm-efk
+docker rm cpm-efk
+docker run --name=cpm-efk --hostname="cpm-efk" -d \
+	-v $EFKDATA:/elasticsearch/data \
+	-p $FLUENTD_URL:24224 \
+	-p $EFK_SYSLOG_URL:5140 \
+	-p $KIBANA_URL:5601 \
+	crunchydata/cpm-efk:latest
+echo "wait for a few seconds till the logger container starts up..."
+sleep 10
 
 echo "restarting cpm-admin container..."
 sleep 2
@@ -50,6 +80,9 @@ chown postgres:postgres $DBDIR
 chcon -Rt svirt_sandbox_file_t $DBDIR
 docker run -e DB_HOST=cpm-admin \
 	--hostname="cpm-admin" \
+	--log-driver=fluentd \
+	--log-opt fluentd-address=$FLUENT_URL \
+	--log-opt fluentd-tag=docker.cpm-admin \
 	-p $LOCAL_IP:14001:13001 \
 	-e DOMAIN=crunchy.lab \
 	-e SWARM_MANAGER_URL=$SWARM_MANAGER_URL \
@@ -57,17 +90,22 @@ docker run -e DB_HOST=cpm-admin \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	--name=cpm-admin -d  \
 	-v $KEYSDIR:/cpmkeys \
-	-v $DBDIR:/pgdata crunchydata/cpm-admin:latest
+	-v $DBDIR:/pgdata \
+	crunchydata/cpm-admin:latest
 
 echo "restarting cpm-task container..."
 sleep 2
 docker stop cpm-task
 docker rm cpm-task
 docker run -e DB_HOST=cpm-admin.crunchy.lab \
+	--log-driver=fluentd \
+	--log-opt fluentd-address=$FLUENT_URL \
+	--log-opt fluentd-tag=docker.cpm-task \
 	-e CPMBASE=/var/cpm \
 	-e SWARM_MANAGER_URL=$SWARM_MANAGER_URL \
 	-e DB_PORT=5432 -e DB_USER=postgres \
-	--name=cpm-task -d crunchydata/cpm-task:latest
+	--name=cpm-task \
+	-d crunchydata/cpm-task:latest
 
 sleep 2
 ###############
@@ -107,17 +145,21 @@ docker stop cpm-collect
 docker rm cpm-collect
 docker run -e DB_HOST=cpm-admin.crunchy.lab \
 	--hostname="cpm-collect" \
+	--log-driver=fluentd \
+	--log-opt fluentd-address=$FLUENT_URL \
+	--log-opt fluentd-tag=docker.cpm-collect \
 	-e CONT_POLL_INT=4 \
 	-e SERVER_POLL_INT=4 \
 	-e HC_POLL_INT=4 \
 	-e CPMBASE=/var/cpm \
 	-e DB_PORT=5432 -e DB_USER=postgres \
 	-e SWARM_MANAGER_URL=$SWARM_MANAGER_URL \
-	-d --name=cpm-collect crunchydata/cpm-collect:latest 
+	-d --name=cpm-collect \
+	crunchydata/cpm-collect:latest 
 
 echo "testing containers for DNS resolution...."
 
-ping -c 2 cpm.crunchy.lab
+ping -c 2 cpm-web.crunchy.lab
 ping -c 2 cpm-admin.crunchy.lab
 ping -c 2 cpm-task.crunchy.lab
 ping -c 2 cpm-promdash.crunchy.lab

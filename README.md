@@ -16,14 +16,8 @@ been provisioned by CPM.
 A user guide is available at:
 [docs/userguide/user-guide.md](docs/userguide/user-guide.md)
 
-A developer guide is available at:
+A developer-installation guide is available at:
 [docs/dev-setup.md](docs/dev-setup.md)
-
-An install guide is available at:
-[docs/install.md](docs/install.md)
-
-An installation guide is available at:
-[docs/install.md](docs/install.md)
 
 A description of the REST API is at:
 [docs/rest-api.md](docs/rest-api.md)

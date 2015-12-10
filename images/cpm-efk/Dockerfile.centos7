@@ -5,27 +5,26 @@ MAINTAINER crunchy
 RUN mkdir -p /var/cpm/bin
 RUN mkdir -p /var/cpm/conf
 ADD bin /var/cpm/bin
-ADD kibana-4.3.0-linux-x64.tar.gz /var/cpm/kibana
+ADD kibana-4.3.0-linux-x64.tar.gz /
+RUN mv /kibana-4.3.0-linux-x64 /kibana
 
-ADD elasticsearch-2.1.0.tar.gz /var/cpm/elasticsearch
+ADD elasticsearch-2.1.0.tar.gz /
+RUN mv /elasticsearch-2.1.0 /elasticsearch
 RUN useradd elasticsearch
-RUN mkdir -p /var/cpm/elasticsearch/elasticsearch-2.1.0/logs \
-	/var/cpm/elasticsearch/elasticsearch-2.1.0/plugins \
-	/var/cpm/elasticsearch/elasticsearch-2.1.0/nodes \
-	/var/cpm/elasticsearch/elasticsearch-2.1.0/data 
-RUN chown -R elasticsearch /var/cpm/elasticsearch/elasticsearch-2.1.0
+RUN mkdir -p /elasticsearch/logs \
+	/elasticsearch/plugins \
+	/elasticsearch/nodes 
+RUN chown -R elasticsearch /elasticsearch
 
-# Install postgresql deps
-RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
-#RUN rpm -ivh /var/cpm/bin/td-agent-2.2.1-0.el7.x86_64.rpm
-RUN yum install -y gcc make ruby ruby-devel procps-ng unzip openssh-clients hostname bind-utils rsyslog java  && yum clean all -y
-#RUN /usr/sbin/td-agent-gem install fluent-plugin-elasticsearch
+VOLUME ["/elasticsearch/data"]
+
+#RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+RUN yum install -y gcc make ruby ruby-devel procps-ng unzip openssh-clients hostname bind-utils java  && yum clean all -y
 RUN gem install fluentd --no-ri --no-rdoc
-RUN fluent-gem install fluent-plugin-elasticsearch
+RUN fluent-gem install fluent-plugin-elasticsearch --no-ri --no-rdoc
 
 ADD sbin /var/cpm/bin
 ADD conf /var/cpm/conf
-#ADD conf/td-agent.conf /etc/td-agent
 
 USER root
 

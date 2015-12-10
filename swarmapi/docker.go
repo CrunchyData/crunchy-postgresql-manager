@@ -294,6 +294,7 @@ func DockerRun(req *DockerRunRequest) (DockerRunResponse, error) {
 
 	options := dockerapi.CreateContainerOptions{}
 	config := dockerapi.Config{}
+	config.Hostname = req.ContainerName
 	options.Config = &config
 	hostConfig := dockerapi.HostConfig{}
 	options.HostConfig = &hostConfig
@@ -314,9 +315,10 @@ func DockerRun(req *DockerRunRequest) (DockerRunResponse, error) {
 	//}
 	//options.HostConfig.Memory = req.MEM
 
-	options.HostConfig.Binds = make([]string, 2)
+	options.HostConfig.Binds = make([]string, 3)
 	options.HostConfig.Binds[0] = req.PGDataPath + ":/pgdata"
 	options.HostConfig.Binds[1] = "/var/cpm/data/keys:/keys"
+	options.HostConfig.Binds[2] = "/var/cpm/config:/syslogconfig"
 
 	container, err3 := docker.CreateContainer(options)
 	if err3 != nil {

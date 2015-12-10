@@ -22,15 +22,23 @@ fi
 
 LOCAL_IP=192.168.0.107
 
-# port 5140 is the syslog server port that fluentd listens on 
+EFKDATA=/home/jeffmc/devproject/src/github.com/crunchydata/crunchy-postgresql-manager/images/cpm-efk/elasticsearch-data
+chcon -Rt svirt_sandbox_file_t $EFKDATA
+
 # port 24224 is the fluentd listen port
+FLUENTD_URL=$LOCAL_IP:24224
+# port 5140 is the syslog server port that fluentd listens on 
+EFK_SYSLOG_URL=$LOCAL_IP:5140
 # port 5601  is the kibana http port
+KIBANA_URL=$LOCAL_IP:5601
+
 echo "restarting cpm-efk"
 docker stop cpm-efk
 docker rm cpm-efk
 docker run --name=cpm-efk -d \
-	-p $LOCAL_IP:24224:24224 \
-	-p $LOCAL_IP:5140:5140 \
-	-p $LOCAL_IP:5601:5601 \
+	-v $EFKDATA:/elasticsearch/data \
+	-p $FLUENTD_URL:24224 \
+	-p $EFK_SYSLOG_URL:5140 \
+	-p $KIBANA_URL:5601 \
 	crunchydata/cpm-efk:latest
 
