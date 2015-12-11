@@ -780,7 +780,7 @@ against so it will always be present.</p></div>
 <div class="section">
     <h1 class="page-header" id="rest_api">9. REST API</h1>
 <h2 id="security">9.1. Security</h2>
-<div class="paragraph"><p>###GET /sec/login/:ID.:PSW</p></div>
+<h3 id="get_sec_login_id_psw">9.1.1. GET /sec/login/:ID.:PSW</h3>
 <div class="paragraph"><p>login and return an auth token</p></div>
 <div class="ulist"><ul>
 <li>
@@ -799,7 +799,7 @@ PSW : the user password to authenticate with
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm</pre>
 </div></div>
-<div class="paragraph"><p>###GET /sec/logout/:Token</p></div>
+<h3 id="get_sec_logout_token">9.1.2. GET /sec/logout/:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -813,7 +813,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/sec/logout/ab3ba695-533-43a4-a3c0-9a4c55288c14</pre>
 </div></div>
-<div class="paragraph"><p>###POST /sec/updateuser</p></div>
+<h3 id="post_sec_updateuser">9.1.3. POST /sec/updateuser</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -828,7 +828,7 @@ Token : the generated auth token for this session
 <pre>curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/provisionproxy</pre>
 </div></div>
-<div class="paragraph"><p>###POST /sec/cp</p></div>
+<h3 id="post_sec_cp">9.1.4. POST /sec/cp</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -843,7 +843,7 @@ Token : the generated auth token for this session
 <pre>curl --data @changepassword.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/changepassword</pre>
 </div></div>
-<div class="paragraph"><p>###POST /sec/adduser</p></div>
+<h3 id="post_sec_adduser">9.1.5. POST /sec/adduser</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -858,7 +858,7 @@ Token : the generated auth token for this session
 <pre>curl --data @adduser.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/adduser</pre>
 </div></div>
-<div class="paragraph"><p>###GET /sec/getuser/:ID.:Token</p></div>
+<h3 id="get_sec_getuser_id_token">9.1.6. GET /sec/getuser/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -872,7 +872,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/sec/getuser/cpm.1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /sec/getusers/:Token</p></div>
+<h3 id="get_sec_getusers_token">9.1.7. GET /sec/getusers/:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -886,7 +886,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/sec/getusers/1efbfd50-9b2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /sec/deleteuser/:ID.:Token</p></div>
+<h3 id="get_sec_deleteuser_id_token">9.1.8. GET /sec/deleteuser/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -900,7 +900,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/sec/deleteuser/1.jkjkjadkjkajdkfjakdfjkad</pre>
 </div></div>
-<div class="paragraph"><p>###POST /sec/updaterole</p></div>
+<h3 id="post_sec_updaterole">9.1.9. POST /sec/updaterole</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -915,7 +915,7 @@ Token : the generated auth token for this session
 <pre>curl --data @updaterole.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/sec/updaterole</pre>
 </div></div>
-<div class="paragraph"><p>###POST /sec/addrole</p></div>
+<h3 id="post_sec_addrole">9.1.10. POST /sec/addrole</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -930,7 +930,7 @@ Token : the generated auth token for this session
 <pre>curl --data @addrole.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/sec/addrole</pre>
 </div></div>
-<div class="paragraph"><p>###GET /sec/deleterole/:ID.:Token</p></div>
+<h3 id="get_sec_deleterole_id_token">9.1.11. GET /sec/deleterole/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -944,7 +944,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/sec/deleterole/1.ajkajdkajdfkjadf</pre>
 </div></div>
-<div class="paragraph"><p>###GET /sec/getroles/:Token</p></div>
+<h3 id="get_sec_getroles_token">9.1.12. GET /sec/getroles/:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -958,7 +958,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/sec/getroles/1efbfd50-9b2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /sec/getrole/:Name.:Token</p></div>
+<h3 id="get_sec_getrole_name_token">9.1.13. GET /sec/getrole/:Name.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -973,7 +973,7 @@ Token : the generated auth token for this session
 <pre>curl  http://cpm-admin.crunchy.lab:13001sec/getrole/superuser.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
 <h2 id="project_information">9.2. Project Information</h2>
-<div class="paragraph"><p>###POST /project/add</p></div>
+<h3 id="post_project_add">9.2.1. POST /project/add</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1007,7 +1007,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl -X POST -d @addproject.json http://cpm-admin:13001/project/add</pre>
 </div></div>
-<div class="paragraph"><p>###GET /project/getall/:Token</p></div>
+<h3 id="get_project_getall_token">9.2.2. GET /project/getall/:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1021,7 +1021,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl http://cpm-admin.crunchy.lab:13001/project/getall/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /project/get/:ID.Token</p></div>
+<h3 id="get_project_get_id_token">9.2.3. GET /project/get/:ID.Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1040,7 +1040,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl http://cpm-admin.crunchy.lab:13001/project/get/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /project/delete/:ID.Token</p></div>
+<h3 id="get_project_delete_id_token">9.2.4. GET /project/delete/:ID.Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1059,7 +1059,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl http://cpm-admin.crunchy.lab:13001/project/delete/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###POST /project/update</p></div>
+<h3 id="post_project_update">9.3.1. POST /project/update</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1093,7 +1093,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl -X POST -d @updateproject.json http://cpm-admin.crunchy.lab:13001/project/update</pre>
 </div></div>
-<div class="paragraph"><p>###GET /projectnodes/:ID.:Token</p></div>
+<h3 id="get_projectnodes_id_token">9.3.2. GET /projectnodes/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1113,7 +1113,7 @@ Token : the generated auth token for this session
 <pre>curl  http://cpm-admin.crunchy.lab:13001/projectnodes/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d</pre>
 </div></div>
 <h2 id="container_information">9.4. Container Information</h2>
-<div class="paragraph"><p>###GET /admin/stop-pg/:ID.:Token</p></div>
+<h3 id="get_admin_stop_pg_id_token">9.4.1. GET /admin/stop-pg/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1132,15 +1132,21 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/admin/stop-pg/8.1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /admin/stop/:ID.:Token
-+ Token : the generated auth token for this session</p></div>
+<h3 id="get_admin_stop_id_token">9.4.2. GET /admin/stop/:ID.:Token</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+Token : the generated auth token for this session
+</p>
+</li>
+</ul></div>
 <div class="paragraph"><p>stop a container
 [source,bash}</p></div>
 <div class="listingblock">
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/admin/stop/8.1efbfd50-9b2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /admin/start/:ID.:Token</p></div>
+<h3 id="get_admin_start_id_token">9.4.3. GET /admin/start/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1159,7 +1165,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/admin/start/8.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /admin/start-pg/:ID.:Token</p></div>
+<h3 id="get_admin_start_pg_id_token">9.4.4. GET /admin/start-pg/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1178,7 +1184,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/admin/start-pg/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d</pre>
 </div></div>
-<div class="paragraph"><p>###GET /node/:ID.:Token</p></div>
+<h3 id="get_node_id_token">9.4.5. GET /node/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1192,7 +1198,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/node/8.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /deletenode/:ID.:Token</p></div>
+<h3 id="get_deletenode_id_token">9.4.6. GET /deletenode/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1206,7 +1212,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/deletenode/17.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###POST /provision</p></div>
+<h3 id="post_provision">9.4.7. POST /provision</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1246,7 +1252,7 @@ Token : the generated auth token for this session
 <pre>curl --data @provision.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/provision</pre>
 </div></div>
-<div class="paragraph"><p>###GET /nodes/nocluster/:Token</p></div>
+<h3 id="get_nodes_nocluster_token">9.4.8. GET /nodes/nocluster/:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1260,7 +1266,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/nodes/nocluster/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /nodes/:Token</p></div>
+<h3 id="get_nodes_token">9.4.9. GET /nodes/:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1275,7 +1281,7 @@ Token : the generated auth token for this session
 <pre>curl  http://cpm-admin.crunchy.lab:13001/nodes/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
 <div class="paragraph"><p>## Proxy Information</p></div>
-<div class="paragraph"><p>###POST /provisionproxy</p></div>
+<h3 id="post_provisionproxy">9.4.10. POST /provisionproxy</h3>
 <div class="paragraph"><p>create a proxy container
 [source,bash}</p></div>
 <div class="listingblock">
@@ -1283,7 +1289,7 @@ Token : the generated auth token for this session
 <pre>curl --data @provisionproxy.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/provisionproxy</pre>
 </div></div>
-<div class="paragraph"><p>###GET /proxy/getbycontainerid/:ContainerID.:Token</p></div>
+<h3 id="get_proxy_getbycontainerid_containerid_token">9.4.11. GET /proxy/getbycontainerid/:ContainerID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1302,7 +1308,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/proxy/getbycontainerid/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###POST /proxy/update</p></div>
+<h3 id="post_proxy_update">9.4.12. POST /proxy/update</h3>
 <div class="paragraph"><p>update a proxy container
 [source,bash}</p></div>
 <div class="listingblock">
@@ -1311,7 +1317,7 @@ Token : the generated auth token for this session
 http://cpm-admin:13001/proxy/update</pre>
 </div></div>
 <h2 id="access_rule_information">9.5. Access Rule Information</h2>
-<div class="paragraph"><p>###GET /rules/get/:ID.:Token</p></div>
+<h3 id="get_rules_get_id_token">9.5.1. GET /rules/get/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1333,7 +1339,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/rules/get/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /rules/getall/:Token</p></div>
+<h3 id="get_rules_getall_token">9.5.2. GET /rules/getall/:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1350,7 +1356,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/rules/getall/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /rules/delete/:ID.:Token</p></div>
+<h3 id="get_rules_delete_id_token">9.5.3. GET /rules/delete/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1372,7 +1378,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/rules/delete/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###POST /rules/update</p></div>
+<h3 id="post_rules_update">9.5.4. POST /rules/update</h3>
 <div class="paragraph"><p>update an access rule
 [source,bash}</p></div>
 <div class="listingblock">
@@ -1380,7 +1386,7 @@ Token : the generated auth token for this session
 <pre>curl --data @ruleupdate.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/rules/update</pre>
 </div></div>
-<div class="paragraph"><p>###POST /rules/insert</p></div>
+<h3 id="post_rules_insert">9.5.5. POST /rules/insert</h3>
 <div class="paragraph"><p>insert an access rule
 [source,bash}</p></div>
 <div class="listingblock">
@@ -1388,7 +1394,7 @@ http://cpm-admin:13001/rules/update</pre>
 <pre>curl --data @ruleinsert.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/rules/insert</pre>
 </div></div>
-<div class="paragraph"><p>###GET /containerrules/getall/:ID.:Token</p></div>
+<h3 id="get_containerrules_getall_id_token">9.5.6. GET /containerrules/getall/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1407,7 +1413,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/containerrules/getall/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###POST /containerrules/update</p></div>
+<h3 id="post_containerrules_update">9.5.7. POST /containerrules/update</h3>
 <div class="paragraph"><p>update accessrules for a container
 [source,bash}</p></div>
 <div class="listingblock">
@@ -1416,7 +1422,7 @@ Token : the generated auth token for this session
 http://cpm-admin:13001/containerrules/update</pre>
 </div></div>
 <h2 id="server_information">9.6. Server Information</h2>
-<div class="paragraph"><p>###GET /admin/startall/:ID.:Token</p></div>
+<h3 id="get_admin_startall_id_token">9.6.1. GET /admin/startall/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1435,7 +1441,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/admin/startall/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /admin/stopall/:ID.:Token</p></div>
+<h3 id="get_admin_stopall_id_token">9.6.2. GET /admin/stopall/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1454,7 +1460,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/admin/stopall/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /nodes/forserver/:ServerID.:Token</p></div>
+<h3 id="get_nodes_forserver_serverid_token">9.6.3. GET /nodes/forserver/:ServerID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1473,7 +1479,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/nodes/forserver/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /server/:ID.:Token</p></div>
+<h3 id="get_server_id_token">9.6.4. GET /server/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1492,7 +1498,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d</pre>
 </div></div>
-<div class="paragraph"><p>###GET /deleteserver/:ID.:Token</p></div>
+<h3 id="get_deleteserver_id_token">9.6.5. GET /deleteserver/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1511,7 +1517,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/deleteserver/1.jkjakdjfkjadkfjkajdf</pre>
 </div></div>
-<div class="paragraph"><p>###GET /servers/:Token</p></div>
+<h3 id="get_servers_token">9.6.6. GET /servers/:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1525,7 +1531,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/servers/789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
 </div></div>
-<div class="paragraph"><p>###GET /servers/:Token</p></div>
+<h3 id="get_servers_token_2">9.6.7. GET /servers/:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1539,7 +1545,7 @@ Token : the security token used for auth
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/servers/789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
 </div></div>
-<div class="paragraph"><p>###GET /addserver/:ID.:Name.:IPAddress.:DockerBridgeIP.:PGDataPath.:ServerClass.:Token</p></div>
+<h3 id="get_addserver_id_name_ipaddress_dockerbridgeip_pgdatapath_serverclass_token">9.6.8. GET /addserver/:ID.:Name.:IPAddress.:DockerBridgeIP.:PGDataPath.:ServerClass.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1584,7 +1590,7 @@ Token : the generated auth token for this session
 <pre>curl  http://cpm-admin.crunchy.lab:13001/addserver/1.foo.192-168-0-104.171-10-10-17.</pre>
 </div></div>
 <h2 id="database_user_information">9.7. Database User Information</h2>
-<div class="paragraph"><p>###POST /dbuser/add</p></div>
+<h3 id="post_dbuser_add">9.7.1. POST /dbuser/add</h3>
 <div class="paragraph"><p>add a database user to a given container
 [source,bash}</p></div>
 <div class="listingblock">
@@ -1592,7 +1598,7 @@ Token : the generated auth token for this session
 <pre>curl --data @dbuseradd.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/dbuser/add</pre>
 </div></div>
-<div class="paragraph"><p>###POST /dbuser/update</p></div>
+<h3 id="post_dbuser_update">9.7.2. POST /dbuser/update</h3>
 <div class="paragraph"><p>update a database user to a given container
 [source,bash}</p></div>
 <div class="listingblock">
@@ -1600,7 +1606,7 @@ http://cpm-admin:13001/dbuser/add</pre>
 <pre>curl --data @dbuserupdate.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/dbuser/update</pre>
 </div></div>
-<div class="paragraph"><p>###GET /dbuser/delete/:ContainerID.:Rolname.:Token</p></div>
+<h3 id="get_dbuser_delete_containerid_rolname_token">9.7.3. GET /dbuser/delete/:ContainerID.:Rolname.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1624,7 +1630,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/dbuser/delete/1.foo.kjakdjfkajdkfj</pre>
 </div></div>
-<div class="paragraph"><p>###GET /dbuser/get/:ContainerID.:Rolname.:Token</p></div>
+<h3 id="get_dbuser_get_containerid_rolname_token">9.7.4. GET /dbuser/get/:ContainerID.:Rolname.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1648,7 +1654,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/dbuser/get/1.foo.kjakdjfkajdkfj</pre>
 </div></div>
-<div class="paragraph"><p>###GET /dbuser/getall/:ID.:Token</p></div>
+<h3 id="get_dbuser_getall_id_token">9.7.5. GET /dbuser/getall/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1668,7 +1674,7 @@ Token : the generated auth token for this session
 <pre>curl  http://cpm-admin.crunchy.lab:13001/dbuser/getall/1.kjakdjfkajdkfj</pre>
 </div></div>
 <h2 id="cluster_information">9.8. Cluster Information</h2>
-<div class="paragraph"><p>###GET /event/join-cluster/:IDList.:MasterID.:ClusterID.:Token</p></div>
+<h3 id="get_event_join_cluster_idlist_masterid_clusterid_token">9.8.1. GET /event/join-cluster/:IDList.:MasterID.:ClusterID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1682,7 +1688,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/event/join-cluster/1.1.1.789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
 </div></div>
-<div class="paragraph"><p>###GET /admin/failover/:ID.:Token</p></div>
+<h3 id="get_admin_failover_id_token">9.8.2. GET /admin/failover/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1701,7 +1707,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/admin/failover/1.789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
 </div></div>
-<div class="paragraph"><p>###GET /clusternodes/:ClusterID.:Token</p></div>
+<h3 id="get_clusternodes_clusterid_token">9.8.3. GET /clusternodes/:ClusterID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1720,7 +1726,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/clusternodes/2.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /cluster/stop/:ID.:Token</p></div>
+<h3 id="get_cluster_stop_id_token">9.8.4. GET /cluster/stop/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1739,7 +1745,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/stop/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /cluster/start/:ID.:Token</p></div>
+<h3 id="get_cluster_start_id_token">9.8.5. GET /cluster/start/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1758,7 +1764,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/start/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /cluster/:ID.:Token</p></div>
+<h3 id="get_cluster_id_token">9.8.6. GET /cluster/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1777,7 +1783,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /cluster/configure/:ID.:Token</p></div>
+<h3 id="get_cluster_configure_id_token">9.8.7. GET /cluster/configure/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1796,7 +1802,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/configure/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /cluster/delete/:ID.:Token</p></div>
+<h3 id="get_cluster_delete_id_token">9.8.8. GET /cluster/delete/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1815,7 +1821,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/delete/1.1efbfd50-9bb243a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /projectclusters/:ID.:Token</p></div>
+<h3 id="get_projectclusters_id_token">9.8.9. GET /projectclusters/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1834,7 +1840,7 @@ Token : the security token used for auth
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/projectclusters/1.789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
 </div></div>
-<div class="paragraph"><p>###POST /cluster</p></div>
+<h3 id="post_cluster">9.8.10. POST /cluster</h3>
 <div class="paragraph"><p>updates or adds a cluster
 [source,bash}</p></div>
 <div class="listingblock">
@@ -1842,7 +1848,7 @@ Token : the security token used for auth
 <pre>curl --data @postcluster.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/cluster</pre>
 </div></div>
-<div class="paragraph"><p>###POST /autocluster</p></div>
+<h3 id="post_autocluster">9.8.11. POST /autocluster</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1872,7 +1878,7 @@ Token : the generated auth token for this session
 <pre>curl --data @autocluster.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/autocluster</pre>
 </div></div>
-<div class="paragraph"><p>###GET /clusters/:Token</p></div>
+<h3 id="get_clusters_token">9.8.12. GET /clusters/:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1886,7 +1892,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/clusters/789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
 </div></div>
-<div class="paragraph"><p>###GET /cluster/scale/:ID.:Token</p></div>
+<h3 id="get_cluster_scale_id_token">9.8.13. GET /cluster/scale/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1906,7 +1912,7 @@ Token : the generated auth token for this session
 <pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/scale/1.789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
 </div></div>
 <h2 id="task_information">9.9. Task Information</h2>
-<div class="paragraph"><p>###POST /task/executenow</p></div>
+<h3 id="post_task_executenow">9.9.1. POST /task/executenow</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1921,7 +1927,7 @@ Token : the generated auth token for this session
 <pre>curl --data @executenow.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/task/executenow</pre>
 </div></div>
-<div class="paragraph"><p>###POST /task/addschedule</p></div>
+<h3 id="post_task_addschedule">9.9.2. POST /task/addschedule</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1936,7 +1942,7 @@ Token : the generated auth token for this session
 <pre>curl --data @addschedule.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/task/addschedule</pre>
 </div></div>
-<div class="paragraph"><p>###GET /task/deleteschedule/:ID.:Token</p></div>
+<h3 id="get_task_deleteschedule_id_token">9.9.3. GET /task/deleteschedule/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1950,7 +1956,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/task/deleteschedule/1.kjkjadfjkajdfkjadksf</pre>
 </div></div>
-<div class="paragraph"><p>###POST /task/updateschedule</p></div>
+<h3 id="post_task_updateschedule">9.9.4. POST /task/updateschedule</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1965,7 +1971,7 @@ Token : the generated auth token for this session
 <pre>curl --data @updateschedule.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/task/updateschedule</pre>
 </div></div>
-<div class="paragraph"><p>###GET /task/getschedules/:ContainerName.:Token</p></div>
+<h3 id="get_task_getschedules_containername_token">9.9.5. GET /task/getschedules/:ContainerName.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1979,7 +1985,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/task/getschedules/foo.kjadkfjkjakdjfkadjf</pre>
 </div></div>
-<div class="paragraph"><p>###GET /task/getschedule/:ID.:Token</p></div>
+<h3 id="get_task_getschedule_id_token">9.9.6. GET /task/getschedule/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1993,7 +1999,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/task/getschedule/1.fkjkjadkfjkjadsfjkdaf</pre>
 </div></div>
-<div class="paragraph"><p>###GET /task/getstatus/:ID.:Token</p></div>
+<h3 id="get_task_getstatus_id_token">9.9.7. GET /task/getstatus/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -2007,7 +2013,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/task/getstatus/1.kjakdjfkajkdjfkjadfasdf</pre>
 </div></div>
-<div class="paragraph"><p>###POST /task/deletestatus</p></div>
+<h3 id="post_task_deletestatus">9.9.8. POST /task/deletestatus</h3>
 <div class="paragraph"><p>deletes a task schedule history
 [source,bash}</p></div>
 <div class="listingblock">
@@ -2015,7 +2021,7 @@ Token : the generated auth token for this session
 <pre>curl --data @deletetaskstatus.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/task/deletestatus</pre>
 </div></div>
-<div class="paragraph"><p>###GET /task/getallstatus/:ID.:Token</p></div>
+<h3 id="get_task_getallstatus_id_token">9.9.9. GET /task/getallstatus/:ID.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -2029,7 +2035,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/task/getallstatus/1.kjakjadfjkjaksdjfkajdf</pre>
 </div></div>
-<div class="paragraph"><p>###GET /task/nodes/:Token</p></div>
+<h3 id="get_task_nodes_token">9.9.10. GET /task/nodes/:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -2044,7 +2050,7 @@ Token : the generated auth token for this session
 <pre>curl  http://cpm-admin.crunchy.lab:13001/task/nodes/kjakjfjkadjfkjkajdf</pre>
 </div></div>
 <h2 id="settings">9.10. Settings</h2>
-<div class="paragraph"><p>###POST /saveprofiles</p></div>
+<h3 id="post_saveprofiles">9.10.1. POST /saveprofiles</h3>
 <div class="paragraph"><p>saves profiles
 [source,bash}</p></div>
 <div class="listingblock">
@@ -2052,7 +2058,7 @@ Token : the generated auth token for this session
 <pre>curl --data @saveprofiles.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/saveprofiles</pre>
 </div></div>
-<div class="paragraph"><p>###POST /saveclusterprofiles</p></div>
+<h3 id="post_saveclusterprofiles">9.10.2. POST /saveclusterprofiles</h3>
 <div class="paragraph"><p>saves cluster profiles
 [source,bash}</p></div>
 <div class="listingblock">
@@ -2060,7 +2066,7 @@ http://cpm-admin:13001/saveprofiles</pre>
 <pre>curl --data @saveclusterprofiles.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/saveclusterprofiles</pre>
 </div></div>
-<div class="paragraph"><p>###POST /savesetting</p></div>
+<h3 id="post_savesetting">9.10.3. POST /savesetting</h3>
 <div class="paragraph"><p>update a setting value
 [source,bash}</p></div>
 <div class="listingblock">
@@ -2068,7 +2074,7 @@ http://cpm-admin:13001/saveclusterprofiles</pre>
 <pre>curl --data @savesetting.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/savesetting</pre>
 </div></div>
-<div class="paragraph"><p>###GET /settings/:Token</p></div>
+<h3 id="get_settings_token">9.10.4. GET /settings/:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -2083,7 +2089,7 @@ Token : the generated auth token for this session
 <pre>curl  http://cpm-admin.crunchy.lab:13001/settings/789c31ff-b18f-7b3-bb63-1fd603895aa5</pre>
 </div></div>
 <h2 id="monitoring">9.11. Monitoring</h2>
-<div class="paragraph"><p>###GET /mon/healthcheck/:Token</p></div>
+<h3 id="get_mon_healthcheck_token">9.11.1. GET /mon/healthcheck/:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -2097,7 +2103,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/mon/healthcheck/24c715ca-2468-4450-8fee-6e2a9f7714dc</pre>
 </div></div>
-<div class="paragraph"><p>###GET /monitor/container/settings/:ID.Token</p></div>
+<h3 id="get_monitor_container_settings_id_token">9.11.2. GET /monitor/container/settings/:ID.Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -2116,7 +2122,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/container/settings/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /monitor/container/repl/:ID.Token</p></div>
+<h3 id="get_monitor_container_repl_id_token">9.11.3. GET /monitor/container/repl/:ID.Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -2135,7 +2141,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/container/repl/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /monitor/container/database/:ID.Token</p></div>
+<h3 id="get_monitor_container_database_id_token">9.11.4. GET /monitor/container/database/:ID.Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -2154,7 +2160,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/container/database/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /monitor/container/bgwriter/:ID.Token</p></div>
+<h3 id="get_monitor_container_bgwriter_id_token">9.11.5. GET /monitor/container/bgwriter/:ID.Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -2173,7 +2179,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/container/bgwriter/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /monitor/container/controldata/:ID.Token</p></div>
+<h3 id="get_monitor_container_controldata_id_token">9.11.6. GET /monitor/container/controldata/:ID.Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -2192,7 +2198,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/container/controldata/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /monitor/server-getinfo/:ServerID.:Metric.:Token</p></div>
+<h3 id="get_monitor_server_getinfo_serverid_metric_token">9.11.7. GET /monitor/server-getinfo/:ServerID.:Metric.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -2206,7 +2212,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/server-getinfo/1.cpmdf.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
 </div></div>
-<div class="paragraph"><p>###GET /monitor/container/loadtest/:ID.:Writes.:Token</p></div>
+<h3 id="get_monitor_container_loadtest_id_writes_token">9.11.8. GET /monitor/container/loadtest/:ID.:Writes.:Token</h3>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -2220,7 +2226,7 @@ Token : the generated auth token for this session
 <div class="content monospaced">
 <pre>curl  http://cpm-admin:13001/monior/container/loadtest/1.1000.9a8f9a1e-9c81-4e4f-9f52-01d2ea6cd741</pre>
 </div></div>
-<div class="paragraph"><p>###GET /version</p></div>
+<h3 id="get_version">9.11.9. GET /version</h3>
 <div class="paragraph"><p>returns the CPM version number
 [source,bash}</p></div>
 <div class="listingblock">
