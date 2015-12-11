@@ -6,4 +6,4 @@ asciidoc \
 -a toc2 \
 -a toc-placement=right \
 -a theme=cerulean \
-./demo.asciidoc
+./index.asciidoc
