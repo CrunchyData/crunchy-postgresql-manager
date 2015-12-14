@@ -1,0 +1,42 @@
+
+== Features
+
+CPM includes several containers which allow for the following:
+
+ * quick deployment of Postgresql containers
+ * deployment of Postgresql streaming replication clusters
+ * basic backup and restore functions
+ * automated DBA administration tasks
+ * container monitoring
+ * multi-server capability
+ * pg-backrest archive restore 
+ * pgbadger reporting
+ * Postgresql metrics collection and reporting
+
+CPM is based on the following technologies:
+
+ * Docker 1.8
+ * Docker Swarm
+ * golang
+ * Angular.js
+ * Prometheus
+ * Postgresql
+
+CPM components include:
+
+ * cpm-admin : REST API for administering CPM containers
+ * cpm-web : Angular.js/nginx for serving web user interface
+ * cpm-collect : metrics collection to Prometheus
+ * cpm-task : cron scheduled administrative tasks executor
+ * cpm-promdash : Prometheus Dashboard for displaying collected metrics
+ * cpm-node : Postgresql database container
+ * cpm-node-proxy : proxy for interfacing with non-container based Postgresql databases
+ * cpm-pgpool : pgpool container which provides a postgresql-smart load balancer
+ * cpm-backup-job : postgresql backup job which performs a pg_basebackup backup
+ * cpm-efk : container holding elasticsearch, fluentd, and kibana, used for log aggregation
+ * cpm-restore-job : restore of a pg_basebackup backup to a new database container
+ * cpm-server : server agent collecting metrics for CPM servers and disk provisioning
+ * cpm-backrest-restore-job : container which performs a pg-backrest restore
+ * skybridge : DNS-to-Docker agent for registering DNS names for each container
+
+
