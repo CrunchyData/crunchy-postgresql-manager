@@ -57,11 +57,12 @@ PSW : the user password to authenticate with
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/sec/login/cpm<span style="color: #990000">.</span>cpm</tt></pre></div></div>
 <h3 id="logout_of_a_user_session">1.1.2. logout of a user session</h3>
 <div class="paragraph"><p><code>GET /sec/logout/:Token</code></p></div>
 <div class="ulist"><ul>
@@ -71,11 +72,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/sec/logout/ab3ba695-533-43a4-a3c0-9a4c55288c14</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/sec/logout/ab3ba695-<span style="color: #993399">533</span>-43a4-a3c0-9a4c55288c14</tt></pre></div></div>
 <h3 id="update_a_user_account">1.1.3. update a user account</h3>
 <div class="paragraph"><p><code>POST /sec/updateuser</code></p></div>
 <div class="ulist"><ul>
@@ -85,12 +87,13 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/provisionproxy</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @provision-proxy<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/provisionproxy</tt></pre></div></div>
 <h3 id="change_a_user_password">1.1.4. change a user password</h3>
 <div class="paragraph"><p><code>POST /sec/cp</code></p></div>
 <div class="ulist"><ul>
@@ -100,12 +103,13 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @changepassword.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/changepassword</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @changepassword<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/changepassword</tt></pre></div></div>
 <h3 id="add_a_user">1.1.5. add a user</h3>
 <div class="paragraph"><p><code>POST /sec/adduser</code></p></div>
 <div class="ulist"><ul>
@@ -115,12 +119,13 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @adduser.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/adduser</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @adduser<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/adduser</tt></pre></div></div>
 <h3 id="return_user_information">1.1.6. return user information</h3>
 <div class="paragraph"><p><code>GET /sec/getuser/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -130,11 +135,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/sec/getuser/cpm.1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/sec/getuser/cpm<span style="color: #990000">.</span>1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="return_all_users_information">1.1.7. return all users information</h3>
 <div class="paragraph"><p><code>GET /sec/getusers/:Token</code></p></div>
 <div class="ulist"><ul>
@@ -144,11 +150,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/sec/getusers/1efbfd50-9b2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/sec/getusers<span style="color: #990000">/</span>1efbfd50-9b2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="delete_a_user">1.1.8. delete a user</h3>
 <div class="paragraph"><p><code>GET /sec/deleteuser/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -158,11 +165,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/sec/deleteuser/1.jkjkjadkjkajdkfjakdfjkad</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/sec/deleteuser<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>jkjkjadkjkajdkfjakdfjkad</tt></pre></div></div>
 <h3 id="update_a_cpm_role">1.1.9. update a CPM role</h3>
 <div class="paragraph"><p><code>POST /sec/updaterole</code></p></div>
 <div class="ulist"><ul>
@@ -172,12 +180,13 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @updaterole.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/sec/updaterole</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @updaterole<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/sec/updaterole</tt></pre></div></div>
 <h3 id="add_a_cpm_role">1.1.10. add a CPM role</h3>
 <div class="paragraph"><p><code>POST /sec/addrole</code></p></div>
 <div class="ulist"><ul>
@@ -187,12 +196,13 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @addrole.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/sec/addrole</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @addrole<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/sec/addrole</tt></pre></div></div>
 <h3 id="delete_a_cpm_role">1.1.11. delete a CPM role</h3>
 <div class="paragraph"><p><code>GET /sec/deleterole/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -202,11 +212,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/sec/deleterole/1.ajkajdkajdfkjadf</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/sec/deleterole<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>ajkajdkajdfkjadf</tt></pre></div></div>
 <h3 id="get_all_cpm_roles">1.1.12. get all CPM roles</h3>
 <div class="paragraph"><p><code>GET /sec/getroles/:Token</code></p></div>
 <div class="ulist"><ul>
@@ -216,11 +227,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/sec/getroles/1efbfd50-9b2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/sec/getroles<span style="color: #990000">/</span>1efbfd50-9b2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="get_a_cpm_role">1.1.13. get a CPM role</h3>
 <div class="paragraph"><p><code>GET /sec/getrole/:Name.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -230,11 +242,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001sec/getrole/superuser.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span>13001sec/getrole/superuser<span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h2 id="project_information">1.2. Project Information</h2>
 <h3 id="adds_a_project">1.2.1. adds a project</h3>
 <div class="paragraph"><p><code>POST /project/add</code></p></div>
@@ -265,11 +278,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl -X POST -d @addproject.json http://cpm-admin:13001/project/add</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl -X POST -d @addproject<span style="color: #990000">.</span>json http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/project/add</tt></pre></div></div>
 <h3 id="return_all_projects">1.2.2. return all projects</h3>
 <div class="paragraph"><p><code>GET /project/getall/:Token</code></p></div>
 <div class="ulist"><ul>
@@ -279,11 +293,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl http://cpm-admin.crunchy.lab:13001/project/getall/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/project/getall<span style="color: #990000">/</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="return_a_single_project">1.2.3. return a single project</h3>
 <div class="paragraph"><p><code>GET /project/get/:ID.Token</code></p></div>
 <div class="ulist"><ul>
@@ -298,11 +313,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl http://cpm-admin.crunchy.lab:13001/project/get/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/project/get<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="delete_a_single_project">1.2.4. delete a single project</h3>
 <div class="paragraph"><p><code>GET /project/delete/:ID.Token</code></p></div>
 <div class="ulist"><ul>
@@ -317,11 +333,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl http://cpm-admin.crunchy.lab:13001/project/delete/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/project/delete<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="updates_a_project">1.2.5. updates a project</h3>
 <div class="paragraph"><p><code>POST /project/update</code></p></div>
 <div class="ulist"><ul>
@@ -351,11 +368,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl -X POST -d @updateproject.json http://cpm-admin.crunchy.lab:13001/project/update</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl -X POST -d @updateproject<span style="color: #990000">.</span>json http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/project/update</tt></pre></div></div>
 <h3 id="return_a_list_of_containers_in_a_project">1.2.6. return a list of containers in a project</h3>
 <div class="paragraph"><p><code>GET /projectnodes/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -370,11 +388,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/projectnodes/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/projectnodes<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>8dc0caed-<span style="color: #993399">39e7</span>-47b4-878c-de1c8b0b595d</tt></pre></div></div>
 <h2 id="container_information">1.3. Container Information</h2>
 <h3 id="stop_a_container_postgres">1.3.1. stop a container postgres</h3>
 <div class="paragraph"><p><code>GET /admin/stop-pg/:ID.:Token</code></p></div>
@@ -390,19 +409,21 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/admin/stop-pg/8.1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/admin/stop-pg<span style="color: #990000">/</span><span style="color: #993399">8</span><span style="color: #990000">.</span>1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="stop_a_container">1.3.2. stop a container</h3>
 <div class="paragraph"><p><code>GET /admin/stop/:ID.:Token</code>
 * Token : the generated auth token for this session</p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/admin/stop/8.1efbfd50-9b2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/admin/stop<span style="color: #990000">/</span><span style="color: #993399">8</span><span style="color: #990000">.</span>1efbfd50-9b2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="start_a_container">1.3.3. start a container</h3>
 <div class="paragraph"><p><code>GET /admin/start/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -417,11 +438,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/admin/start/8.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/admin/start<span style="color: #990000">/</span><span style="color: #993399">8</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="start_a_containers_postgres_database">1.3.4. start a containers postgres database</h3>
 <div class="paragraph"><p><code>GET /admin/start-pg/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -436,11 +458,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/admin/start-pg/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/admin/start-pg<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>8dc0caed-<span style="color: #993399">39e7</span>-47b4-878c-de1c8b0b595d</tt></pre></div></div>
 <h3 id="return_a_container">1.3.5. return a container</h3>
 <div class="paragraph"><p><code>GET /node/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -450,11 +473,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/node/8.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/node<span style="color: #990000">/</span><span style="color: #993399">8</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="delete_a_container">1.3.6. delete a container</h3>
 <div class="paragraph"><p><code>GET /deletenode/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -464,11 +488,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/deletenode/17.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/deletenode<span style="color: #990000">/</span><span style="color: #993399">17</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="provision_a_new_container">1.3.7. provision a new container</h3>
 <div class="paragraph"><p><code>POST /provision</code></p></div>
 <div class="ulist"><ul>
@@ -503,12 +528,13 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @provision.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/provision</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @provision<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/provision</tt></pre></div></div>
 <h3 id="return_all_containers_not_in_a_cluster">1.3.8. return all containers not in a cluster</h3>
 <div class="paragraph"><p><code>GET /nodes/nocluster/:Token</code></p></div>
 <div class="ulist"><ul>
@@ -518,11 +544,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/nodes/nocluster/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/nodes/nocluster<span style="color: #990000">/</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="return_all_containers">1.3.9. return all containers</h3>
 <div class="paragraph"><p><code>GET /nodes/:Token</code></p></div>
 <div class="ulist"><ul>
@@ -532,20 +559,22 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/nodes/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/nodes<span style="color: #990000">/</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <div class="paragraph"><p>## Proxy Information</p></div>
 <h3 id="create_a_proxy_container">1.3.10. create a proxy container</h3>
 <div class="paragraph"><p><code>POST /provisionproxy</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @provisionproxy.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/provisionproxy</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @provisionproxy<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/provisionproxy</tt></pre></div></div>
 <h3 id="return_proxy_information">1.3.11. return proxy information</h3>
 <div class="paragraph"><p><code>GET /proxy/getbycontainerid/:ContainerID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -560,19 +589,21 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/proxy/getbycontainerid/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/proxy/getbycontainerid<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="update_a_proxy_container">1.3.12. update a proxy container</h3>
 <div class="paragraph"><p><code>POST /proxy/update</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @proxyupdate.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/proxy/update</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @proxyupdate<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/proxy/update</tt></pre></div></div>
 <h2 id="access_rule_information">1.4. Access Rule Information</h2>
 <h3 id="get_an_access_rule">1.4.1. get an access rule</h3>
 <div class="paragraph"><p><code>GET /rules/get/:ID.:Token</code></p></div>
@@ -588,11 +619,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/rules/get/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/rules/get<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="get_all_access_rules">1.4.2. get all access rules</h3>
 <div class="paragraph"><p><code>GET /rules/getall/:Token</code></p></div>
 <div class="ulist"><ul>
@@ -602,11 +634,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/rules/getall/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/rules/getall<span style="color: #990000">/</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="delete_an_access_rule">1.4.3. delete an access rule</h3>
 <div class="paragraph"><p><code>GET /rules/delete/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -621,27 +654,30 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/rules/delete/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/rules/delete<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="update_an_access_rule">1.4.4. update an access rule</h3>
 <div class="paragraph"><p><code>POST /rules/update</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @ruleupdate.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/rules/update</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @ruleupdate<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/rules/update</tt></pre></div></div>
 <h3 id="insert_an_access_rule">1.4.5. insert an access rule</h3>
 <div class="paragraph"><p><code>POST /rules/insert</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @ruleinsert.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/rules/insert</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @ruleinsert<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/rules/insert</tt></pre></div></div>
 <h3 id="get_all_accessrules_for_a_container">1.4.6. get all accessrules for a container</h3>
 <div class="paragraph"><p><code>GET /containerrules/getall/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -656,19 +692,21 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/containerrules/getall/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/containerrules/getall<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="update_accessrules_for_a_container">1.4.7. update accessrules for a container</h3>
 <div class="paragraph"><p><code>POST /containerrules/update</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @containerrulesupdate.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/containerrules/update</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @containerrulesupdate<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/containerrules/update</tt></pre></div></div>
 <h2 id="server_information">1.5. Server Information</h2>
 <h3 id="perform_a_docker_start_on_all_containers_on_a_given_server">1.5.1. perform a docker start on all containers on a given server</h3>
 <div class="paragraph"><p><code>GET /admin/startall/:ID.:Token</code></p></div>
@@ -684,11 +722,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/admin/startall/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/admin/startall<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="perform_a_docker_stop_on_all_containers_on_a_given_server">1.5.2. perform a docker stop on all containers on a given server</h3>
 <div class="paragraph"><p><code>GET /admin/stopall/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -703,11 +742,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/admin/stopall/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/admin/stopall<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="return_all_containers_for_a_server">1.5.3. return all containers for a server</h3>
 <div class="paragraph"><p><code>GET /nodes/forserver/:ServerID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -722,11 +762,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/nodes/forserver/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/nodes/forserver<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="return_a_server">1.5.4. return a server</h3>
 <div class="paragraph"><p><code>GET /server/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -741,11 +782,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span><span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>8dc0caed-<span style="color: #993399">39e7</span>-47b4-878c-de1c8b0b595d</tt></pre></div></div>
 <h3 id="delete_a_server">1.5.5. delete a server</h3>
 <div class="paragraph"><p><code>GET /deleteserver/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -760,11 +802,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/deleteserver/1.jkjakdjfkjadkfjkajdf</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/deleteserver<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>jkjakdjfkjadkfjkajdf</tt></pre></div></div>
 <h3 id="returns_all_servers">1.5.6. returns all servers</h3>
 <div class="paragraph"><p><code>GET /servers/:Token</code></p></div>
 <div class="ulist"><ul>
@@ -774,11 +817,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/servers/789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/servers<span style="color: #990000">/</span>789c31ff-b18f-47b3-bb<span style="color: #993399">63</span>-1fd603895aa5</tt></pre></div></div>
 <h3 id="get_all_the_servers_defined_in_cpm">1.5.7. Get all the servers defined in CPM</h3>
 <div class="paragraph"><p><code>GET /servers/:Token</code></p></div>
 <div class="ulist"><ul>
@@ -788,11 +832,12 @@ Token : the security token used for auth
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/servers/789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/servers<span style="color: #990000">/</span>789c31ff-b18f-47b3-bb<span style="color: #993399">63</span>-1fd603895aa5</tt></pre></div></div>
 <h3 id="add_a_server">1.5.8. add a server</h3>
 <div class="paragraph"><p><code>GET /addserver/:ID.:Name.:IPAddress.:DockerBridgeIP.:PGDataPath.:ServerClass.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -850,12 +895,13 @@ http://www.gnu.org/software/src-highlite -->
 http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/dbuser/add</tt></pre></div></div>
 <h3 id="update_a_database_user_to_a_given_container">1.6.2. update a database user to a given container</h3>
 <div class="paragraph"><p><code>POST /dbuser/update</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @dbuserupdate.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/dbuser/update</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @dbuserupdate<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/dbuser/update</tt></pre></div></div>
 <h3 id="delete_a_database_user_for_a_given_container">1.6.3. delete a database user for a given container</h3>
 <div class="paragraph"><p><code>GET /dbuser/delete/:ContainerID.:Rolname.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -875,11 +921,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/dbuser/delete/1.foo.kjakdjfkajdkfj</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/dbuser/delete<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>foo<span style="color: #990000">.</span>kjakdjfkajdkfj</tt></pre></div></div>
 <h3 id="get_a_database_user_for_a_given_container">1.6.4. get a database user for a given container</h3>
 <div class="paragraph"><p><code>GET /dbuser/get/:ContainerID.:Rolname.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -899,11 +946,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/dbuser/get/1.foo.kjakdjfkajdkfj</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/dbuser/get<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>foo<span style="color: #990000">.</span>kjakdjfkajdkfj</tt></pre></div></div>
 <h3 id="get_all_database_users_for_a_given_container">1.6.5. get all database users for a given container</h3>
 <div class="paragraph"><p><code>GET /dbuser/getall/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -918,11 +966,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/dbuser/getall/1.kjakdjfkajdkfj</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/dbuser/getall<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>kjakdjfkajdkfj</tt></pre></div></div>
 <h2 id="cluster_information">1.7. Cluster Information</h2>
 <h3 id="add_a_node_to_a_cluster">1.7.1. add a node to a cluster</h3>
 <div class="paragraph"><p><code>GET /event/join-cluster/:IDList.:MasterID.:ClusterID.:Token</code></p></div>
@@ -933,11 +982,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/event/join-cluster/1.1.1.789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/event/join-cluster<span style="color: #990000">/</span><span style="color: #993399">1.1</span><span style="color: #990000">.</span><span style="color: #993399">1</span><span style="color: #990000">.</span>789c31ff-b18f-47b3-bb<span style="color: #993399">63</span>-1fd603895aa5</tt></pre></div></div>
 <h3 id="cause_a_postgres_fail_over_on_a_given_container">1.7.2. cause a postgres fail over on a given container</h3>
 <div class="paragraph"><p><code>GET /admin/failover/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -952,11 +1002,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/admin/failover/1.789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/admin/failover<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>789c31ff-b18f-47b3-bb<span style="color: #993399">63</span>-1fd603895aa5</tt></pre></div></div>
 <h3 id="return_all_containers_for_a_given_cluster">1.7.3. return all containers for a given cluster</h3>
 <div class="paragraph"><p><code>GET /clusternodes/:ClusterID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -971,11 +1022,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/clusternodes/2.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/clusternodes<span style="color: #990000">/</span><span style="color: #993399">2</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="perform_a_docker_stop_on_a_given_clusters_set_of_containers">1.7.4. perform a docker stop on a given clusters set of containers</h3>
 <div class="paragraph"><p><code>GET /cluster/stop/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -990,11 +1042,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/stop/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/cluster/stop<span style="color: #990000">/</span><span style="color: #993399">2</span><span style="color: #990000">.</span>1efbfd50-9bb243a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="perform_a_docker_start_on_a_given_clusters_set_of_containers">1.7.5. perform a docker start on a given clusters set of containers</h3>
 <div class="paragraph"><p><code>GET /cluster/start/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1009,11 +1062,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/start/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/cluster/start<span style="color: #990000">/</span><span style="color: #993399">2</span><span style="color: #990000">.</span>1efbfd50-9bb243a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="return_a_cluster">1.7.6. return a cluster</h3>
 <div class="paragraph"><p><code>GET /cluster/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1028,11 +1082,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/cluster<span style="color: #990000">/</span><span style="color: #993399">2</span><span style="color: #990000">.</span>1efbfd50-9bb243a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="configure_a_cluster">1.7.7. configure a cluster</h3>
 <div class="paragraph"><p><code>GET /cluster/configure/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1047,11 +1102,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/configure/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/cluster/configure<span style="color: #990000">/</span><span style="color: #993399">2</span><span style="color: #990000">.</span>1efbfd50-9bb243a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="delete_a_cluster_and_its_containers">1.7.8. delete a cluster and its containers</h3>
 <div class="paragraph"><p><code>GET /cluster/delete/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1066,11 +1122,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/delete/1.1efbfd50-9bb243a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/cluster/delete<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>1efbfd50-9bb243a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="get_all_the_clusters_for_a_given_project">1.7.9. Get all the clusters for a given project</h3>
 <div class="paragraph"><p><code>GET /projectclusters/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1085,19 +1142,21 @@ Token : the security token used for auth
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/projectclusters/1.789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/projectclusters<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>789c31ff-b18f-47b3-bb<span style="color: #993399">63</span>-1fd603895aa5</tt></pre></div></div>
 <h3 id="updates_or_adds_a_cluster">1.7.10. updates or adds a cluster</h3>
 <div class="paragraph"><p><code>POST /cluster</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @postcluster.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/cluster</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @postcluster<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/cluster</tt></pre></div></div>
 <h3 id="performs_an_auto_cluster">1.7.11. performs an auto-cluster</h3>
 <div class="paragraph"><p><code>POST /autocluster</code></p></div>
 <div class="ulist"><ul>
@@ -1122,12 +1181,13 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @autocluster.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/autocluster</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @autocluster<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/autocluster</tt></pre></div></div>
 <h3 id="returns_all_clusters">1.7.12. returns all clusters</h3>
 <div class="paragraph"><p><code>GET /clusters/:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1137,11 +1197,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/clusters/789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/clusters<span style="color: #990000">/</span>789c31ff-b18f-47b3-bb<span style="color: #993399">63</span>-1fd603895aa5</tt></pre></div></div>
 <h3 id="add_a_standby_node_to_a_given_cluster">1.7.13. add a standby node to a given cluster</h3>
 <div class="paragraph"><p><code>GET /cluster/scale/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1156,11 +1217,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/scale/1.789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/cluster/scale<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>789c31ff-b18f-47b3-bb<span style="color: #993399">63</span>-1fd603895aa5</tt></pre></div></div>
 <h2 id="task_information">1.8. Task Information</h2>
 <h3 id="execute_a_task_schedule_immediately">1.8.1. execute a task schedule immediately</h3>
 <div class="paragraph"><p><code>POST /task/executenow</code></p></div>
@@ -1171,12 +1233,13 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @executenow.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/task/executenow</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @executenow<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/task/executenow</tt></pre></div></div>
 <h3 id="add_a_new_container_schedule">1.8.2. add a new container schedule</h3>
 <div class="paragraph"><p><code>POST /task/addschedule</code></p></div>
 <div class="ulist"><ul>
@@ -1186,12 +1249,13 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @addschedule.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/task/addschedule</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @addschedule<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/task/addschedule</tt></pre></div></div>
 <h3 id="remove_a_container_schedule">1.8.3. remove a container schedule</h3>
 <div class="paragraph"><p><code>GET /task/deleteschedule/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1201,11 +1265,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/task/deleteschedule/1.kjkjadfjkajdfkjadksf</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/task/deleteschedule<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>kjkjadfjkajdfkjadksf</tt></pre></div></div>
 <h3 id="update_a_container_schedule">1.8.4. update a container schedule</h3>
 <div class="paragraph"><p><code>POST /task/updateschedule</code></p></div>
 <div class="ulist"><ul>
@@ -1215,12 +1280,13 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @updateschedule.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/task/updateschedule</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @updateschedule<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/task/updateschedule</tt></pre></div></div>
 <h3 id="get_all_schedules_for_a_container">1.8.5. get all schedules for a container</h3>
 <div class="paragraph"><p><code>GET /task/getschedules/:ContainerName.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1230,11 +1296,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/task/getschedules/foo.kjadkfjkjakdjfkadjf</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/task/getschedules/foo<span style="color: #990000">.</span>kjadkfjkjakdjfkadjf</tt></pre></div></div>
 <h3 id="get_a_container_schedule">1.8.6. get a container schedule</h3>
 <div class="paragraph"><p><code>GET /task/getschedule/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1244,11 +1311,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/task/getschedule/1.fkjkjadkfjkjadsfjkdaf</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/task/getschedule<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>fkjkjadkfjkjadsfjkdaf</tt></pre></div></div>
 <h3 id="get_a_schedule_job_status">1.8.7. get a schedule job status</h3>
 <div class="paragraph"><p><code>GET /task/getstatus/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1258,19 +1326,21 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/task/getstatus/1.kjakdjfkajkdjfkjadfasdf</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/task/getstatus<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>kjakdjfkajkdjfkjadfasdf</tt></pre></div></div>
 <h3 id="deletes_a_task_schedule_history">1.8.8. deletes a task schedule history</h3>
 <div class="paragraph"><p><code>POST /task/deletestatus</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @deletetaskstatus.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/task/deletestatus</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @deletetaskstatus<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/task/deletestatus</tt></pre></div></div>
 <h3 id="get_all_scheduled_job_status_for_a_container">1.8.9. get all scheduled job status for a container</h3>
 <div class="paragraph"><p><code>GET /task/getallstatus/:ID.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1280,11 +1350,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/task/getallstatus/1.kjakjadfjkjaksdjfkajdf</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/task/getallstatus<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>kjakjadfjkjaksdjfkajdf</tt></pre></div></div>
 <h3 id="todo">1.8.10. TODO</h3>
 <div class="paragraph"><p><code>GET /task/nodes/:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1294,36 +1365,40 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/task/nodes/kjakjfjkadjfkjkajdf</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/task/nodes/kjakjfjkadjfkjkajdf</tt></pre></div></div>
 <h2 id="settings">1.9. Settings</h2>
 <h3 id="saves_profiles">1.9.1. saves profiles</h3>
 <div class="paragraph"><p><code>POST /saveprofiles</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @saveprofiles.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/saveprofiles</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @saveprofiles<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/saveprofiles</tt></pre></div></div>
 <h3 id="saves_cluster_profiles">1.9.2. saves cluster profiles</h3>
 <div class="paragraph"><p><code>POST /saveclusterprofiles</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @saveclusterprofiles.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/saveclusterprofiles</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @saveclusterprofiles<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/saveclusterprofiles</tt></pre></div></div>
 <h3 id="update_a_setting_value">1.9.3. update a setting value</h3>
 <div class="paragraph"><p><code>POST /savesetting</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @savesetting.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/savesetting</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @savesetting<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/savesetting</tt></pre></div></div>
 <h3 id="returns_all_settings">1.9.4. returns all settings</h3>
 <div class="paragraph"><p><code>GET /settings/:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1333,11 +1408,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/settings/789c31ff-b18f-7b3-bb63-1fd603895aa5</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/settings<span style="color: #990000">/</span>789c31ff-b18f-7b3-bb<span style="color: #993399">63</span>-1fd603895aa5</tt></pre></div></div>
 <h2 id="monitoring">1.10. Monitoring</h2>
 <h3 id="gethc1_health_check_1_databases_down">1.10.1. GetHC1 - health check 1 - databases down</h3>
 <div class="paragraph"><p><code>GET /mon/healthcheck/:Token</code></p></div>
@@ -1348,11 +1424,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/mon/healthcheck/24c715ca-2468-4450-8fee-6e2a9f7714dc</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/mon/healthcheck<span style="color: #990000">/</span>24c715ca-<span style="color: #993399">2468</span>-<span style="color: #993399">4450</span>-8fee-6e2a9f7714dc</tt></pre></div></div>
 <h3 id="return_container_pg_settings_data">1.10.2. return container pg_settings data</h3>
 <div class="paragraph"><p><code>GET /monitor/container/settings/:ID.Token</code></p></div>
 <div class="ulist"><ul>
@@ -1367,11 +1444,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/container/settings/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/monitor/container/settings<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="return_container_pg_replication_data">1.10.3. return container pg_replication data</h3>
 <div class="paragraph"><p><code>GET /monitor/container/repl/:ID.Token</code></p></div>
 <div class="ulist"><ul>
@@ -1386,11 +1464,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/container/repl/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/monitor/container/repl<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="return_container_pg_databases_data">1.10.4. return container pg_databases data</h3>
 <div class="paragraph"><p><code>GET /monitor/container/database/:ID.Token</code></p></div>
 <div class="ulist"><ul>
@@ -1405,11 +1484,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/container/database/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/monitor/container/database<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="return_container_bgwriter_data">1.10.5. return container bgwriter data</h3>
 <div class="paragraph"><p><code>GET /monitor/container/bgwriter/:ID.Token</code></p></div>
 <div class="ulist"><ul>
@@ -1424,11 +1504,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/container/bgwriter/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/monitor/container/bgwriter<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="return_container_controldata_data">1.10.6. return container controldata data</h3>
 <div class="paragraph"><p><code>GET /monitor/container/controldata/:ID.Token</code></p></div>
 <div class="ulist"><ul>
@@ -1443,11 +1524,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/container/controldata/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/monitor/container/controldata<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="return_server_monitoring_data">1.10.7. return server monitoring data</h3>
 <div class="paragraph"><p><code>GET /monitor/server-getinfo/:ServerID.:Metric.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1457,11 +1539,12 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/server-getinfo/1.cpmdf.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/monitor/server-getinfo<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>cpmdf<span style="color: #990000">.</span>1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</tt></pre></div></div>
 <h3 id="perform_a_load_test_and_return_the_results">1.10.8. perform a load test and return the results</h3>
 <div class="paragraph"><p><code>GET /monitor/container/loadtest/:ID.:Writes.:Token</code></p></div>
 <div class="ulist"><ul>
@@ -1471,18 +1554,468 @@ Token : the generated auth token for this session
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
 <div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin:13001/monior/container/loadtest/1.1000.9a8f9a1e-9c81-4e4f-9f52-01d2ea6cd741</pre>
-</div></div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/monior/container/loadtest<span style="color: #990000">/</span><span style="color: #993399">1.1000</span><span style="color: #990000">.</span>9a8f9a1e-9c81-4e4f-9f52-01d2ea6cd741</tt></pre></div></div>
 <h3 id="returns_the_cpm_version_number">1.10.9. returns the CPM version number</h3>
 <div class="paragraph"><p><code>GET /version</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/version</tt></pre></div></div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="cpm_server_api">2. CPM Server API</h1>
+<div class="paragraph"><p>The CPM Server REST API includes functions that pertain to CPM servers
+such as disk volume provisioning and collection of server metrics.  This
+API is exposed by the cpmserver golang program.  Each CPM server runs a
+cpmserver.</p></div>
+<h2 id="metrics">2.1. Metrics</h2>
+<h3 id="get_iostat_metrics">2.1.1. get iostat metrics</h3>
+<div class="paragraph"><p><code>POST /metrics/iostat</code></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Something : blank value
+</p>
+</li>
+<li>
+<p>
+Other : blank value
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @get-iostat<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-server<span style="color: #990000">:</span><span style="color: #993399">10001</span>/metrics/iostat</tt></pre></div></div>
+<h3 id="get_df_metrics">2.1.2. get df metrics</h3>
+<div class="paragraph"><p><code>POST /metrics/df</code></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Something : blank value
+</p>
+</li>
+<li>
+<p>
+Other : blank value
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @get-df<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-server<span style="color: #990000">:</span><span style="color: #993399">10001</span>/metrics/df</tt></pre></div></div>
+<h3 id="get_memory_metrics">2.1.3. get memory metrics</h3>
+<div class="paragraph"><p><code>POST /metrics/mem</code></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Something : blank value
+</p>
+</li>
+<li>
+<p>
+Other : blank value
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @get-df<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-server<span style="color: #990000">:</span><span style="color: #993399">10001</span>/metrics/mem</tt></pre></div></div>
+<h3 id="get_cpu_metrics">2.1.4. get cpu metrics</h3>
+<div class="paragraph"><p><code>POST /metrics/cpu</code></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Something : blank value
+</p>
+</li>
+<li>
+<p>
+Other : blank value
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @get-df<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-server<span style="color: #990000">:</span><span style="color: #993399">10001</span>/metrics/cpu</tt></pre></div></div>
+<h2 id="disk_mgmt">2.2. Disk Mgmt</h2>
+<h3 id="provision_a_disk_volume">2.2.1. provision a disk volume</h3>
+<div class="paragraph"><p><code>POST /disk/provision</code></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Path : the disk path to provision
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @get-df<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-server<span style="color: #990000">:</span><span style="color: #993399">10001</span>/disk/provision</tt></pre></div></div>
+<h3 id="delete_a_disk_volume">2.2.2. delete a disk volume</h3>
+<div class="paragraph"><p><code>POST /disk/delete</code></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Path : the disk path to delete
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @get-df<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-server<span style="color: #990000">:</span><span style="color: #993399">10001</span>/disk/delete</tt></pre></div></div>
+<h3 id="get_the_status_of_the_service">2.2.3. get the status of the service</h3>
+<div class="paragraph"><p><code>GET /status</code></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Token : the generated auth token for this session
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-server<span style="color: #990000">:</span><span style="color: #993399">11001</span>/status</tt></pre></div></div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="cpm_task_api">3. CPM Task API</h1>
+<div class="paragraph"><p>The CPM Task REST API includes functions that pertain to tasks
+that are scheduled within CPM.  Tasks include doing backups and
+restores currently.  Tasks can also be executed upon
+demand by CPM users.</p></div>
+<h2 id="misc">3.1. Misc</h2>
+<h3 id="add_status_for_an_executing_task">3.1.1. add status for an executing task</h3>
+<div class="paragraph"><p><code>POST /status/add</code></p></div>
 <div class="listingblock">
 <div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/version</pre>
+<pre>{
+        'Token'         :'1',
+        'ID'            :'1',
+        'ContainerName' :'SM',
+        'StartTime'     :'SM',
+        'TaskName'      :'somecontainer'
+        'ProfileName'   :'somecontainer'
+        'ScheduleID'    :'somecontainer'
+        'Path'          :'somecontainer'
+        'ElapsedTime'   :'somecontainer'
+        'TaskSize'      :'somecontainer'
+        'Status'        :'somecontainer'
+        'UpdateDt'      :'somecontainer'
+}</pre>
 </div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @add-status<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-task<span style="color: #990000">:</span><span style="color: #993399">10001</span>/status/add</tt></pre></div></div>
+<h3 id="update_status_for_an_executing_task">3.1.2. update status for an executing task</h3>
+<div class="paragraph"><p><code>POST /status/update</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'ScheduleID'    :'1',
+        'StatusID'      :'1',
+        'DockerProfile' :'SM',
+        'ProfileName'   :'SM',
+        'ContainerName' :'somecontainer'
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @update-status<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-task<span style="color: #990000">:</span><span style="color: #993399">10001</span>/status/update</tt></pre></div></div>
+<h3 id="execute_a_task_immediately">3.1.3. execute a task immediately</h3>
+<div class="paragraph"><p><code>POST /executenow</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'ScheduleID'    :'1',
+        'StatusID'      :'1',
+        'DockerProfile' :'SM',
+        'ProfileName'   :'SM',
+        'ContainerName' :'somecontainer'
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @executenow<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-task<span style="color: #990000">:</span><span style="color: #993399">10001</span>/executenow</tt></pre></div></div>
+<h3 id="reload_the_cron_schedule">3.1.4. reload the cron schedule</h3>
+<div class="paragraph"><p><code>POST /reload</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'Name'  :'anything'
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @reload<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//cpm-task<span style="color: #990000">:</span><span style="color: #993399">10001</span>/reload</tt></pre></div></div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="cpm_container_api">4. CPM Container API</h1>
+<div class="paragraph"><p>The CPM Container REST API includes functions that pertain to command
+and control of the cpm-node and cpm-pgpool containers.  This API
+effectively implements an agent capability within each provisioned
+container that allows CPM to control the container when it is running.</p></div>
+<h2 id="misc_2">4.1. Misc</h2>
+<h3 id="status">4.1.1. status</h3>
+<div class="paragraph"><p><code>GET /status</code></p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl http<span style="color: #990000">:</span>//somecontainer<span style="color: #990000">:</span><span style="color: #993399">10001</span>/status</tt></pre></div></div>
+<h3 id="write_a_file_to_the_container">4.1.2. write a file to the container</h3>
+<div class="paragraph"><p><code>POST /remotewritefile</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'Path'  :'pg_hba.conf',
+        'Filecontents'  :'...'
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @writefile<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//somecontainer<span style="color: #990000">:</span><span style="color: #993399">10001</span>/remotewritefile</tt></pre></div></div>
+<h3 id="create_the_cpm_objects_within_the_container_database">4.1.3. create the CPM objects within the container database</h3>
+<div class="paragraph"><p><code>POST /seed</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'ContainerName' :'somecontainer'
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @seed<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//somecontainer<span style="color: #990000">:</span><span style="color: #993399">10001</span>/seed</tt></pre></div></div>
+<h3 id="start_postgresql_on_the_container">4.1.4. start Postgresql on the container</h3>
+<div class="paragraph"><p><code>POST /startpg</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'ContainerName' :'somecontainer'
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @startpg<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//somecontainer<span style="color: #990000">:</span><span style="color: #993399">10001</span>/startpg</tt></pre></div></div>
+<h3 id="stop_postgresql_on_the_container">4.1.5. stop Postgresql on the container</h3>
+<div class="paragraph"><p><code>POST /stoppg</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'ContainerName' :'somecontainer'
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @stoppg<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//somecontainer<span style="color: #990000">:</span><span style="color: #993399">10001</span>/stoppg</tt></pre></div></div>
+<h3 id="start_postgresql_on_a_standby_container">4.1.6. start Postgresql on a standby container</h3>
+<div class="paragraph"><p><code>POST /startpgonstandby</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'ContainerName' :'somecontainer'
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @startpgonstandby<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//somecontainer<span style="color: #990000">:</span><span style="color: #993399">10001</span>/startpgonstandby</tt></pre></div></div>
+<h3 id="run_the_postgresql_initdb_command_on_the_container">4.1.7. run the postgresql initdb command on the container</h3>
+<div class="paragraph"><p><code>POST /initdb</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'ContainerName' :'somecontainer'
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @initdb<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//somecontainer<span style="color: #990000">:</span><span style="color: #993399">10001</span>/initdb</tt></pre></div></div>
+<h3 id="start_pgpool_on_a_pgpool_container">4.1.8. start pgpool on a pgpool container</h3>
+<div class="paragraph"><p><code>POST /startpgpool</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'ContainerName' :'somecontainer',
+        'Path'  :'something'
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @startpgpool<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//somecontainer<span style="color: #990000">:</span><span style="color: #993399">10001</span>/startpgpool</tt></pre></div></div>
+<h3 id="stop_pgpool_on_a_pgpool_container">4.1.9. stop pgpool on a pgpool container</h3>
+<div class="paragraph"><p><code>POST /stoppgpool</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'ContainerName' :'somecontainer',
+        'Path'          :'something'
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @stoppgpool<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//somecontainer<span style="color: #990000">:</span><span style="color: #993399">10001</span>/stoppgpool</tt></pre></div></div>
+<h3 id="perform_a_pg_basebackup_on_the_container">4.1.10. perform a pg_basebackup on the container</h3>
+<div class="paragraph"><p><code>POST /basebackup</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'MasterHostName'        :'master',
+        'Username'      :'someuser',
+        'Password' :'adskjafd'
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @basebackup<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//somecontainer<span style="color: #990000">:</span><span style="color: #993399">10001</span>/basebackup</tt></pre></div></div>
+<h3 id="trigger_a_failover_on_this_container">4.1.11. trigger a failover on this container</h3>
+<div class="paragraph"><p><code>POST /failover</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'ContainerName' :'somecontainer'
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @failover<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//somecontainer<span style="color: #990000">:</span><span style="color: #993399">10001</span>/failover</tt></pre></div></div>
+<h3 id="run_pg_controldata_on_the_container_and_get_output">4.1.12. run pg_controldata on the container and get output</h3>
+<div class="paragraph"><p><code>POST /controldata</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'Path'  :'/fokj',
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @controldata<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//somecontainer<span style="color: #990000">:</span><span style="color: #993399">10001</span>/controldata</tt></pre></div></div>
+<h3 id="run_pgbadger_on_the_container_and_get_the_results">4.1.13. run pgbadger on the container and get the results</h3>
+<div class="paragraph"><p><code>POST /badgergenerate</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'ContainerName' :'somecontainer'
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @badgergenerate<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//somecontainer<span style="color: #990000">:</span><span style="color: #993399">10001</span>/badgergenerate</tt></pre></div></div>
+<h3 id="run_a_database_restore_on_the_container">4.1.14. run a database restore on the container</h3>
+<div class="paragraph"><p><code>POST /restore</code></p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>{
+        'ContainerName'         :'somecontainer',
+        'RestoreRemotePath'     :'/kjkjadf',
+        'RestoreRemoteHost'     :'antherhost',
+        'RestoreDbUser'         :'someuser',
+        'RestoreDbPass'         :'jkjadfadfk',
+        'RestoreSet'            :'current'
+}</pre>
+</div></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>curl --data @restore<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
+http<span style="color: #990000">:</span>//somecontainer<span style="color: #990000">:</span><span style="color: #993399">10001</span>/restore</tt></pre></div></div>
 </div>
         </div>  <!-- /.col-md-9 -->
         <div class="col-md-3">
@@ -1504,7 +2037,7 @@ Token : the generated auth token for this session
         <div class="container">
 <div class="row"><div id="footnotes"></div></div>
 <div id="footer-text">
-Last updated 2015-12-14 09:43:17 CST
+Last updated 2015-12-14 10:52:40 CST
 <br>Built with <a href="https://github.com/llaville/asciidoc-bootstrap-backend">AsciiDoc-Bootstrap backend</a> 4.5.0
 </div>
         </div>

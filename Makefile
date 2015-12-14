@@ -9,7 +9,6 @@ gendeps:
 		github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi \
 		github.com/crunchydata/crunchy-postgresql-manager/cpmcontainerapi \
 		github.com/crunchydata/crunchy-postgresql-manager/task \
-		github.com/crunchydata/crunchy-postgresql-manager/dummy \
 		github.com/crunchydata/crunchy-postgresql-manager/sec \
 		github.com/crunchydata/crunchy-postgresql-manager/template \
 		github.com/crunchydata/crunchy-postgresql-manager/admindb 
@@ -20,7 +19,6 @@ build:
 		cd cpmcontainerserver && make
 		cd backupcommand && make
 		cd taskserver && make
-		cd dummyserver && make
 		cd collectserver && make
 		cd restorecommand && make
 		cd backrestrestorecommand && make

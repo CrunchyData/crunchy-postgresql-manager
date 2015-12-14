@@ -5,7 +5,6 @@ build:
 	        cp ../../sql/clusteradmin.sql  ./sql/setup.sql
 	        cp ../../sql/*  ./sql
 	        cp $(GOBIN)/adminserver  ./bin
-	        cp $(GOBIN)/dummyserver  ./bin
 	        sudo docker build -t cpm-admin -f Dockerfile.$(OSFLAVOR) .
 		sudo docker tag -f cpm-admin:latest crunchydata/cpm-admin
 
