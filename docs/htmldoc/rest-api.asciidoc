@@ -3,9 +3,9 @@
 
 === Security
 
-==== GET /sec/login/:ID.:PSW
+==== login and return an auth token
 
-login and return an auth token
+`GET /sec/login/:ID.:PSW`
 
 * ID : the user id to authenticate with
 * PSW : the user password to authenticate with
@@ -15,85 +15,91 @@ login and return an auth token
 curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm
 ----
 
-==== GET /sec/logout/:Token
+==== logout of a user session
+
+`GET /sec/logout/:Token`
 
 * Token : the generated auth token for this session
-
-logout Logout
 
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/sec/logout/ab3ba695-533-43a4-a3c0-9a4c55288c14
 ----
 
-==== POST /sec/updateuser
+==== update a user account
+
+`POST /sec/updateuser`
 
 * Token : the generated auth token for this session
 
-update a user account into UpdateUser
 [source,bash}
 ----
 curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/provisionproxy
 ----
 
-==== POST /sec/cp
+==== change a user password
+
+`POST /sec/cp`
 
 * Token : the generated auth token for this session
 
-change a user password ChangePassword
 [source,bash}
 ----
 curl --data @changepassword.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/changepassword
 ----
 
-==== POST /sec/adduser
+==== add a user
+
+`POST /sec/adduser`
 
 * Token : the generated auth token for this session
 
-add a user AddUser
 [source,bash}
 ----
 curl --data @adduser.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/adduser
 ----
 
-==== GET /sec/getuser/:ID.:Token
+==== return user information
+
+`GET /sec/getuser/:ID.:Token`
 
 * Token : the generated auth token for this session
 
-return a user information GetUser
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/sec/getuser/cpm.1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /sec/getusers/:Token
+==== return all users information
+
+`GET /sec/getusers/:Token`
 
 * Token : the generated auth token for this session
 
-return all users information GetAllUsers
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/sec/getusers/1efbfd50-9b2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /sec/deleteuser/:ID.:Token
+==== delete a user
+
+`GET /sec/deleteuser/:ID.:Token`
 
 * Token : the generated auth token for this session
 
-delete a user DeleteUser
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/sec/deleteuser/1.jkjkjadkjkajdkfjakdfjkad
 ----
 
-==== POST /sec/updaterole
+==== update a CPM role
+
+`POST /sec/updaterole`
 
 * Token : the generated auth token for this session
-
-update a CPM role UpdateRole
 
 [source,bash}
 ----
@@ -101,42 +107,45 @@ curl --data @updaterole.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/sec/updaterole
 ----
 
-==== POST /sec/addrole
+==== add a CPM role
+
+`POST /sec/addrole`
 
 * Token : the generated auth token for this session
 
-add a CPM role AddRole
 [source,bash}
 ----
 curl --data @addrole.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/sec/addrole
 ----
 
-==== GET /sec/deleterole/:ID.:Token
+==== delete a CPM role
+
+`GET /sec/deleterole/:ID.:Token`
 
 * Token : the generated auth token for this session
 
-delete a CPM role DeleteRole
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/sec/deleterole/1.ajkajdkajdfkjadf
 ----
 
-==== GET /sec/getroles/:Token
+==== get all CPM roles
+
+`GET /sec/getroles/:Token`
 
 * Token : the generated auth token for this session
 
-get all CPM roles GetAllRoles
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/sec/getroles/1efbfd50-9b2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /sec/getrole/:Name.:Token
+==== get a CPM role
+`GET /sec/getrole/:Name.:Token`
 
 * Token : the generated auth token for this session
 
-get a CPM role GetRole (CURRENTLY NOT USED)
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001sec/getrole/superuser.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
@@ -144,7 +153,9 @@ curl  http://cpm-admin.crunchy.lab:13001sec/getrole/superuser.1efbfd50-9bb2-43a0
 
 === Project Information
 
-==== POST /project/add
+==== adds a project
+
+`POST /project/add`
 
 * ID : can be empty
 * Name : the name to use for this project
@@ -152,46 +163,49 @@ curl  http://cpm-admin.crunchy.lab:13001sec/getrole/superuser.1efbfd50-9bb2-43a0
 * CreateDt : can be empty
 * Token : the generated auth token for this session
 
-adds a project
 [source,bash}
 ----
 curl -X POST -d @addproject.json http://cpm-admin:13001/project/add
 ----
 
-==== GET /project/getall/:Token
+==== return all projects
+
+`GET /project/getall/:Token`
 
 * Token : the generated auth token for this session
 
-return all projects
 [source,bash}
 ----
 curl http://cpm-admin.crunchy.lab:13001/project/getall/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /project/get/:ID.Token
+==== return a single project
+
+`GET /project/get/:ID.Token`
 
 * ID : id of a project
 * Token : the generated auth token for this session
 
-return a single project
 [source,bash}
 ----
 curl http://cpm-admin.crunchy.lab:13001/project/get/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /project/delete/:ID.Token
+==== delete a single project
+
+`GET /project/delete/:ID.Token`
 
 * ID : id of a project
 * Token : the generated auth token for this session
 
-delete a single project
-~~~~~~~~~~~~~~~~~~~~~~~~
 [source,bash}
 ----
 curl http://cpm-admin.crunchy.lab:13001/project/delete/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== POST /project/update
+==== updates a project
+
+`POST /project/update`
 
 * ID : the generated id of a project
 * Name : the name to use for this project
@@ -199,18 +213,18 @@ curl http://cpm-admin.crunchy.lab:13001/project/delete/1.1efbfd50-9bb2-43a0-8c91
 * UpdateDate : can be empty
 * Token : the generated auth token for this session
 
-updates a project
 [source,bash}
 ----
 curl -X POST -d @updateproject.json http://cpm-admin.crunchy.lab:13001/project/update
 ----
 
-==== GET /projectnodes/:ID.:Token
+==== return a list of containers in a project
+
+`GET /projectnodes/:ID.:Token`
 
 * ID : the unique assigned ID of a project
 * Token : the generated auth token for this session
 
-return a list of containers in a project
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/projectnodes/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d
@@ -218,69 +232,77 @@ curl  http://cpm-admin.crunchy.lab:13001/projectnodes/1.8dc0caed-39e7-47b4-878c-
 
 === Container Information
 
-==== GET /admin/stop-pg/:ID.:Token
+==== stop a container postgres
+
+`GET /admin/stop-pg/:ID.:Token`
 
 * ID : the container ID
 * Token : the generated auth token for this session
 
-stop a container postgres
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/admin/stop-pg/8.1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /admin/stop/:ID.:Token 
+==== stop a container
+
+`GET /admin/stop/:ID.:Token` 
 * Token : the generated auth token for this session
 
-stop a container
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/admin/stop/8.1efbfd50-9b2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /admin/start/:ID.:Token
+==== start a container
+
+`GET /admin/start/:ID.:Token`
 
 * ID : the container ID
 * Token : the generated auth token for this session
 
-start a container
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/admin/start/8.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /admin/start-pg/:ID.:Token
+==== start a containers postgres database
+
+`GET /admin/start-pg/:ID.:Token`
 
 * ID : the container ID
 * Token : the generated auth token for this session
 
-start a containers postgres database
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/admin/start-pg/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d
 ----
 
-==== GET /node/:ID.:Token
+==== return a container
+
+`GET /node/:ID.:Token`
 
 * Token : the generated auth token for this session
 
-return a container
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/node/8.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /deletenode/:ID.:Token
+==== delete a container
+
+`GET /deletenode/:ID.:Token`
 
 * Token : the generated auth token for this session
 
-delete a container
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/deletenode/17.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== POST /provision
+==== provision a new container
+
+`POST /provision`
 
 * Profile : the Docker profile to use for this node
 * Image : the Docker image name to base this node on
@@ -289,28 +311,29 @@ curl  http://cpm-admin.crunchy.lab:13001/deletenode/17.1efbfd50-9bb2-43a0-8c91-b
 * Standalone : flag for making this node available to be part of a cluster
 * Token : the generated auth token for this session
 
-provision a new container
 [source,bash}
 ----
 curl --data @provision.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/provision
 ----
 
-==== GET /nodes/nocluster/:Token
+==== return all containers not in a cluster
+
+`GET /nodes/nocluster/:Token`
 
 * Token : the generated auth token for this session
 
-return all containers not in a cluster
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/nodes/nocluster/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /nodes/:Token
+==== return all containers
+
+`GET /nodes/:Token`
 
 * Token : the generated auth token for this session
 
-return all containers
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/nodes/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
@@ -318,29 +341,32 @@ curl  http://cpm-admin.crunchy.lab:13001/nodes/1efbfd50-9bb2-43a0-8c91-b6f4a837a
 
 ## Proxy Information
 
-==== POST /provisionproxy
+==== create a proxy container
 
-create a proxy container
+`POST /provisionproxy`
+
 [source,bash}
 ----
 curl --data @provisionproxy.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/provisionproxy
 ----
 
-==== GET /proxy/getbycontainerid/:ContainerID.:Token
+==== return proxy information
+
+`GET /proxy/getbycontainerid/:ContainerID.:Token`
 
 * ContainerID : the container ID of the proxy
 * Token : the generated auth token for this session
 
-return proxy information
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/proxy/getbycontainerid/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== POST /proxy/update
+==== update a proxy container
 
-update a proxy container
+`POST /proxy/update`
+
 [source,bash}
 ----
 curl --data @proxyupdate.json -H "Content-Type: application/json" -X POST \
@@ -349,70 +375,77 @@ http://cpm-admin:13001/proxy/update
 
 === Access Rule Information
 
-==== GET /rules/get/:ID.:Token
+==== get an access rule
+
+`GET /rules/get/:ID.:Token`
 
 * ID : the access rule ID
 * Token : the generated auth token for this session
 
- get an access rule
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/rules/get/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /rules/getall/:Token
+==== get all access rules
+
+`GET /rules/getall/:Token`
 
 * Token : the generated auth token for this session
 
- get all access rules
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/rules/getall/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /rules/delete/:ID.:Token
+==== delete an access rule
+
+`GET /rules/delete/:ID.:Token`
 
 * ID : the access rule ID
 * Token : the generated auth token for this session
 
- delete an access rule
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/rules/delete/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== POST /rules/update
+==== update an access rule
 
-update an access rule
+`POST /rules/update`
+
 [source,bash}
 ----
 curl --data @ruleupdate.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/rules/update
 ----
 
-==== POST /rules/insert
+==== insert an access rule
 
-insert an access rule
+`POST /rules/insert`
+
 [source,bash}
 ----
 curl --data @ruleinsert.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/rules/insert
 ----
 
-==== GET /containerrules/getall/:ID.:Token
+==== get all accessrules for a container
+
+`GET /containerrules/getall/:ID.:Token`
 
 * ID : the container ID
 * Token : the generated auth token for this session
 
-get all accessrules for a container
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/containerrules/getall/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== POST /containerrules/update
+==== update accessrules for a container
 
-update accessrules for a container
+`POST /containerrules/update`
+
 [source,bash}
 ----
 curl --data @containerrulesupdate.json -H "Content-Type: application/json" -X POST \
@@ -421,82 +454,91 @@ http://cpm-admin:13001/containerrules/update
 
 === Server Information
 
-==== GET /admin/startall/:ID.:Token
+==== perform a docker start on all containers on a given server
+
+`GET /admin/startall/:ID.:Token`
 
 * ID : the unique ID for a server
 * Token : the generated auth token for this session
 
-perform a docker start on all containers on a given server
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/admin/startall/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /admin/stopall/:ID.:Token
+==== perform a docker stop on all containers on a given server
+
+`GET /admin/stopall/:ID.:Token`
 
 * ID : the unique ID for a server
 * Token : the generated auth token for this session
 
-perform a docker stop on all containers on a given server
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/admin/stopall/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /nodes/forserver/:ServerID.:Token
+==== return all containers for a server
+
+`GET /nodes/forserver/:ServerID.:Token`
 
 * ServerID : the unique ID for a server
 * Token : the generated auth token for this session
 
-return all containers for a server
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/nodes/forserver/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /server/:ID.:Token
+==== return a server
+
+`GET /server/:ID.:Token`
 
 * ID : the unique assigned ID of a server
 * Token : the generated auth token for this session
 
-return a server
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d
 ----
 
-==== GET /deleteserver/:ID.:Token
+==== delete a server
+
+`GET /deleteserver/:ID.:Token`
 
 * ID : the unique assigned ID of a server
 * Token : the generated auth token for this session
 
-delete a server
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/deleteserver/1.jkjakdjfkjadkfjkajdf
 ----
 
-==== GET /servers/:Token
+==== returns all servers
+
+`GET /servers/:Token`
 
 * Token : the generated auth token for this session
 
-returns all servers
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/servers/789c31ff-b18f-47b3-bb63-1fd603895aa5
 ----
 
-==== GET /servers/:Token
+==== Get all the servers defined in CPM
+
+`GET /servers/:Token`
 
 * Token : the security token used for auth
 
-Get all the servers defined in CPM
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/servers/789c31ff-b18f-47b3-bb63-1fd603895aa5
 ----
 
-==== GET /addserver/:ID.:Name.:IPAddress.:DockerBridgeIP.:PGDataPath.:ServerClass.:Token
+==== add a server
+
+`GET /addserver/:ID.:Name.:IPAddress.:DockerBridgeIP.:PGDataPath.:ServerClass.:Token`
 
 * ID : 0 for adding a new server...non-zero is to update a server
 * Name : the server name
@@ -506,62 +548,66 @@ curl  http://cpm-admin.crunchy.lab:13001/servers/789c31ff-b18f-47b3-bb63-1fd6038
 * ServerClass : the server class we are assiging to this server (low|medium|high)
 * Token : the generated auth token for this session
 
-add a server
-[source,bash}
+[source,bash]
 ----
 curl  http://cpm-admin.crunchy.lab:13001/addserver/1.foo.192-168-0-104.171-10-10-17.
 ----
 
 === Database User Information
 
-==== POST /dbuser/add
+==== add a database user to a given container
 
-add a database user to a given container
-[source,bash}
+`POST /dbuser/add`
+
+[source,bash]
 ----
 curl --data @dbuseradd.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/dbuser/add
 ----
 
-==== POST /dbuser/update
+==== update a database user to a given container
 
-update a database user to a given container
+`POST /dbuser/update`
+
 [source,bash}
 ----
 curl --data @dbuserupdate.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/dbuser/update
 ----
 
-==== GET /dbuser/delete/:ContainerID.:Rolname.:Token
+==== delete a database user for a given container
+
+`GET /dbuser/delete/:ContainerID.:Rolname.:Token`
 
 * ContainerID : the container ID
 * Rolname : the role name we are deleting
 * Token : the generated auth token for this session
 
-delete a database user for a given container
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/dbuser/delete/1.foo.kjakdjfkajdkfj
 ----
 
-==== GET /dbuser/get/:ContainerID.:Rolname.:Token
+==== get a database user for a given container
+
+`GET /dbuser/get/:ContainerID.:Rolname.:Token`
 
 * ContainerID : the container ID
 * Rolname : the role name we are fetching
 * Token : the generated auth token for this session
 
-get a database user for a given container
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/dbuser/get/1.foo.kjakdjfkajdkfj
 ----
 
-==== GET /dbuser/getall/:ID.:Token
+==== get all database users for a given container
+
+`GET /dbuser/getall/:ID.:Token`
 
 * ContainerID : the container ID
 * Token : the generated auth token for this session
 
-get all database users for a given container
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/dbuser/getall/1.kjakdjfkajdkfj
@@ -569,143 +615,156 @@ curl  http://cpm-admin.crunchy.lab:13001/dbuser/getall/1.kjakdjfkajdkfj
 
 === Cluster Information
 
-==== GET /event/join-cluster/:IDList.:MasterID.:ClusterID.:Token
+==== add a node to a cluster
+
+`GET /event/join-cluster/:IDList.:MasterID.:ClusterID.:Token`
 
 * Token : the generated auth token for this session
 
-add a node to a cluster
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/event/join-cluster/1.1.1.789c31ff-b18f-47b3-bb63-1fd603895aa5
 ----
 
-==== GET /admin/failover/:ID.:Token
+==== cause a postgres fail over on a given container
+
+`GET /admin/failover/:ID.:Token`
 
 * ID : the container ID
 * Token : the generated auth token for this session
 
-cause a postgres fail over on a given container
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/admin/failover/1.789c31ff-b18f-47b3-bb63-1fd603895aa5
 ----
 
-==== GET /clusternodes/:ClusterID.:Token
+==== return all containers for a given cluster
+
+`GET /clusternodes/:ClusterID.:Token`
 
 * ClusterID : the unique ID of a cluster
 * Token : the generated auth token for this session
 
-return all containers for a given cluster
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/clusternodes/2.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /cluster/stop/:ID.:Token
+==== perform a docker stop on a given clusters set of containers
+
+`GET /cluster/stop/:ID.:Token`
 
 * ID : the unique assigned ID of a cluster
 * Token : the generated auth token for this session
 
-perform a docker stop on a given clusters set of containers
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/cluster/stop/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /cluster/start/:ID.:Token
+==== perform a docker start on a given clusters set of containers
+
+`GET /cluster/start/:ID.:Token`
 
 * ID : the unique assigned ID of a cluster
 * Token : the generated auth token for this session
 
-perform a docker start on a given clusters set of containers
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/cluster/start/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /cluster/:ID.:Token
+==== return a cluster
+
+`GET /cluster/:ID.:Token`
 
 * ID : the unique assigned ID of a cluster
 * Token : the generated auth token for this session
 
-return a cluster
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/cluster/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /cluster/configure/:ID.:Token
+==== configure a cluster
+
+`GET /cluster/configure/:ID.:Token`
 
 * ID : the unique assigned ID of a cluster
 * Token : the generated auth token for this session
 
-configure a cluster
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/cluster/configure/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /cluster/delete/:ID.:Token
+==== delete a cluster and its containers
+
+`GET /cluster/delete/:ID.:Token`
 
 * ID : the unique assigned ID of a cluster
 * Token : the generated auth token for this session
 
-delete a cluster and its containers
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/cluster/delete/1.1efbfd50-9bb243a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /projectclusters/:ID.:Token
+==== Get all the clusters for a given project
+
+`GET /projectclusters/:ID.:Token`
 
 * ID : the user id to authenticate with
 * Token : the security token used for auth
 
-Get all the clusters for a given project
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/projectclusters/1.789c31ff-b18f-47b3-bb63-1fd603895aa5
 ----
 
-==== POST /cluster
+==== updates or adds a cluster
 
-updates or adds a cluster
+`POST /cluster`
+
 [source,bash}
 ----
 curl --data @postcluster.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/cluster
 ----
 
-==== POST /autocluster
+==== performs an auto-cluster
+
+`POST /autocluster`
 
 * Name : the name to use for this cluster
 * ClusterType : the type of cluster (synchronous|asynchronous)
 * ClusterProfile : the cluster profile to use for cluster creation (SM|LG|MED)
 * Token : the generated auth token for this session
 
-performs an auto-cluster
 [source,bash}
 ----
 curl --data @autocluster.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/autocluster
 ----
 
-==== GET /clusters/:Token
+==== returns all clusters
+
+`GET /clusters/:Token`
 
 * Token : the generated auth token for this session
 
-returns all clusters
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/clusters/789c31ff-b18f-47b3-bb63-1fd603895aa5
 ----
 
-==== GET /cluster/scale/:ID.:Token
+==== add a standby node to a given cluster
+
+`GET /cluster/scale/:ID.:Token`
 
 * ID : unique id of a given cluster
 * Token : the generated auth token for this session
 
-add a standby node to a given cluster
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/cluster/scale/1.789c31ff-b18f-47b3-bb63-1fd603895aa5
@@ -713,103 +772,113 @@ curl  http://cpm-admin.crunchy.lab:13001/cluster/scale/1.789c31ff-b18f-47b3-bb63
 
 === Task Information
 
-==== POST /task/executenow
+==== execute a task schedule immediately
+
+`POST /task/executenow`
 
 * Token : the generated auth token for this session
 
-execute a task schedule immediately
 [source,bash}
 ----
 curl --data @executenow.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/task/executenow
 ----
 
-==== POST /task/addschedule
+==== add a new container schedule
+
+`POST /task/addschedule`
 
 * Token : the generated auth token for this session
 
-add a new container admin schedule AddSchedule
 [source,bash}
 ----
 curl --data @addschedule.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/task/addschedule
 ----
 
-==== GET /task/deleteschedule/:ID.:Token
+==== remove a container schedule
+
+`GET /task/deleteschedule/:ID.:Token`
 
 * Token : the generated auth token for this session
 
-remove a container schedule DeleteSchedule
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/task/deleteschedule/1.kjkjadfjkajdfkjadksf
 ----
 
-==== POST /task/updateschedule
+==== update a container schedule
+
+`POST /task/updateschedule`
 
 * Token : the generated auth token for this session
 
-update a container schedule UpdateSchedule
 [source,bash}
 ----
 curl --data @updateschedule.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/task/updateschedule
 ----
 
-==== GET /task/getschedules/:ContainerName.:Token
+==== get all schedules for a container
+
+`GET /task/getschedules/:ContainerName.:Token`
 
 * Token : the generated auth token for this session
 
-get all schedules for a container GetAllSchedules
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/task/getschedules/foo.kjadkfjkjakdjfkadjf
 ----
 
-==== GET /task/getschedule/:ID.:Token
+==== get a container schedule
+
+`GET /task/getschedule/:ID.:Token`
 
 * Token : the generated auth token for this session
 
-get a container schedule GetSchedule
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/task/getschedule/1.fkjkjadkfjkjadsfjkdaf
 ----
 
-==== GET /task/getstatus/:ID.:Token
+==== get a schedule job status
+
+`GET /task/getstatus/:ID.:Token`
 
 * Token : the generated auth token for this session
 
-get a schedule job status GetStatus
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/task/getstatus/1.kjakdjfkajkdjfkjadfasdf
 ----
 
-==== POST /task/deletestatus
+==== deletes a task schedule history
 
-deletes a task schedule history
+`POST /task/deletestatus`
+
 [source,bash}
 ----
 curl --data @deletetaskstatus.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/task/deletestatus
 ----
 
-==== GET /task/getallstatus/:ID.:Token
+==== get all scheduled job status for a container
+
+`GET /task/getallstatus/:ID.:Token`
 
 * Token : the generated auth token for this session
 
-get all scheduled job status for a container GetAllStatus
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/task/getallstatus/1.kjakjadfjkjaksdjfkajdf
 ----
 
-==== GET /task/nodes/:Token
+==== TODO
+
+`GET /task/nodes/:Token`
 
 * Token : the generated auth token for this session
 
-TODO
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/task/nodes/kjakjfjkadjfkjkajdf
@@ -817,39 +886,42 @@ curl  http://cpm-admin.crunchy.lab:13001/task/nodes/kjakjfjkadjfkjkajdf
 
 === Settings
 
-==== POST /saveprofiles
+==== saves profiles
 
-saves profiles
+`POST /saveprofiles`
+
 [source,bash}
 ----
 curl --data @saveprofiles.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/saveprofiles
 ----
 
-==== POST /saveclusterprofiles
+==== saves cluster profiles
 
-saves cluster profiles
+`POST /saveclusterprofiles`
+
 [source,bash}
 ----
 curl --data @saveclusterprofiles.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/saveclusterprofiles
 ----
 
+==== update a setting value
 
-==== POST /savesetting
+`POST /savesetting`
 
-update a setting value
 [source,bash}
 ----
 curl --data @savesetting.json -H "Content-Type: application/json" -X POST \
 http://cpm-admin:13001/savesetting
 ----
 
-==== GET /settings/:Token
+==== returns all settings
+
+`GET /settings/:Token`
 
 * Token : the generated auth token for this session
 
-returns all settings
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/settings/789c31ff-b18f-7b3-bb63-1fd603895aa5
@@ -857,94 +929,103 @@ curl  http://cpm-admin.crunchy.lab:13001/settings/789c31ff-b18f-7b3-bb63-1fd6038
 
 === Monitoring
 
-==== GET /mon/healthcheck/:Token
+==== GetHC1 - health check 1 - databases down
+
+`GET /mon/healthcheck/:Token`
 
 * Token : the generated auth token for this session
 
-GetHC1 - health check 1 - databases down
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/mon/healthcheck/24c715ca-2468-4450-8fee-6e2a9f7714dc
 ----
 
-==== GET /monitor/container/settings/:ID.Token
+==== return container pg_settings data
+
+`GET /monitor/container/settings/:ID.Token`
 
 * ID : the container ID
 * Token : the generated auth token for this session
 
-return container pg_settings data
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/monitor/container/settings/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /monitor/container/repl/:ID.Token
+==== return container pg_replication data
+
+`GET /monitor/container/repl/:ID.Token`
 
 * ID : the container ID
 * Token : the generated auth token for this session
 
-return container pg_replication data
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/monitor/container/repl/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /monitor/container/database/:ID.Token
+==== return container pg_databases data
+
+`GET /monitor/container/database/:ID.Token`
 
 * ID : the container ID
 * Token : the generated auth token for this session
 
-return container pg_databases data
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/monitor/container/database/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /monitor/container/bgwriter/:ID.Token
+==== return container bgwriter data
+
+`GET /monitor/container/bgwriter/:ID.Token`
 
 * ID : the container ID
 * Token : the generated auth token for this session
 
-return container bgwriter data
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/monitor/container/bgwriter/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /monitor/container/controldata/:ID.Token
+==== return container controldata data
+
+`GET /monitor/container/controldata/:ID.Token`
 
 * ID : the container ID
 * Token : the generated auth token for this session
 
-return container controldata data
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/monitor/container/controldata/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /monitor/server-getinfo/:ServerID.:Metric.:Token
+==== return server monitoring data
+
+`GET /monitor/server-getinfo/:ServerID.:Metric.:Token`
 
 * Token : the generated auth token for this session
 
-return server monitoring data
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/monitor/server-getinfo/1.cpmdf.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2
 ----
 
-==== GET /monitor/container/loadtest/:ID.:Writes.:Token
+==== perform a load test and return the results
+
+`GET /monitor/container/loadtest/:ID.:Writes.:Token`
 
 * Token : the generated auth token for this session
 
-perform a load test and return the results
 [source,bash}
 ----
 curl  http://cpm-admin:13001/monior/container/loadtest/1.1000.9a8f9a1e-9c81-4e4f-9f52-01d2ea6cd741
 ----
 
-==== GET /version
+==== returns the CPM version number
 
-returns the CPM version number
+`GET /version`
+
 [source,bash}
 ----
 curl  http://cpm-admin.crunchy.lab:13001/version

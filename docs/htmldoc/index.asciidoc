@@ -1,9 +1,16 @@
 = Crunchy Postgresql Manager (CPM)
 
 == What is CPM?
-CPM is...
+CPM is a Docker-based set of containers that provide the basis of a Postgresql-as-a-Service
+platform.  Using CPM, organizations can quickly provision Postgresql containers with
+a simple point-and-click web user interface.
 
-include::ch2.asciidoc[]
+CPM utilizes the open source Postgresql SQL database and is open source on 
+https://github.com/crunchydata/crunchy-postgresql-manager github for anyone to use.
+
+Professional and secure support is offered by http://www.crunchydata.com Crunchy Data Solutions.
+
+include::features.asciidoc[]
 
 include::dev-setup.asciidoc[]
 
