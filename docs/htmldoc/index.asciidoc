@@ -20,10 +20,12 @@ include::firewall-setup.asciidoc[]
 
 include::logging.asciidoc[]
 
-include::rest-api.asciidoc[]
-
 include::server-setup.asciidoc[]
 
 include::swarm-setup.asciidoc[]
 
 include::licenses.asciidoc[]
+
+== Other Documentation
+CPM has multiple REST APIs which are documented here:
+ link:rest-api.html[REST API Documentation]

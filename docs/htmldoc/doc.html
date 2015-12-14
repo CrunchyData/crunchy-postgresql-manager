@@ -936,1457 +936,13 @@ logs are still stored in the /pgdata/pg_log directory of each container, this is
 against so it will always be present.</p></div>
 </div>
 <div class="section">
-    <h1 class="page-header" id="rest_api">9. REST API</h1>
-<h2 id="security">9.1. Security</h2>
-<h3 id="login_and_return_an_auth_token">9.1.1. login and return an auth token</h3>
-<div class="paragraph"><p><code>GET /sec/login/:ID.:PSW</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the user id to authenticate with
-</p>
-</li>
-<li>
-<p>
-PSW : the user password to authenticate with
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/sec/login/cpm.cpm</pre>
-</div></div>
-<h3 id="logout_logout">9.1.2. logout Logout</h3>
-<div class="paragraph"><p><code>GET /sec/logout/:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/sec/logout/ab3ba695-533-43a4-a3c0-9a4c55288c14</pre>
-</div></div>
-<h3 id="update_a_user_account_into_updateuser">9.1.3. update a user account into UpdateUser</h3>
-<div class="paragraph"><p><code>POST /sec/updateuser</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @provision-proxy.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/provisionproxy</pre>
-</div></div>
-<h3 id="change_a_user_password_changepassword">9.1.4. change a user password ChangePassword</h3>
-<div class="paragraph"><p><code>POST /sec/cp</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @changepassword.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/changepassword</pre>
-</div></div>
-<h3 id="add_a_user_adduser">9.1.5. add a user AddUser</h3>
-<div class="paragraph"><p><code>POST /sec/adduser</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @adduser.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/adduser</pre>
-</div></div>
-<h3 id="return_a_user_information_getuser">9.1.6. return a user information GetUser</h3>
-<div class="paragraph"><p><code>GET /sec/getuser/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/sec/getuser/cpm.1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="return_all_users_information_getallusers">9.1.7. return all users information GetAllUsers</h3>
-<div class="paragraph"><p><code>GET /sec/getusers/:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/sec/getusers/1efbfd50-9b2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="delete_a_user_deleteuser">9.1.8. delete a user DeleteUser</h3>
-<div class="paragraph"><p><code>GET /sec/deleteuser/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/sec/deleteuser/1.jkjkjadkjkajdkfjakdfjkad</pre>
-</div></div>
-<h3 id="update_a_cpm_role_updaterole">9.1.9. update a CPM role UpdateRole</h3>
-<div class="paragraph"><p><code>POST /sec/updaterole</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @updaterole.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/sec/updaterole</pre>
-</div></div>
-<h3 id="add_a_cpm_role_addrole">9.1.10. add a CPM role AddRole</h3>
-<div class="paragraph"><p><code>POST /sec/addrole</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @addrole.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/sec/addrole</pre>
-</div></div>
-<h3 id="delete_a_cpm_role_deleterole">9.1.11. delete a CPM role DeleteRole</h3>
-<div class="paragraph"><p><code>GET /sec/deleterole/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/sec/deleterole/1.ajkajdkajdfkjadf</pre>
-</div></div>
-<h3 id="get_all_cpm_roles_getallroles">9.1.12. get all CPM roles GetAllRoles</h3>
-<div class="paragraph"><p><code>GET /sec/getroles/:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/sec/getroles/1efbfd50-9b2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="get_a_cpm_role_getrole_currently_not_used">9.1.13. get a CPM role GetRole (CURRENTLY NOT USED)</h3>
-<div class="paragraph"><p><code>GET /sec/getrole/:Name.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001sec/getrole/superuser.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h2 id="project_information">9.2. Project Information</h2>
-<h3 id="adds_a_project">9.2.1. adds a project</h3>
-<div class="paragraph"><p><code>POST /project/add</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : can be empty
-</p>
-</li>
-<li>
-<p>
-Name : the name to use for this project
-</p>
-</li>
-<li>
-<p>
-Desc : the project description
-</p>
-</li>
-<li>
-<p>
-CreateDt : can be empty
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl -X POST -d @addproject.json http://cpm-admin:13001/project/add</pre>
-</div></div>
-<h3 id="return_all_projects">9.2.2. return all projects</h3>
-<div class="paragraph"><p><code>GET /project/getall/:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl http://cpm-admin.crunchy.lab:13001/project/getall/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="return_a_single_project">9.2.3. return a single project</h3>
-<div class="paragraph"><p><code>GET /project/get/:ID.Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : id of a project
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl http://cpm-admin.crunchy.lab:13001/project/get/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="delete_a_single_project">9.2.4. delete a single project</h3>
-<div class="paragraph"><p><code>GET /project/delete/:ID.Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : id of a project
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl http://cpm-admin.crunchy.lab:13001/project/delete/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="updates_a_project">9.2.5. updates a project</h3>
-<div class="paragraph"><p><code>POST /project/update</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the generated id of a project
-</p>
-</li>
-<li>
-<p>
-Name : the name to use for this project
-</p>
-</li>
-<li>
-<p>
-Desc : the description of the project
-</p>
-</li>
-<li>
-<p>
-UpdateDate : can be empty
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl -X POST -d @updateproject.json http://cpm-admin.crunchy.lab:13001/project/update</pre>
-</div></div>
-<h3 id="return_a_list_of_containers_in_a_project">9.2.6. return a list of containers in a project</h3>
-<div class="paragraph"><p><code>GET /projectnodes/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the unique assigned ID of a project
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/projectnodes/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d</pre>
-</div></div>
-<h2 id="container_information">9.3. Container Information</h2>
-<h3 id="stop_a_container_postgres">9.3.1. stop a container postgres</h3>
-<div class="paragraph"><p><code>GET /admin/stop-pg/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the container ID
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/admin/stop-pg/8.1efbfd5-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="stop_a_container">9.3.2. stop a container</h3>
-<div class="paragraph"><p><code>GET /admin/stop/:ID.:Token</code>
-* Token : the generated auth token for this session</p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/admin/stop/8.1efbfd50-9b2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="start_a_container">9.3.3. start a container</h3>
-<div class="paragraph"><p><code>GET /admin/start/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the container ID
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/admin/start/8.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="start_a_containers_postgres_database">9.3.4. start a containers postgres database</h3>
-<div class="paragraph"><p><code>GET /admin/start-pg/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the container ID
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/admin/start-pg/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d</pre>
-</div></div>
-<h3 id="return_a_container">9.3.5. return a container</h3>
-<div class="paragraph"><p><code>GET /node/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/node/8.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="delete_a_container">9.3.6. delete a container</h3>
-<div class="paragraph"><p><code>GET /deletenode/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/deletenode/17.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="provision_a_new_container">9.3.7. provision a new container</h3>
-<div class="paragraph"><p><code>POST /provision</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Profile : the Docker profile to use for this node
-</p>
-</li>
-<li>
-<p>
-Image : the Docker image name to base this node on
-</p>
-</li>
-<li>
-<p>
-ServerID : the unique ID of the server to host this container
-</p>
-</li>
-<li>
-<p>
-ContainerName : the user picked name for this container
-</p>
-</li>
-<li>
-<p>
-Standalone : flag for making this node available to be part of a cluster
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @provision.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/provision</pre>
-</div></div>
-<h3 id="return_all_containers_not_in_a_cluster">9.3.8. return all containers not in a cluster</h3>
-<div class="paragraph"><p><code>GET /nodes/nocluster/:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/nodes/nocluster/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="return_all_containers">9.3.9. return all containers</h3>
-<div class="paragraph"><p><code>GET /nodes/:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/nodes/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<div class="paragraph"><p>## Proxy Information</p></div>
-<h3 id="create_a_proxy_container">9.3.10. create a proxy container</h3>
-<div class="paragraph"><p><code>POST /provisionproxy</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @provisionproxy.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/provisionproxy</pre>
-</div></div>
-<h3 id="return_proxy_information">9.3.11. return proxy information</h3>
-<div class="paragraph"><p><code>GET /proxy/getbycontainerid/:ContainerID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ContainerID : the container ID of the proxy
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/proxy/getbycontainerid/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="update_a_proxy_container">9.3.12. update a proxy container</h3>
-<div class="paragraph"><p><code>POST /proxy/update</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @proxyupdate.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/proxy/update</pre>
-</div></div>
-<h2 id="access_rule_information">9.4. Access Rule Information</h2>
-<h3 id="get_an_access_rule">9.4.1. get an access rule</h3>
-<div class="paragraph"><p><code>GET /rules/get/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the access rule ID
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/rules/get/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="get_all_access_rules">9.4.2. get all access rules</h3>
-<div class="paragraph"><p><code>GET /rules/getall/:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/rules/getall/1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="delete_an_access_rule">9.4.3. delete an access rule</h3>
-<div class="paragraph"><p><code>GET /rules/delete/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the access rule ID
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/rules/delete/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="update_an_access_rule">9.4.4. update an access rule</h3>
-<div class="paragraph"><p><code>POST /rules/update</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @ruleupdate.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/rules/update</pre>
-</div></div>
-<h3 id="insert_an_access_rule">9.4.5. insert an access rule</h3>
-<div class="paragraph"><p><code>POST /rules/insert</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @ruleinsert.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/rules/insert</pre>
-</div></div>
-<h3 id="get_all_accessrules_for_a_container">9.4.6. get all accessrules for a container</h3>
-<div class="paragraph"><p><code>GET /containerrules/getall/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the container ID
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/containerrules/getall/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="update_accessrules_for_a_container">9.4.7. update accessrules for a container</h3>
-<div class="paragraph"><p><code>POST /containerrules/update</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @containerrulesupdate.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/containerrules/update</pre>
-</div></div>
-<h2 id="server_information">9.5. Server Information</h2>
-<h3 id="perform_a_docker_start_on_all_containers_on_a_given_server">9.5.1. perform a docker start on all containers on a given server</h3>
-<div class="paragraph"><p><code>GET /admin/startall/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the unique ID for a server
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/admin/startall/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="perform_a_docker_stop_on_all_containers_on_a_given_server">9.5.2. perform a docker stop on all containers on a given server</h3>
-<div class="paragraph"><p><code>GET /admin/stopall/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the unique ID for a server
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/admin/stopall/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="return_all_containers_for_a_server">9.5.3. return all containers for a server</h3>
-<div class="paragraph"><p><code>GET /nodes/forserver/:ServerID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ServerID : the unique ID for a server
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/nodes/forserver/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="return_a_server">9.5.4. return a server</h3>
-<div class="paragraph"><p><code>GET /server/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the unique assigned ID of a server
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/1.8dc0caed-39e7-47b4-878c-de1c8b0b595d</pre>
-</div></div>
-<h3 id="delete_a_server">9.5.5. delete a server</h3>
-<div class="paragraph"><p><code>GET /deleteserver/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the unique assigned ID of a server
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/deleteserver/1.jkjakdjfkjadkfjkajdf</pre>
-</div></div>
-<h3 id="returns_all_servers">9.5.6. returns all servers</h3>
-<div class="paragraph"><p><code>GET /servers/:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/servers/789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
-</div></div>
-<h3 id="get_all_the_servers_defined_in_cpm">9.5.7. Get all the servers defined in CPM</h3>
-<div class="paragraph"><p><code>GET /servers/:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the security token used for auth
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/servers/789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
-</div></div>
-<h3 id="add_a_server">9.5.8. add a server</h3>
-<div class="paragraph"><p><code>GET /addserver/:ID.:Name.:IPAddress.:DockerBridgeIP.:PGDataPath.:ServerClass.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : 0 for adding a new server&#8230;non-zero is to update a server
-</p>
-</li>
-<li>
-<p>
-Name : the server name
-</p>
-</li>
-<li>
-<p>
-IPAddress : the server IP address
-</p>
-</li>
-<li>
-<p>
-DockerBridgeIP : the Docker Bridge IP to use for this server
-</p>
-</li>
-<li>
-<p>
-PGDataPath : the root file path to where PG data files will be stored
-</p>
-</li>
-<li>
-<p>
-ServerClass : the server class we are assiging to this server (low|medium|high)
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>curl  http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab<span style="color: #990000">:</span><span style="color: #993399">13001</span>/addserver<span style="color: #990000">/</span><span style="color: #993399">1</span><span style="color: #990000">.</span>foo<span style="color: #990000">.</span><span style="color: #993399">192</span>-<span style="color: #993399">168</span>-<span style="color: #993399">0</span>-<span style="color: #993399">104.171</span>-<span style="color: #993399">10</span>-<span style="color: #993399">10</span>-<span style="color: #993399">17</span><span style="color: #990000">.</span></tt></pre></div></div>
-<h2 id="database_user_information">9.6. Database User Information</h2>
-<h3 id="add_a_database_user_to_a_given_container">9.6.1. add a database user to a given container</h3>
-<div class="paragraph"><p><code>POST /dbuser/add</code></p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>curl --data @dbuseradd<span style="color: #990000">.</span>json -H <span style="color: #FF0000">"Content-Type: application/json"</span> -X POST <span style="color: #990000">\</span>
-http<span style="color: #990000">:</span>//cpm-admin<span style="color: #990000">:</span><span style="color: #993399">13001</span>/dbuser/add</tt></pre></div></div>
-<h3 id="update_a_database_user_to_a_given_container">9.6.2. update a database user to a given container</h3>
-<div class="paragraph"><p><code>POST /dbuser/update</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @dbuserupdate.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/dbuser/update</pre>
-</div></div>
-<h3 id="delete_a_database_user_for_a_given_container">9.6.3. delete a database user for a given container</h3>
-<div class="paragraph"><p><code>GET /dbuser/delete/:ContainerID.:Rolname.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ContainerID : the container ID
-</p>
-</li>
-<li>
-<p>
-Rolname : the role name we are deleting
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/dbuser/delete/1.foo.kjakdjfkajdkfj</pre>
-</div></div>
-<h3 id="get_a_database_user_for_a_given_container">9.6.4. get a database user for a given container</h3>
-<div class="paragraph"><p><code>GET /dbuser/get/:ContainerID.:Rolname.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ContainerID : the container ID
-</p>
-</li>
-<li>
-<p>
-Rolname : the role name we are fetching
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/dbuser/get/1.foo.kjakdjfkajdkfj</pre>
-</div></div>
-<h3 id="get_all_database_users_for_a_given_container">9.6.5. get all database users for a given container</h3>
-<div class="paragraph"><p><code>GET /dbuser/getall/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ContainerID : the container ID
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/dbuser/getall/1.kjakdjfkajdkfj</pre>
-</div></div>
-<h2 id="cluster_information">9.7. Cluster Information</h2>
-<h3 id="add_a_node_to_a_cluster">9.7.1. add a node to a cluster</h3>
-<div class="paragraph"><p><code>GET /event/join-cluster/:IDList.:MasterID.:ClusterID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/event/join-cluster/1.1.1.789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
-</div></div>
-<h3 id="cause_a_postgres_fail_over_on_a_given_container">9.7.2. cause a postgres fail over on a given container</h3>
-<div class="paragraph"><p><code>GET /admin/failover/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the container ID
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/admin/failover/1.789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
-</div></div>
-<h3 id="return_all_containers_for_a_given_cluster">9.7.3. return all containers for a given cluster</h3>
-<div class="paragraph"><p><code>GET /clusternodes/:ClusterID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ClusterID : the unique ID of a cluster
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/clusternodes/2.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="perform_a_docker_stop_on_a_given_clusters_set_of_containers">9.7.4. perform a docker stop on a given clusters set of containers</h3>
-<div class="paragraph"><p><code>GET /cluster/stop/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the unique assigned ID of a cluster
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/stop/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="perform_a_docker_start_on_a_given_clusters_set_of_containers">9.7.5. perform a docker start on a given clusters set of containers</h3>
-<div class="paragraph"><p><code>GET /cluster/start/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the unique assigned ID of a cluster
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/start/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="return_a_cluster">9.7.6. return a cluster</h3>
-<div class="paragraph"><p><code>GET /cluster/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the unique assigned ID of a cluster
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="configure_a_cluster">9.7.7. configure a cluster</h3>
-<div class="paragraph"><p><code>GET /cluster/configure/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the unique assigned ID of a cluster
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/configure/2.1efbfd50-9bb243a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="delete_a_cluster_and_its_containers">9.7.8. delete a cluster and its containers</h3>
-<div class="paragraph"><p><code>GET /cluster/delete/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the unique assigned ID of a cluster
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/delete/1.1efbfd50-9bb243a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="get_all_the_clusters_for_a_given_project">9.7.9. Get all the clusters for a given project</h3>
-<div class="paragraph"><p><code>GET /projectclusters/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the user id to authenticate with
-</p>
-</li>
-<li>
-<p>
-Token : the security token used for auth
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/projectclusters/1.789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
-</div></div>
-<h3 id="updates_or_adds_a_cluster">9.7.10. updates or adds a cluster</h3>
-<div class="paragraph"><p><code>POST /cluster</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @postcluster.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/cluster</pre>
-</div></div>
-<h3 id="performs_an_auto_cluster">9.7.11. performs an auto-cluster</h3>
-<div class="paragraph"><p><code>POST /autocluster</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Name : the name to use for this cluster
-</p>
-</li>
-<li>
-<p>
-ClusterType : the type of cluster (synchronous|asynchronous)
-</p>
-</li>
-<li>
-<p>
-ClusterProfile : the cluster profile to use for cluster creation (SM|LG|MED)
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @autocluster.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/autocluster</pre>
-</div></div>
-<h3 id="returns_all_clusters">9.7.12. returns all clusters</h3>
-<div class="paragraph"><p><code>GET /clusters/:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/clusters/789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
-</div></div>
-<h3 id="add_a_standby_node_to_a_given_cluster">9.7.13. add a standby node to a given cluster</h3>
-<div class="paragraph"><p><code>GET /cluster/scale/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : unique id of a given cluster
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/cluster/scale/1.789c31ff-b18f-47b3-bb63-1fd603895aa5</pre>
-</div></div>
-<h2 id="task_information">9.8. Task Information</h2>
-<h3 id="execute_a_task_schedule_immediately">9.8.1. execute a task schedule immediately</h3>
-<div class="paragraph"><p><code>POST /task/executenow</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @executenow.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/task/executenow</pre>
-</div></div>
-<h3 id="add_a_new_container_admin_schedule_addschedule">9.8.2. add a new container admin schedule AddSchedule</h3>
-<div class="paragraph"><p><code>POST /task/addschedule</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @addschedule.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/task/addschedule</pre>
-</div></div>
-<h3 id="remove_a_container_schedule_deleteschedule">9.8.3. remove a container schedule DeleteSchedule</h3>
-<div class="paragraph"><p><code>GET /task/deleteschedule/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/task/deleteschedule/1.kjkjadfjkajdfkjadksf</pre>
-</div></div>
-<h3 id="update_a_container_schedule_updateschedule">9.8.4. update a container schedule UpdateSchedule</h3>
-<div class="paragraph"><p><code>POST /task/updateschedule</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @updateschedule.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/task/updateschedule</pre>
-</div></div>
-<h3 id="get_all_schedules_for_a_container_getallschedules">9.8.5. get all schedules for a container GetAllSchedules</h3>
-<div class="paragraph"><p><code>GET /task/getschedules/:ContainerName.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/task/getschedules/foo.kjadkfjkjakdjfkadjf</pre>
-</div></div>
-<h3 id="get_a_container_schedule_getschedule">9.8.6. get a container schedule GetSchedule</h3>
-<div class="paragraph"><p><code>GET /task/getschedule/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/task/getschedule/1.fkjkjadkfjkjadsfjkdaf</pre>
-</div></div>
-<h3 id="get_a_schedule_job_status_getstatus">9.8.7. get a schedule job status GetStatus</h3>
-<div class="paragraph"><p><code>GET /task/getstatus/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/task/getstatus/1.kjakdjfkajkdjfkjadfasdf</pre>
-</div></div>
-<h3 id="deletes_a_task_schedule_history">9.8.8. deletes a task schedule history</h3>
-<div class="paragraph"><p><code>POST /task/deletestatus</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @deletetaskstatus.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/task/deletestatus</pre>
-</div></div>
-<h3 id="get_all_scheduled_job_status_for_a_container">9.8.9. get all scheduled job status for a container</h3>
-<div class="paragraph"><p><code>GET /task/getallstatus/:ID.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/task/getallstatus/1.kjakjadfjkjaksdjfkajdf</pre>
-</div></div>
-<h3 id="todo">9.8.10. TODO</h3>
-<div class="paragraph"><p><code>GET /task/nodes/:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/task/nodes/kjakjfjkadjfkjkajdf</pre>
-</div></div>
-<h2 id="settings">9.9. Settings</h2>
-<h3 id="saves_profiles">9.9.1. saves profiles</h3>
-<div class="paragraph"><p><code>POST /saveprofiles</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @saveprofiles.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/saveprofiles</pre>
-</div></div>
-<h3 id="saves_cluster_profiles">9.9.2. saves cluster profiles</h3>
-<div class="paragraph"><p><code>POST /saveclusterprofiles</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @saveclusterprofiles.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/saveclusterprofiles</pre>
-</div></div>
-<h3 id="update_a_setting_value">9.9.3. update a setting value</h3>
-<div class="paragraph"><p><code>POST /savesetting</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl --data @savesetting.json -H "Content-Type: application/json" -X POST \
-http://cpm-admin:13001/savesetting</pre>
-</div></div>
-<h3 id="returns_all_settings">9.9.4. returns all settings</h3>
-<div class="paragraph"><p><code>GET /settings/:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/settings/789c31ff-b18f-7b3-bb63-1fd603895aa5</pre>
-</div></div>
-<h2 id="monitoring">9.10. Monitoring</h2>
-<h3 id="gethc1_health_check_1_databases_down">9.10.1. GetHC1 - health check 1 - databases down</h3>
-<div class="paragraph"><p><code>GET /mon/healthcheck/:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/mon/healthcheck/24c715ca-2468-4450-8fee-6e2a9f7714dc</pre>
-</div></div>
-<h3 id="return_container_pg_settings_data">9.10.2. return container pg_settings data</h3>
-<div class="paragraph"><p><code>GET /monitor/container/settings/:ID.Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the container ID
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/container/settings/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="return_container_pg_replication_data">9.10.3. return container pg_replication data</h3>
-<div class="paragraph"><p><code>GET /monitor/container/repl/:ID.Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the container ID
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/container/repl/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="return_container_pg_databases_data">9.10.4. return container pg_databases data</h3>
-<div class="paragraph"><p><code>GET /monitor/container/database/:ID.Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the container ID
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/container/database/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="return_container_bgwriter_data">9.10.5. return container bgwriter data</h3>
-<div class="paragraph"><p><code>GET /monitor/container/bgwriter/:ID.Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the container ID
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/container/bgwriter/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="return_container_controldata_data">9.10.6. return container controldata data</h3>
-<div class="paragraph"><p><code>GET /monitor/container/controldata/:ID.Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-ID : the container ID
-</p>
-</li>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/container/controldata/1.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="return_server_monitoring_data">9.10.7. return server monitoring data</h3>
-<div class="paragraph"><p><code>GET /monitor/server-getinfo/:ServerID.:Metric.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/monitor/server-getinfo/1.cpmdf.1efbfd50-9bb2-43a0-8c91-b6f4a837a4f2</pre>
-</div></div>
-<h3 id="perform_a_load_test_and_return_the_results">9.10.8. perform a load test and return the results</h3>
-<div class="paragraph"><p><code>GET /monitor/container/loadtest/:ID.:Writes.:Token</code></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Token : the generated auth token for this session
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin:13001/monior/container/loadtest/1.1000.9a8f9a1e-9c81-4e4f-9f52-01d2ea6cd741</pre>
-</div></div>
-<h3 id="returns_the_cpm_version_number">9.10.9. returns the CPM version number</h3>
-<div class="paragraph"><p><code>GET /version</code></p></div>
-<div class="paragraph"><p>[source,bash}</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>curl  http://cpm-admin.crunchy.lab:13001/version</pre>
-</div></div>
-</div>
-<div class="section">
-    <h1 class="page-header" id="server_setup">10. Server Setup</h1>
-<h2 id="single_server_configuration">10.1. Single-Server Configuration</h2>
+    <h1 class="page-header" id="server_setup">9. Server Setup</h1>
+<h2 id="single_server_configuration">9.1. Single-Server Configuration</h2>
 <div class="paragraph"><p>The typical CPM developer installation will run CPM on a single
 server, both CPM and it&#8217;s requisite DNS bridge (dnsbridge or skybridge).
 This is the single-server configuration that most people will
 use to demo, hack, and prototype CPM with.</p></div>
-<h2 id="multi_server_configuration">10.2. Multi-Server Configuration</h2>
+<h2 id="multi_server_configuration">9.2. Multi-Server Configuration</h2>
 <div class="paragraph"><p>A more typical example of a real CPM production deployment is
 to utilize multiple servers.  In this configuration, CPM
 will let you configure Postgres clusters that span more than
@@ -2402,12 +958,12 @@ server2<span style="color: #990000">.</span>crunchy<span style="color: #990000">
 admin<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab   - <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.103</span> <span style="color: #990000">(</span>static IP<span style="color: #990000">)</span></tt></pre></div></div>
 <div class="paragraph"><p>These can be physical or virtual servers.  All three servers are available to run the CPM postgres and pgpool containers, however only one server will act
 as the CPM Admin server (admin.crunchy.lab).</p></div>
-<h3 id="cpm_installation">10.2.1. CPM Installation</h3>
+<h3 id="cpm_installation">9.2.1. CPM Installation</h3>
 <div class="paragraph"><p>You will perform a user-install of CPM, the installer will ask
 you which remote servers you want to configure and will copy
 the required CPM files to the remote server.  The installer will
 also enable and start the required CPM services on each server.</p></div>
-<h3 id="dns_configuration_for_multi_server_cpm">10.2.2. DNS Configuration for Multi-Server CPM</h3>
+<h3 id="dns_configuration_for_multi_server_cpm">9.2.2. DNS Configuration for Multi-Server CPM</h3>
 <div class="paragraph"><p>On each server in a multi-server configuration, you will need
 to specify in your /etc/resolv.conf the CPM DNS server you have
 deployed.  In this example, we have chosen to run the CPM skybridge
@@ -2420,7 +976,7 @@ would also need to specify the CPM DNS nameserver as follows:</p></div>
 <div class="content monospaced">
 <pre>--dns=192.168.56.101 --dns=192.168.0.1</pre>
 </div></div>
-<h3 id="networking_for_multi_server_cpm">10.2.3. Networking for Multi-Server CPM</h3>
+<h3 id="networking_for_multi_server_cpm">9.2.3. Networking for Multi-Server CPM</h3>
 <div class="paragraph"><p>For a multi-host CPM deployment, you will define network routes
 as follows:</p></div>
 <div class="paragraph"><p>You need to define routes to the other docker servers, we create
@@ -2463,182 +1019,201 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>ip route add <span style="color: #993399">172.17</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.103</span> dev vboxnet0
 ip route add <span style="color: #993399">172.18</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.101</span> dev vboxnet0
 ip route add <span style="color: #993399">172.19</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.102</span> dev vboxnet0</tt></pre></div></div>
-<div class="paragraph"><p>Testing</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>A script is provided to help verify that your environment is
+<h3 id="testing">9.2.4. Testing</h3>
+<div class="paragraph"><p>A script is provided to help verify that your environment is
 configured correctly:
-http://github.com/crunchydata/cpm/network-test.sh
-
-== Swarm Configuration
-
-CPM uses Docker Swarm to virtualize multiple Docker servers into
+<a href="http://github.com/crunchydata/cpm/network-test.sh">http://github.com/crunchydata/cpm/network-test.sh</a></p></div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="swarm_configuration">10. Swarm Configuration</h1>
+<div class="paragraph"><p>CPM uses Docker Swarm to virtualize multiple Docker servers into
 a single virtual server.  This is a convenient way to implement
 multiple host Docker which is necessary to scale out the
 CPM containers onto multiple Docker hosts.  In this example
 we run the Swarm manager and agent on the same host, this is
 they way a developer might run CPM.  In a real setup, you would
-have a single manager and multiple swarm agent hosts.
-
-For this example configuration, we start the Swarm Manager
-on 192.168.0.103:8000
-
-The Swarm agent is started to listen to 0.0.0.0:2375
-
-=== Installation
-
-Swarm is provided by Docker at https://github.com/docker/swarm.  Use the
+have a single manager and multiple swarm agent hosts.</p></div>
+<div class="paragraph"><p>For this example configuration, we start the Swarm Manager
+on 192.168.0.103:8000</p></div>
+<div class="paragraph"><p>The Swarm agent is started to listen to 0.0.0.0:2375</p></div>
+<h2 id="installation">10.1. Installation</h2>
+<div class="paragraph"><p>Swarm is provided by Docker at <a href="https://github.com/docker/swarm">https://github.com/docker/swarm</a>.  Use the
 instructions at the Swarm github page to install a binary version
 of Swarm into the /usr/local/bin directory of all the servers you
-will be using for CPM.
-
-Swarm needs a single token to define the cluster you are creating.  This
-is done one-time as follows, save this token value for future reference:
-[source,bash]
-----
-swarm create
-7b9fb5037919f89bd52c3c4888586be3
-----
-
-===  Docker Configuration
-
-Docker is configured on each server to listen to 0.0.0.0:2375 for API events.  On
+will be using for CPM.</p></div>
+<div class="paragraph"><p>Swarm needs a single token to define the cluster you are creating.  This
+is done one-time as follows, save this token value for future reference:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>swarm create
+7b9fb5037919f89bd52c3c4888586be3</tt></pre></div></div>
+<h2 id="docker_configuration">10.2. Docker Configuration</h2>
+<div class="paragraph"><p>Docker is configured on each server to listen to 0.0.0.0:2375 for API events.  On
 Centos/RHEL this is done by adding -H tcp://0.0.0.0:2375 in the /etc/sysconfig/docker
-file:
-[source,bash]
-----
-export SWARM_PORT=2375
-/usr/bin/docker -d --selinux-enabled -H tcp://0.0.0.0:$SWARM_PORT --label storage=ssd --label hostname=espresso.crunchy.lab --label profile=small
-----
-
-Notice that we assign labels to the docker daemon, these labels are used by CPM (via Swarm)
-to figure out the correct server to deploy containers upon.  CPM requires you classify a server with a label key of 'profile' and value of 'SM', 'MED', or 'LG'.  This label value is used to determine where a container will be placed during the provisioning process.  Also, a label key of hostname is used to provide the user a way to provision a container upon a specific host.  The value of the hostname key is the fully qualified host name of the server.
-
-=== Startup
-
-On each server in your cluster, Start the swarm server agent listening to the local Docker API:
-[source,bash]
-----
-export LOCAL_HOST=192.168.0.103
-export SWARM_PORT=2375
-swarm join --addr=$LOCAL_HOST:$SWARM_PORT token://7b9fb5037919f89bd52c3c4888586be3
-----
-
-On one server in your cluster, Start the swarm manager that listens to CPM
-requests, in this example I specify two servers that will act as the cluster nodes, this is one simple form of Swarm Discovery:
-[source,bash]
-----
-export MANAGER_HOST=192.168.0.103
-export MANAGER_PORT=8000
-swarm manage --host $MANAGER_HOST:$MANAGER_PORT
-nodes://192.168.0.107:2375,192.168.0.106:2375
-----
-
-=== Test
-
-To see what servers are include in the swarm:
-[source,bash]
-----
-export MANAGER_HOST=192.168.0.103
-export MANAGER_PORT=8000
-swarm list token://7b9fb5037919f89bd52c3c4888586be3
-docker -H tcp://$MANAGER_HOST:$MANAGER_PORT info
-----
-
-You now run docker commands via the swarm manager ip:port to interact with swarm:
-[source,bash]
-----
-export MANAGER_HOST=192.168.0.103
-export MANAGER_PORT=8000
-docker -H tcp://$MANAGER_HOST:$MANAGER_PORT info
-docker -H tcp://$MANAGER_HOST:$MANAGER_PORT run
-docker -H tcp://$MANAGER_HOST:$MANAGER_PORT ps
-docker -H tcp://$MANAGER_HOST:$MANAGER_PORT logs
-----
-
-== Licenses
-
-CPM is built on products that include the following licenses:
-
-
-
-=== Docker (Apache 2.0)
-
-https://github.com/docker/docker/blob/master/LICENSE
-
-  Apache License
-                           Version 2.0, January 2004
-                        http://www.apache.org/licenses/
-
-   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
-
-   1. Definitions.
-
-      "License" shall mean the terms and conditions for use, reproduction,
-      and distribution as defined by Sections 1 through 9 of this document.
-
-      "Licensor" shall mean the copyright owner or entity authorized by
-      the copyright owner that is granting the License.
-
-      "Legal Entity" shall mean the union of the acting entity and all
-      other entities that control, are controlled by, or are under common
-      control with that entity. For the purposes of this definition,
-      "control" means (i) the power, direct or indirect, to cause the
-      direction or management of such entity, whether by contract or
-      otherwise, or (ii) ownership of fifty percent (50%) or more of the
-      outstanding shares, or (iii) beneficial ownership of such entity.
-
-      "You" (or "Your") shall mean an individual or Legal Entity
-      exercising permissions granted by this License.
-
-      "Source" form shall mean the preferred form for making modifications,
-      including but not limited to software source code, documentation
-      source, and configuration files.
-
-      "Object" form shall mean any form resulting from mechanical
-      transformation or translation of a Source form, including but
-      not limited to compiled object code, generated documentation,
-      and conversions to other media types.
-
-      "Work" shall mean the work of authorship, whether in Source or
-      Object form, made available under the License, as indicated by a
-      copyright notice that is included in or attached to the work
-      (an example is provided in the Appendix below).
-
-      "Derivative Works" shall mean any work, whether in Source or Object
-      form, that is based on (or derived from) the Work and for which the
-      editorial revisions, annotations, elaborations, or other modifications
-      represent, as a whole, an original work of authorship. For the purposes
-      of this License, Derivative Works shall not include works that remain
-      separable from, or merely link (or bind by name) to the interfaces of,
-      the Work and Derivative Works thereof.
-
-      "Contribution" shall mean any work of authorship, including
-      the original version of the Work and any modifications or additions
-      to that Work or Derivative Works thereof, that is intentionally
-      submitted to Licensor for inclusion in the Work by the copyright owner
-      or by an individual or Legal Entity authorized to submit on behalf of
-      the copyright owner. For the purposes of this definition, "submitted"
-      means any form of electronic, verbal, or written communication sent
-      to the Licensor or its representatives, including but not limited to
-      communication on electronic mailing lists, source code control systems,
-      and issue tracking systems that are managed by, or on behalf of, the
-      Licensor for the purpose of discussing and improving the Work, but
-      excluding communication that is conspicuously marked or otherwise
-      designated in writing by the copyright owner as "Not a Contribution."
-
-      "Contributor" shall mean Licensor and any individual or Legal Entity
-      on behalf of whom a Contribution has been received by Licensor and
-      subsequently incorporated within the Work.
-
-   2. Grant of Copyright License. Subject to the terms and conditions of
+file:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">SWARM_PORT</span><span style="color: #990000">=</span><span style="color: #993399">2375</span>
+/usr/bin/docker -d --selinux-enabled -H tcp<span style="color: #990000">://</span><span style="color: #993399">0.0</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">:</span><span style="color: #009900">$SWARM_PORT</span> --label <span style="color: #009900">storage</span><span style="color: #990000">=</span>ssd --label <span style="color: #009900">hostname</span><span style="color: #990000">=</span>espresso<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab --label <span style="color: #009900">profile</span><span style="color: #990000">=</span>small</tt></pre></div></div>
+<div class="paragraph"><p>Notice that we assign labels to the docker daemon, these labels are used by CPM (via Swarm)
+to figure out the correct server to deploy containers upon.  CPM requires you classify a server with a label key of <em>profile</em> and value of <em>SM</em>, <em>MED</em>, or <em>LG</em>.  This label value is used to determine where a container will be placed during the provisioning process.  Also, a label key of hostname is used to provide the user a way to provision a container upon a specific host.  The value of the hostname key is the fully qualified host name of the server.</p></div>
+<h2 id="startup">10.3. Startup</h2>
+<div class="paragraph"><p>On each server in your cluster, Start the swarm server agent listening to the local Docker API:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">LOCAL_HOST</span><span style="color: #990000">=</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.103</span>
+<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">SWARM_PORT</span><span style="color: #990000">=</span><span style="color: #993399">2375</span>
+swarm join --addr<span style="color: #990000">=</span><span style="color: #009900">$LOCAL_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$SWARM_PORT</span> token<span style="color: #990000">://</span>7b9fb5037919f89bd52c3c4888586be3</tt></pre></div></div>
+<div class="paragraph"><p>On one server in your cluster, Start the swarm manager that listens to CPM
+requests, in this example I specify two servers that will act as the cluster nodes, this is one simple form of Swarm Discovery:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">MANAGER_HOST</span><span style="color: #990000">=</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.103</span>
+<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">MANAGER_PORT</span><span style="color: #990000">=</span><span style="color: #993399">8000</span>
+swarm manage --host <span style="color: #009900">$MANAGER_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$MANAGER_PORT</span>
+nodes<span style="color: #990000">://</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.107</span><span style="color: #990000">:</span><span style="color: #993399">2375</span><span style="color: #990000">,</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.106</span><span style="color: #990000">:</span><span style="color: #993399">2375</span></tt></pre></div></div>
+<h2 id="test">10.4. Test</h2>
+<div class="paragraph"><p>To see what servers are include in the swarm:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">MANAGER_HOST</span><span style="color: #990000">=</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.103</span>
+<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">MANAGER_PORT</span><span style="color: #990000">=</span><span style="color: #993399">8000</span>
+swarm list token<span style="color: #990000">://</span>7b9fb5037919f89bd52c3c4888586be3
+docker -H tcp<span style="color: #990000">://</span><span style="color: #009900">$MANAGER_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$MANAGER_PORT</span> info</tt></pre></div></div>
+<div class="paragraph"><p>You now run docker commands via the swarm manager ip:port to interact with swarm:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">MANAGER_HOST</span><span style="color: #990000">=</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.103</span>
+<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">MANAGER_PORT</span><span style="color: #990000">=</span><span style="color: #993399">8000</span>
+docker -H tcp<span style="color: #990000">://</span><span style="color: #009900">$MANAGER_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$MANAGER_PORT</span> info
+docker -H tcp<span style="color: #990000">://</span><span style="color: #009900">$MANAGER_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$MANAGER_PORT</span> run
+docker -H tcp<span style="color: #990000">://</span><span style="color: #009900">$MANAGER_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$MANAGER_PORT</span> ps
+docker -H tcp<span style="color: #990000">://</span><span style="color: #009900">$MANAGER_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$MANAGER_PORT</span> logs</tt></pre></div></div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="licenses">11. Licenses</h1>
+<div class="paragraph"><p>CPM is built on products that include the following licenses:</p></div>
+<h2 id="docker_apache_2_0">11.1. Docker (Apache 2.0)</h2>
+<div class="paragraph"><p><a href="https://github.com/docker/docker/blob/master/LICENSE">https://github.com/docker/docker/blob/master/LICENSE</a></p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Apache License
+                         Version 2.0, January 2004
+                      http://www.apache.org/licenses/</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION</pre>
+</div></div>
+<ol>
+<li>
+Definitions.
+<div class="literalblock">
+<div class="content monospaced">
+<pre>"License" shall mean the terms and conditions for use, reproduction,
+and distribution as defined by Sections 1 through 9 of this document.</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>"Licensor" shall mean the copyright owner or entity authorized by
+the copyright owner that is granting the License.</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>"Legal Entity" shall mean the union of the acting entity and all
+other entities that control, are controlled by, or are under common
+control with that entity. For the purposes of this definition,
+"control" means (i) the power, direct or indirect, to cause the
+direction or management of such entity, whether by contract or
+otherwise, or (ii) ownership of fifty percent (50%) or more of the
+outstanding shares, or (iii) beneficial ownership of such entity.</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>"You" (or "Your") shall mean an individual or Legal Entity
+exercising permissions granted by this License.</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>"Source" form shall mean the preferred form for making modifications,
+including but not limited to software source code, documentation
+source, and configuration files.</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>"Object" form shall mean any form resulting from mechanical
+transformation or translation of a Source form, including but
+not limited to compiled object code, generated documentation,
+and conversions to other media types.</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>"Work" shall mean the work of authorship, whether in Source or
+Object form, made available under the License, as indicated by a
+copyright notice that is included in or attached to the work
+(an example is provided in the Appendix below).</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>"Derivative Works" shall mean any work, whether in Source or Object
+form, that is based on (or derived from) the Work and for which the
+editorial revisions, annotations, elaborations, or other modifications
+represent, as a whole, an original work of authorship. For the purposes
+of this License, Derivative Works shall not include works that remain
+separable from, or merely link (or bind by name) to the interfaces of,
+the Work and Derivative Works thereof.</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>"Contribution" shall mean any work of authorship, including
+the original version of the Work and any modifications or additions
+to that Work or Derivative Works thereof, that is intentionally
+submitted to Licensor for inclusion in the Work by the copyright owner
+or by an individual or Legal Entity authorized to submit on behalf of
+the copyright owner. For the purposes of this definition, "submitted"
+means any form of electronic, verbal, or written communication sent
+to the Licensor or its representatives, including but not limited to
+communication on electronic mailing lists, source code control systems,
+and issue tracking systems that are managed by, or on behalf of, the
+Licensor for the purpose of discussing and improving the Work, but
+excluding communication that is conspicuously marked or otherwise
+designated in writing by the copyright owner as "Not a Contribution."</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>"Contributor" shall mean Licensor and any individual or Legal Entity
+on behalf of whom a Contribution has been received by Licensor and
+subsequently incorporated within the Work.</pre>
+</div></div>
+</li>
+<li>
+Grant of Copyright License. Subject to the terms and conditions of
       this License, each Contributor hereby grants to You a perpetual,
       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
       copyright license to reproduce, prepare Derivative Works of,
       publicly display, publicly perform, sublicense, and distribute the
       Work and such Derivative Works in Source or Object form.
-
-   3. Grant of Patent License. Subject to the terms and conditions of
+</li>
+<li>
+Grant of Patent License. Subject to the terms and conditions of
       this License, each Contributor hereby grants to You a perpetual,
       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
       (except as stated in this section) patent license to make, have made,
@@ -2653,62 +1228,76 @@ https://github.com/docker/docker/blob/master/LICENSE
       or contributory patent infringement, then any patent licenses
       granted to You under this License for that Work shall terminate
       as of the date such litigation is filed.
-
-   4. Redistribution. You may reproduce and distribute copies of the
+</li>
+<li>
+Redistribution. You may reproduce and distribute copies of the
       Work or Derivative Works thereof in any medium, with or without
       modifications, and in Source or Object form, provided that You
       meet the following conditions:
-
-      (a) You must give any other recipients of the Work or
-          Derivative Works a copy of this License; and
-
-      (b) You must cause any modified files to carry prominent notices
-          stating that You changed the files; and
-
-      (c) You must retain, in the Source form of any Derivative Works
-          that You distribute, all copyright, patent, trademark, and
-          attribution notices from the Source form of the Work,
-          excluding those notices that do not pertain to any part of
-          the Derivative Works; and
-
-      (d) If the Work includes a "NOTICE" text file as part of its
-          distribution, then any Derivative Works that You distribute must
-          include a readable copy of the attribution notices contained
-          within such NOTICE file, excluding those notices that do not
-          pertain to any part of the Derivative Works, in at least one
-          of the following places: within a NOTICE text file distributed
-          as part of the Derivative Works; within the Source form or
-          documentation, if provided along with the Derivative Works; or,
-          within a display generated by the Derivative Works, if and
-          wherever such third-party notices normally appear. The contents
-          of the NOTICE file are for informational purposes only and
-          do not modify the License. You may add Your own attribution
-          notices within Derivative Works that You distribute, alongside
-          or as an addendum to the NOTICE text from the Work, provided
-          that such additional attribution notices cannot be construed
-          as modifying the License.
-
-      You may add Your own copyright statement to Your modifications and
-      may provide additional or different license terms and conditions
-      for use, reproduction, or distribution of Your modifications, or
-      for any such Derivative Works as a whole, provided Your use,
-      reproduction, and distribution of the Work otherwise complies with
-      the conditions stated in this License.
-
-   5. Submission of Contributions. Unless You explicitly state otherwise,
+<div class="literalblock">
+<div class="content monospaced">
+<pre>(a) You must give any other recipients of the Work or
+    Derivative Works a copy of this License; and</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>(b) You must cause any modified files to carry prominent notices
+    stating that You changed the files; and</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>(c) You must retain, in the Source form of any Derivative Works
+    that You distribute, all copyright, patent, trademark, and
+    attribution notices from the Source form of the Work,
+    excluding those notices that do not pertain to any part of
+    the Derivative Works; and</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>(d) If the Work includes a "NOTICE" text file as part of its
+    distribution, then any Derivative Works that You distribute must
+    include a readable copy of the attribution notices contained
+    within such NOTICE file, excluding those notices that do not
+    pertain to any part of the Derivative Works, in at least one
+    of the following places: within a NOTICE text file distributed
+    as part of the Derivative Works; within the Source form or
+    documentation, if provided along with the Derivative Works; or,
+    within a display generated by the Derivative Works, if and
+    wherever such third-party notices normally appear. The contents
+    of the NOTICE file are for informational purposes only and
+    do not modify the License. You may add Your own attribution
+    notices within Derivative Works that You distribute, alongside
+    or as an addendum to the NOTICE text from the Work, provided
+    that such additional attribution notices cannot be construed
+    as modifying the License.</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>You may add Your own copyright statement to Your modifications and
+may provide additional or different license terms and conditions
+for use, reproduction, or distribution of Your modifications, or
+for any such Derivative Works as a whole, provided Your use,
+reproduction, and distribution of the Work otherwise complies with
+the conditions stated in this License.</pre>
+</div></div>
+</li>
+<li>
+Submission of Contributions. Unless You explicitly state otherwise,
       any Contribution intentionally submitted for inclusion in the Work
       by You to the Licensor shall be under the terms and conditions of
       this License, without any additional terms or conditions.
       Notwithstanding the above, nothing herein shall supersede or modify
       the terms of any separate license agreement you may have executed
       with Licensor regarding such Contributions.
-
-   6. Trademarks. This License does not grant permission to use the trade
+</li>
+<li>
+Trademarks. This License does not grant permission to use the trade
       names, trademarks, service marks, or product names of the Licensor,
       except as required for reasonable and customary use in describing the
       origin of the Work and reproducing the content of the NOTICE file.
-
-   7. Disclaimer of Warranty. Unless required by applicable law or
+</li>
+<li>
+Disclaimer of Warranty. Unless required by applicable law or
       agreed to in writing, Licensor provides the Work (and each
       Contributor provides its Contributions) on an "AS IS" BASIS,
       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
@@ -2717,8 +1306,9 @@ https://github.com/docker/docker/blob/master/LICENSE
       PARTICULAR PURPOSE. You are solely responsible for determining the
       appropriateness of using or redistributing the Work and assume any
       risks associated with Your exercise of permissions under this License.
-
-   8. Limitation of Liability. In no event and under no legal theory,
+</li>
+<li>
+Limitation of Liability. In no event and under no legal theory,
       whether in tort (including negligence), contract, or otherwise,
       unless required by applicable law (such as deliberate and grossly
       negligent acts) or agreed to in writing, shall any Contributor be
@@ -2729,8 +1319,9 @@ https://github.com/docker/docker/blob/master/LICENSE
       work stoppage, computer failure or malfunction, or any and all
       other commercial damages or losses), even if such Contributor
       has been advised of the possibility of such damages.
-
-   9. Accepting Warranty or Additional Liability. While redistributing
+</li>
+<li>
+Accepting Warranty or Additional Liability. While redistributing
       the Work or Derivative Works thereof, You may choose to offer,
       and charge a fee for, acceptance of support, warranty, indemnity,
       or other liability obligations and/or rights consistent with this
@@ -2740,42 +1331,56 @@ https://github.com/docker/docker/blob/master/LICENSE
       defend, and hold each Contributor harmless for any liability
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
-
-   END OF TERMS AND CONDITIONS
-
-   Copyright 2014 Docker, Inc.
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-
-
-=== DockerClient
-
-https://github.com/fsouza/go-dockerclient/blob/master/LICENSE
-
-Copyright (c) 2014, go-dockerclient authors
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-  * Redistributions of source code must retain the above copyright notice,
+<div class="literalblock">
+<div class="content monospaced">
+<pre>END OF TERMS AND CONDITIONS</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Copyright 2014 Docker, Inc.</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>http://www.apache.org/licenses/LICENSE-2.0</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</pre>
+</div></div>
+</li>
+</ol>
+<h2 id="dockerclient">11.2. DockerClient</h2>
+<div class="paragraph"><p><a href="https://github.com/fsouza/go-dockerclient/blob/master/LICENSE">https://github.com/fsouza/go-dockerclient/blob/master/LICENSE</a></p></div>
+<div class="paragraph"><p>Copyright (c) 2014, go-dockerclient authors
+All rights reserved.</p></div>
+<div class="paragraph"><p>Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Redistributions of source code must retain the above copyright notice,
 this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above copyright notice,
+</p>
+</li>
+<li>
+<p>
+Redistributions in binary form must reproduce the above copyright notice,
 this list of conditions and the following disclaimer in the documentation
 and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
@@ -2784,113 +1389,88 @@ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
-
-=== JSON Rest API (MIT License)
-
-https://github.com/ant0ine/go-json-rest/blob/master/LICENSE
-
-Copyright (c) 2013-2014 Antoine Imbert
-
-The MIT License
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-=== Postgres PQ Library
-
-https://github.com/lib/pq/blob/master/LICENSE.md
-
-Copyright (c) 2011-2013, 'pq' Contributors Portions Copyright (C) 2011 Blake Mizerany
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-=== AngularJS
-
-https://github.com/angular/angular.js/blob/master/LICENSE
-The MIT License
-
-Copyright (c) 2010-2014 Google, Inc. http://angularjs.org
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p></div>
+<h2 id="json_rest_api_mit_license">11.3. JSON Rest API (MIT License)</h2>
+<div class="paragraph"><p><a href="https://github.com/ant0ine/go-json-rest/blob/master/LICENSE">https://github.com/ant0ine/go-json-rest/blob/master/LICENSE</a></p></div>
+<div class="paragraph"><p>Copyright (c) 2013-2014 Antoine Imbert</p></div>
+<div class="paragraph"><p>The MIT License</p></div>
+<div class="paragraph"><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p></div>
+<div class="paragraph"><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p></div>
+<div class="paragraph"><p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></div>
+<h2 id="postgres_pq_library">11.4. Postgres PQ Library</h2>
+<div class="paragraph"><p><a href="https://github.com/lib/pq/blob/master/LICENSE.md">https://github.com/lib/pq/blob/master/LICENSE.md</a></p></div>
+<div class="paragraph"><p>Copyright (c) 2011-2013, <em>pq</em> Contributors Portions Copyright &#169; 2011 Blake Mizerany</p></div>
+<div class="paragraph"><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p></div>
+<div class="paragraph"><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p></div>
+<div class="paragraph"><p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></div>
+<h2 id="angularjs">11.5. AngularJS</h2>
+<div class="paragraph"><p><a href="https://github.com/angular/angular.js/blob/master/LICENSE">https://github.com/angular/angular.js/blob/master/LICENSE</a>
+The MIT License</p></div>
+<div class="paragraph"><p>Copyright (c) 2010-2014 Google, Inc. <a href="http://angularjs.org">http://angularjs.org</a></p></div>
+<div class="paragraph"><p>Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+furnished to do so, subject to the following conditions:</p></div>
+<div class="paragraph"><p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p></div>
+<div class="paragraph"><p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-
-=== Twitter Bootstrap
-
-https://github.com/twbs/bootstrap/blob/master/LICENSE
-
-The MIT License (MIT)
-
-Copyright (c) 2011-2014 Twitter, Inc
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
+THE SOFTWARE.</p></div>
+<h2 id="twitter_bootstrap">11.6. Twitter Bootstrap</h2>
+<div class="paragraph"><p><a href="https://github.com/twbs/bootstrap/blob/master/LICENSE">https://github.com/twbs/bootstrap/blob/master/LICENSE</a></p></div>
+<div class="paragraph"><p>The MIT License (MIT)</p></div>
+<div class="paragraph"><p>Copyright (c) 2011-2014 Twitter, Inc</p></div>
+<div class="paragraph"><p>Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+furnished to do so, subject to the following conditions:</p></div>
+<div class="paragraph"><p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p></div>
+<div class="paragraph"><p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-
-=== Go Language
-
-http://golang.org/LICENSE
-
-
-Copyright (c) 2012 The Go Authors. All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
+THE SOFTWARE.</p></div>
+<h2 id="go_language">11.7. Go Language</h2>
+<div class="paragraph"><p><a href="http://golang.org/LICENSE">http://golang.org/LICENSE</a></p></div>
+<div class="paragraph"><p>Copyright (c) 2012 The Go Authors. All rights reserved.</p></div>
+<div class="paragraph"><p>Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
-met:
-
-   * Redistributions of source code must retain the above copyright
+met:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Redistributions of source code must retain the above copyright
 notice, this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above
+</p>
+</li>
+<li>
+<p>
+Redistributions in binary form must reproduce the above
 copyright notice, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the
 distribution.
-   * Neither the name of Google Inc. nor the names of its
+</p>
+</li>
+<li>
+<p>
+Neither the name of Google Inc. nor the names of its
 contributors may be used to endorse or promote products derived from
 this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
@@ -2900,8 +1480,13 @@ LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</pre>
-</div></div>
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p></div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="other_documentation">12. Other Documentation</h1>
+<div class="paragraph"><p>CPM has multiple REST APIs which are documented here:
+ 
+<a href="rest-api.html">REST API Documentation</a></p></div>
 </div>
         </div>  <!-- /.col-md-9 -->
         <div class="col-md-3">
@@ -2923,7 +1508,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</pre>
         <div class="container">
 <div class="row"><div id="footnotes"></div></div>
 <div id="footer-text">
-Last updated 2015-12-14 09:01:31 CST
+Last updated 2015-12-14 09:48:05 CST
 <br>Built with <a href="https://github.com/llaville/asciidoc-bootstrap-backend">AsciiDoc-Bootstrap backend</a> 4.5.0
 </div>
         </div>

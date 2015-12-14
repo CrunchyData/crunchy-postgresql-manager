@@ -1,5 +1,12 @@
+= CPM REST API
 
-== REST API
+== CPM Admin API
+The CPM Admin REST API is how CPM functionality is exposed both for the cpm-web user interface
+and also for custom written scripts or applications that a CPM developer might want
+to build.  The REST API is developed using golang's http package and is served
+up by the cpmadminserver golang program.  The cpm-admin container when run exposes
+this REST API.  The cpm-web web user interface accesses the cpm-admin REST API for
+all it's functionality.
 
 === Security
 
