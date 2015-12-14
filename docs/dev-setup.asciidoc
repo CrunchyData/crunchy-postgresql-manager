@@ -40,29 +40,27 @@ export GOBIN=$GOPATH/bin
 export PATH=$GOBIN:$PATH
 -----
 
-### Download and Install godep 
-
+.Download and Install godep 
 [source,bash]
 -----
 cd devproject
 go get github.com/tools/godep
 -----
 
-### Download CPM Source 
-
+.Download CPM Source 
 [source,bash]
 -----
 go get github.com/crunchydata/crunchy-postgresql-manager
 cd src/github.com/crunchydata/crunchy-postgresql-manager
 -----
 
-### Download and Restore All Dependencies 
+.Download and Restore All Dependencies 
 [source,bash]
 -----
 godep restore
 -----
 
-### Compile CPM ###
+.Compile CPM
 [source,bash]
 -----
 make build
@@ -84,19 +82,20 @@ In the above example, labels are added for Swarm, including the hostname and a C
 
 === Build CPM Docker Images 
 
+.Pull down Prometheus images 
+[source,bash]
+-----
+sudo docker pull prom/promdash
+sudo docker pull prom/prometheus
+-----
+
+.Build Images
 [source,bash]
 -----
 make buildimages
 docker images
 -----
 
-=== Pull down Prometheus images 
-
-[source,bash]
------
-sudo docker pull prom/promdash
-sudo docker pull prom/prometheus
------
 
 === Disable Firewalld 
 
@@ -196,7 +195,8 @@ swarm join --addr=192.168.0.107:2375 token://<<<insert your swarm generated toke
 -----
 
 A swarm guide is available at:
-[docs/swarm.md](swarm.md)
+
+link:swarm-setup.html[Swarm Setup]
 
 
 === Start CPM Server Agent
@@ -237,8 +237,8 @@ curl http://192.168.0.107:10001/status
 
 Modify the run-cpm.sh script by updating the following
 environment variable references:
-* INSTALLDIR - the location of your build directory
-* SWARM_MANAGER_URL - the IP address of your dev box
+ * INSTALLDIR - the location of your build directory
+ * SWARM_MANAGER_URL - the IP address of your dev box
 
 Also, edit or remove the local host port mapping that is
 provided in the example to meet your local requirements
@@ -255,17 +255,15 @@ This script will start several Docker containers that make up CPM.
 
 On the dev host, the following URLs are useful:
 
-CPM Web User Interface
-----------------------
-http://cpm.crunchy.lab:13001
+ * http://cpm.crunchy.lab:13001 - CPM Web User Interface
 
-CPM Admin API
-----------------------
-http://cpm-admin.crunchy.lab:13001
+ * http://cpm-newserver.crunchy.lab:10001 - CPM Server Agent
 
-Prometheus Dashboard
-----------------------
-http://cpm-promdash.crunchy.lab:3000
+ * http://cpm-task.crunchy.lab:13001 - CPM Task Service
+
+ * http://cpm-admin.crunchy.lab:13001 - CPM Admin Service
+
+ * http://cpm-promdash.crunchy.lab:3000 -  Prometheus Dashboard
 
 If you are running CPM on a VM (host-only) and
 accessing CPM from the VM host (not the guest), then
@@ -274,9 +272,7 @@ configuration via the PromDash user interface
 and specify the prometheus server URL
 as http://192.168.56.103:16000.
 
-Prometheus DB
-----------------------
-http://cpm-prometheus.crunchy.lab:9090
+ * http://cpm-prometheus.crunchy.lab:9090 -  Prometheus DB
 
 If you are running the CPM user interface from outside the dev host
 (e.g.  from your vbox host browser), you will need to update
@@ -292,8 +288,7 @@ projects/container-logic.js
 Look for occurances of cpm-promdash:3000 and change them to
 the static IP address and ports listed above.
 
-Login
---------
+=== Login
 
 Browse to the CPM web user interface
 user id is cpm
@@ -305,7 +300,7 @@ is your CPM host (e.g. 192.168.0.107, newserver)
 
 Then you will be ready to start creating PostgreSQL instances.
 
-=== nginx selinux issues
+ * nginx selinux issues
 
 in some cases with selinux enabled, you might see AVC errors, if so, look at this:
 
@@ -322,39 +317,6 @@ go get golang.org/x/tools/cmd/godoc
 godoc -http=:6060
 -----
 
-
-=== Packaging
-
-compile all the CPM source using
-[source,bash]
------
-make build
------
-
-Build Images
-[source,bash]
------
-make buildimages
------
-
-Pushing Images to DockerHub
-
-You have to tag the images you want to push, find the image tag, then
-run these commands, currently this is a manual step:
-[source,bash]
------
-sudo docker tag -f c91ba0d8cb98 crunchydata/cpm-dashboard:0.9.7
-sudo docker push crunchydata/cpm-dashboard:0.9.7
------
-
-Build Archives
-
-
-run the sbin/basic-user-install-package.sh script, it will create an archive
-file for CPM, then upload it to the S3 site:
-https://s3.amazonaws.com/crunchydata/cpm/cpm.0.9.7-linux-amd64.tar.gz
-
-
 === Logging
 
 Logging of the CPM product containers is as follows:
@@ -364,7 +326,7 @@ Logging of the CPM product containers is as follows:
 - cpm-task - logs to fluentd (cpm-efk) by default
 - postgres containers - logs to fluentd via syslog
 
-see [log-aggregation.md](log-aggregation.md) for more details
+see link:logging.html[Log Aggregation] for more details 
 
 === Port Mapping
 
@@ -374,29 +336,29 @@ will add some port mapping to the startup script, run-cpm.sh.
 
 For example, to allow the cpm web interface you would add the following
 to the docker run command for the cpm web container:
-````````````
+....
 -p 192.168.0.107:13001:13001
-````````````
+....
 
 And for the cpm admin container, you would need to map port 13001 to
 the local 14001 port:
-[source,bash]
------
+
+....
 -p 192.168.0.107:14001:13001
------
+....
 
 Also, for the prometheus dashboard to work, you will need to map its
 port to the local host:
-[source,bash]
------
+
+....
 -p 192.168.0.107:3000:3000
------
+....
 
 and also map the prometheus port to the local host:
-[source,bash]
------
+
+....
 -p 192.168.0.107:9090:9090
------
+....
 
 You can add the cpm service names to your remote DNS system to resolve
 or to your /etc/hosts files to resolve.
@@ -404,15 +366,16 @@ or to your /etc/hosts files to resolve.
 You will then need to enter these IP addresses and port numbers in
 the cpm web login screen and browser from a remote host.
 
-### Connecting to Containers Remotely
+=== Connecting to Containers Remotely
 
 You can connect to a container's database from a remote server
 by adding a static route to the CPM servers Docker bridge range
 as follows
+
 .Example
-----
+....
 ip route add 172.17.0.0/16 via 192.168.0.107 dev ens3
-----
+....
 
 With this route in place, you can now access a running container's
 database on a remote host.  Make sure that your remote host is not

@@ -21,7 +21,6 @@ as the CPM Admin server (espresso.crunchy.lab).
 
 Perform a developer install on the espresso server as
 documented in the Developer Install Guide.
-
  link:doc.html[Developer Install Guide]
 
 

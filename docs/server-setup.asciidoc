@@ -8,23 +8,8 @@ server, both CPM and it's requisite DNS bridge (dnsbridge or skybridge).
 This is the single-server configuration that most people will
 use to demo, hack, and prototype CPM with.
 
-=== Multi-Server Configuration
-
-A more typical example of a real CPM production deployment is
-to utilize multiple servers.  In this configuration, CPM
-will let you configure Postgres clusters that span more than
-one server.
-
-Here is an example of a multi-host scenario of 3 servers:
-[source,bash]
-----
-server1.crunchy.lab - 192.168.56.101 (static IP)
-server2.crunchy.lab - 192.168.56.102 (static IP)
-admin.crunchy.lab   - 192.168.56.103 (static IP)
-----
-
-These can be physical or virtual servers.  All three servers are available to run the CPM postgres and pgpool containers, however only one server will act
-as the CPM Admin server (admin.crunchy.lab).
+These can be physical or virtual servers.  In this setup, you will be running
+all CPM containers on a single server.
 
 ==== CPM Installation
 
@@ -33,15 +18,25 @@ you which remote servers you want to configure and will copy
 the required CPM files to the remote server.  The installer will
 also enable and start the required CPM services on each server.
 
-==== DNS Configuration for Multi-Server CPM
+==== DNS Configuration
 
-On each server in a multi-server configuration, you will need
-to specify in your /etc/resolv.conf the CPM DNS server you have
-deployed.  In this example, we have chosen to run the CPM skybridge
-DNS server on the admin.crunchy.lab server.
+For CPM, you need to run a skybridge container.  skybridge is a container that provides
+a DNS-to-Docker service, that listens to Docker container events, and registers DNS
+records for any containers that are created.  It runs a version of skydns
+that is a DNS name server.  Therefore, when it starts it will listen on port 53 on 
+your dev server.
 
-So each server would need to specify it's primary DNS nameserver
-to be 192.168.56.101.
+To use it as a name server, you would register it in your /etc/resolv.conf file
+as the primary name server.  For this example of installation, I use the
+crunchy.lab DNS domain name.  Here is an example of a configured /etc/resolv.conf
+file:
+....
+search crunchy.lab
+nameserver 192.168.0.107
+nameserver 192.168.0.1
+....
+
+On dev servers that  
 
 Also, on each server, the Docker configuration in /etc/sysconfig/docker
 would also need to specify the CPM DNS nameserver as follows:
