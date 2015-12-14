@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="AsciiDoc 8.6.8, bootstrap backend 4.5.0">
+    <title>Multi-Host Server Setup for CPM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- AsciiDoc Bootstrap styles -->
+    <link rel="stylesheet" type="text/css" id="bootstrapTheme" href="./stylesheets/asciidoc-bootstrap.cerulean.min.css">
+    <!-- Back to top (jquery plugin) -->
+    <link rel="stylesheet" type="text/css" href="./stylesheets/ui.totop.css">
+
+    <!--[if (lt IE 9) & (!IEMobile)]>
+        <script src="./javascripts/html5shiv.min.js"></script>
+        <script src="./javascripts/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+  <body id="toc-top">
+    <div id="page">
+
+
+      <div class="jumbotron">
+        <div class="container">
+          <h1>Multi-Host Server Setup for CPM</h1>
+        </div>
+      </div>
+
+  <div id="content" class="container">
+
+    <div class="row">
+
+
+
+
+        <div class="col-md-9" role="main">
+<div class="section">
+    <h1 class="page-header" id="introduction">1. Introduction</h1>
+<div class="paragraph"><p>A more typical example of a real CPM production deployment is
+to utilize multiple servers.  In this configuration, CPM
+will let you configure Postgres clusters that span more than
+one server.</p></div>
+<div class="paragraph"><p>Here is an example of a multi-host scenario of 3 servers:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>espresso<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab - <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.107</span> <span style="color: #990000">(</span>static IP<span style="color: #990000">)</span>
+coffee<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab - <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.108</span> <span style="color: #990000">(</span>static IP<span style="color: #990000">)</span></tt></pre></div></div>
+<div class="paragraph"><p>These can be physical or virtual servers.  Both servers are available to run the CPM containers , however only one server will act
+as the CPM Admin server (espresso.crunchy.lab).</p></div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="step_1_cpm_installation">2. Step 1 - CPM Installation</h1>
+<div class="paragraph"><p>Perform a developer install on the espresso server as
+documented in the Developer Install Guide.</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>link:doc.html[Developer Install Guide]</pre>
+</div></div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="dns_configuration_for_multi_server_cpm">3. DNS Configuration for Multi-Server CPM</h1>
+<div class="paragraph"><p>On each server in a multi-server configuration, you will need
+to specify in your /etc/resolv.conf the CPM DNS server you have
+deployed.  In this example, we have chosen to run the CPM skybridge
+DNS server on the admin.crunchy.lab server.</p></div>
+<div class="paragraph"><p>So each server would need to specify it&#8217;s primary DNS nameserver
+to be 192.168.56.101.</p></div>
+<div class="paragraph"><p>Also, on each server, the Docker configuration in /etc/sysconfig/docker
+would also need to specify the CPM DNS nameserver as follows:</p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>--dns=192.168.56.101 --dns=192.168.0.1</pre>
+</div></div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="networking_for_multi_server_cpm">4. Networking for Multi-Server CPM</h1>
+<div class="paragraph"><p>For a multi-host CPM deployment, you will define network routes
+as follows:</p></div>
+<div class="paragraph"><p>You need to define routes to the other docker servers, we create
+a route file in /etc/sysconfig/network-scripts.  The name of the
+file is route-xxxx where xxx is the name of the ethernet adapter for our 192.168.56.X network,
+for Example:
+        route-enp0s3</p></div>
+<div class="paragraph"><p>For server1, the route values are:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #993399">172.19</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.102</span> metric <span style="color: #993399">0</span>
+<span style="color: #993399">172.17</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.103</span> metric <span style="color: #993399">0</span></tt></pre></div></div>
+<div class="paragraph"><p>For admin server, the route values are:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #993399">172.18</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.101</span> metric <span style="color: #993399">0</span>
+<span style="color: #993399">172.19</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.102</span> metric <span style="color: #993399">0</span></tt></pre></div></div>
+<div class="paragraph"><p>For server2, the route values are:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #993399">172.18</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.101</span> metric <span style="color: #993399">0</span>
+<span style="color: #993399">172.17</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.103</span> metric <span style="color: #993399">0</span></tt></pre></div></div>
+<div class="paragraph"><p>After these routes are in place, each docker container on each
+server can route to containers on the other servers.</p></div>
+<div class="paragraph"><p>Route examples on virtualbox:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>ip route add <span style="color: #993399">172.17</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.103</span> dev vboxnet0
+ip route add <span style="color: #993399">172.18</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.101</span> dev vboxnet0
+ip route add <span style="color: #993399">172.19</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.102</span> dev vboxnet0</tt></pre></div></div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="testing">5. Testing</h1>
+<div class="paragraph"><p>A script is provided to help verify that your environment is
+configured correctly:
+<a href="http://github.com/crunchydata/cpm/network-test.sh">http://github.com/crunchydata/cpm/network-test.sh</a></p></div>
+</div>
+        </div>  <!-- /.col-md-9 -->
+        <div class="col-md-3">
+        <div id="sidebar">
+    <div class="toc2">
+<div class="panel panel-default">
+<div class="panel-heading">Table of Contents</div>
+<div class="panel-body" id="toc">
+</div>
+</div>
+    </div>
+</div>
+        </div>  <!-- /.col-md-3 -->
+    </div>  <!-- /.row -->
+
+  </div>  <!-- /.container -->
+
+    <footer id="footer" role="contentinfo">
+        <div class="container">
+<div class="row"><div id="footnotes"></div></div>
+<div id="footer-text">
+Last updated 2015-12-14 12:58:47 CST
+<br>Built with <a href="https://github.com/llaville/asciidoc-bootstrap-backend">AsciiDoc-Bootstrap backend</a> 4.5.0
+</div>
+        </div>
+    </footer>
+
+    <script src="./javascripts/jquery.min.js"></script>
+    <script src="./bootstrap/js/bootstrap.min.js"></script>
+    <script src="./javascripts/asciidoc.js"></script>
+    <!-- Install TOC and/or footnotes (if necessary) -->
+    <script type="text/javascript">asciidoc.install(2);</script>
+
+    <script src="./javascripts/jquery.ui.totop.min.js"></script>
+
+
+
+    <!-- Remove footnotes if empty block -->
+    <script type="text/javascript">$(function(){ if ($("#footnotes div").length == 0) $("#footnotes").parent().remove(); });</script>
+
+    <script type="text/javascript">$(function(){ if ($("#dropdown-menu-versions")) $("#dropdown-menu-versions").parent().remove(); });</script>
+
+    <script type="text/javascript">$(function(){ $().UItoTop(); });</script>
+    </div> <!-- page -->
+  </body>
+</html>
