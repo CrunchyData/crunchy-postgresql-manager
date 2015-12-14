@@ -17,10 +17,10 @@ A user guide is available at:
 [docs/userguide/user-guide.md](docs/userguide/user-guide.md)
 
 A developer-installation guide is available at:
-[docs/dev-setup.md](docs/dev-setup.md)
+[docs/htmldoc/index.html](docs/htmldoc/index.html)
 
 A description of the REST API is at:
-[docs/rest-api.md](docs/rest-api.md)
+[docs/htmldoc/rest-api.html](docs/htmldoc/rest-api.html)
 
 CPM consists of the following containers:
 
