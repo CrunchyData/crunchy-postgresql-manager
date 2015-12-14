@@ -17,7 +17,7 @@ A user guide is available at:
 [docs/userguide/user-guide.md](docs/userguide/user-guide.md)
 
 A developer-installation guide is available at:
-[docs/htmldoc/index.html](docs/htmldoc/index.html)
+[docs/htmldoc/doc.html](docs/htmldoc/doc.html)
 
 A description of the REST API is at:
 [docs/htmldoc/rest-api.html](docs/htmldoc/rest-api.html)
