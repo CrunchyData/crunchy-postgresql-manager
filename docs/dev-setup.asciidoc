@@ -22,38 +22,28 @@ the CPM install:
 sudo yum -y update
 ....
 
-To get started, install git first:
+To get started, install some required packages first:
 ....
-sudo yum -y install git mercurial
+sudo yum -y install git mercurial golang
 ....
 
 === Setup Go Project Structure 
 
 As your development user, create the development directory as follows:
-[source,bash]
------
-mkdir -p devproject/src devproject/bin devproject/pkg
 
+....
+mkdir -p devproject/src devproject/bin devproject/pkg
 export GOPATH=~/devproject
 export GOBIN=$GOPATH/bin
 export PATH=$GOBIN:$PATH
------
-
-.Download and Install godep 
-....
-cd devproject
-go get github.com/tools/godep
+export CPMROOT=$GOPATH/src/github.com/crunchydata/crunchy-postgresql-manager
 ....
 
 .Download CPM Source 
 ....
+cd $GOPATH
 go get github.com/crunchydata/crunchy-postgresql-manager
-cd src/github.com/crunchydata/crunchy-postgresql-manager
-....
-
-.Download and Restore All Dependencies 
-....
-godep restore
+cd $CPMROOT
 ....
 
 .Install Local Dependencies
@@ -62,8 +52,22 @@ To install the local server dependencies, there is a script, sbin/dev-dep-instal
 that you will run to do the various package installations:
 
 ....
-sudo ./sbin/dev-dep-install.sh
+sudo $CPMROOT/sbin/dev-dep-install.sh
 ....
+
+.Download and Install godep 
+....
+cd $GOPATH
+go get github.com/tools/godep
+....
+
+.Download and Restore All Dependencies 
+....
+cd $CPMROOT
+godep restore
+....
+
+ * note:  this takes a minute or two to complete *
 
 .Compile CPM
 ....
@@ -92,8 +96,8 @@ The above configuration specifies the following:
 
 Start docker
 ....
-systemctl enable docker.service
-systemctl start docker.service
+sudo systemctl enable docker.service
+sudo systemctl start docker.service
 ....
 
 === Build CPM Docker Images 
@@ -108,16 +112,17 @@ sudo docker pull prom/prometheus
 .Build Images
 
 ....
+cd $CPMROOT
 make buildimages
-docker images
+sudo docker images
 ....
 
 
 === Disable Firewalld 
 
 ....
-systemctl disable firewalld.service
-systemctl stop firewalld.service
+sudo systemctl disable firewalld.service
+sudo systemctl stop firewalld.service
 ....
 
 The document, firewall-setup.md, shows how the CPM ports can be opened up.
@@ -178,7 +183,6 @@ sudo ./sbin/run-skybridge.sh
 === Configure and Start Swarm
 
 Download the swarm binary as follows, within a new swarm go project:
-
 
 ....
 export GOPATH=~/swarmproject
