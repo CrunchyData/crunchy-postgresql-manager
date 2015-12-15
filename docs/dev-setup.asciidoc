@@ -15,18 +15,17 @@ subscription-manager repos --enable=rhel-7-server-extras-rpms
 subscription-manager repos --enable=rhel-7-server-optional-rpms
 -----
 
-=== Install Dependencies development machine 
+=== Install Local Dependencies
 
 Note that I like to use the PGDG postgres distro instead of the redhat provided postgres!  Here is an example of installing postgres on a Centos 7 box,
 replace 'centos' with 'redhat' if installing on a Redhat box:
 
-[source,bash]
------
+....
 sudo yum -y install net-tools bind-utils install golang git docker mercurial sysstat
 rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
 rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
 yum install -y nmap-ncat procps-ng postgresql94 postgresql94-contrib postgresql94-server libxslt unzip openssh-clients hostname bind-utils
------
+....
 
 === Setup Go Project Structure 
 
@@ -41,72 +40,78 @@ export PATH=$GOBIN:$PATH
 -----
 
 .Download and Install godep 
-[source,bash]
------
+....
 cd devproject
 go get github.com/tools/godep
------
+....
 
 .Download CPM Source 
-[source,bash]
------
+....
 go get github.com/crunchydata/crunchy-postgresql-manager
 cd src/github.com/crunchydata/crunchy-postgresql-manager
------
+....
 
 .Download and Restore All Dependencies 
-[source,bash]
------
+....
 godep restore
------
+....
 
 .Compile CPM
-[source,bash]
------
+....
 make build
------
+....
 
 === Configure Docker 
 
-Edit the docker configuration by editing the OPTIONS parameter as follows:
-[source,bash]
------
-vi /etc/sysconfig/docker
-OPTIONS='--selinux-enabled --bip=172.17.42.1/16 --dns-search=crunchy.lab --dns=192.168.0.107 --dns=192.168.0.1 -H unix:///var/run/docker.sock -H tcp://0.0.0.0:2375  --label hostname=coffee.crunchy.lab --label profile=small'
+Edit the docker configuration (/etc/sysconfig/docker) by editing the OPTIONS parameter as follows:
+....
+OPTIONS='--selinux-enabled --bip=172.17.42.1/16 --dns-search=crunchy.lab --dns=192.168.0.107 --dns=192.168.0.1 -H unix:///var/run/docker.sock --label host=192.168.0.107 --label profile=SM -H tcp://192.168.0.107:2375'
+....
+
+The above configuration specifies the following:
+....
+ --bip=172.17.42.1/16 - this says for Docker to use this IP range when assiging IP addresses to created containers
+ --dns-search=crunchy.lab - this tells Docker to include the crunchy.lab domain inside each container as the search domain
+ --dns=192.168.0.107 - this tells Docker to include the 192.168.0.107 address as a primary DNS server address in each container
+ --dns=192.168.0.101 - this tells Docker to include the 192.168.0.101 address as a secondary DNS server address in each container
+ -H unix://var/run/docker.sock - this tells Docker to accept connections by the docker.sock domain socket
+ -H tcp://192.168.0.107:2375 - this tells Docker to accept connections at this IP address, used by Docker Swarm specifically
+ --label host=192.168.0.107 - this label is assigned to this Docker server to uniquely identify it within CPM
+ --label profile=SM - this label is assigned to this Docker server to categorize it for use within CPM
+....
+
+
+Start docker
+....
 systemctl enable docker.service
 systemctl start docker.service
-docker info
------
-
-In the above example, labels are added for Swarm, including the hostname and a CPM server profile of small to indicate this is a small server in terms of capacity.
+....
 
 === Build CPM Docker Images 
 
 .Pull down Prometheus images 
-[source,bash]
------
+
+....
 sudo docker pull prom/promdash
 sudo docker pull prom/prometheus
------
+....
 
 .Build Images
-[source,bash]
------
+
+....
 make buildimages
 docker images
------
+....
 
 
 === Disable Firewalld 
 
-[source,bash]
------
+....
 systemctl disable firewalld.service
 systemctl stop firewalld.service
------
+....
 
-There is a document, firewall-setup.md, that shows how the CPM ports
-can be opened up.
+The document, firewall-setup.md, shows how the CPM ports can be opened up.
 
 === Setup skybridge 
 
@@ -120,62 +125,53 @@ Ethernet adapter typically so that you can assign it a static IP
 address.  In Virtualbox, this adapter would be a Host-Only adapter
 for example.
 
-For Docker to use the new DNS nameserver, you will need to modify
-the docker config file /etc/sysconfig/docker.  Add lines in it
-like this:
-[source,bash]
------
-OPTIONS='--selinux-enabled --bip=172.17.42.1/16 --dns-search=crunchy.lab --dns=192.168.0.106 --dns=192.168.0.1'
------
 
-This example shows that skybridge is running on 192.168.0.106, I am using
-a domain of crunchy.lab, and that my secondary nameserver (from my ISP)
-is 192.168.0.1.  This configuration will have all the containers
+The docker OPTIONS configuration above will have all the containers
 in CPM trying to use the skybridge DNS nameserver as the primary
 nameserver which is required by CPM.
 
 Your /etc/resolv.conf should look similar to this if your network
 configuration is set up correctly:
-[source,bash]
------
+
+....
 search crunchy.lab
 nameserver 192.168.0.107
 nameserver 192.168.0.1
------
+....
 
 You can make these changes to your /etc/resolv.conf permanent by
 adding the following settings to your ethernet adapter configuration
 in /etc/syconfig/network-scripts:
-[source,bash]
------
+
+....
 DNS1=192.168.0.107
 DNS2=192.168.0.1
 DOMAIN=crunchy.lab
 PEERDNS=no
------
+....
 
 This will cause the skybridge DNS nameserver to be queried first.
 
 
 Pull down skybridge as follows:
-[source,bash]
------
+
+....
 sudo docker pull crunchydata/skybridge
------
+....
 
 Start skybridge by editing the sbin/run-skybridge.sh script
 to specify your local IP address, then run the skybridge container:
-[source,bash]
------
-sudo ./sbin/run-skybridge.sh
------
 
-Configure and Start Swarm
--------------------------
+....
+sudo ./sbin/run-skybridge.sh
+....
+
+=== Configure and Start Swarm
 
 Download the swarm binary as follows, within a new swarm go project:
-[source,bash]
------
+
+
+....
 export GOPATH=~/swarmproject
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:$GOPATH/bin
@@ -184,59 +180,125 @@ cd $GOPATH/src/github.com/docker/
 git clone https://github.com/docker/swarm
 cd swarm
 $GOPATH/bin/godep go install
------
+....
 
 Start swarm up as follows, as root user:
-[source,bash]
------
+
+
+....
 swarm create
 swarm manage --host 192.168.0.107:8000 nodes://192.168.0.107:2375
 swarm join --addr=192.168.0.107:2375 token://<<<insert your swarm generated token here>>>
------
+....
 
 A swarm guide is available at:
 
 link:swarm-setup.html[Swarm Setup]
 
+=== Testing skybridge and Swarm
+
+At this point, it is a good time to test the installation of skybridge,
+docker, and docker swarm.
+
+Make sure the following processes are running:
+
+....
+ps aux | grep docker
+ps aux | grep swarm
+docker inspect skybridge
+....
+
+You should see the docker and swarm processes running as well as the
+skybridge docker container.
+
+Next, create a sample container:
+
+....
+docker run --name=tester --hostname=tester -it crunchydata/cpm bash
+....
+
+In another terminal, ping the new container:
+
+....
+ping tester
+....
+
+You should see the tester.crunchy.lab name resolving and responding to the ping command.  If not,
+then there is a configuration error.  If you can ping the tester container, then proceed on
+in the installation.
+
+=== Start cpm-efk Logging
+
+The default logging configuration in CPM uses the cpm-efk container
+to aggregate logs.  
+
+Prior to starting the cpm-efk container, modify the run-cpm-efk.sh script as documented here:
+
+link:logging.html[Logging Setup]
+
+Start cpm-efk as follows:
+
+....
+cd $CPMROOT/images/cpm-efk
+sudo ./run-cpm-efk.sh
+....
+
 
 === Start CPM Server Agent
 
-After you have successfully compiled CPM and built the CPM Docker images,
-on each server that is to run CPM, you will need to start a CPM Server
+On each server that is to run CPM, you will need to start a CPM Server
 Agent.  The server agent is run within the cpm-server container on each
 server host that will be configured to be used in CPM.
 
-Each container needs to be started with skybridge running and also
+Each CPM server agent needs to be started with skybridge running and also
 have its port 10001 mapped to the local host port 10001.  CPM will
 attempt to communicate to each host using this port.  
 
 For this example, I will name the CPM server, newserver.
 
 So, edit the images/cpm-server/run-cpmserver.sh script, and modify the server
-ip address to be that of the host you are running the CPM server
+IP address to be that of the host you are running the CPM server
 upon.
 
 Then run the script which will create a running cpm-server named
 cpm-newserver.
-[source,bash]
------
+
+....
 sudo ./run-cpmserver.sh
 ping cpm-newserver
------
+....
 
 If you have the server running, you can test it by doing a GET
 to it:
-[source,bash]
------
+
+....
 curl http://cpm-newserver:10001/status
 curl http://192.168.0.107:10001/status
------
+....
+
+
+=== Seed the Server
+
+A one-time initialization of the server is performed by
+running the $CPMROOT/sbin/dev-setup.sh script.
+
+This script copies files from the CPM github source
+directories into the local system's /var/cpm/ directory.
+
+Modify the sbin/dev-setup.sh script by updating
+the source directory environment variable DEVROOT
+to match your local dev system.
+
+....
+sudo ./dev-setup.sh
+....
+
 
 === Running CPM
 
-
-Modify the run-cpm.sh script by updating the following
+Modify the $CPMROOT/run-cpm.sh script by updating the following
 environment variable references:
+
  * INSTALLDIR - the location of your build directory
  * SWARM_MANAGER_URL - the IP address of your dev box
 
@@ -246,16 +308,16 @@ for accessing CPM.
 
 
 You can run CPM by running the following script:
-[source,bash]
------
+
+....
 sudo ./run-cpm.sh
------
+....
 
 This script will start several Docker containers that make up CPM.  
 
 On the dev host, the following URLs are useful:
 
- * http://cpm.crunchy.lab:13001 - CPM Web User Interface
+ * http://cpm-web.crunchy.lab:13001 - CPM Web User Interface
 
  * http://cpm-newserver.crunchy.lab:10001 - CPM Server Agent
 
@@ -282,18 +344,19 @@ not be accessible from your vbox host unless you specify the
 skybridge DNS server.
 
 The js files to change are:
-servers/servers.js
-projects/container-logic.js
+ * servers/servers.js
+ * projects/container-logic.js
 
 Look for occurances of cpm-promdash:3000 and change them to
 the static IP address and ports listed above.
 
 === Login
 
-Browse to the CPM web user interface
-user id is cpm
-password is cpm
-Admin URL is either http://cpm-admin:13001 (on your CPM host)
+To start using CPM, first log into the web interface at http://cpm-web:13001
+
+The default superuser ID is *cpm* and the password is *cpm*.  Also, you will
+enter the Admin URL value of http://cpm-admin:13001 on the login dialog
+screen.
 
 Initially you will need to first define your CPM server which
 is your CPM host (e.g. 192.168.0.107, newserver)
@@ -311,11 +374,11 @@ http://axilleas.me/en/blog/2013/selinux-policy-for-nginx-and-gitlab-unix-socket-
 
 To see the godocs, install godoc, and start up the godoc server, then
 browse to the CPM API documentation:
-[source,bash]
------
+
+....
 go get golang.org/x/tools/cmd/godoc
 godoc -http=:6060
------
+....
 
 === Logging
 
@@ -336,6 +399,7 @@ will add some port mapping to the startup script, run-cpm.sh.
 
 For example, to allow the cpm web interface you would add the following
 to the docker run command for the cpm web container:
+
 ....
 -p 192.168.0.107:13001:13001
 ....

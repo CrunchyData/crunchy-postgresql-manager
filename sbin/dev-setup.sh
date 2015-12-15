@@ -32,10 +32,6 @@ if [[ $EUID -ne 0 ]]; then
 	exit 1
 fi
 
-rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
-
-yum install -y postgresql94 postgresql94-contrib postgresql94-server
-
 export DEVROOT=/home/jeffmc/devproject
 export DEVBASE=$DEVROOT/src/github.com/crunchydata/crunchy-postgresql-manager
 export CPMBASE=/var/cpm
@@ -46,15 +42,13 @@ mkdir -p $CPMBASE/data/pgsql
 mkdir -p $CPMBASE/logs
 mkdir -p $CPMBASE/keys
 
-chcon -Rt svirt_sandbox_file_t $CPMBASE
-
-cp $DEVROOT/bin/cpmserverapi $CPMBASE/bin
+cp $DEVROOT/images/cpm-efk/conf/listen.conf $CPMBASE/config
+cp $DEVROOT/images/cpm-efk/conf/rsyslog.conf $CPMBASE/config
 cp $DEVBASE/sbin/cert.pem $DEVBASE/sbin/key.pem $CPMBASE/keys
 
 cp $DEVBASE/sbin/* $CPMBASE/bin
 
 cp $DEVBASE/config/cpmserverapi.service  /usr/lib/systemd/system
 
-systemctl enable cpmserverapi.service
-systemctl start cpmserverapi.service
+chcon -Rt svirt_sandbox_file_t $CPMBASE
 

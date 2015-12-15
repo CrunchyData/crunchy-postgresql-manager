@@ -18,10 +18,6 @@ include::docker-setup.asciidoc[]
 
 include::firewall-setup.asciidoc[]
 
-include::logging.asciidoc[]
-
-include::server-setup.asciidoc[]
-
 include::swarm-setup.asciidoc[]
 
 include::licenses.asciidoc[]

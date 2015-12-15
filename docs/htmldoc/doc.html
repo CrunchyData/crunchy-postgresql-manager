@@ -215,18 +215,16 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>subscription-manager repos --enable<span style="color: #990000">=</span>rhel-<span style="color: #993399">7</span>-server-extras-rpms
 subscription-manager repos --enable<span style="color: #990000">=</span>rhel-<span style="color: #993399">7</span>-server-optional-rpms</tt></pre></div></div>
-<h2 id="install_dependencies_development_machine">3.2. Install Dependencies development machine</h2>
+<h2 id="install_local_dependencies">3.2. Install Local Dependencies</h2>
 <div class="paragraph"><p>Note that I like to use the PGDG postgres distro instead of the redhat provided postgres!  Here is an example of installing postgres on a Centos 7 box,
 replace <em>centos</em> with <em>redhat</em> if installing on a Redhat box:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>sudo yum -y install net-tools bind-utils install golang git docker mercurial sysstat
-rpm -Uvh http<span style="color: #990000">:</span>//dl<span style="color: #990000">.</span>fedoraproject<span style="color: #990000">.</span>org/pub/epel<span style="color: #990000">/</span><span style="color: #993399">7</span>/x86_64/e/epel-release-<span style="color: #993399">7</span>-<span style="color: #993399">5</span><span style="color: #990000">.</span>noarch<span style="color: #990000">.</span>rpm
-rpm -Uvh http<span style="color: #990000">:</span>//yum<span style="color: #990000">.</span>postgresql<span style="color: #990000">.</span>org<span style="color: #990000">/</span><span style="color: #993399">9.4</span>/redhat/rhel-<span style="color: #993399">7</span>-x86_64/pgdg-centos<span style="color: #993399">94</span>-<span style="color: #993399">9.4</span>-<span style="color: #993399">1</span><span style="color: #990000">.</span>noarch<span style="color: #990000">.</span>rpm
-yum install -y nmap-ncat procps-ng postgresql94 postgresql94-contrib postgresql94-server libxslt unzip openssh-clients hostname bind-utils</tt></pre></div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>sudo yum -y install net-tools bind-utils install golang git docker mercurial sysstat
+rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
+yum install -y nmap-ncat procps-ng postgresql94 postgresql94-contrib postgresql94-server libxslt unzip openssh-clients hostname bind-utils</pre>
+</div></div>
 <h2 id="setup_go_project_structure">3.3. Setup Go Project Structure</h2>
 <div class="paragraph"><p>As your development user, create the development directory as follows:</p></div>
 <div class="listingblock">
@@ -239,76 +237,72 @@ http://www.gnu.org/software/src-highlite -->
 <span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">GOPATH</span><span style="color: #990000">=~</span>/devproject
 <span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">GOBIN</span><span style="color: #990000">=</span><span style="color: #009900">$GOPATH</span>/bin
 <span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">PATH</span><span style="color: #990000">=</span><span style="color: #009900">$GOBIN</span><span style="color: #990000">:</span><span style="color: #009900">$PATH</span></tt></pre></div></div>
-<div class="listingblock">
+<div class="literalblock">
 <div class="title">Download and Install godep</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>cd devproject
-go get github<span style="color: #990000">.</span>com/tools/godep</tt></pre></div></div>
-<div class="listingblock">
+<div class="content monospaced">
+<pre>cd devproject
+go get github.com/tools/godep</pre>
+</div></div>
+<div class="literalblock">
 <div class="title">Download CPM Source</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>go get github<span style="color: #990000">.</span>com/crunchydata/crunchy-postgresql-manager
-cd src/github<span style="color: #990000">.</span>com/crunchydata/crunchy-postgresql-manager</tt></pre></div></div>
-<div class="listingblock">
+<div class="content monospaced">
+<pre>go get github.com/crunchydata/crunchy-postgresql-manager
+cd src/github.com/crunchydata/crunchy-postgresql-manager</pre>
+</div></div>
+<div class="literalblock">
 <div class="title">Download and Restore All Dependencies</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>godep restore</tt></pre></div></div>
-<div class="listingblock">
+<div class="content monospaced">
+<pre>godep restore</pre>
+</div></div>
+<div class="literalblock">
 <div class="title">Compile CPM</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>make build</tt></pre></div></div>
+<div class="content monospaced">
+<pre>make build</pre>
+</div></div>
 <h2 id="configure_docker">3.4. Configure Docker</h2>
-<div class="paragraph"><p>Edit the docker configuration by editing the OPTIONS parameter as follows:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>vi /etc/sysconfig/docker
-<span style="color: #009900">OPTIONS</span><span style="color: #990000">=</span><span style="color: #FF0000">'--selinux-enabled --bip=172.17.42.1/16 --dns-search=crunchy.lab --dns=192.168.0.107 --dns=192.168.0.1 -H unix:///var/run/docker.sock -H tcp://0.0.0.0:2375  --label hostname=coffee.crunchy.lab --label profile=small'</span>
-systemctl <span style="font-weight: bold"><span style="color: #0000FF">enable</span></span> docker<span style="color: #990000">.</span>service
-systemctl start docker<span style="color: #990000">.</span>service
-docker info</tt></pre></div></div>
-<div class="paragraph"><p>In the above example, labels are added for Swarm, including the hostname and a CPM server profile of small to indicate this is a small server in terms of capacity.</p></div>
+<div class="paragraph"><p>Edit the docker configuration (/etc/sysconfig/docker) by editing the OPTIONS parameter as follows:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>OPTIONS='--selinux-enabled --bip=172.17.42.1/16 --dns-search=crunchy.lab --dns=192.168.0.107 --dns=192.168.0.1 -H unix:///var/run/docker.sock --label host=192.168.0.107 --label profile=SM -H tcp://192.168.0.107:2375'</pre>
+</div></div>
+<div class="paragraph"><p>The above configuration specifies the following:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre> --bip=172.17.42.1/16 - this says for Docker to use this IP range when assiging IP addresses to created containers
+ --dns-search=crunchy.lab - this tells Docker to include the crunchy.lab domain inside each container as the search domain
+ --dns=192.168.0.107 - this tells Docker to include the 192.168.0.107 address as a primary DNS server address in each container
+ --dns=192.168.0.101 - this tells Docker to include the 192.168.0.101 address as a secondary DNS server address in each container
+ -H unix://var/run/docker.sock - this tells Docker to accept connections by the docker.sock domain socket
+ -H tcp://192.168.0.107:2375 - this tells Docker to accept connections at this IP address, used by Docker Swarm specifically
+ --label host=192.168.0.107 - this label is assigned to this Docker server to uniquely identify it within CPM
+ --label profile=SM - this label is assigned to this Docker server to categorize it for use within CPM</pre>
+</div></div>
+<div class="paragraph"><p>Start docker</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>systemctl enable docker.service
+systemctl start docker.service</pre>
+</div></div>
 <h2 id="build_cpm_docker_images">3.5. Build CPM Docker Images</h2>
-<div class="listingblock">
+<div class="literalblock">
 <div class="title">Pull down Prometheus images</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>sudo docker pull prom/promdash
-sudo docker pull prom/prometheus</tt></pre></div></div>
-<div class="listingblock">
+<div class="content monospaced">
+<pre>sudo docker pull prom/promdash
+sudo docker pull prom/prometheus</pre>
+</div></div>
+<div class="literalblock">
 <div class="title">Build Images</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>make buildimages
-docker images</tt></pre></div></div>
+<div class="content monospaced">
+<pre>make buildimages
+docker images</pre>
+</div></div>
 <h2 id="disable_firewalld">3.6. Disable Firewalld</h2>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>systemctl disable firewalld<span style="color: #990000">.</span>service
-systemctl stop firewalld<span style="color: #990000">.</span>service</tt></pre></div></div>
-<div class="paragraph"><p>There is a document, firewall-setup.md, that shows how the CPM ports
-can be opened up.</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>systemctl disable firewalld.service
+systemctl stop firewalld.service</pre>
+</div></div>
+<div class="paragraph"><p>The document, firewall-setup.md, shows how the CPM ports can be opened up.</p></div>
 <h2 id="setup_skybridge">3.7. Setup skybridge</h2>
 <div class="paragraph"><p>CPM services are found using DNS by the various parts of CPM.  When
 a Docker image is started, we need it to be registered with a DNS service
@@ -318,131 +312,157 @@ When a VM is created to develop CPM upon, you would create an extra
 Ethernet adapter typically so that you can assign it a static IP
 address.  In Virtualbox, this adapter would be a Host-Only adapter
 for example.</p></div>
-<div class="paragraph"><p>For Docker to use the new DNS nameserver, you will need to modify
-the docker config file /etc/sysconfig/docker.  Add lines in it
-like this:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><span style="color: #009900">OPTIONS</span><span style="color: #990000">=</span><span style="color: #FF0000">'--selinux-enabled --bip=172.17.42.1/16 --dns-search=crunchy.lab --dns=192.168.0.106 --dns=192.168.0.1'</span></tt></pre></div></div>
-<div class="paragraph"><p>This example shows that skybridge is running on 192.168.0.106, I am using
-a domain of crunchy.lab, and that my secondary nameserver (from my ISP)
-is 192.168.0.1.  This configuration will have all the containers
+<div class="paragraph"><p>The docker OPTIONS configuration above will have all the containers
 in CPM trying to use the skybridge DNS nameserver as the primary
 nameserver which is required by CPM.</p></div>
 <div class="paragraph"><p>Your /etc/resolv.conf should look similar to this if your network
 configuration is set up correctly:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>search crunchy<span style="color: #990000">.</span>lab
-nameserver <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.107</span>
-nameserver <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.1</span></tt></pre></div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>search crunchy.lab
+nameserver 192.168.0.107
+nameserver 192.168.0.1</pre>
+</div></div>
 <div class="paragraph"><p>You can make these changes to your /etc/resolv.conf permanent by
 adding the following settings to your ethernet adapter configuration
 in /etc/syconfig/network-scripts:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><span style="color: #009900">DNS1</span><span style="color: #990000">=</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.107</span>
-<span style="color: #009900">DNS2</span><span style="color: #990000">=</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.1</span>
-<span style="color: #009900">DOMAIN</span><span style="color: #990000">=</span>crunchy<span style="color: #990000">.</span>lab
-<span style="color: #009900">PEERDNS</span><span style="color: #990000">=</span>no</tt></pre></div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>DNS1=192.168.0.107
+DNS2=192.168.0.1
+DOMAIN=crunchy.lab
+PEERDNS=no</pre>
+</div></div>
 <div class="paragraph"><p>This will cause the skybridge DNS nameserver to be queried first.</p></div>
 <div class="paragraph"><p>Pull down skybridge as follows:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>sudo docker pull crunchydata/skybridge</tt></pre></div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>sudo docker pull crunchydata/skybridge</pre>
+</div></div>
 <div class="paragraph"><p>Start skybridge by editing the sbin/run-skybridge.sh script
 to specify your local IP address, then run the skybridge container:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>sudo <span style="color: #990000">.</span>/sbin/run-skybridge<span style="color: #990000">.</span>sh</tt></pre></div></div>
-</div>
-<div class="section">
-    <h1 class="page-header" id="configure_and_start_swarm">4. Configure and Start Swarm</h1>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>sudo ./sbin/run-skybridge.sh</pre>
+</div></div>
+<h2 id="configure_and_start_swarm">3.8. Configure and Start Swarm</h2>
 <div class="paragraph"><p>Download the swarm binary as follows, within a new swarm go project:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">GOPATH</span><span style="color: #990000">=~</span>/swarmproject
-<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">GOBIN</span><span style="color: #990000">=</span><span style="color: #009900">$GOPATH</span>/bin
-<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">PATH</span><span style="color: #990000">=</span><span style="color: #009900">$PATH</span><span style="color: #990000">:</span><span style="color: #009900">$GOPATH</span>/bin
-mkdir -p <span style="color: #009900">$GOPATH</span>/src/github<span style="color: #990000">.</span>com/docker<span style="color: #990000">/</span>
-cd <span style="color: #009900">$GOPATH</span>/src/github<span style="color: #990000">.</span>com/docker<span style="color: #990000">/</span>
-git clone https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/docker/swarm
+<div class="literalblock">
+<div class="content monospaced">
+<pre>export GOPATH=~/swarmproject
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:$GOPATH/bin
+mkdir -p $GOPATH/src/github.com/docker/
+cd $GOPATH/src/github.com/docker/
+git clone https://github.com/docker/swarm
 cd swarm
-<span style="color: #009900">$GOPATH</span>/bin/godep go install</tt></pre></div></div>
+$GOPATH/bin/godep go install</pre>
+</div></div>
 <div class="paragraph"><p>Start swarm up as follows, as root user:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>swarm create
-swarm manage --host <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.107</span><span style="color: #990000">:</span><span style="color: #993399">8000</span> nodes<span style="color: #990000">://</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.107</span><span style="color: #990000">:</span><span style="color: #993399">2375</span>
-swarm join --addr<span style="color: #990000">=</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.107</span><span style="color: #990000">:</span><span style="color: #993399">2375</span> token<span style="color: #990000">://&lt;&lt;&lt;</span>insert your swarm generated token here<span style="color: #990000">&gt;&gt;&gt;</span></tt></pre></div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>swarm create
+swarm manage --host 192.168.0.107:8000 nodes://192.168.0.107:2375
+swarm join --addr=192.168.0.107:2375 token://&lt;&lt;&lt;insert your swarm generated token here&gt;&gt;&gt;</pre>
+</div></div>
 <div class="paragraph"><p>A swarm guide is available at:</p></div>
 <div class="paragraph"><p><a href="swarm-setup.html">Swarm Setup</a></p></div>
-<h2 id="start_cpm_server_agent">4.1. Start CPM Server Agent</h2>
-<div class="paragraph"><p>After you have successfully compiled CPM and built the CPM Docker images,
-on each server that is to run CPM, you will need to start a CPM Server
+<h2 id="testing_skybridge_and_swarm">3.9. Testing skybridge and Swarm</h2>
+<div class="paragraph"><p>At this point, it is a good time to test the installation of skybridge,
+docker, and docker swarm.</p></div>
+<div class="paragraph"><p>Make sure the following processes are running:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>ps aux | grep docker
+ps aux | grep swarm
+docker inspect skybridge</pre>
+</div></div>
+<div class="paragraph"><p>You should see the docker and swarm processes running as well as the
+skybridge docker container.</p></div>
+<div class="paragraph"><p>Next, create a sample container:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>docker run --name=tester --hostname=tester -it crunchydata/cpm bash</pre>
+</div></div>
+<div class="paragraph"><p>In another terminal, ping the new container:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>ping tester</pre>
+</div></div>
+<div class="paragraph"><p>You should see the tester.crunchy.lab name resolving and responding to the ping command.  If not,
+then there is a configuration error.  If you can ping the tester container, then proceed on
+in the installation.</p></div>
+<h2 id="start_cpm_efk_logging">3.10. Start cpm-efk Logging</h2>
+<div class="paragraph"><p>The default logging configuration in CPM uses the cpm-efk container
+to aggregate logs.</p></div>
+<div class="paragraph"><p>Prior to starting the cpm-efk container, modify the run-cpm-efk.sh script as documented here:</p></div>
+<div class="paragraph"><p><a href="logging.html">Logging Setup</a></p></div>
+<div class="paragraph"><p>Start cpm-efk as follows:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>cd $CPMROOT/images/cpm-efk
+sudo ./run-cpm-efk.sh</pre>
+</div></div>
+<h2 id="start_cpm_server_agent">3.11. Start CPM Server Agent</h2>
+<div class="paragraph"><p>On each server that is to run CPM, you will need to start a CPM Server
 Agent.  The server agent is run within the cpm-server container on each
 server host that will be configured to be used in CPM.</p></div>
-<div class="paragraph"><p>Each container needs to be started with skybridge running and also
+<div class="paragraph"><p>Each CPM server agent needs to be started with skybridge running and also
 have its port 10001 mapped to the local host port 10001.  CPM will
 attempt to communicate to each host using this port.</p></div>
 <div class="paragraph"><p>For this example, I will name the CPM server, newserver.</p></div>
 <div class="paragraph"><p>So, edit the images/cpm-server/run-cpmserver.sh script, and modify the server
-ip address to be that of the host you are running the CPM server
+IP address to be that of the host you are running the CPM server
 upon.</p></div>
 <div class="paragraph"><p>Then run the script which will create a running cpm-server named
 cpm-newserver.</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>sudo <span style="color: #990000">.</span>/run-cpmserver<span style="color: #990000">.</span>sh
-ping cpm-newserver</tt></pre></div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>sudo ./run-cpmserver.sh
+ping cpm-newserver</pre>
+</div></div>
 <div class="paragraph"><p>If you have the server running, you can test it by doing a GET
 to it:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>curl http<span style="color: #990000">:</span>//cpm-newserver<span style="color: #990000">:</span><span style="color: #993399">10001</span>/status
-curl http<span style="color: #990000">://</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.107</span><span style="color: #990000">:</span><span style="color: #993399">10001</span>/status</tt></pre></div></div>
-<h2 id="running_cpm">4.2. Running CPM</h2>
-<div class="paragraph"><p>Modify the run-cpm.sh script by updating the following
-environment variable references:
- * INSTALLDIR - the location of your build directory
- * SWARM_MANAGER_URL - the IP address of your dev box</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>curl http://cpm-newserver:10001/status
+curl http://192.168.0.107:10001/status</pre>
+</div></div>
+<h2 id="seed_the_server">3.12. Seed the Server</h2>
+<div class="paragraph"><p>A one-time initialization of the server is performed by
+running the $CPMROOT/sbin/dev-setup.sh script.</p></div>
+<div class="paragraph"><p>This script copies files from the CPM github source
+directories into the local system&#8217;s /var/cpm/ directory.</p></div>
+<div class="paragraph"><p>Modify the sbin/dev-setup.sh script by updating
+the source directory environment variable DEVROOT
+to match your local dev system.</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>sudo ./dev-setup.sh</pre>
+</div></div>
+<h2 id="running_cpm">3.13. Running CPM</h2>
+<div class="paragraph"><p>Modify the $CPMROOT/run-cpm.sh script by updating the following
+environment variable references:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+INSTALLDIR - the location of your build directory
+</p>
+</li>
+<li>
+<p>
+SWARM_MANAGER_URL - the IP address of your dev box
+</p>
+</li>
+</ul></div>
 <div class="paragraph"><p>Also, edit or remove the local host port mapping that is
 provided in the example to meet your local requirements
 for accessing CPM.</p></div>
 <div class="paragraph"><p>You can run CPM by running the following script:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>sudo <span style="color: #990000">.</span>/run-cpm<span style="color: #990000">.</span>sh</tt></pre></div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>sudo ./run-cpm.sh</pre>
+</div></div>
 <div class="paragraph"><p>This script will start several Docker containers that make up CPM.</p></div>
 <div class="paragraph"><p>On the dev host, the following URLs are useful:</p></div>
 <div class="ulist"><ul>
@@ -492,15 +512,15 @@ these are specified in the javascript as cpm-promdash:3000, this will
 not be accessible from your vbox host unless you specify the
 skybridge DNS server.</p></div>
 <div class="paragraph"><p>The js files to change are:
-servers/servers.js
-projects/container-logic.js</p></div>
+ * servers/servers.js
+ * projects/container-logic.js</p></div>
 <div class="paragraph"><p>Look for occurances of cpm-promdash:3000 and change them to
 the static IP address and ports listed above.</p></div>
-<h2 id="login">4.3. Login</h2>
-<div class="paragraph"><p>Browse to the CPM web user interface
-user id is cpm
-password is cpm
-Admin URL is either <a href="http://cpm-admin:13001">http://cpm-admin:13001</a> (on your CPM host)</p></div>
+<h2 id="login">3.14. Login</h2>
+<div class="paragraph"><p>To start using CPM, first log into the web interface at <a href="http://cpm-web:13001">http://cpm-web:13001</a></p></div>
+<div class="paragraph"><p>The default superuser ID is <strong>cpm</strong> and the password is <strong>cpm</strong>.  Also, you will
+enter the Admin URL value of <a href="http://cpm-admin:13001">http://cpm-admin:13001</a> on the login dialog
+screen.</p></div>
 <div class="paragraph"><p>Initially you will need to first define your CPM server which
 is your CPM host (e.g. 192.168.0.107, newserver)</p></div>
 <div class="paragraph"><p>Then you will be ready to start creating PostgreSQL instances.</p></div>
@@ -513,17 +533,15 @@ nginx selinux issues
 </ul></div>
 <div class="paragraph"><p>in some cases with selinux enabled, you might see AVC errors, if so, look at this:</p></div>
 <div class="paragraph"><p><a href="http://axilleas.me/en/blog/2013/selinux-policy-for-nginx-and-gitlab-unix-socket-in-fedora-19/">http://axilleas.me/en/blog/2013/selinux-policy-for-nginx-and-gitlab-unix-socket-in-fedora-19/</a></p></div>
-<h2 id="godocs">4.4. Godocs</h2>
+<h2 id="godocs">3.15. Godocs</h2>
 <div class="paragraph"><p>To see the godocs, install godoc, and start up the godoc server, then
 browse to the CPM API documentation:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>go get golang<span style="color: #990000">.</span>org/x/tools/cmd/godoc
-godoc -http<span style="color: #990000">=:</span><span style="color: #993399">6060</span></tt></pre></div></div>
-<h2 id="logging">4.5. Logging</h2>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>go get golang.org/x/tools/cmd/godoc
+godoc -http=:6060</pre>
+</div></div>
+<h2 id="logging">3.16. Logging</h2>
 <div class="paragraph"><p>Logging of the CPM product containers is as follows:
 - cpm-web - logs to /var/cpm/logs on the CPM host
 - cpm-admin - logs to fluentd (cpm-efk) by default
@@ -532,7 +550,7 @@ godoc -http<span style="color: #990000">=:</span><span style="color: #993399">60
 - postgres containers - logs to fluentd via syslog</p></div>
 <div class="paragraph"><p>see 
 <a href="logging.html">Log Aggregation</a> for more details</p></div>
-<h2 id="port_mapping">4.6. Port Mapping</h2>
+<h2 id="port_mapping">3.17. Port Mapping</h2>
 <div class="paragraph"><p>You will likely want to map the CPM addresses to a host IP addressto allow
 access from outside of the Docker assigned IP addresses.  To do this you
 will add some port mapping to the startup script, run-cpm.sh.</p></div>
@@ -563,7 +581,7 @@ port to the local host:</p></div>
 or to your /etc/hosts files to resolve.</p></div>
 <div class="paragraph"><p>You will then need to enter these IP addresses and port numbers in
 the cpm web login screen and browser from a remote host.</p></div>
-<h2 id="connecting_to_containers_remotely">4.7. Connecting to Containers Remotely</h2>
+<h2 id="connecting_to_containers_remotely">3.18. Connecting to Containers Remotely</h2>
 <div class="paragraph"><p>You can connect to a container&#8217;s database from a remote server
 by adding a static route to the CPM servers Docker bridge range
 as follows</p></div>
@@ -577,7 +595,7 @@ database on a remote host.  Make sure that your remote host is not
 running Docker on the same Docker bridge IP range.</p></div>
 </div>
 <div class="section">
-    <h1 class="page-header" id="docker_configuration">5. Docker Configuration</h1>
+    <h1 class="page-header" id="docker_configuration">4. Docker Configuration</h1>
 <div class="paragraph"><p>Each docker container has a dynamic assigned (by docker) IP address
 that is within a defined range that is configured when docker starts.</p></div>
 <div class="paragraph"><p>To support multiple Docker servers, we configure each Docker service
@@ -588,7 +606,7 @@ to use a different Docker bridge IP address range as follows:</p></div>
 server2.crunchy.lab - 172.42.19.0/16
 admin.crunchy.lab   - 172.42.17.0/16</pre>
 </div></div>
-<h2 id="docker_dns_configuration">5.1. docker DNS configuration</h2>
+<h2 id="docker_dns_configuration">4.1. docker DNS configuration</h2>
 <div class="paragraph"><p>Docker is configured on each server to reference the DNS server
 for each container that it starts.  This is done by altering
 the Docker service configuration to include the following
@@ -603,7 +621,7 @@ internet, include the public internet DNS address as well:</p></div>
 <div class="content monospaced">
 <pre>        --dns=192.168.0.1</pre>
 </div></div>
-<h2 id="docker_setup">5.2. docker setup</h2>
+<h2 id="docker_setup">4.2. docker setup</h2>
 <div class="paragraph"><p>modify /usr/lib/systemd/system/docker.service:</p></div>
 <div class="literalblock">
 <div class="content monospaced">
@@ -641,7 +659,7 @@ the following command to add a user to the docker group:</p></div>
 <div class="content monospaced">
 <pre>        usermod -a -G docker &lt;your-user&gt;</pre>
 </div></div>
-<h2 id="docker_images">5.3. docker images</h2>
+<h2 id="docker_images">4.3. docker images</h2>
 <div class="paragraph"><p>Docker images are stored in Docker Hub but you can also build them
 from source.</p></div>
 <div class="paragraph"><p>Here is an example of pulling down an image from Docker Hub:</p></div>
@@ -649,7 +667,7 @@ from source.</p></div>
 <div class="content monospaced">
 <pre>docker pull crunchydata/cpm-admin</pre>
 </div></div>
-<h2 id="docker_setup_2">5.4. Docker Setup</h2>
+<h2 id="docker_setup_2">4.4. Docker Setup</h2>
 <div class="paragraph"><p>Docker on each server host is configured as follows:
 On the Admin server:</p></div>
 <div class="literalblock">
@@ -672,7 +690,7 @@ On the Admin server:</p></div>
 
         ExecStart=/usr/bin/docker -d --bip=172.19.42.1/16 --dns=192.168.56.103 --dns=192.168.0.1 --selinux-enabled -H fd://</pre>
 </div></div>
-<h2 id="docker_configuration_explaination">5.5. Docker Configuration Explaination</h2>
+<h2 id="docker_configuration_explaination">4.5. Docker Configuration Explaination</h2>
 <div class="paragraph"><p>Each VM will run Docker.  Docker creates a dynamic Ethernet bridge it
 uses to assign IP addresses to its containers.
 Docker by default assigns IP addresses to containers in a dynamic manner,
@@ -709,14 +727,14 @@ containers.  This requires docker to be configured as follows:</p></div>
 <div class="paragraph"><p>That configuration needs to be made in the /etc/sysconfig/docker file which
 gets referenced by the /usr/lib/systemd/docker.service
 file used to start docker.</p></div>
-<h2 id="reference">5.6. Reference</h2>
+<h2 id="reference">4.6. Reference</h2>
 <div class="paragraph"><p><a href="http://ispyker.blogspot.com/2014/04/accessing-docker-container-private.html">http://ispyker.blogspot.com/2014/04/accessing-docker-container-private.html</a></p></div>
 </div>
 <div class="section">
-    <h1 class="page-header" id="firewall_configuration">6. Firewall Configuration</h1>
+    <h1 class="page-header" id="firewall_configuration">5. Firewall Configuration</h1>
 <div class="paragraph"><p>This is a set of steps that can be followed to allow you
 to enable firewalld (on Centos7 and RHEL 7) and run CPM.</p></div>
-<h2 id="disable_network_manager">6.1. Disable Network Manager</h2>
+<h2 id="disable_network_manager">5.1. Disable Network Manager</h2>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.6
 by Lorenzo Bettini
@@ -733,7 +751,7 @@ I should turn off NetworkManager in RHEL/CentoS 7.0, I am assuming
 this will be fixed in 7.1 but am not sure:</div>
 </div>
 <div class="paragraph"><p><a href="https://bugzilla.redhat.com/show_bug.cgi?id=1098281">https://bugzilla.redhat.com/show_bug.cgi?id=1098281</a></p></div>
-<h2 id="enable_ip_forwarding">6.2. Enable IP Forwarding</h2>
+<h2 id="enable_ip_forwarding">5.2. Enable IP Forwarding</h2>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.6
 by Lorenzo Bettini
@@ -741,7 +759,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>vi /etc/sysctl<span style="color: #990000">.</span>conf
 net<span style="color: #990000">.</span>ipv4<span style="color: #990000">.</span><span style="color: #009900">ip_forward</span><span style="color: #990000">=</span><span style="color: #993399">1</span></tt></pre></div></div>
-<h2 id="open_dns_port">6.3. Open DNS Port</h2>
+<h2 id="open_dns_port">5.3. Open DNS Port</h2>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.6
 by Lorenzo Bettini
@@ -749,7 +767,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>firewall-cmd --permanent --zone<span style="color: #990000">=</span>public --add-service<span style="color: #990000">=</span>dns
 firewall-cmd --reload</tt></pre></div></div>
-<h2 id="open_cpm_web_port">6.4. Open CPM Web Port</h2>
+<h2 id="open_cpm_web_port">5.4. Open CPM Web Port</h2>
 <div class="paragraph"><p>Create a file in /etc/firewalld/services named cpm.xml</p></div>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.6
@@ -770,7 +788,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>chmod <span style="color: #993399">640</span> cpm<span style="color: #990000">.</span>xml
 restorecon cpm<span style="color: #990000">.</span>xml</tt></pre></div></div>
-<h2 id="add_the_cpm_service">6.5. Add the CPM service</h2>
+<h2 id="add_the_cpm_service">5.5. Add the CPM service</h2>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.6
 by Lorenzo Bettini
@@ -778,7 +796,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>firewall-cmd --permanent --add-service<span style="color: #990000">=</span>cpm
 firewall-cmd --reload</tt></pre></div></div>
-<h2 id="open_the_postgresql_port">6.6. Open the Postgresql Port</h2>
+<h2 id="open_the_postgresql_port">5.6. Open the Postgresql Port</h2>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.6
 by Lorenzo Bettini
@@ -786,7 +804,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>firewall-cmd --permanent --zone<span style="color: #990000">=</span>public --add-service<span style="color: #990000">=</span>postgresql
 firewall-cmd --reload</tt></pre></div></div>
-<h2 id="allow_masquerading">6.7. Allow Masquerading</h2>
+<h2 id="allow_masquerading">5.7. Allow Masquerading</h2>
 <div class="paragraph"><p>You might not want to do this if you want finer grained firewall rules!
 This does allow all external hosts to route to the PG containers and
 masquerade as the firewall hosts ip address as the source address.</p></div>
@@ -797,7 +815,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>firewall-cmd --permanent --zone<span style="color: #990000">=</span>public --add-masquerade
 firewall-cmd --reload</tt></pre></div></div>
-<h2 id="allow_external_host_routing">6.8. Allow External Host Routing</h2>
+<h2 id="allow_external_host_routing">5.8. Allow External Host Routing</h2>
 <div class="paragraph"><p>On external hosts, you need to create a static route that allows
 them to reach the Docker containers (e.g. 172.18.0.0/16) via the
 Docker host ip (e.g. 192.168.0.103) using a particular eth interface (e.g. enp2s0):</p></div>
@@ -807,231 +825,13 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>ip route add <span style="color: #993399">172.18</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.103</span> dev enp2s0</tt></pre></div></div>
-<h2 id="allow_cpm_dns">6.9. Allow CPM DNS</h2>
+<h2 id="allow_cpm_dns">5.9. Allow CPM DNS</h2>
 <div class="paragraph"><p>To resolve the Docker container host names, assigned by CPM Skybridge,
 you will need to specify on your remote hosts, the CPM DNS host ip address
 as the primary DNS nameserver in your /etc/resolv.conf.</p></div>
 </div>
 <div class="section">
-    <h1 class="page-header" id="log_aggregation">7. Log Aggregation</h1>
-<div class="paragraph"><p>Log aggregation within CPM can be accomplished using the cpm-efk container.</p></div>
-<div class="paragraph"><p>The cpm-efk container includes:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-elasticsearch - <a href="https://www.elastic.co/products/elasticsearch">https://www.elastic.co/products/elasticsearch</a>
-</p>
-</li>
-<li>
-<p>
-fluentd - <a href="http://www.fluentd.org/">http://www.fluentd.org/</a>
-</p>
-</li>
-<li>
-<p>
-kibana - <a href="https://www.elastic.co/products/kibana">https://www.elastic.co/products/kibana</a>
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>These tools when combined provide a capability similar to that of tools like splunk for log analysis and
-aggregation.</p></div>
-<h2 id="starting_cpm_efk">7.1. Starting cpm-efk</h2>
-<div class="paragraph"><p>Some customization to the run-cpm-efk.sh script and rsyslog.conf files are required:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-modify LOCAL_IP environment variable to use your local system&#8217;s IP address
-</p>
-</li>
-<li>
-<p>
-modify EFKDATA environment variable to use a local directory where the cpm-efk container will persist it&#8217;s data
-</p>
-</li>
-<li>
-<p>
-modify /var/cpm/conf/rsyslog.conf to specify your local IP address that cpm-efk will be listening on
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>Start up cpm-efk as follows:</p></div>
-<div class="literalblock">
-<div class="content monospaced">
-<pre>cd images/cpm-efk
-sudo ./run-cpm-efk.sh</pre>
-</div></div>
-<div class="paragraph"><p>This will start the cpm-efk container.  When running, the cpm-efk container
-will listen to the following ports:</p></div>
-<div class="literalblock">
-<div class="content monospaced">
-<pre>fluentd - 24224
-fluentd-syslog - 5140
-kibana-http - 5601</pre>
-</div></div>
-<div class="paragraph"><p>You can start using the kibana web interface at <a href="http://cpm-efk:5601">http://cpm-efk:5601</a></p></div>
-<h2 id="cpm_internal_logs">7.2. CPM Internal Logs</h2>
-<div class="paragraph"><p>Log messages produced by the CPM administration containers (cpm-admin, cpm-task, etc.)
-are logged to stdout (except cpm-web) by default.  We can view the stdout logs using
-the normal <strong>docker log</strong> command or, as of Docker 1.8, we can specify a Docker log driver to route the container&#8217;s stdout log
-output to a fluentd server (running inside the cpm-efk container).</p></div>
-<div class="paragraph"><p>In the startup scripts for CPM, run-cpm.sh, you will see
-that the Docker log driver is specified to use the fluentd
-driver by default:</p></div>
-<div class="literalblock">
-<div class="content monospaced">
-<pre>--log-driver=fluentd \
---log-opt fluentd-address=192.168.0.107:24224 \
---log-opt fluentd-tag=docker.cpm-admin \</pre>
-</div></div>
-<div class="paragraph"><p>This will send the docker log output for the CPM containers
-to the fluentd server running at the specified address (e.g. 192.168.0.107:24224).</p></div>
-<div class="paragraph"><p>The exception to this is the cpm-web (nginx) container.  Nginx has
-a configuration that requires you to send stdout and stderr to
-a file.  There is a bug in Docker (1.8.2 and earlier versions), that
-prevents a non-root user write access to /dev/stdout and /dev/stderr.
-See <a href="https://github.com/docker/docker/issues/6880">https://github.com/docker/docker/issues/6880</a> for details on the bug.</p></div>
-<div class="paragraph"><p>So, until the next release of Docker, we will continue to
-send cpm-web output to log files mounted from the local host (e.g. /var/cpm/logs).</p></div>
-<div class="paragraph"><p>If you want to have the CPM product containers send their logs to the Docker log instead
-of using the cpm-efk and fluentd logging, just remove the log driver lines above
-from the run-cpm.sh startup script when you start the CPM product containers.</p></div>
-<h2 id="postgres_container_logs">7.3. Postgres Container Logs</h2>
-<div class="paragraph"><p>On each CPM provisioned Postgresql container, we have enabled Postgresql
-to send log output to both stdout and syslog.</p></div>
-<div class="paragraph"><p>We use syslog within each container a the mechanism to aggregate all the Postgresql
-logs into the cpm-efk container.</p></div>
-<div class="paragraph"><p>The use of syslog within each container is triggered by the presense of
-/syslogconfig/rsyslog.conf within each container.  There is a volume mount that
-is used by the container to find the syslog configuration files:</p></div>
-<div class="literalblock">
-<div class="content monospaced">
-<pre>-v /var/cpm/config:/syslogconfig</pre>
-</div></div>
-<div class="paragraph"><p>On each CPM server, to use the syslog feature, you will need a /var/cpm/config directory
-that contains both rsyslog.conf and listen.conf configuration files.  If the configuration
-files are not present, the cpm-node containers will not use configure syslog logging to
-cpm-efk.</p></div>
-<h3 id="rsyslog_configuration">7.3.1. rsyslog Configuration</h3>
-<div class="paragraph"><p>To support syslog logging within each Postgres container (cpm-node),
-the rsyslogd binary is installed within the cpm-node container.</p></div>
-<div class="paragraph"><p>The configuration of rsyslog within a container is tricky and is
-documented by Dan Walsh here:</p></div>
-<div class="paragraph"><p><a href="http://www.projectatomic.io/blog/2014/09/running-syslog-within-a-docker-container/">http://www.projectatomic.io/blog/2014/09/running-syslog-within-a-docker-container/</a></p></div>
-<div class="paragraph"><p>The sample rsyslog.conf file causes the container&#8217;s rsyslog to forward syslog
-messages to a remote syslog server (e.g. 192.168.0.107:5140) which is served
-by the cpm-efk fluentd-syslog component:</p></div>
-<div class="literalblock">
-<div class="content monospaced">
-<pre>$WorkDirectory /var/lib/rsyslog
-$ActionQueueFileName fwdRule1
-$ActionQueueMaxDiskSpace 2g
-$ActionQueueSaveOnShutdown on
-$ActionQueueType LinkedList
-$ActionResumeRetryCount -1
-*.* @@192.168.0.107:5140</pre>
-</div></div>
-<div class="paragraph"><p>Also, in /etc/rsyslog.d/listen.conf the line $SystemLogSocketName
-is commented out.</p></div>
-<div class="paragraph"><p>Sample rsyslog.conf and listen.conf files are stored in the github CPM_ROOT/images/cpm-efk/conf directory.
-These config files are copied to your local /var/cpm/config directory when you start up cpm-efk.</p></div>
-<h3 id="postgres_configuration_changes">7.3.2. Postgres Configuration Changes</h3>
-<div class="paragraph"><p>The Postgresql running inside each cpm-node container is configured to log to both
-standard log files and syslog.</p></div>
-<div class="paragraph"><p>This dual logging is accomplished in postgresql.conf as follows:</p></div>
-<div class="literalblock">
-<div class="content monospaced">
-<pre>log_destination = 'stderr,syslog'
-syslog_facility = 'LOCAL0'
-syslog_ident = 'postgres'</pre>
-</div></div>
-</div>
-<div class="section">
-    <h1 class="page-header" id="server_setup">8. Server Setup</h1>
-<h2 id="single_server_configuration">8.1. Single-Server Configuration</h2>
-<div class="paragraph"><p>The typical CPM developer installation will run CPM on a single
-server, both CPM and it&#8217;s requisite DNS bridge (dnsbridge or skybridge).
-This is the single-server configuration that most people will
-use to demo, hack, and prototype CPM with.</p></div>
-<div class="paragraph"><p>These can be physical or virtual servers.  In this setup, you will be running
-all CPM containers on a single server.</p></div>
-<h3 id="cpm_installation">8.1.1. CPM Installation</h3>
-<div class="paragraph"><p>You will perform a user-install of CPM, the installer will ask
-you which remote servers you want to configure and will copy
-the required CPM files to the remote server.  The installer will
-also enable and start the required CPM services on each server.</p></div>
-<h3 id="dns_configuration">8.1.2. DNS Configuration</h3>
-<div class="paragraph"><p>For CPM, you need to run a skybridge container.  skybridge is a container that provides
-a DNS-to-Docker service, that listens to Docker container events, and registers DNS
-records for any containers that are created.  It runs a version of skydns
-that is a DNS name server.  Therefore, when it starts it will listen on port 53 on
-your dev server.</p></div>
-<div class="paragraph"><p>To use it as a name server, you would register it in your /etc/resolv.conf file
-as the primary name server.  For this example of installation, I use the
-crunchy.lab DNS domain name.  Here is an example of a configured /etc/resolv.conf
-file:</p></div>
-<div class="literalblock">
-<div class="content monospaced">
-<pre>search crunchy.lab
-nameserver 192.168.0.107
-nameserver 192.168.0.1</pre>
-</div></div>
-<div class="paragraph"><p>On dev servers that</p></div>
-<div class="paragraph"><p>Also, on each server, the Docker configuration in /etc/sysconfig/docker
-would also need to specify the CPM DNS nameserver as follows:</p></div>
-<div class="listingblock">
-<div class="content monospaced">
-<pre>--dns=192.168.56.101 --dns=192.168.0.1</pre>
-</div></div>
-<h3 id="networking_for_multi_server_cpm">8.1.3. Networking for Multi-Server CPM</h3>
-<div class="paragraph"><p>For a multi-host CPM deployment, you will define network routes
-as follows:</p></div>
-<div class="paragraph"><p>You need to define routes to the other docker servers, we create
-a route file in /etc/sysconfig/network-scripts.  The name of the
-file is route-xxxx where xxx is the name of the ethernet adapter for our 192.168.56.X network,
-for Example:
-        route-enp0s3</p></div>
-<div class="paragraph"><p>For server1, the route values are:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><span style="color: #993399">172.19</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.102</span> metric <span style="color: #993399">0</span>
-<span style="color: #993399">172.17</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.103</span> metric <span style="color: #993399">0</span></tt></pre></div></div>
-<div class="paragraph"><p>For admin server, the route values are:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><span style="color: #993399">172.18</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.101</span> metric <span style="color: #993399">0</span>
-<span style="color: #993399">172.19</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.102</span> metric <span style="color: #993399">0</span></tt></pre></div></div>
-<div class="paragraph"><p>For server2, the route values are:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><span style="color: #993399">172.18</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.101</span> metric <span style="color: #993399">0</span>
-<span style="color: #993399">172.17</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.103</span> metric <span style="color: #993399">0</span></tt></pre></div></div>
-<div class="paragraph"><p>After these routes are in place, each docker container on each
-server can route to containers on the other servers.</p></div>
-<div class="paragraph"><p>Route examples on virtualbox:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>ip route add <span style="color: #993399">172.17</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.103</span> dev vboxnet0
-ip route add <span style="color: #993399">172.18</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.101</span> dev vboxnet0
-ip route add <span style="color: #993399">172.19</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.102</span> dev vboxnet0</tt></pre></div></div>
-<h3 id="testing">8.1.4. Testing</h3>
-<div class="paragraph"><p>A script is provided to help verify that your environment is
-configured correctly:
-<a href="http://github.com/crunchydata/cpm/network-test.sh">http://github.com/crunchydata/cpm/network-test.sh</a></p></div>
-</div>
-<div class="section">
-    <h1 class="page-header" id="swarm_configuration">9. Swarm Configuration</h1>
+    <h1 class="page-header" id="swarm_configuration">6. Swarm Configuration</h1>
 <div class="paragraph"><p>CPM uses Docker Swarm to virtualize multiple Docker servers into
 a single virtual server.  This is a convenient way to implement
 multiple host Docker which is necessary to scale out the
@@ -1042,7 +842,7 @@ have a single manager and multiple swarm agent hosts.</p></div>
 <div class="paragraph"><p>For this example configuration, we start the Swarm Manager
 on 192.168.0.103:8000</p></div>
 <div class="paragraph"><p>The Swarm agent is started to listen to 0.0.0.0:2375</p></div>
-<h2 id="installation">9.1. Installation</h2>
+<h2 id="installation">6.1. Installation</h2>
 <div class="paragraph"><p>Swarm is provided by Docker at <a href="https://github.com/docker/swarm">https://github.com/docker/swarm</a>.  Use the
 instructions at the Swarm github page to install a binary version
 of Swarm into the /usr/local/bin directory of all the servers you
@@ -1056,7 +856,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>swarm create
 7b9fb5037919f89bd52c3c4888586be3</tt></pre></div></div>
-<h2 id="docker_configuration_2">9.2. Docker Configuration</h2>
+<h2 id="docker_configuration_2">6.2. Docker Configuration</h2>
 <div class="paragraph"><p>Docker is configured on each server to listen to 0.0.0.0:2375 for API events.  On
 Centos/RHEL this is done by adding -H tcp://0.0.0.0:2375 in the /etc/sysconfig/docker
 file:</p></div>
@@ -1069,7 +869,7 @@ http://www.gnu.org/software/src-highlite -->
 /usr/bin/docker -d --selinux-enabled -H tcp<span style="color: #990000">://</span><span style="color: #993399">0.0</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">:</span><span style="color: #009900">$SWARM_PORT</span> --label <span style="color: #009900">storage</span><span style="color: #990000">=</span>ssd --label <span style="color: #009900">hostname</span><span style="color: #990000">=</span>espresso<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab --label <span style="color: #009900">profile</span><span style="color: #990000">=</span>small</tt></pre></div></div>
 <div class="paragraph"><p>Notice that we assign labels to the docker daemon, these labels are used by CPM (via Swarm)
 to figure out the correct server to deploy containers upon.  CPM requires you classify a server with a label key of <em>profile</em> and value of <em>SM</em>, <em>MED</em>, or <em>LG</em>.  This label value is used to determine where a container will be placed during the provisioning process.  Also, a label key of hostname is used to provide the user a way to provision a container upon a specific host.  The value of the hostname key is the fully qualified host name of the server.</p></div>
-<h2 id="startup">9.3. Startup</h2>
+<h2 id="startup">6.3. Startup</h2>
 <div class="paragraph"><p>On each server in your cluster, Start the swarm server agent listening to the local Docker API:</p></div>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.6
@@ -1090,7 +890,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">MANAGER_PORT</span><span style="color: #990000">=</span><span style="color: #993399">8000</span>
 swarm manage --host <span style="color: #009900">$MANAGER_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$MANAGER_PORT</span>
 nodes<span style="color: #990000">://</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.107</span><span style="color: #990000">:</span><span style="color: #993399">2375</span><span style="color: #990000">,</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.106</span><span style="color: #990000">:</span><span style="color: #993399">2375</span></tt></pre></div></div>
-<h2 id="test">9.4. Test</h2>
+<h2 id="test">6.4. Test</h2>
 <div class="paragraph"><p>To see what servers are include in the swarm:</p></div>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.6
@@ -1115,9 +915,9 @@ docker -H tcp<span style="color: #990000">://</span><span style="color: #009900"
 docker -H tcp<span style="color: #990000">://</span><span style="color: #009900">$MANAGER_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$MANAGER_PORT</span> logs</tt></pre></div></div>
 </div>
 <div class="section">
-    <h1 class="page-header" id="licenses">10. Licenses</h1>
+    <h1 class="page-header" id="licenses">7. Licenses</h1>
 <div class="paragraph"><p>CPM is built on products that include the following licenses:</p></div>
-<h2 id="docker_apache_2_0">10.1. Docker (Apache 2.0)</h2>
+<h2 id="docker_apache_2_0">7.1. Docker (Apache 2.0)</h2>
 <div class="paragraph"><p><a href="https://github.com/docker/docker/blob/master/LICENSE">https://github.com/docker/docker/blob/master/LICENSE</a></p></div>
 <div class="literalblock">
 <div class="content monospaced">
@@ -1312,7 +1112,7 @@ docker -H tcp<span style="color: #990000">://</span><span style="color: #009900"
    See the License for the specific language governing permissions and
    limitations under the License.</pre>
 </div></div>
-<h2 id="dockerclient">10.2. DockerClient</h2>
+<h2 id="dockerclient">7.2. DockerClient</h2>
 <div class="paragraph"><p><a href="https://github.com/fsouza/go-dockerclient/blob/master/LICENSE">https://github.com/fsouza/go-dockerclient/blob/master/LICENSE</a></p></div>
 <div class="literalblock">
 <div class="content monospaced">
@@ -1339,7 +1139,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</pre>
 </div></div>
-<h2 id="json_rest_api_mit_license">10.3. JSON Rest API (MIT License)</h2>
+<h2 id="json_rest_api_mit_license">7.3. JSON Rest API (MIT License)</h2>
 <div class="paragraph"><p><a href="https://github.com/ant0ine/go-json-rest/blob/master/LICENSE">https://github.com/ant0ine/go-json-rest/blob/master/LICENSE</a></p></div>
 <div class="literalblock">
 <div class="content monospaced">
@@ -1353,7 +1153,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</pre>
 </div></div>
-<h2 id="postgres_pq_library">10.4. Postgres PQ Library</h2>
+<h2 id="postgres_pq_library">7.4. Postgres PQ Library</h2>
 <div class="paragraph"><p><a href="https://github.com/lib/pq/blob/master/LICENSE.md">https://github.com/lib/pq/blob/master/LICENSE.md</a></p></div>
 <div class="literalblock">
 <div class="content monospaced">
@@ -1365,7 +1165,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</pre>
 </div></div>
-<h2 id="angularjs">10.5. AngularJS</h2>
+<h2 id="angularjs">7.5. AngularJS</h2>
 <div class="paragraph"><p><a href="https://github.com/angular/angular.js/blob/master/LICENSE">https://github.com/angular/angular.js/blob/master/LICENSE</a></p></div>
 <div class="literalblock">
 <div class="content monospaced">
@@ -1391,7 +1191,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.</pre>
 </div></div>
-<h2 id="twitter_bootstrap">10.6. Twitter Bootstrap</h2>
+<h2 id="twitter_bootstrap">7.6. Twitter Bootstrap</h2>
 <div class="paragraph"><p><a href="https://github.com/twbs/bootstrap/blob/master/LICENSE">https://github.com/twbs/bootstrap/blob/master/LICENSE</a></p></div>
 <div class="literalblock">
 <div class="content monospaced">
@@ -1417,7 +1217,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.</pre>
 </div></div>
-<h2 id="go_language">10.7. Go Language</h2>
+<h2 id="go_language">7.7. Go Language</h2>
 <div class="paragraph"><p><a href="http://golang.org/LICENSE">http://golang.org/LICENSE</a></p></div>
 <div class="literalblock">
 <div class="content monospaced">
@@ -1451,7 +1251,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</pre>
 </div></div>
 </div>
 <div class="section">
-    <h1 class="page-header" id="other_documentation">11. Other Documentation</h1>
+    <h1 class="page-header" id="other_documentation">8. Other Documentation</h1>
 <div class="paragraph"><p>CPM has multiple REST APIs which are documented here:
  
 <a href="rest-api.html">REST API Documentation</a></p></div>
@@ -1476,7 +1276,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</pre>
         <div class="container">
 <div class="row"><div id="footnotes"></div></div>
 <div id="footer-text">
-Last updated 2015-12-14 09:48:05 CST
+Last updated 2015-12-15 11:34:00 CST
 <br>Built with <a href="https://github.com/llaville/asciidoc-bootstrap-backend">AsciiDoc-Bootstrap backend</a> 4.5.0
 </div>
         </div>

@@ -26,7 +26,7 @@ LOCAL_IP=192.168.0.107
 FLUENT_URL=$LOCAL_IP:24224
 
 echo "setting up log dir..."
-KEYSDIR=/var/cpm/logs
+LOGDIR=/var/cpm/logs
 mkdir $LOGDIR
 chcon -Rt svirt_sandbox_file_t $LOGDIR
 
@@ -34,7 +34,7 @@ echo "setting up keys dir..."
 KEYSDIR=/var/cpm/keys
 mkdir $KEYSDIR
 cp $INSTALLDIR/sbin/key.pem $KEYSDIR
-cp $INSTALLDIR/sbin/cert $KEYSDIR
+cp $INSTALLDIR/sbin/cert.pem $KEYSDIR
 chcon -Rt svirt_sandbox_file_t $KEYSDIR
 
 echo "restarting cpm container..."
@@ -47,28 +47,6 @@ docker run --name=cpm-web -d \
 	-v $KEYSDIR:/cpmkeys \
 	-v $INSTALLDIR/images/cpm/www/v3:/www \
 	crunchydata/cpm:latest
-
-echo "restarting cpm-efk container..."
-EFKDATADIR=/var/cpm/data/elasticsearch-data
-chcon -Rt svirt_sandbox_file_t $EFKDATADIR
-
-# port 24224 is the fluentd listen port
-FLUENTD_URL=$LOCAL_IP:24224
-# port 5140 is the syslog server port that fluentd listens on 
-EFK_SYSLOG_URL=$LOCAL_IP:5140
-# port 5601  is the kibana http port
-KIBANA_URL=$LOCAL_IP:5601
-
-docker stop cpm-efk
-docker rm cpm-efk
-docker run --name=cpm-efk --hostname="cpm-efk" -d \
-	-v $EFKDATA:/elasticsearch/data \
-	-p $FLUENTD_URL:24224 \
-	-p $EFK_SYSLOG_URL:5140 \
-	-p $KIBANA_URL:5601 \
-	crunchydata/cpm-efk:latest
-echo "wait for a few seconds till the logger container starts up..."
-sleep 10
 
 echo "restarting cpm-admin container..."
 sleep 2
