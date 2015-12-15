@@ -312,7 +312,7 @@ synchronous_standby_names = '{{.CLUSTER_TYPE}}'	# standby servers that provide s
 
 # - Where to Log -
 
-log_destination = 'stderr'		# Valid values are combinations of
+log_destination = 'stderr,syslog'		# Valid values are combinations of
 					# stderr, csvlog, syslog, and eventlog,
 					# depending on platform.  csvlog
 					# requires logging_collector to be on.
@@ -345,8 +345,8 @@ log_rotation_size = 0			# Automatic rotation of logfiles will
 					# 0 disables.
 
 # These are relevant when logging to syslog:
-#syslog_facility = 'LOCAL0'
-#syslog_ident = 'postgres'
+syslog_facility = 'LOCAL0'
+syslog_ident = 'postgres'
 
 # This is only relevant when logging to eventlog (win32):
 #event_source = 'PostgreSQL'

@@ -32,6 +32,12 @@ EFK_SYSLOG_URL=$LOCAL_IP:5140
 # port 5601  is the kibana http port
 KIBANA_URL=$LOCAL_IP:5601
 
+# the presence of these config files locally will cause the
+# cpm-node containers to configure rsyslog for remote logging
+# comment these lines out if you don't want this
+cp ./conf/listen.conf /var/cpm/config
+cp ./conf/rsyslog.conf /var/cpm/config
+
 echo "restarting cpm-efk"
 docker stop cpm-efk
 docker rm cpm-efk

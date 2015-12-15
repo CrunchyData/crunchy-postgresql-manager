@@ -2,14 +2,14 @@ FROM docker.io/centos:centos7
 
 MAINTAINER crunchy
 
-RUN yum install -y wget java gcc make ruby ruby-devel procps-ng unzip openssh-clients hostname bind-utils && yum clean all -y
+RUN yum install -y tar wget java gcc make ruby ruby-devel procps-ng unzip openssh-clients hostname bind-utils && yum clean all -y
 
 RUN wget https://download.elastic.co/kibana/kibana/kibana-4.3.0-linux-x64.tar.gz
-ADD kibana-4.3.0-linux-x64.tar.gz /
+RUN tar xvzf kibana-4.3.0-linux-x64.tar.gz 
 RUN mv /kibana-4.3.0-linux-x64 /kibana
 
 RUN wget https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-2.1.0.tar.gz
-ADD elasticsearch-2.1.0.tar.gz /
+RUN tar xvzf elasticsearch-2.1.0.tar.gz 
 RUN mv /elasticsearch-2.1.0 /elasticsearch
 RUN useradd elasticsearch
 RUN mkdir -p /elasticsearch/logs \
@@ -27,6 +27,7 @@ RUN mkdir -p /var/cpm/conf
 ADD bin /var/cpm/bin
 ADD sbin /var/cpm/bin
 ADD conf /var/cpm/conf
+ADD conf/listen.conf /etc/rsyslog.d/listen.conf
 
 USER root
 
