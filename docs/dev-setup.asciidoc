@@ -6,25 +6,25 @@ clean RHEL or Centos 7.1 minimal installation.
 This instruction assumes you are using a static IP address of
 192.168.0.107 for your CPM server.
 
-=== RHEL Setup 
+=== Centos/RHEL Setup 
 
 note that for RHEL 7.1, you will need to add the following repos:
-[source,bash]
------
-subscription-manager repos --enable=rhel-7-server-extras-rpms
-subscription-manager repos --enable=rhel-7-server-optional-rpms
------
-
-=== Install Local Dependencies
-
-Note that I like to use the PGDG postgres distro instead of the redhat provided postgres!  Here is an example of installing postgres on a Centos 7 box,
-replace 'centos' with 'redhat' if installing on a Redhat box:
 
 ....
-sudo yum -y install net-tools bind-utils install golang git docker mercurial sysstat
-rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
-rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
-yum install -y nmap-ncat procps-ng postgresql94 postgresql94-contrib postgresql94-server libxslt unzip openssh-clients hostname bind-utils
+subscription-manager repos --enable=rhel-7-server-extras-rpms
+subscription-manager repos --enable=rhel-7-server-optional-rpms
+....
+
+It is always good to run a full update on the operating system before beginning
+the CPM install:
+
+....
+sudo yum -y update
+....
+
+To get started, install git first:
+....
+sudo yum -y install git mercurial
 ....
 
 === Setup Go Project Structure 
@@ -54,6 +54,15 @@ cd src/github.com/crunchydata/crunchy-postgresql-manager
 .Download and Restore All Dependencies 
 ....
 godep restore
+....
+
+.Install Local Dependencies
+
+To install the local server dependencies, there is a script, sbin/dev-dep-install.sh,
+that you will run to do the various package installations:
+
+....
+sudo ./sbin/dev-dep-install.sh
 ....
 
 .Compile CPM

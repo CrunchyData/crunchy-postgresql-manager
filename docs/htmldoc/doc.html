@@ -206,26 +206,25 @@ skybridge : DNS-to-Docker agent for registering DNS names for each container
 clean RHEL or Centos 7.1 minimal installation.</p></div>
 <div class="paragraph"><p>This instruction assumes you are using a static IP address of
 192.168.0.107 for your CPM server.</p></div>
-<h2 id="rhel_setup">3.1. RHEL Setup</h2>
+<h2 id="centos_rhel_setup">3.1. Centos/RHEL Setup</h2>
 <div class="paragraph"><p>note that for RHEL 7.1, you will need to add the following repos:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>subscription-manager repos --enable<span style="color: #990000">=</span>rhel-<span style="color: #993399">7</span>-server-extras-rpms
-subscription-manager repos --enable<span style="color: #990000">=</span>rhel-<span style="color: #993399">7</span>-server-optional-rpms</tt></pre></div></div>
-<h2 id="install_local_dependencies">3.2. Install Local Dependencies</h2>
-<div class="paragraph"><p>Note that I like to use the PGDG postgres distro instead of the redhat provided postgres!  Here is an example of installing postgres on a Centos 7 box,
-replace <em>centos</em> with <em>redhat</em> if installing on a Redhat box:</p></div>
 <div class="literalblock">
 <div class="content monospaced">
-<pre>sudo yum -y install net-tools bind-utils install golang git docker mercurial sysstat
-rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
-rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
-yum install -y nmap-ncat procps-ng postgresql94 postgresql94-contrib postgresql94-server libxslt unzip openssh-clients hostname bind-utils</pre>
+<pre>subscription-manager repos --enable=rhel-7-server-extras-rpms
+subscription-manager repos --enable=rhel-7-server-optional-rpms</pre>
 </div></div>
-<h2 id="setup_go_project_structure">3.3. Setup Go Project Structure</h2>
+<div class="paragraph"><p>It is always good to run a full update on the operating system before beginning
+the CPM install:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>sudo yum -y update</pre>
+</div></div>
+<div class="paragraph"><p>To get started, install git first:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>sudo yum -y install git mercurial</pre>
+</div></div>
+<h2 id="setup_go_project_structure">3.2. Setup Go Project Structure</h2>
 <div class="paragraph"><p>As your development user, create the development directory as follows:</p></div>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.6
@@ -254,12 +253,18 @@ cd src/github.com/crunchydata/crunchy-postgresql-manager</pre>
 <div class="content monospaced">
 <pre>godep restore</pre>
 </div></div>
+<div class="paragraph"><div class="title">Install Local Dependencies</div><p>To install the local server dependencies, there is a script, sbin/dev-dep-install.sh,
+that you will run to do the various package installations:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>sudo ./sbin/dev-dep-install.sh</pre>
+</div></div>
 <div class="literalblock">
 <div class="title">Compile CPM</div>
 <div class="content monospaced">
 <pre>make build</pre>
 </div></div>
-<h2 id="configure_docker">3.4. Configure Docker</h2>
+<h2 id="configure_docker">3.3. Configure Docker</h2>
 <div class="paragraph"><p>Edit the docker configuration (/etc/sysconfig/docker) by editing the OPTIONS parameter as follows:</p></div>
 <div class="literalblock">
 <div class="content monospaced">
@@ -283,7 +288,7 @@ cd src/github.com/crunchydata/crunchy-postgresql-manager</pre>
 <pre>systemctl enable docker.service
 systemctl start docker.service</pre>
 </div></div>
-<h2 id="build_cpm_docker_images">3.5. Build CPM Docker Images</h2>
+<h2 id="build_cpm_docker_images">3.4. Build CPM Docker Images</h2>
 <div class="literalblock">
 <div class="title">Pull down Prometheus images</div>
 <div class="content monospaced">
@@ -296,14 +301,14 @@ sudo docker pull prom/prometheus</pre>
 <pre>make buildimages
 docker images</pre>
 </div></div>
-<h2 id="disable_firewalld">3.6. Disable Firewalld</h2>
+<h2 id="disable_firewalld">3.5. Disable Firewalld</h2>
 <div class="literalblock">
 <div class="content monospaced">
 <pre>systemctl disable firewalld.service
 systemctl stop firewalld.service</pre>
 </div></div>
 <div class="paragraph"><p>The document, firewall-setup.md, shows how the CPM ports can be opened up.</p></div>
-<h2 id="setup_skybridge">3.7. Setup skybridge</h2>
+<h2 id="setup_skybridge">3.6. Setup skybridge</h2>
 <div class="paragraph"><p>CPM services are found using DNS by the various parts of CPM.  When
 a Docker image is started, we need it to be registered with a DNS service
 and the local machine configured to resolve using that DNS server.</p></div>
@@ -345,7 +350,7 @@ to specify your local IP address, then run the skybridge container:</p></div>
 <div class="content monospaced">
 <pre>sudo ./sbin/run-skybridge.sh</pre>
 </div></div>
-<h2 id="configure_and_start_swarm">3.8. Configure and Start Swarm</h2>
+<h2 id="configure_and_start_swarm">3.7. Configure and Start Swarm</h2>
 <div class="paragraph"><p>Download the swarm binary as follows, within a new swarm go project:</p></div>
 <div class="literalblock">
 <div class="content monospaced">
@@ -367,7 +372,7 @@ swarm join --addr=192.168.0.107:2375 token://&lt;&lt;&lt;insert your swarm gener
 </div></div>
 <div class="paragraph"><p>A swarm guide is available at:</p></div>
 <div class="paragraph"><p><a href="swarm-setup.html">Swarm Setup</a></p></div>
-<h2 id="testing_skybridge_and_swarm">3.9. Testing skybridge and Swarm</h2>
+<h2 id="testing_skybridge_and_swarm">3.8. Testing skybridge and Swarm</h2>
 <div class="paragraph"><p>At this point, it is a good time to test the installation of skybridge,
 docker, and docker swarm.</p></div>
 <div class="paragraph"><p>Make sure the following processes are running:</p></div>
@@ -392,7 +397,7 @@ skybridge docker container.</p></div>
 <div class="paragraph"><p>You should see the tester.crunchy.lab name resolving and responding to the ping command.  If not,
 then there is a configuration error.  If you can ping the tester container, then proceed on
 in the installation.</p></div>
-<h2 id="start_cpm_efk_logging">3.10. Start cpm-efk Logging</h2>
+<h2 id="start_cpm_efk_logging">3.9. Start cpm-efk Logging</h2>
 <div class="paragraph"><p>The default logging configuration in CPM uses the cpm-efk container
 to aggregate logs.</p></div>
 <div class="paragraph"><p>Prior to starting the cpm-efk container, modify the run-cpm-efk.sh script as documented here:</p></div>
@@ -403,7 +408,7 @@ to aggregate logs.</p></div>
 <pre>cd $CPMROOT/images/cpm-efk
 sudo ./run-cpm-efk.sh</pre>
 </div></div>
-<h2 id="start_cpm_server_agent">3.11. Start CPM Server Agent</h2>
+<h2 id="start_cpm_server_agent">3.10. Start CPM Server Agent</h2>
 <div class="paragraph"><p>On each server that is to run CPM, you will need to start a CPM Server
 Agent.  The server agent is run within the cpm-server container on each
 server host that will be configured to be used in CPM.</p></div>
@@ -428,7 +433,7 @@ to it:</p></div>
 <pre>curl http://cpm-newserver:10001/status
 curl http://192.168.0.107:10001/status</pre>
 </div></div>
-<h2 id="seed_the_server">3.12. Seed the Server</h2>
+<h2 id="seed_the_server">3.11. Seed the Server</h2>
 <div class="paragraph"><p>A one-time initialization of the server is performed by
 running the $CPMROOT/sbin/dev-setup.sh script.</p></div>
 <div class="paragraph"><p>This script copies files from the CPM github source
@@ -440,7 +445,7 @@ to match your local dev system.</p></div>
 <div class="content monospaced">
 <pre>sudo ./dev-setup.sh</pre>
 </div></div>
-<h2 id="running_cpm">3.13. Running CPM</h2>
+<h2 id="running_cpm">3.12. Running CPM</h2>
 <div class="paragraph"><p>Modify the $CPMROOT/run-cpm.sh script by updating the following
 environment variable references:</p></div>
 <div class="ulist"><ul>
@@ -468,7 +473,7 @@ for accessing CPM.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<a href="http://cpm.crunchy.lab:13001">http://cpm.crunchy.lab:13001</a> - CPM Web User Interface
+<a href="http://cpm-web.crunchy.lab:13001">http://cpm-web.crunchy.lab:13001</a> - CPM Web User Interface
 </p>
 </li>
 <li>
@@ -516,7 +521,7 @@ skybridge DNS server.</p></div>
  * projects/container-logic.js</p></div>
 <div class="paragraph"><p>Look for occurances of cpm-promdash:3000 and change them to
 the static IP address and ports listed above.</p></div>
-<h2 id="login">3.14. Login</h2>
+<h2 id="login">3.13. Login</h2>
 <div class="paragraph"><p>To start using CPM, first log into the web interface at <a href="http://cpm-web:13001">http://cpm-web:13001</a></p></div>
 <div class="paragraph"><p>The default superuser ID is <strong>cpm</strong> and the password is <strong>cpm</strong>.  Also, you will
 enter the Admin URL value of <a href="http://cpm-admin:13001">http://cpm-admin:13001</a> on the login dialog
@@ -533,7 +538,7 @@ nginx selinux issues
 </ul></div>
 <div class="paragraph"><p>in some cases with selinux enabled, you might see AVC errors, if so, look at this:</p></div>
 <div class="paragraph"><p><a href="http://axilleas.me/en/blog/2013/selinux-policy-for-nginx-and-gitlab-unix-socket-in-fedora-19/">http://axilleas.me/en/blog/2013/selinux-policy-for-nginx-and-gitlab-unix-socket-in-fedora-19/</a></p></div>
-<h2 id="godocs">3.15. Godocs</h2>
+<h2 id="godocs">3.14. Godocs</h2>
 <div class="paragraph"><p>To see the godocs, install godoc, and start up the godoc server, then
 browse to the CPM API documentation:</p></div>
 <div class="literalblock">
@@ -541,7 +546,7 @@ browse to the CPM API documentation:</p></div>
 <pre>go get golang.org/x/tools/cmd/godoc
 godoc -http=:6060</pre>
 </div></div>
-<h2 id="logging">3.16. Logging</h2>
+<h2 id="logging">3.15. Logging</h2>
 <div class="paragraph"><p>Logging of the CPM product containers is as follows:
 - cpm-web - logs to /var/cpm/logs on the CPM host
 - cpm-admin - logs to fluentd (cpm-efk) by default
@@ -550,7 +555,7 @@ godoc -http=:6060</pre>
 - postgres containers - logs to fluentd via syslog</p></div>
 <div class="paragraph"><p>see 
 <a href="logging.html">Log Aggregation</a> for more details</p></div>
-<h2 id="port_mapping">3.17. Port Mapping</h2>
+<h2 id="port_mapping">3.16. Port Mapping</h2>
 <div class="paragraph"><p>You will likely want to map the CPM addresses to a host IP addressto allow
 access from outside of the Docker assigned IP addresses.  To do this you
 will add some port mapping to the startup script, run-cpm.sh.</p></div>
@@ -581,7 +586,7 @@ port to the local host:</p></div>
 or to your /etc/hosts files to resolve.</p></div>
 <div class="paragraph"><p>You will then need to enter these IP addresses and port numbers in
 the cpm web login screen and browser from a remote host.</p></div>
-<h2 id="connecting_to_containers_remotely">3.18. Connecting to Containers Remotely</h2>
+<h2 id="connecting_to_containers_remotely">3.17. Connecting to Containers Remotely</h2>
 <div class="paragraph"><p>You can connect to a container&#8217;s database from a remote server
 by adding a static route to the CPM servers Docker bridge range
 as follows</p></div>
