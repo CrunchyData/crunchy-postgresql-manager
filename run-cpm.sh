@@ -21,8 +21,8 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 INSTALLDIR=/home/jeffmc/devproject/src/github.com/crunchydata/crunchy-postgresql-manager
-SWARM_MANAGER_URL=tcp://192.168.0.107:8000 
 LOCAL_IP=192.168.0.107
+SWARM_MANAGER_URL=tcp://$LOCAL_IP:8000 
 FLUENT_URL=$LOCAL_IP:24224
 
 echo "setting up log dir..."
