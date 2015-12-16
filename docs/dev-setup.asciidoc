@@ -267,6 +267,9 @@ cd $CPMROOT/images/cpm-efk
 sudo ./run-cpm-efk.sh
 ....
 
+At this point, you can test the cpm-efk container by browsing
+to http://192.168.0.107:5601.  You should see the Kibana web console.
+
 
 === Start CPM Server Agent
 
@@ -280,7 +283,7 @@ attempt to communicate to each host using this port.
 
 For this example, I will name the CPM server, newserver.
 
-So, edit the images/cpm-server/run-cpmserver.sh script, and modify the server
+So, edit the $CPMROOT/images/cpm-server/run-cpmserver.sh script, and modify the server
 IP address to be that of the host you are running the CPM server
 upon.
 
@@ -314,7 +317,7 @@ the source directory environment variable DEVROOT
 to match your local dev system.
 
 ....
-sudo ./dev-setup.sh
+sudo $CPMROOT/sbin/dev-setup.sh
 ....
 
 
@@ -324,7 +327,7 @@ Modify the $CPMROOT/run-cpm.sh script by updating the following
 environment variable references:
 
  * INSTALLDIR - the location of your build directory
- * SWARM_MANAGER_URL - the IP address of your dev box
+ * LOCAL_IP - the IP address of your dev box
 
 Also, edit or remove the local host port mapping that is
 provided in the example to meet your local requirements
