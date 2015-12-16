@@ -27,7 +27,7 @@ RUN mkdir -p /var/cpm/conf
 ADD bin /var/cpm/bin
 ADD sbin /var/cpm/bin
 ADD conf /var/cpm/conf
-ADD conf/listen.conf /etc/rsyslog.d/listen.conf
+#ADD conf/listen.conf /etc/rsyslog.d/listen.conf
 
 USER root
 
