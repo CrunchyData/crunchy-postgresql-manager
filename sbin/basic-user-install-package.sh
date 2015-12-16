@@ -21,7 +21,7 @@
 set -e
 
 # set the istall directory
-export VERSION=0.9.9
+export VERSION=1.0.1
 export WORKDIR=$GOPATH/src/github.com/crunchydata/crunchy-postgresql-manager
 export TMPDIR=/tmp/var/cpm
 export ARCHIVE=/tmp/cpm.$VERSION-linux-amd64.tar.gz
@@ -105,6 +105,12 @@ pushImages () {
 	sudo docker tag -f cpm-node-proxy crunchydata/cpm-node-proxy:latest
 	sudo docker push -f crunchydata/cpm-node-proxy:$VERSION
 	sudo docker push -f crunchydata/cpm-node-proxy:latest
+
+	echo "saving cpm-efk image"
+	sudo docker tag -f cpm-efk crunchydata/cpm-efk:$VERSION
+	sudo docker tag -f cpm-efk crunchydata/cpm-efk:latest
+	sudo docker push -f crunchydata/cpm-efk:$VERSION
+	sudo docker push -f crunchydata/cpm-efk:latest
 }
 
 saveImages () {
@@ -135,6 +141,9 @@ saveImages () {
 
 	echo "saving cpm-node-proxy image"
 	sudo docker save crunchydata/cpm-node-proxy > /tmp/cpm-node-proxy.tar
+
+	echo "saving cpm-efk image"
+	sudo docker save crunchydata/cpm-efk > /tmp/cpm-efk.tar
 
 }
 
