@@ -196,16 +196,23 @@ cd $GOPATH/src/github.com/docker/
 git clone https://github.com/docker/swarm
 cd swarm
 git checkout v1.0.0
+go get github.com/tools/godep
 $GOPATH/bin/godep go install
 ....
 
-Start swarm up as follows, as root user:
+This will create the swarm binary located in $GOPATH/swarmproject/bin
 
+Start swarm up by running the $CPMROOT/sbin/run-swarm.sh script, first
+modify the script updating the LOCALIP and SWARM_TOKEN variables.
 
+.Get a swarm token
 ....
 swarm create
-swarm manage --host 192.168.0.107:8000 nodes://192.168.0.107:2375
-swarm join --addr=192.168.0.107:2375 token://<<<insert your swarm generated token here>>>
+....
+
+.Run Swarm
+....
+$CPMROOT/sbin/run-swarm.sh
 ....
 
 A swarm guide is available at:
@@ -222,7 +229,7 @@ Make sure the following processes are running:
 ....
 ps aux | grep docker
 ps aux | grep swarm
-docker inspect skybridge
+sudo docker inspect skybridge
 ....
 
 You should see the docker and swarm processes running as well as the
@@ -240,9 +247,9 @@ In another terminal, ping the new container:
 ping tester
 ....
 
-You should see the tester.crunchy.lab name resolving and responding to the ping command.  If not,
-then there is a configuration error.  If you can ping the tester container, then proceed on
-in the installation.
+You should see the tester.crunchy.lab name resolving and responding 
+to the ping command.  If not, then there is a configuration error.  
+If you can ping the tester container, then proceed on in the installation.
 
 === Start cpm-efk Logging
 
