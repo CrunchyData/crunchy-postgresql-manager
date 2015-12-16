@@ -36,6 +36,7 @@ buildimages:
 		cd images/cpm-backrest-restore-job && make
 		cd images/cpm-prometheus && make
 		cd images/cpm-collect && make
+		cd images/cpm-efk && make
 
 clean:
 		rm -rf $(GOBIN)/*server* $(GOBIN)/*command*
