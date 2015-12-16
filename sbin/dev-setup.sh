@@ -42,8 +42,8 @@ mkdir -p $CPMBASE/data/pgsql
 mkdir -p $CPMBASE/logs
 mkdir -p $CPMBASE/keys
 
-cp $DEVROOT/images/cpm-efk/conf/listen.conf $CPMBASE/config
-cp $DEVROOT/images/cpm-efk/conf/rsyslog.conf $CPMBASE/config
+cp $DEVBASE/images/cpm-efk/conf/listen.conf $CPMBASE/config
+cp $DEVBASE/images/cpm-efk/conf/rsyslog.conf $CPMBASE/config
 cp $DEVBASE/sbin/cert.pem $DEVBASE/sbin/key.pem $CPMBASE/keys
 
 cp $DEVBASE/sbin/* $CPMBASE/bin
