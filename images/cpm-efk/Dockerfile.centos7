@@ -2,19 +2,19 @@ FROM docker.io/centos:centos7
 
 MAINTAINER crunchy
 
+RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+
 RUN yum install -y tar wget java gcc make ruby ruby-devel procps-ng unzip openssh-clients hostname bind-utils && yum clean all -y
 
-RUN wget https://download.elastic.co/kibana/kibana/kibana-4.3.0-linux-x64.tar.gz
-RUN tar xvzf kibana-4.3.0-linux-x64.tar.gz 
-RUN mv /kibana-4.3.0-linux-x64 /kibana
+ADD kibana.tar.gz /
 
-RUN wget https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-2.1.0.tar.gz
-RUN tar xvzf elasticsearch-2.1.0.tar.gz 
-RUN mv /elasticsearch-2.1.0 /elasticsearch
-RUN useradd elasticsearch
+ADD elasticsearch.tar.gz /
+
 RUN mkdir -p /elasticsearch/logs \
 	/elasticsearch/plugins \
 	/elasticsearch/nodes 
+
+RUN useradd elasticsearch
 RUN chown -R elasticsearch /elasticsearch
 
 VOLUME ["/elasticsearch/data"]
