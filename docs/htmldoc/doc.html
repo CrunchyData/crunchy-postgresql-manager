@@ -219,46 +219,53 @@ the CPM install:</p></div>
 <div class="content monospaced">
 <pre>sudo yum -y update</pre>
 </div></div>
-<div class="paragraph"><p>To get started, install git first:</p></div>
+<div class="paragraph"><p>To get started, install some required packages first:</p></div>
 <div class="literalblock">
 <div class="content monospaced">
-<pre>sudo yum -y install git mercurial</pre>
+<pre>sudo yum -y install git mercurial golang wget</pre>
 </div></div>
 <h2 id="setup_go_project_structure">3.2. Setup Go Project Structure</h2>
 <div class="paragraph"><p>As your development user, create the development directory as follows:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>mkdir -p devproject/src devproject/bin devproject/pkg
-
-<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">GOPATH</span><span style="color: #990000">=~</span>/devproject
-<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">GOBIN</span><span style="color: #990000">=</span><span style="color: #009900">$GOPATH</span>/bin
-<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">PATH</span><span style="color: #990000">=</span><span style="color: #009900">$GOBIN</span><span style="color: #990000">:</span><span style="color: #009900">$PATH</span></tt></pre></div></div>
 <div class="literalblock">
-<div class="title">Download and Install godep</div>
 <div class="content monospaced">
-<pre>cd devproject
-go get github.com/tools/godep</pre>
+<pre>mkdir -p devproject/src devproject/bin devproject/pkg
+export GOPATH=~/devproject
+export GOBIN=$GOPATH/bin
+export PATH=$GOBIN:$PATH
+export CPMROOT=$GOPATH/src/github.com/crunchydata/crunchy-postgresql-manager</pre>
 </div></div>
 <div class="literalblock">
 <div class="title">Download CPM Source</div>
 <div class="content monospaced">
-<pre>go get github.com/crunchydata/crunchy-postgresql-manager
-cd src/github.com/crunchydata/crunchy-postgresql-manager</pre>
-</div></div>
-<div class="literalblock">
-<div class="title">Download and Restore All Dependencies</div>
-<div class="content monospaced">
-<pre>godep restore</pre>
+<pre>cd $GOPATH
+go get github.com/crunchydata/crunchy-postgresql-manager
+cd $CPMROOT</pre>
 </div></div>
 <div class="paragraph"><div class="title">Install Local Dependencies</div><p>To install the local server dependencies, there is a script, sbin/dev-dep-install.sh,
 that you will run to do the various package installations:</p></div>
 <div class="literalblock">
 <div class="content monospaced">
-<pre>sudo ./sbin/dev-dep-install.sh</pre>
+<pre>sudo $CPMROOT/sbin/dev-dep-install.sh</pre>
 </div></div>
+<div class="literalblock">
+<div class="title">Download and Install godep</div>
+<div class="content monospaced">
+<pre>cd $GOPATH
+go get github.com/tools/godep</pre>
+</div></div>
+<div class="literalblock">
+<div class="title">Download and Restore All Dependencies</div>
+<div class="content monospaced">
+<pre>cd $CPMROOT
+godep restore</pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+note:  this takes a minute or two to complete *
+</p>
+</li>
+</ul></div>
 <div class="literalblock">
 <div class="title">Compile CPM</div>
 <div class="content monospaced">
@@ -285,8 +292,8 @@ that you will run to do the various package installations:</p></div>
 <div class="paragraph"><p>Start docker</p></div>
 <div class="literalblock">
 <div class="content monospaced">
-<pre>systemctl enable docker.service
-systemctl start docker.service</pre>
+<pre>sudo systemctl enable docker.service
+sudo systemctl start docker.service</pre>
 </div></div>
 <h2 id="build_cpm_docker_images">3.4. Build CPM Docker Images</h2>
 <div class="literalblock">
@@ -298,14 +305,15 @@ sudo docker pull prom/prometheus</pre>
 <div class="literalblock">
 <div class="title">Build Images</div>
 <div class="content monospaced">
-<pre>make buildimages
-docker images</pre>
+<pre>cd $CPMROOT
+make buildimages
+sudo docker images</pre>
 </div></div>
 <h2 id="disable_firewalld">3.5. Disable Firewalld</h2>
 <div class="literalblock">
 <div class="content monospaced">
-<pre>systemctl disable firewalld.service
-systemctl stop firewalld.service</pre>
+<pre>sudo systemctl disable firewalld.service
+sudo systemctl stop firewalld.service</pre>
 </div></div>
 <div class="paragraph"><p>The document, firewall-setup.md, shows how the CPM ports can be opened up.</p></div>
 <h2 id="setup_skybridge">3.6. Setup skybridge</h2>
@@ -351,6 +359,8 @@ to specify your local IP address, then run the skybridge container:</p></div>
 <pre>sudo ./sbin/run-skybridge.sh</pre>
 </div></div>
 <h2 id="configure_and_start_swarm">3.7. Configure and Start Swarm</h2>
+<div class="paragraph"><p>Currently, centos 7 only offers golang 1.4.2, and Swarm 1.0.1 requires
+golang 1.5.  So for the time being, we will build and run Swarm 1.0.0.</p></div>
 <div class="paragraph"><p>Download the swarm binary as follows, within a new swarm go project:</p></div>
 <div class="literalblock">
 <div class="content monospaced">
@@ -361,14 +371,22 @@ mkdir -p $GOPATH/src/github.com/docker/
 cd $GOPATH/src/github.com/docker/
 git clone https://github.com/docker/swarm
 cd swarm
+git checkout v1.0.0
+go get github.com/tools/godep
 $GOPATH/bin/godep go install</pre>
 </div></div>
-<div class="paragraph"><p>Start swarm up as follows, as root user:</p></div>
+<div class="paragraph"><p>This will create the swarm binary located in $GOPATH/swarmproject/bin</p></div>
+<div class="paragraph"><p>Start swarm up by running the $CPMROOT/sbin/run-swarm.sh script, first
+modify the script updating the LOCALIP and SWARM_TOKEN variables.</p></div>
 <div class="literalblock">
+<div class="title">Get a swarm token</div>
 <div class="content monospaced">
-<pre>swarm create
-swarm manage --host 192.168.0.107:8000 nodes://192.168.0.107:2375
-swarm join --addr=192.168.0.107:2375 token://&lt;&lt;&lt;insert your swarm generated token here&gt;&gt;&gt;</pre>
+<pre>swarm create</pre>
+</div></div>
+<div class="literalblock">
+<div class="title">Run Swarm</div>
+<div class="content monospaced">
+<pre>$CPMROOT/sbin/run-swarm.sh</pre>
 </div></div>
 <div class="paragraph"><p>A swarm guide is available at:</p></div>
 <div class="paragraph"><p><a href="swarm-setup.html">Swarm Setup</a></p></div>
@@ -380,7 +398,7 @@ docker, and docker swarm.</p></div>
 <div class="content monospaced">
 <pre>ps aux | grep docker
 ps aux | grep swarm
-docker inspect skybridge</pre>
+sudo docker inspect skybridge</pre>
 </div></div>
 <div class="paragraph"><p>You should see the docker and swarm processes running as well as the
 skybridge docker container.</p></div>
@@ -394,9 +412,9 @@ skybridge docker container.</p></div>
 <div class="content monospaced">
 <pre>ping tester</pre>
 </div></div>
-<div class="paragraph"><p>You should see the tester.crunchy.lab name resolving and responding to the ping command.  If not,
-then there is a configuration error.  If you can ping the tester container, then proceed on
-in the installation.</p></div>
+<div class="paragraph"><p>You should see the tester.crunchy.lab name resolving and responding
+to the ping command.  If not, then there is a configuration error.
+If you can ping the tester container, then proceed on in the installation.</p></div>
 <h2 id="start_cpm_efk_logging">3.9. Start cpm-efk Logging</h2>
 <div class="paragraph"><p>The default logging configuration in CPM uses the cpm-efk container
 to aggregate logs.</p></div>
@@ -408,6 +426,8 @@ to aggregate logs.</p></div>
 <pre>cd $CPMROOT/images/cpm-efk
 sudo ./run-cpm-efk.sh</pre>
 </div></div>
+<div class="paragraph"><p>At this point, you can test the cpm-efk container by browsing
+to <a href="http://192.168.0.107:5601">http://192.168.0.107:5601</a>.  You should see the Kibana web console.</p></div>
 <h2 id="start_cpm_server_agent">3.10. Start CPM Server Agent</h2>
 <div class="paragraph"><p>On each server that is to run CPM, you will need to start a CPM Server
 Agent.  The server agent is run within the cpm-server container on each
@@ -416,7 +436,7 @@ server host that will be configured to be used in CPM.</p></div>
 have its port 10001 mapped to the local host port 10001.  CPM will
 attempt to communicate to each host using this port.</p></div>
 <div class="paragraph"><p>For this example, I will name the CPM server, newserver.</p></div>
-<div class="paragraph"><p>So, edit the images/cpm-server/run-cpmserver.sh script, and modify the server
+<div class="paragraph"><p>So, edit the $CPMROOT/images/cpm-server/run-cpmserver.sh script, and modify the server
 IP address to be that of the host you are running the CPM server
 upon.</p></div>
 <div class="paragraph"><p>Then run the script which will create a running cpm-server named
@@ -443,7 +463,7 @@ the source directory environment variable DEVROOT
 to match your local dev system.</p></div>
 <div class="literalblock">
 <div class="content monospaced">
-<pre>sudo ./dev-setup.sh</pre>
+<pre>sudo $CPMROOT/sbin/dev-setup.sh</pre>
 </div></div>
 <h2 id="running_cpm">3.12. Running CPM</h2>
 <div class="paragraph"><p>Modify the $CPMROOT/run-cpm.sh script by updating the following
@@ -456,7 +476,7 @@ INSTALLDIR - the location of your build directory
 </li>
 <li>
 <p>
-SWARM_MANAGER_URL - the IP address of your dev box
+LOCAL_IP - the IP address of your dev box
 </p>
 </li>
 </ul></div>
