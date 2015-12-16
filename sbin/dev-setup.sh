@@ -40,6 +40,7 @@ mkdir -p $CPMBASE/bin
 mkdir -p $CPMBASE/config
 mkdir -p $CPMBASE/data/pgsql
 mkdir -p $CPMBASE/logs
+chmod 777 $CPMBASE/logs
 mkdir -p $CPMBASE/keys
 
 cp $DEVBASE/images/cpm-efk/conf/listen.conf $CPMBASE/config
