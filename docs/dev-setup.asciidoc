@@ -182,6 +182,9 @@ sudo ./sbin/run-skybridge.sh
 
 === Configure and Start Swarm
 
+Currently, centos 7 only offers golang 1.4.2, and Swarm 1.0.1 requires
+golang 1.5.  So for the time being, we will build and run Swarm 1.0.0.
+
 Download the swarm binary as follows, within a new swarm go project:
 
 ....
@@ -192,6 +195,7 @@ mkdir -p $GOPATH/src/github.com/docker/
 cd $GOPATH/src/github.com/docker/
 git clone https://github.com/docker/swarm
 cd swarm
+git checkout v1.0.0
 $GOPATH/bin/godep go install
 ....
 
