@@ -24,7 +24,10 @@
 # program before this one.
 #
 
-swarm manage --host 192.168.0.107:8000 nodes://192.168.0.107:2375 &
+LOCALIP=192.168.0.107
+SWARM_TOKEN=7228941e30510cf52742e1c011d00bca
+
+swarm manage --host $LOCALIP:8000 nodes://$LOCALIP:2375 &
 sleep 4
-swarm join --addr=192.168.0.107:2375 token://7228941e30510cf52742e1c011d00bca
+swarm join --addr=$LOCALIP:2375 token://$SWARM_TOKEN
 
