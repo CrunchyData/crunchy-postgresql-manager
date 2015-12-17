@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="AsciiDoc 8.6.8, bootstrap backend 4.5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- AsciiDoc Bootstrap styles -->
+    <link rel="stylesheet" type="text/css" id="bootstrapTheme" href="./stylesheets/asciidoc-bootstrap.cerulean.min.css">
+    <!-- Back to top (jquery plugin) -->
+    <link rel="stylesheet" type="text/css" href="./stylesheets/ui.totop.css">
+
+    <!--[if (lt IE 9) & (!IEMobile)]>
+        <script src="./javascripts/html5shiv.min.js"></script>
+        <script src="./javascripts/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+  <body id="toc-top">
+    <div id="page">
+
+
+      <div class="jumbotron">
+        <div class="container">
+        </div>
+      </div>
+
+  <div id="content" class="container">
+
+    <div class="row">
+
+
+
+
+        <div class="col-md-9" role="main">
+<div class="section">
+    <h1 class="page-header" id="log_aggregation">1. Log Aggregation</h1>
+<div class="paragraph"><p>Log aggregation within CPM can be accomplished using the cpm-efk container.</p></div>
+<div class="paragraph"><p>The cpm-efk container includes:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+elasticsearch - <a href="https://www.elastic.co/products/elasticsearch">https://www.elastic.co/products/elasticsearch</a>
+</p>
+</li>
+<li>
+<p>
+fluentd - <a href="http://www.fluentd.org/">http://www.fluentd.org/</a>
+</p>
+</li>
+<li>
+<p>
+kibana - <a href="https://www.elastic.co/products/kibana">https://www.elastic.co/products/kibana</a>
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>These tools when combined provide a capability similar to that of tools like splunk for log analysis and
+aggregation.</p></div>
+<h2 id="starting_cpm_efk">1.1. Starting cpm-efk</h2>
+<div class="paragraph"><p>Some customization to the run-cpm-efk.sh script and rsyslog.conf files are required:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+modify LOCAL_IP environment variable to use your local system&#8217;s IP address
+</p>
+</li>
+<li>
+<p>
+modify EFKDATA environment variable to use a local directory where the cpm-efk container will persist it&#8217;s data
+</p>
+</li>
+<li>
+<p>
+modify /var/cpm/conf/rsyslog.conf to specify your local IP address that cpm-efk will be listening on
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Start up cpm-efk as follows:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>cd images/cpm-efk
+sudo ./run-cpm-efk.sh</pre>
+</div></div>
+<div class="paragraph"><p>This will start the cpm-efk container.  When running, the cpm-efk container
+will listen to the following ports:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>fluentd - 24224
+fluentd-syslog - 5140
+kibana-http - 5601</pre>
+</div></div>
+<div class="paragraph"><p>You can start using the kibana web interface at <a href="http://cpm-efk:5601">http://cpm-efk:5601</a></p></div>
+<h2 id="cpm_internal_logs">1.2. CPM Internal Logs</h2>
+<div class="paragraph"><p>Log messages produced by the CPM administration containers (cpm-admin, cpm-task, etc.)
+are logged to stdout (except cpm-web) by default.  We can view the stdout logs using
+the normal <strong>docker log</strong> command or, as of Docker 1.8, we can specify a Docker log driver to route the container&#8217;s stdout log
+output to a fluentd server (running inside the cpm-efk container).</p></div>
+<div class="paragraph"><p>In the startup scripts for CPM, run-cpm.sh, you will see
+that the Docker log driver is specified to use the fluentd
+driver by default:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>--log-driver=fluentd \
+--log-opt fluentd-address=192.168.0.107:24224 \
+--log-opt fluentd-tag=docker.cpm-admin \</pre>
+</div></div>
+<div class="paragraph"><p>This will send the docker log output for the CPM containers
+to the fluentd server running at the specified address (e.g. 192.168.0.107:24224).</p></div>
+<div class="paragraph"><p>The exception to this is the cpm-web (nginx) container.  Nginx has
+a configuration that requires you to send stdout and stderr to
+a file.  There is a bug in Docker (1.8.2 and earlier versions), that
+prevents a non-root user write access to /dev/stdout and /dev/stderr.
+See <a href="https://github.com/docker/docker/issues/6880">https://github.com/docker/docker/issues/6880</a> for details on the bug.</p></div>
+<div class="paragraph"><p>So, until the next release of Docker, we will continue to
+send cpm-web output to log files mounted from the local host (e.g. /var/cpm/logs).</p></div>
+<div class="paragraph"><p>If you want to have the CPM product containers send their logs to the Docker log instead
+of using the cpm-efk and fluentd logging, just remove the log driver lines above
+from the run-cpm.sh startup script when you start the CPM product containers.</p></div>
+<h2 id="postgres_container_logs">1.3. Postgres Container Logs</h2>
+<div class="paragraph"><p>On each CPM provisioned Postgresql container, we have enabled Postgresql
+to send log output to both stdout and syslog.</p></div>
+<div class="paragraph"><p>We use syslog within each container a the mechanism to aggregate all the Postgresql
+logs into the cpm-efk container.</p></div>
+<div class="paragraph"><p>The use of syslog within each container is triggered by the presense of
+/syslogconfig/rsyslog.conf within each container.  There is a volume mount that
+is used by the container to find the syslog configuration files:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>-v /var/cpm/config:/syslogconfig</pre>
+</div></div>
+<div class="paragraph"><p>On each CPM server, to use the syslog feature, you will need a /var/cpm/config directory
+that contains both rsyslog.conf and listen.conf configuration files.  If the configuration
+files are not present, the cpm-node containers will not use configure syslog logging to
+cpm-efk.</p></div>
+<h3 id="rsyslog_configuration">1.3.1. rsyslog Configuration</h3>
+<div class="paragraph"><p>To support syslog logging within each Postgres container (cpm-node),
+the rsyslogd binary is installed within the cpm-node container.</p></div>
+<div class="paragraph"><p>The configuration of rsyslog within a container is tricky and is
+documented by Dan Walsh here:</p></div>
+<div class="paragraph"><p><a href="http://www.projectatomic.io/blog/2014/09/running-syslog-within-a-docker-container/">http://www.projectatomic.io/blog/2014/09/running-syslog-within-a-docker-container/</a></p></div>
+<div class="paragraph"><p>The sample rsyslog.conf file causes the container&#8217;s rsyslog to forward syslog
+messages to a remote syslog server (e.g. 192.168.0.107:5140) which is served
+by the cpm-efk fluentd-syslog component:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>$WorkDirectory /var/lib/rsyslog
+$ActionQueueFileName fwdRule1
+$ActionQueueMaxDiskSpace 2g
+$ActionQueueSaveOnShutdown on
+$ActionQueueType LinkedList
+$ActionResumeRetryCount -1
+*.* @@192.168.0.107:5140</pre>
+</div></div>
+<div class="paragraph"><p>Also, in /etc/rsyslog.d/listen.conf the line $SystemLogSocketName
+is commented out.</p></div>
+<div class="paragraph"><p>Sample rsyslog.conf and listen.conf files are stored in the github CPM_ROOT/images/cpm-efk/conf directory.
+These config files are copied to your local /var/cpm/config directory when you start up cpm-efk.</p></div>
+<h3 id="postgres_configuration_changes">1.3.2. Postgres Configuration Changes</h3>
+<div class="paragraph"><p>The Postgresql running inside each cpm-node container is configured to log to both
+standard log files and syslog.</p></div>
+<div class="paragraph"><p>This dual logging is accomplished in postgresql.conf as follows:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>log_destination = 'stderr,syslog'
+syslog_facility = 'LOCAL0'
+syslog_ident = 'postgres'</pre>
+</div></div>
+<h2 id="kibana">1.4. Kibana</h2>
+<div class="paragraph"><p>Kibana is the web console where you can view all the log messages,
+create dashboards, create queries, and create graphs.  Here
+is a sample screenshot:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="cpm-efk-kibana.png" alt="cpm-efk-kibana.png">
+</div>
+</div>
+<div class="paragraph"><p>CPM does not ship with pre-defined Kibana reports or queries.  So, CPM
+administrators will likely want to create a dashboard for Postgresql
+logs and another for the CPM product containers.</p></div>
+</div>
+        </div>  <!-- /.col-md-9 -->
+        <div class="col-md-3">
+        <div id="sidebar">
+    <div class="toc2">
+<div class="panel panel-default">
+<div class="panel-heading">Table of Contents</div>
+<div class="panel-body" id="toc">
+</div>
+</div>
+    </div>
+</div>
+        </div>  <!-- /.col-md-3 -->
+    </div>  <!-- /.row -->
+
+  </div>  <!-- /.container -->
+
+    <footer id="footer" role="contentinfo">
+        <div class="container">
+<div class="row"><div id="footnotes"></div></div>
+<div id="footer-text">
+Last updated 2015-12-17 10:58:56 CST
+<br>Built with <a href="https://github.com/llaville/asciidoc-bootstrap-backend">AsciiDoc-Bootstrap backend</a> 4.5.0
+</div>
+        </div>
+    </footer>
+
+    <script src="./javascripts/jquery.min.js"></script>
+    <script src="./bootstrap/js/bootstrap.min.js"></script>
+    <script src="./javascripts/asciidoc.js"></script>
+    <!-- Install TOC and/or footnotes (if necessary) -->
+    <script type="text/javascript">asciidoc.install(2);</script>
+
+    <script src="./javascripts/jquery.ui.totop.min.js"></script>
+
+
+
+    <!-- Remove footnotes if empty block -->
+    <script type="text/javascript">$(function(){ if ($("#footnotes div").length == 0) $("#footnotes").parent().remove(); });</script>
+
+    <script type="text/javascript">$(function(){ if ($("#dropdown-menu-versions")) $("#dropdown-menu-versions").parent().remove(); });</script>
+
+    <script type="text/javascript">$(function(){ $().UItoTop(); });</script>
+    </div> <!-- page -->
+  </body>
+</html>

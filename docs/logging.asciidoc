@@ -137,4 +137,15 @@ syslog_facility = 'LOCAL0'
 syslog_ident = 'postgres'
 ....
 
+=== Kibana
+
+Kibana is the web console where you can view all the log messages, 
+create dashboards, create queries, and create graphs.  Here
+is a sample screenshot:
+
+image::cpm-efk-kibana.png[]
+
+CPM does not ship with pre-defined Kibana reports or queries.  So, CPM 
+administrators will likely want to create a dashboard for Postgresql
+logs and another for the CPM product containers.
 
