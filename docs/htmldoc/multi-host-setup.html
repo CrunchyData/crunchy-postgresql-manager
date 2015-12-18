@@ -40,7 +40,7 @@
 to utilize multiple servers.  In this configuration, CPM
 will let you configure Postgres clusters that span more than
 one server.</p></div>
-<div class="paragraph"><p>Here is an example of a multi-host scenario of 3 servers:</p></div>
+<div class="paragraph"><p>Here is an example of a multi-host scenario of 2 servers:</p></div>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.6
 by Lorenzo Bettini
@@ -50,6 +50,73 @@ http://www.gnu.org/software/src-highlite -->
 coffee<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab - <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.108</span> <span style="color: #990000">(</span>static IP<span style="color: #990000">)</span></tt></pre></div></div>
 <div class="paragraph"><p>These can be physical or virtual servers.  Both servers are available to run the CPM containers , however only one server will act
 as the CPM Admin server (espresso.crunchy.lab).</p></div>
+<div class="paragraph"><p>So we will end up with the following deployment:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+espresso server
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+cpm-web container
+</p>
+</li>
+<li>
+<p>
+cpm-admin container
+</p>
+</li>
+<li>
+<p>
+cpm-server container named cpm-espresso
+</p>
+</li>
+<li>
+<p>
+cpm-task container
+</p>
+</li>
+<li>
+<p>
+cpm-collect container
+</p>
+</li>
+<li>
+<p>
+cpm-promdash container
+</p>
+</li>
+<li>
+<p>
+cpm-prometheus container
+</p>
+</li>
+<li>
+<p>
+CPM provisioned containers
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+coffee server
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+cpm-server container named cpm-coffee
+</p>
+</li>
+<li>
+<p>
+CPM provisioned containers
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
 </div>
 <div class="section">
     <h1 class="page-header" id="step_1_cpm_installation">2. Step 1 - CPM Installation</h1>
@@ -144,7 +211,7 @@ configured correctly:
         <div class="container">
 <div class="row"><div id="footnotes"></div></div>
 <div id="footer-text">
-Last updated 2015-12-14 13:03:29 CST
+Last updated 2015-12-18 10:00:27 CST
 <br>Built with <a href="https://github.com/llaville/asciidoc-bootstrap-backend">AsciiDoc-Bootstrap backend</a> 4.5.0
 </div>
         </div>

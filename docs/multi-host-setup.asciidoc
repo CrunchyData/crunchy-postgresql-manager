@@ -7,22 +7,73 @@ to utilize multiple servers.  In this configuration, CPM
 will let you configure Postgres clusters that span more than
 one server.
 
-Here is an example of a multi-host scenario of 3 servers:
+Here is an example of a multi-host scenario of 2 servers:
 [source,bash]
 ----
 espresso.crunchy.lab - 192.168.0.107 (static IP)
-coffee.crunchy.lab - 192.168.0.108 (static IP)
+bean.crunchy.lab - 192.168.0.108 (static IP)
 ----
 
 These can be physical or virtual servers.  Both servers are available to run the CPM containers , however only one server will act
 as the CPM Admin server (espresso.crunchy.lab).
 
-== Step 1 - CPM Installation
+So we will end up with the following deployment:
+
+ * espresso server
+ ** cpm-web container
+ ** cpm-admin container
+ ** cpm-server container named cpm-espresso
+ ** cpm-task container
+ ** cpm-collect container
+ ** cpm-promdash container
+ ** cpm-prometheus container
+ ** CPM provisioned containers
+
+ * bean server
+ ** cpm-server container named cpm-bean
+ ** CPM provisioned containers
+
+== CPM Installation
 
 Perform a developer install on the espresso server as
 documented in the Developer Install Guide.
  link:doc.html[Developer Install Guide]
 
+=== Install CPM Dependencies on Secondary Server
+
+Install docker
+
+=== Docker Configuration on Secondary Server
+
+Configure the Docker daemon on the secondary server
+to the following:
+
+....
+OPTIONS='--selinux-enabled --bip=172.18.42.1/16 --dns-search=crunchy.lab --dns=192.168.0.107 --dns=192.168.0.1 -H unix:///var/run/docker.sock --label host=192.168.0.105 --label profile=SM -H tcp://192.168.0.105:2375'
+....
+
+In this Docker configuration you see that we have the following:
+
+ * a different (unique) IP address block than what we used on the espresso server
+ * a DNS primary server that points to the skybridge running on the espresso server
+ * a 'host' label that specifies the IP address of the bean server
+ * listener on the local IP address and Swarm port
+
+.Start up the Docker service
+....
+sudo systemctl start docker.service
+....
+
+
+=== Copy and Load CPM Docker Images
+
+You will also need to copy the CPM Docker images over to the
+coffee server.  For this purpose, you can run on the espresso
+server the $CPMROOT/sbin/copy-images.sh script.  This script
+will save the CPM Docker images and copy them over to the
+coffee server, then will install them on the coffee server.
+This script assumes you have ssh configured and can scp files to the coffee
+server.
 
 == DNS Configuration for Multi-Server CPM
 

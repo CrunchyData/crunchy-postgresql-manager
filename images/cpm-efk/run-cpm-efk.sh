@@ -24,6 +24,7 @@ LOCAL_IP=192.168.0.107
 
 EFKDATA=/home/jeffmc/devproject/src/github.com/crunchydata/crunchy-postgresql-manager/images/cpm-efk/elasticsearch-data
 mkdir -p $EFKDATA
+chmod 777 $EFKDATA
 chcon -Rt svirt_sandbox_file_t $EFKDATA
 
 # port 24224 is the fluentd listen port
