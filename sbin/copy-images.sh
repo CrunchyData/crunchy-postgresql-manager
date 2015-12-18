@@ -61,34 +61,34 @@ copyImages () {
 saveImages () {
 
 	echo "saving cpm image"
-	sudo docker save crunchydata/cpm > $TMPDIR/cpm.tar
+	sudo docker save crunchydata/cpm:latest > $TMPDIR/cpm.tar
 
 	echo "saving cpm-pgpool image"
-	sudo docker save crunchydata/cpm-pgpool > $TMPDIR/cpm-pgpool.tar
+	sudo docker save crunchydata/cpm-pgpool:latest > $TMPDIR/cpm-pgpool.tar
 
 	echo "saving cpm-admin image"
-	sudo docker save crunchydata/cpm-admin > $TMPDIR/cpm-admin.tar
+	sudo docker save crunchydata/cpm-admin:latest > $TMPDIR/cpm-admin.tar
 
 	echo "saving cpm-base image"
-	sudo docker save crunchydata/cpm-restore-job > $TMPDIR/cpm-restore-job.tar
+	sudo docker save crunchydata/cpm-restore-job:latest > $TMPDIR/cpm-restore-job.tar
 
 	echo "saving cpm-collect image"
-	sudo docker save crunchydata/cpm-collect > $TMPDIR/cpm-collect.tar
+	sudo docker save crunchydata/cpm-collect:latest > $TMPDIR/cpm-collect.tar
 
 	echo "saving cpm-backup image"
-	sudo docker save crunchydata/cpm-task > $TMPDIR/cpm-task.tar
+	sudo docker save crunchydata/cpm-task:latest > $TMPDIR/cpm-task.tar
 
 	echo "saving cpm-backup-job image"
-	sudo docker save crunchydata/cpm-backup-job > $TMPDIR/cpm-backup-job.tar
+	sudo docker save crunchydata/cpm-backup-job:latest > $TMPDIR/cpm-backup-job.tar
 
 	echo "saving cpm-node image"
-	sudo docker save crunchydata/cpm-node > $TMPDIR/cpm-node.tar
+	sudo docker save crunchydata/cpm-node:latest > $TMPDIR/cpm-node.tar
 
 	echo "saving cpm-node-proxy image"
-	sudo docker save crunchydata/cpm-node-proxy > $TMPDIR/cpm-node-proxy.tar
+	sudo docker save crunchydata/cpm-node-proxy:latest > $TMPDIR/cpm-node-proxy.tar
 
 	echo "saving cpm-efk image"
-	sudo docker save crunchydata/cpm-efk > $TMPDIR/cpm-efk.tar
+	sudo docker save crunchydata/cpm-efk:latest > $TMPDIR/cpm-efk.tar
 
 }
 
