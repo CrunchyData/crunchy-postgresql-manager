@@ -70,58 +70,48 @@ sudo systemctl start docker.service
 You will also need to copy the CPM Docker images over to the
 coffee server.  For this purpose, you can run on the espresso
 server the $CPMROOT/sbin/copy-images.sh script.  This script
-will save the CPM Docker images and copy them over to the
-coffee server, then will install them on the coffee server.
+will save the CPM Docker images, copy them over to the
+coffee server, and install them on the coffee server.
 This script assumes you have ssh configured and can scp files to the coffee
 server.
 
-== DNS Configuration for Multi-Server CPM
+=== DNS Configuration for Multi-Server CPM
 
 On each server in a multi-server configuration, you will need
 to specify in your /etc/resolv.conf the CPM DNS server you have
 deployed.  In this example, we have chosen to run the CPM skybridge
-DNS server on the admin.crunchy.lab server.
+DNS server on the espresso server.
 
-So each server would need to specify it's primary DNS nameserver
-to be 192.168.56.101.
+=== Networking for Multi-Server CPM
 
-Also, on each server, the Docker configuration in /etc/sysconfig/docker
-would also need to specify the CPM DNS nameserver as follows:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
---dns=192.168.56.101 --dns=192.168.0.1
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Each CPM server will need to define a network route to the Docker
+bridge IP ranges each server is configured with.  In this
+example, we have two Docker bridge IP ranges:
 
-== Networking for Multi-Server CPM
+....
+espress - 172.17.42.1/16
+coffee  - 172.18.42.1/16
+....
 
-For a multi-host CPM deployment, you will define network routes
-as follows:
+So, to allow networking between Docker containers running on each
+server we define on each server a static route as follows:
 
-You need to define routes to the other docker servers, we create
-a route file in /etc/sysconfig/network-scripts.  The name of the
-file is route-xxxx where xxx is the name of the ethernet adapter for our 192.168.56.X network,
-for Example:  
-	route-enp0s3
+.espresso 
+....
+172.18.0.0/16 via 192.168.0.105 metric 0
+....
 
-For server1, the route values are:
-[source,bash]
-----
-172.19.0.0/16 via 192.168.56.102 metric 0
-172.17.0.0/16 via 192.168.56.103 metric 0
-----
+.coffee
+....
+172.17.0.0/16 via 192.168.0.107 metric 0
+....
 
-For admin server, the route values are:
-[source,bash]
-----
-172.18.0.0/16 via 192.168.56.101 metric 0
-172.19.0.0/16 via 192.168.56.102 metric 0
-----
+These routes can be made permanent by creating a file
+in /etc/sysconfig/network-scripts/route-ens3 on each
+server and adding the routing rules above.  On your
+system, ens3 might be named differently (e.g. eth1), change
+the file names accordingly.
 
-For server2, the route values are:
-[source,bash]
-----
-172.18.0.0/16 via 192.168.56.101 metric 0
-172.17.0.0/16 via 192.168.56.103 metric 0
-----
 
 After these routes are in place, each docker container on each
 server can route to containers on the other servers.
@@ -134,8 +124,34 @@ ip route add 172.18.0.0/16 via 192.168.56.101 dev vboxnet0
 ip route add 172.19.0.0/16 via 192.168.56.102 dev vboxnet0
 ----
 
+=== Swarm Installation
+
+We need to install Swarm on the secondary server.  The most simple
+way to perform the install is to just copy the swarm binary over
+to the to the secondary server's /usr/local/bin directory.
+
+....
+scp swarm root@bean:/usr/local/bin
+....
+
+=== Swarm Configuration
+
+So, next we need to add the secondary server (bean) to the Swarm configuration
+on the primary server (espresso).  On the primary server, add the bean
+server as another Swarm node as follows:
+....
+swarm manage --host $LOCALIP:8000 nodes://$LOCALIP:2375,$SECONDARYIP:2375 &
+....
+
+This line is commented out in the $CPMROOT/sbin/run-swarm.sh script.
+
+On the secondary server, bean, we need to run the Swarm agent as follows:
+
+....
+swarm join --addr=$SECONDARYIP:2375 token://$SWARM_TOKEN
+....
+
 == Testing
 
-A script is provided to help verify that your environment is
-configured correctly:
-http://github.com/crunchydata/cpm/network-test.sh
+create a docker container on secondary and see if it resolves via skybridge
+test swarm on the primary to see both nodes
