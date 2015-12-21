@@ -21,15 +21,17 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 LOCAL_IP=192.168.0.107
+EFK_IP=192.168.0.107
+SERVERNAME=espresso
 
 echo "restarting cpm-server"
-docker stop cpm-newserver
-docker rm cpm-newserver
-docker run --name=cpm-newserver -d \
+docker stop cpm-$SERVERNAME
+docker rm cpm-$SERVERNAME
+docker run --name=cpm-$SERVERNAME -d \
 	--privileged \
 	--log-driver=fluentd \
-	--log-opt fluentd-address=$LOCAL_IP:24224 \
-	--log-opt fluentd-tag=docker.cpm-newserver \
+	--log-opt fluentd-address=$EFK_IP:24224 \
+	--log-opt fluentd-tag=docker.cpm-$SERVERNAME \
 	-p $LOCAL_IP:10001:10001 \
 	-v /:/rootfs \
 	-v /var/cpm/data/pgsql:/var/cpm/data/pgsql \
