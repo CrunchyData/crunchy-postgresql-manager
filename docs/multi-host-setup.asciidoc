@@ -39,6 +39,9 @@ Perform a developer install on the espresso server as
 documented in the Developer Install Guide.
  link:doc.html[Developer Install Guide]
 
+IMPORTANT: Start up CPM on the primary server prior to configuring the
+secondary server!
+
 === Install CPM Dependencies on Secondary Server
 
 Install docker
@@ -151,7 +154,35 @@ On the secondary server, bean, we need to run the Swarm agent as follows:
 swarm join --addr=$SECONDARYIP:2375 token://$SWARM_TOKEN
 ....
 
-== Testing
+==== Swarm Test
+
+You verify that Swarm is configured by running the following command:
+
+....
+swarm list  token://7228941e30510cf52742e1c011d00bca
+192.168.0.105:2375
+192.168.0.107:2375
+....
+
+=== Start CPM Server Agent
+
+On the secondary server, we will start a server agent.  This agent
+performs disk provisioning and metrics collection for this server, it also
+interfaces with the Docker daemon to register/deregister containers with DNS.
+
+Copy from the primary server to the secondary server, the $CPMROOT/images/cpm-server/run-cpm-server.sh
+script.
+
+Edit the script, supplying 
+
+
+
+
+
+
+
+In the output above, you should see both the primary and secondary servers is the
+list of Swarm nodes.
 
 create a docker container on secondary and see if it resolves via skybridge
 test swarm on the primary to see both nodes

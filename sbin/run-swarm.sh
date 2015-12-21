@@ -28,8 +28,8 @@ LOCALIP=192.168.0.107
 SECONDARYIP=192.168.0.105
 SWARM_TOKEN=7228941e30510cf52742e1c011d00bca
 
-#swarm manage --host $LOCALIP:8000 nodes://$LOCALIP:2375,$SECONDARYIP:2375 &
-swarm manage --host $LOCALIP:8000 nodes://$LOCALIP:2375 &
+swarm manage --host $LOCALIP:8000 nodes://$LOCALIP:2375,$SECONDARYIP:2375 &
+#swarm manage --host $LOCALIP:8000 nodes://$LOCALIP:2375 &
 sleep 4
 swarm join --addr=$LOCALIP:2375 token://$SWARM_TOKEN
 #swarm join --addr=$SECONDARYIP:2375 token://$SWARM_TOKEN

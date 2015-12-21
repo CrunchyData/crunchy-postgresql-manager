@@ -37,6 +37,7 @@ loadImages () {
 	docker load -i /tmp/cpm-task.tar; \
 	docker load -i /tmp/cpm-backup-job.tar; \
 	docker load -i /tmp/cpm-node.tar; \
+	docker load -i /tmp/cpm-server.tar; \
 	docker load -i /tmp/cpm-node-proxy.tar; \
 	docker load -i /tmp/cpm-efk.tar'
 
@@ -50,6 +51,7 @@ copyImages () {
 		$TMPDIR/cpm-restore-job.tar \
 		$TMPDIR/cpm-collect.tar \
 		$TMPDIR/cpm-task.tar  \
+		$TMPDIR/cpm-server.tar  \
 		$TMPDIR/cpm-backup-job.tar  \
 		$TMPDIR/cpm-node.tar  \
 		$TMPDIR/cpm-node-proxy.tar  \
@@ -65,6 +67,9 @@ saveImages () {
 
 	echo "saving cpm-pgpool image"
 	sudo docker save crunchydata/cpm-pgpool:latest > $TMPDIR/cpm-pgpool.tar
+
+	echo "saving cpm-server image"
+	sudo docker save crunchydata/cpm-server:latest > $TMPDIR/cpm-server.tar
 
 	echo "saving cpm-admin image"
 	sudo docker save crunchydata/cpm-admin:latest > $TMPDIR/cpm-admin.tar
