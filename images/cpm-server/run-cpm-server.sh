@@ -20,18 +20,22 @@ if [[ $EUID -ne 0 ]]; then
 	      exit 1
 fi
 
-LOCAL_IP=192.168.0.107
 EFK_IP=192.168.0.107
+LOCAL_IP=192.168.0.107
+SWARM_MASTER_IP=192.168.0.107
 SERVERNAME=espresso
+SWARM_MANAGER_URL=tcp://$SWARM_MASTER_IP:8000
 
 echo "restarting cpm-server"
 docker stop cpm-$SERVERNAME
 docker rm cpm-$SERVERNAME
-docker run --name=cpm-$SERVERNAME -d \
+docker -H $SWARM_MANAGER_URL \
+	run --name=cpm-$SERVERNAME -d \
 	--privileged \
 	--log-driver=fluentd \
 	--log-opt fluentd-address=$EFK_IP:24224 \
 	--log-opt fluentd-tag=docker.cpm-$SERVERNAME \
+	-e constraint:host==$LOCAL_IP \
 	-p $LOCAL_IP:10001:10001 \
 	-v /:/rootfs \
 	-v /var/cpm/data/pgsql:/var/cpm/data/pgsql \

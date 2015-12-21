@@ -168,7 +168,7 @@ scp swarm root@bean:/usr/local/bin
 === Swarm Configuration
 
 For Swarm Discovery, we will specify our Swarm cluster using a static
-file, /tmp/my_cluster, that looks like this:
+file, by default located at /tmp/my_cluster on each server, that looks like this:
 
 ....
 192.168.0.107:2375
@@ -182,9 +182,8 @@ up Swarm.
 Modify the $CPMROOT/sbin/run-swarm.sh script environment variables:
 
 ....
-LOCALIP=192.168.0.107
+PRIMARYIP=192.168.0.107
 SECONDARYIP=192.168.0.105
-SWARM_BIN=/home/jeffmc/devproject/bin
 ....
 
 On the primary server run the script:
@@ -193,25 +192,17 @@ On the primary server run the script:
 sudo ./sbin/run-swarm.sh
 ....
 
-So, next we need to add the secondary server (bean) to the Swarm configuration
-on the primary server (espresso).  On the primary server, add the bean
-server as another Swarm node as follows:
-....
-swarm manage --host $LOCALIP:8000 file:///tmp/my_cluster
-....
-
-This line is commented out in the $CPMROOT/sbin/run-swarm.sh script.
-
-On the secondary server, bean, we need to run the Swarm agent as follows:
+On the secondary server, run the run-swarm-secondary.sh script:
 
 ....
-swarm join --addr=$SECONDARYIP:2375 token://$SWARM_TOKEN
+./sbin/run-swarm-secondary.sh
 ....
 
 ==== Swarm Test
 
 You verify that Swarm is configured by running the following command:
 
+.On the Primary server
 ....
 swarm list file:///tmp/my_cluster
 192.168.0.105:2375
