@@ -41,9 +41,10 @@ echo "restarting cpm container..."
 docker stop cpm-web
 docker rm cpm-web
 chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v3
-docker run --name=cpm-web -d \
+docker -H $SWARM_MANAGER_URL run --name=cpm-web -d \
 	-p $LOCAL_IP:13001:13001 \
 	-v $LOGDIR:/cpmlogs \
+	-e constraint:host==$LOCAL_IP \
 	-v $KEYSDIR:/cpmkeys \
 	-v $INSTALLDIR/images/cpm/www/v3:/www \
 	crunchydata/cpm:latest
@@ -56,12 +57,13 @@ DBDIR=/var/cpm/data/pgsql/cpm-admin
 mkdir -p $DBDIR
 chown postgres:postgres $DBDIR
 chcon -Rt svirt_sandbox_file_t $DBDIR
-docker run -e DB_HOST=cpm-admin \
+docker -H $SWARM_MANAGER_URL run -e DB_HOST=cpm-admin \
 	--hostname="cpm-admin" \
 	--log-driver=fluentd \
 	--log-opt fluentd-address=$FLUENT_URL \
 	--log-opt fluentd-tag=docker.cpm-admin \
 	-p $LOCAL_IP:14001:13001 \
+	-e constraint:host==$LOCAL_IP \
 	-e DOMAIN=crunchy.lab \
 	-e SWARM_MANAGER_URL=$SWARM_MANAGER_URL \
 	-e CPMBASE=/var/cpm \
@@ -75,10 +77,11 @@ echo "restarting cpm-task container..."
 sleep 2
 docker stop cpm-task
 docker rm cpm-task
-docker run -e DB_HOST=cpm-admin.crunchy.lab \
+docker -H $SWARM_MANAGER_URL run -e DB_HOST=cpm-admin.crunchy.lab \
 	--log-driver=fluentd \
 	--log-opt fluentd-address=$FLUENT_URL \
 	--log-opt fluentd-tag=docker.cpm-task \
+	-e constraint:host==$LOCAL_IP \
 	-e CPMBASE=/var/cpm \
 	-e SWARM_MANAGER_URL=$SWARM_MANAGER_URL \
 	-e DB_PORT=5432 -e DB_USER=postgres \
@@ -97,9 +100,10 @@ chcon -Rt svirt_sandbox_file_t $DATADIR
 
 docker stop cpm-promdash
 docker rm cpm-promdash
-docker run  \
+docker -H $SWARM_MANAGER_URL run  \
 	-v $DATADIR:/tmp/prom \
 	-p $LOCAL_IP:3000:3000 \
+	-e constraint:host==$LOCAL_IP \
 	-e DATABASE_URL=sqlite3:/tmp/prom/file.sqlite3 \
 	--name=cpm-promdash -d prom/promdash
 ###############
@@ -111,9 +115,10 @@ chcon -Rt svirt_sandbox_file_t $PROMCONFIG
 
 docker stop cpm-prometheus
 docker rm cpm-prometheus
-docker run  \
+docker -H $SWARM_MANAGER_URL run  \
 	-v $PROMCONFIG:/etc/prometheus/prometheus.yml \
 	-p $LOCAL_IP:9090:9090 \
+	-e constraint:host==$LOCAL_IP \
 	--name=cpm-prometheus -d prom/prometheus:latest
 ##############
 
@@ -121,11 +126,13 @@ echo "restarting cpm-collect container..."
 sleep 2
 docker stop cpm-collect
 docker rm cpm-collect
-docker run -e DB_HOST=cpm-admin.crunchy.lab \
+docker -H $SWARM_MANAGER_URL run \
 	--hostname="cpm-collect" \
 	--log-driver=fluentd \
 	--log-opt fluentd-address=$FLUENT_URL \
 	--log-opt fluentd-tag=docker.cpm-collect \
+	-e DB_HOST=cpm-admin.crunchy.lab \
+	-e constraint:host==$LOCAL_IP \
 	-e CONT_POLL_INT=4 \
 	-e SERVER_POLL_INT=4 \
 	-e HC_POLL_INT=4 \
