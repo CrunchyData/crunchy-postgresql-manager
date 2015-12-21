@@ -11,7 +11,7 @@ Here is an example of a multi-host scenario of 2 servers:
 [source,bash]
 ----
 espresso.crunchy.lab - 192.168.0.107 (static IP)
-bean.crunchy.lab - 192.168.0.108 (static IP)
+bean.crunchy.lab - 192.168.0.105 (static IP)
 ----
 
 These can be physical or virtual servers.  Both servers are available to run the CPM containers , however only one server will act
@@ -44,7 +44,14 @@ secondary server!
 
 === Install CPM Dependencies on Secondary Server
 
-Install docker
+ * Install docker
+
+IMPORTANT: Disable and stop the firewall
+
+....
+sudo systemctl stop firewalld.service
+sudo systemclt disable firewalld.service
+....
 
 === Docker Configuration on Secondary Server
 
@@ -71,12 +78,20 @@ sudo systemctl start docker.service
 === Copy and Load CPM Docker Images
 
 You will also need to copy the CPM Docker images over to the
-coffee server.  For this purpose, you can run on the espresso
+bean server.  For this purpose, you can run on the espresso
 server the $CPMROOT/sbin/copy-images.sh script.  This script
 will save the CPM Docker images, copy them over to the
-coffee server, and install them on the coffee server.
-This script assumes you have ssh configured and can scp files to the coffee
+bean server, and install them on the bean server.
+This script assumes you have ssh configured and can scp files to the bean
 server.
+
+.Test
+....
+sudo docker images
+....
+
+This command should list all the CPM images you have loaded on your secondary server.
+
 
 === DNS Configuration for Multi-Server CPM
 
@@ -93,7 +108,7 @@ example, we have two Docker bridge IP ranges:
 
 ....
 espress - 172.17.42.1/16
-coffee  - 172.18.42.1/16
+bean  - 172.18.42.1/16
 ....
 
 So, to allow networking between Docker containers running on each
@@ -101,10 +116,22 @@ server we define on each server a static route as follows:
 
 .espresso 
 ....
-172.18.0.0/16 via 192.168.0.105 metric 0
+ip route add 172.18.0.0/16 via 192.168.0.105 dev enp2s0
 ....
 
-.coffee
+.or in /etc/sysconfig/network-scripts/route-enp2s0
+
+....
+172.17.0.0/16 via 192.168.0.107 metric 0
+....
+
+.bean
+....
+ip route add 172.17.0.0/16 via 192.168.0.107 dev ens3
+....
+
+.or in /etc/sysconfig/network-scripts/route-ens3
+
 ....
 172.17.0.0/16 via 192.168.0.107 metric 0
 ....
@@ -120,18 +147,19 @@ After these routes are in place, each docker container on each
 server can route to containers on the other servers.
 
 Route examples on virtualbox:
-[source,bash]
-----
+
+....
 ip route add 172.17.0.0/16 via 192.168.56.103 dev vboxnet0
 ip route add 172.18.0.0/16 via 192.168.56.101 dev vboxnet0
 ip route add 172.19.0.0/16 via 192.168.56.102 dev vboxnet0
-----
+....
 
 === Swarm Installation
 
 We need to install Swarm on the secondary server.  The most simple
 way to perform the install is to just copy the swarm binary over
-to the to the secondary server's /usr/local/bin directory.
+to the to the secondary server's /usr/local/bin directory.  The CPM
+scripts assume the swarm binary is in /usr/local/bin.
 
 ....
 scp swarm root@bean:/usr/local/bin
@@ -139,11 +167,37 @@ scp swarm root@bean:/usr/local/bin
 
 === Swarm Configuration
 
+For Swarm Discovery, we will specify our Swarm cluster using a static
+file, /tmp/my_cluster, that looks like this:
+
+....
+192.168.0.107:2375
+192.168.0.105:2375
+....
+
+This is a list of all servers that we want to make up the Swarm cluster.  We
+will use this same file on the primary and secondary servers when starting
+up Swarm.
+
+Modify the $CPMROOT/sbin/run-swarm.sh script environment variables:
+
+....
+LOCALIP=192.168.0.107
+SECONDARYIP=192.168.0.105
+SWARM_BIN=/home/jeffmc/devproject/bin
+....
+
+On the primary server run the script:
+
+....
+sudo ./sbin/run-swarm.sh
+....
+
 So, next we need to add the secondary server (bean) to the Swarm configuration
 on the primary server (espresso).  On the primary server, add the bean
 server as another Swarm node as follows:
 ....
-swarm manage --host $LOCALIP:8000 nodes://$LOCALIP:2375,$SECONDARYIP:2375 &
+swarm manage --host $LOCALIP:8000 file:///tmp/my_cluster
 ....
 
 This line is commented out in the $CPMROOT/sbin/run-swarm.sh script.
@@ -159,10 +213,31 @@ swarm join --addr=$SECONDARYIP:2375 token://$SWARM_TOKEN
 You verify that Swarm is configured by running the following command:
 
 ....
-swarm list  token://7228941e30510cf52742e1c011d00bca
+swarm list file:///tmp/my_cluster
 192.168.0.105:2375
 192.168.0.107:2375
+docker -H tcp://$LOCALIP:8000 info
+Containers: 125
+Images: 64
+Role: primary
+Strategy: spread
+Filters: health, port, dependency, affinity, constraint
+Nodes: 2
+ bean.crunchy.lab: 192.168.0.105:2375
+   └ Containers: 2
+     └ Reserved CPUs: 0 / 4
+       └ Reserved Memory: 0 B / 6.314 GiB
+         └ Labels: executiondriver=native-0.2, host=192.168.0.105, kernelversion=3.10.0-327.3.1.el7.x86_64, operatingsystem=CentOS Linux 7 (Core), profile=SM, storagedriver=devicemapper
+	  espresso.crunchy.lab: 192.168.0.107:2375
+	    └ Containers: 123
+	      └ Reserved CPUs: 0 / 8
+	        └ Reserved Memory: 0 B / 16.24 GiB
+		  └ Labels: executiondriver=native-0.2, host=192.168.0.107, kernelversion=3.10.0-229.20.1.el7.x86_64, operatingsystem=CentOS Linux 7 (Core), profile=SM, storagedriver=devicemapper
+		  CPUs: 12
+		  Total Memory: 22.55 GiB
+		  Name: espresso.crunchy.lab
 ....
+
 
 === Start CPM Server Agent
 
@@ -173,16 +248,24 @@ interfaces with the Docker daemon to register/deregister containers with DNS.
 Copy from the primary server to the secondary server, the $CPMROOT/images/cpm-server/run-cpm-server.sh
 script.
 
-Edit the script, supplying 
+Edit the script, supplying the LOCAL_IP, EFK_IP, and SERVERNAME environment variables.
 
+.Start the CPM Server Agent
+....
+sudo ./run-cpm-server.sh
+....
 
+==== Test the Server Agent
 
+.Basic Server Agent Test
+....
+ping cpm-bean
+....
 
+You should see the cpm-bean container IP address resolve.
 
+....
+curl http://cpm-bean:10001/status
+....
 
-
-In the output above, you should see both the primary and secondary servers is the
-list of Swarm nodes.
-
-create a docker container on secondary and see if it resolves via skybridge
-test swarm on the primary to see both nodes
+You should get back an OK status.

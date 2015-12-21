@@ -24,19 +24,11 @@
 # program before this one.
 #
 
-rm $SWARM_CLUSTER_FILE
-
 PRIMARYIP=192.168.0.107
-SECONDARYIP=192.168.0.105
 SWARM_CLUSTER_FILE=/tmp/my_cluster
-echo $PRIMARYIP:2375 >> $SWARM_CLUSTER_FILE
-echo $SECONDARYIP:2375 >> $SWARM_CLUSTER_FILE
 
 SWARM_URL=$PRIMARYIP:8000
 DOCKER_PORT=2375
 
-swarm manage --host $SWARM_URL file://$SWARM_CLUSTER_FILE
-sleep 4
 swarm join --addr=$PRIMARYIP:$DOCKER_PORT file://$SWARM_CLUSTER_FILE
-#swarm list file:///tmp/my_cluster
 
