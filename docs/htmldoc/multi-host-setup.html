@@ -47,7 +47,7 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>espresso<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab - <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.107</span> <span style="color: #990000">(</span>static IP<span style="color: #990000">)</span>
-bean<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab - <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.108</span> <span style="color: #990000">(</span>static IP<span style="color: #990000">)</span></tt></pre></div></div>
+bean<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab - <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.105</span> <span style="color: #990000">(</span>static IP<span style="color: #990000">)</span></tt></pre></div></div>
 <div class="paragraph"><p>These can be physical or virtual servers.  Both servers are available to run the CPM containers , however only one server will act
 as the CPM Admin server (espresso.crunchy.lab).</p></div>
 <div class="paragraph"><p>So we will end up with the following deployment:</p></div>
@@ -124,8 +124,32 @@ CPM provisioned containers
 documented in the Developer Install Guide.
  
 <a href="doc.html">Developer Install Guide</a></p></div>
+<div class="admonition important">
+<div class="icon">
+<span class="fa"></span>
+</div>
+<div class="content">Start up CPM on the primary server prior to configuring the
+secondary server!</div>
+</div>
 <h2 id="install_cpm_dependencies_on_secondary_server">2.1. Install CPM Dependencies on Secondary Server</h2>
-<div class="paragraph"><p>Install docker</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Install docker
+</p>
+</li>
+</ul></div>
+<div class="admonition important">
+<div class="icon">
+<span class="fa"></span>
+</div>
+<div class="content">Disable and stop the firewall</div>
+</div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>sudo systemctl stop firewalld.service
+sudo systemclt disable firewalld.service</pre>
+</div></div>
 <h2 id="docker_configuration_on_secondary_server">2.2. Docker Configuration on Secondary Server</h2>
 <div class="paragraph"><p>Configure the Docker daemon on the secondary server
 to the following:</p></div>
@@ -163,12 +187,18 @@ listener on the local IP address and Swarm port
 </div></div>
 <h2 id="copy_and_load_cpm_docker_images">2.3. Copy and Load CPM Docker Images</h2>
 <div class="paragraph"><p>You will also need to copy the CPM Docker images over to the
-coffee server.  For this purpose, you can run on the espresso
+bean server.  For this purpose, you can run on the espresso
 server the $CPMROOT/sbin/copy-images.sh script.  This script
 will save the CPM Docker images, copy them over to the
-coffee server, and install them on the coffee server.
-This script assumes you have ssh configured and can scp files to the coffee
+bean server, and install them on the bean server.
+This script assumes you have ssh configured and can scp files to the bean
 server.</p></div>
+<div class="literalblock">
+<div class="title">Test</div>
+<div class="content monospaced">
+<pre>sudo docker images</pre>
+</div></div>
+<div class="paragraph"><p>This command should list all the CPM images you have loaded on your secondary server.</p></div>
 <h2 id="dns_configuration_for_multi_server_cpm">2.4. DNS Configuration for Multi-Server CPM</h2>
 <div class="paragraph"><p>On each server in a multi-server configuration, you will need
 to specify in your /etc/resolv.conf the CPM DNS server you have
@@ -181,17 +211,27 @@ example, we have two Docker bridge IP ranges:</p></div>
 <div class="literalblock">
 <div class="content monospaced">
 <pre>espress - 172.17.42.1/16
-coffee  - 172.18.42.1/16</pre>
+bean  - 172.18.42.1/16</pre>
 </div></div>
 <div class="paragraph"><p>So, to allow networking between Docker containers running on each
 server we define on each server a static route as follows:</p></div>
 <div class="literalblock">
 <div class="title">espresso</div>
 <div class="content monospaced">
-<pre>172.18.0.0/16 via 192.168.0.105 metric 0</pre>
+<pre>ip route add 172.18.0.0/16 via 192.168.0.105 dev enp2s0</pre>
 </div></div>
 <div class="literalblock">
-<div class="title">coffee</div>
+<div class="title">or in /etc/sysconfig/network-scripts/route-enp2s0</div>
+<div class="content monospaced">
+<pre>172.17.0.0/16 via 192.168.0.107 metric 0</pre>
+</div></div>
+<div class="literalblock">
+<div class="title">bean</div>
+<div class="content monospaced">
+<pre>ip route add 172.17.0.0/16 via 192.168.0.107 dev ens3</pre>
+</div></div>
+<div class="literalblock">
+<div class="title">or in /etc/sysconfig/network-scripts/route-ens3</div>
 <div class="content monospaced">
 <pre>172.17.0.0/16 via 192.168.0.107 metric 0</pre>
 </div></div>
@@ -203,41 +243,164 @@ the file names accordingly.</p></div>
 <div class="paragraph"><p>After these routes are in place, each docker container on each
 server can route to containers on the other servers.</p></div>
 <div class="paragraph"><p>Route examples on virtualbox:</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>ip route add <span style="color: #993399">172.17</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.103</span> dev vboxnet0
-ip route add <span style="color: #993399">172.18</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.101</span> dev vboxnet0
-ip route add <span style="color: #993399">172.19</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">/</span><span style="color: #993399">16</span> via <span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">56.102</span> dev vboxnet0</tt></pre></div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>ip route add 172.17.0.0/16 via 192.168.56.103 dev vboxnet0
+ip route add 172.18.0.0/16 via 192.168.56.101 dev vboxnet0
+ip route add 172.19.0.0/16 via 192.168.56.102 dev vboxnet0</pre>
+</div></div>
 <h2 id="swarm_installation">2.6. Swarm Installation</h2>
 <div class="paragraph"><p>We need to install Swarm on the secondary server.  The most simple
 way to perform the install is to just copy the swarm binary over
-to the to the secondary server&#8217;s /usr/local/bin directory.</p></div>
+to the to the secondary server&#8217;s /usr/local/bin directory.  The CPM
+scripts assume the swarm binary is in /usr/local/bin.</p></div>
 <div class="literalblock">
 <div class="content monospaced">
 <pre>scp swarm root@bean:/usr/local/bin</pre>
 </div></div>
 <h2 id="swarm_configuration">2.7. Swarm Configuration</h2>
-<div class="paragraph"><p>So, next we need to add the secondary server (bean) to the Swarm configuration
-on the primary server (espresso).  On the primary server, add the bean
-server as another Swarm node as follows:</p></div>
+<div class="paragraph"><p>For Swarm Discovery, we will specify our Swarm cluster using a static
+file, by default located at /tmp/my_cluster on each server, that looks like this:</p></div>
 <div class="literalblock">
 <div class="content monospaced">
-<pre>swarm manage --host $LOCALIP:8000 nodes://$LOCALIP:2375,$SECONDARYIP:2375 &amp;</pre>
+<pre>192.168.0.107:2375
+192.168.0.105:2375</pre>
 </div></div>
-<div class="paragraph"><p>This line is commented out in the $CPMROOT/sbin/run-swarm.sh script.</p></div>
-<div class="paragraph"><p>On the secondary server, bean, we need to run the Swarm agent as follows:</p></div>
+<div class="paragraph"><p>This is a list of all servers that we want to make up the Swarm cluster.  We
+will use this same file on the primary and secondary servers when starting
+up Swarm.</p></div>
+<div class="paragraph"><p>Modify the $CPMROOT/sbin/run-swarm.sh script environment variables:</p></div>
 <div class="literalblock">
 <div class="content monospaced">
-<pre>swarm join --addr=$SECONDARYIP:2375 token://$SWARM_TOKEN</pre>
+<pre>PRIMARYIP=192.168.0.107
+SECONDARYIP=192.168.0.105</pre>
 </div></div>
-</div>
-<div class="section">
-    <h1 class="page-header" id="testing">3. Testing</h1>
-<div class="paragraph"><p>create a docker container on secondary and see if it resolves via skybridge
-test swarm on the primary to see both nodes</p></div>
+<div class="paragraph"><p>On the primary server run the script:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>sudo ./sbin/run-swarm.sh</pre>
+</div></div>
+<div class="paragraph"><p>On the secondary server, run the run-swarm-secondary.sh script:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>./sbin/run-swarm-secondary.sh</pre>
+</div></div>
+<h3 id="swarm_test">2.7.1. Swarm Test</h3>
+<div class="paragraph"><p>You verify that Swarm is configured by running the following command:</p></div>
+<div class="literalblock">
+<div class="title">On the Primary server</div>
+<div class="content monospaced">
+<pre>swarm list file:///tmp/my_cluster
+192.168.0.105:2375
+192.168.0.107:2375
+docker -H tcp://$LOCALIP:8000 info
+Containers: 125
+Images: 64
+Role: primary
+Strategy: spread
+Filters: health, port, dependency, affinity, constraint
+Nodes: 2
+ bean.crunchy.lab: 192.168.0.105:2375
+   └ Containers: 2
+     └ Reserved CPUs: 0 / 4
+       └ Reserved Memory: 0 B / 6.314 GiB
+         └ Labels: executiondriver=native-0.2, host=192.168.0.105, kernelversion=3.10.0-327.3.1.el7.x86_64, operatingsystem=CentOS Linux 7 (Core), profile=SM, storagedriver=devicemapper
+          espresso.crunchy.lab: 192.168.0.107:2375
+            └ Containers: 123
+              └ Reserved CPUs: 0 / 8
+                └ Reserved Memory: 0 B / 16.24 GiB
+                  └ Labels: executiondriver=native-0.2, host=192.168.0.107, kernelversion=3.10.0-229.20.1.el7.x86_64, operatingsystem=CentOS Linux 7 (Core), profile=SM, storagedriver=devicemapper
+                  CPUs: 12
+                  Total Memory: 22.55 GiB
+                  Name: espresso.crunchy.lab</pre>
+</div></div>
+<h2 id="start_cpm_server_agent">2.8. Start CPM Server Agent</h2>
+<div class="paragraph"><p>On the secondary server, we will start a server agent.  This agent
+performs disk provisioning and metrics collection for this server, it also
+interfaces with the Docker daemon to register/deregister containers with DNS.</p></div>
+<div class="paragraph"><p>Copy from the primary server to the secondary server, the $CPMROOT/images/cpm-server/run-cpm-server.sh
+script.</p></div>
+<div class="paragraph"><p>Edit the script, supplying the LOCAL_IP, EFK_IP, and SERVERNAME environment variables.</p></div>
+<div class="literalblock">
+<div class="title">Start the CPM Server Agent</div>
+<div class="content monospaced">
+<pre>sudo ./run-cpm-server.sh</pre>
+</div></div>
+<h3 id="test_the_server_agent">2.8.1. Test the Server Agent</h3>
+<div class="literalblock">
+<div class="title">Basic Server Agent Test</div>
+<div class="content monospaced">
+<pre>ping cpm-bean</pre>
+</div></div>
+<div class="paragraph"><p>You should see the cpm-bean container IP address resolve.</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>curl http://cpm-bean:10001/status</pre>
+</div></div>
+<div class="paragraph"><p>You should get back an OK status.</p></div>
+<h2 id="startup_sequence">2.9. Startup Sequence</h2>
+<div class="ulist"><ul>
+<li>
+<p>
+start docker on primary
+</p>
+</li>
+<li>
+<p>
+start docker on secondary
+</p>
+</li>
+<li>
+<p>
+start swarm manager on primary
+</p>
+</li>
+<li>
+<p>
+start swarm agent on primary
+</p>
+</li>
+<li>
+<p>
+start swarm agent on secondary
+</p>
+</li>
+<li>
+<p>
+start skybridge on primary
+</p>
+</li>
+<li>
+<p>
+start cpm-efk on primary
+</p>
+</li>
+<li>
+<p>
+start cpm-server on primary
+</p>
+</li>
+<li>
+<p>
+start cpm-server on secondary
+</p>
+</li>
+<li>
+<p>
+start cpm-web, cpm-admin, cpm-task on primary
+</p>
+</li>
+<li>
+<p>
+start cpm-prometheus on primary
+</p>
+</li>
+<li>
+<p>
+start cpm-promdash, cpm-collect on primary
+</p>
+</li>
+</ul></div>
 </div>
         </div>  <!-- /.col-md-9 -->
         <div class="col-md-3">
@@ -259,7 +422,7 @@ test swarm on the primary to see both nodes</p></div>
         <div class="container">
 <div class="row"><div id="footnotes"></div></div>
 <div id="footer-text">
-Last updated 2015-12-18 16:07:47 CST
+Last updated 2015-12-22 09:12:48 CST
 <br>Built with <a href="https://github.com/llaville/asciidoc-bootstrap-backend">AsciiDoc-Bootstrap backend</a> 4.5.0
 </div>
         </div>
