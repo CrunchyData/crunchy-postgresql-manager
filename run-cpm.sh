@@ -38,21 +38,21 @@ cp $INSTALLDIR/sbin/cert.pem $KEYSDIR
 chcon -Rt svirt_sandbox_file_t $KEYSDIR
 
 echo "restarting cpm container..."
-docker stop cpm-web
-docker rm cpm-web
+docker -H $SWARM_MANAGER_URL stop cpm-web
+docker -H $SWARM_MANAGER_URL rm cpm-web
 chcon -Rt svirt_sandbox_file_t $INSTALLDIR/images/cpm/www/v3
 docker -H $SWARM_MANAGER_URL run --name=cpm-web -d \
 	-p $LOCAL_IP:13001:13001 \
-	-v $LOGDIR:/cpmlogs \
 	-e constraint:host==$LOCAL_IP \
+	-v $LOGDIR:/cpmlogs \
 	-v $KEYSDIR:/cpmkeys \
 	-v $INSTALLDIR/images/cpm/www/v3:/www \
 	crunchydata/cpm:latest
 
 echo "restarting cpm-admin container..."
 sleep 2
-docker stop cpm-admin
-docker rm cpm-admin
+docker -H $SWARM_MANAGER_URL stop cpm-admin
+docker -H $SWARM_MANAGER_URL rm cpm-admin
 DBDIR=/var/cpm/data/pgsql/cpm-admin
 mkdir -p $DBDIR
 chown postgres:postgres $DBDIR
@@ -75,8 +75,8 @@ docker -H $SWARM_MANAGER_URL run -e DB_HOST=cpm-admin \
 
 echo "restarting cpm-task container..."
 sleep 2
-docker stop cpm-task
-docker rm cpm-task
+docker -H $SWARM_MANAGER_URL stop cpm-task
+docker -H $SWARM_MANAGER_URL rm cpm-task
 docker -H $SWARM_MANAGER_URL run -e DB_HOST=cpm-admin.crunchy.lab \
 	--log-driver=fluentd \
 	--log-opt fluentd-address=$FLUENT_URL \
@@ -98,8 +98,8 @@ chmod 777 $DATADIR
 cp $INSTALLDIR/config/file.sqlite3 $DATADIR
 chcon -Rt svirt_sandbox_file_t $DATADIR
 
-docker stop cpm-promdash
-docker rm cpm-promdash
+docker -H $SWARM_MANAGER_URL stop cpm-promdash
+docker -H $SWARM_MANAGER_URL rm cpm-promdash
 docker -H $SWARM_MANAGER_URL run  \
 	-v $DATADIR:/tmp/prom \
 	-p $LOCAL_IP:3000:3000 \
@@ -113,8 +113,8 @@ export PROMCONFIG=/var/cpm/config/prometheus.yml
 chmod 777 $PROMCONFIG
 chcon -Rt svirt_sandbox_file_t $PROMCONFIG
 
-docker stop cpm-prometheus
-docker rm cpm-prometheus
+docker -H $SWARM_MANAGER_URL stop cpm-prometheus
+docker -H $SWARM_MANAGER_URL rm cpm-prometheus
 docker -H $SWARM_MANAGER_URL run  \
 	-v $PROMCONFIG:/etc/prometheus/prometheus.yml \
 	-p $LOCAL_IP:9090:9090 \
@@ -124,8 +124,8 @@ docker -H $SWARM_MANAGER_URL run  \
 
 echo "restarting cpm-collect container..."
 sleep 2
-docker stop cpm-collect
-docker rm cpm-collect
+docker -H $SWARM_MANAGER_URL stop cpm-collect
+docker -H $SWARM_MANAGER_URL rm cpm-collect
 docker -H $SWARM_MANAGER_URL run \
 	--hostname="cpm-collect" \
 	--log-driver=fluentd \

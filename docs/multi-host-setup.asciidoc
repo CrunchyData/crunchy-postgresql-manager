@@ -260,3 +260,18 @@ curl http://cpm-bean:10001/status
 ....
 
 You should get back an OK status.
+
+=== Startup Sequence
+
+ * start docker on primary
+ * start docker on secondary
+ * start swarm manager on primary
+ * start swarm agent on primary
+ * start swarm agent on secondary
+ * start skybridge on primary
+ * start cpm-efk on primary
+ * start cpm-server on primary
+ * start cpm-server on secondary
+ * start cpm-web, cpm-admin, cpm-task on primary
+ * start cpm-prometheus on primary
+ * start cpm-promdash, cpm-collect on primary

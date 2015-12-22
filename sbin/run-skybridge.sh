@@ -28,23 +28,23 @@ DATADIR=/var/cpm/data/etcd
 mkdir -p $DATADIR
 rm -rf $DATADIR/*
 #	-e DOCKER_HOST=http://192.168.0.106:5000 \
-#	-H $SWARM_MANAGER_URL \
-#	-e "constraint:host==192.168.0.107" \
 # 
 #	-v /run/docker.sock:/tmp/docker.sock \
 
 chcon -Rt svirt_sandbox_file_t $DATADIR
 echo "restarting skybridge container..."
-docker stop skybridge
-docker rm skybridge
+docker -H $SWARM_MANAGER_URL stop skybridge
+docker -H $SWARM_MANAGER_URL rm skybridge
 docker \
+	-H $SWARM_MANAGER_URL \
 	run --name=skybridge -d \
 	--hostname="skybridge" \
 	--privileged \
-	-p $MYHOSTIP:53:53/udp \
+	-p $LOCALIP:53:53/udp \
 	-v /var/cpm/data/etcd:/etcddata \
 	-e SWARM_MANAGER_URL=$SWARM_MANAGER_URL \
 	-e DNS_DOMAIN=$MYDOMAIN \
 	-e DNS_NAMESERVER=192.168.0.1 \
+	-e constraint:host==192.168.0.107 \
 	crunchydata/skybridge:latest
 
