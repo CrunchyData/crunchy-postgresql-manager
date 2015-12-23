@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="AsciiDoc 8.6.8, bootstrap backend 4.5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- AsciiDoc Bootstrap styles -->
+    <link rel="stylesheet" type="text/css" id="bootstrapTheme" href="./stylesheets/asciidoc-bootstrap.cerulean.min.css">
+    <!-- Back to top (jquery plugin) -->
+    <link rel="stylesheet" type="text/css" href="./stylesheets/ui.totop.css">
+
+    <!--[if (lt IE 9) & (!IEMobile)]>
+        <script src="./javascripts/html5shiv.min.js"></script>
+        <script src="./javascripts/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+  <body id="toc-top">
+    <div id="page">
+
+
+      <div class="jumbotron">
+        <div class="container">
+        </div>
+      </div>
+
+  <div id="content" class="container">
+
+    <div class="row">
+
+
+
+
+        <div class="col-md-9" role="main">
+<div class="section">
+    <h1 class="page-header" id="swarm_configuration">1. Swarm Configuration</h1>
+<div class="paragraph"><p>CPM uses Docker Swarm to virtualize multiple Docker servers into
+a single virtual server.  This is a convenient way to implement
+multiple host Docker which is necessary to scale out the
+CPM containers onto multiple Docker hosts.  In this example
+we run the Swarm manager and agent on the same host, this is
+they way a developer might run CPM.  In a real setup, you would
+have a single manager and multiple swarm agent hosts.</p></div>
+<div class="paragraph"><p>For this example configuration, we start the Swarm Manager
+on 192.168.0.103:8000</p></div>
+<div class="paragraph"><p>The Swarm agent is started to listen to 0.0.0.0:2375</p></div>
+<h2 id="installation">1.1. Installation</h2>
+<div class="paragraph"><p>Swarm is provided by Docker at <a href="https://github.com/docker/swarm">https://github.com/docker/swarm</a>.  Use the
+instructions at the Swarm github page to install a binary version
+of Swarm into the /usr/local/bin directory of all the servers you
+will be using for CPM.</p></div>
+<div class="paragraph"><p>Swarm needs a single token to define the cluster you are creating.  This
+is done one-time as follows, save this token value for future reference:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>swarm create
+7b9fb5037919f89bd52c3c4888586be3</tt></pre></div></div>
+<h2 id="docker_configuration">1.2. Docker Configuration</h2>
+<div class="paragraph"><p>Docker is configured on each server to listen to 0.0.0.0:2375 for API events.  On
+Centos/RHEL this is done by adding -H tcp://0.0.0.0:2375 in the /etc/sysconfig/docker
+file:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">SWARM_PORT</span><span style="color: #990000">=</span><span style="color: #993399">2375</span>
+/usr/bin/docker -d --selinux-enabled -H tcp<span style="color: #990000">://</span><span style="color: #993399">0.0</span><span style="color: #990000">.</span><span style="color: #993399">0.0</span><span style="color: #990000">:</span><span style="color: #009900">$SWARM_PORT</span> --label <span style="color: #009900">storage</span><span style="color: #990000">=</span>ssd --label <span style="color: #009900">hostname</span><span style="color: #990000">=</span>espresso<span style="color: #990000">.</span>crunchy<span style="color: #990000">.</span>lab --label <span style="color: #009900">profile</span><span style="color: #990000">=</span>small</tt></pre></div></div>
+<div class="paragraph"><p>Notice that we assign labels to the docker daemon, these labels are used by CPM (via Swarm)
+to figure out the correct server to deploy containers upon.  CPM requires you classify a server with a label key of <em>profile</em> and value of <em>SM</em>, <em>MED</em>, or <em>LG</em>.  This label value is used to determine where a container will be placed during the provisioning process.  Also, a label key of hostname is used to provide the user a way to provision a container upon a specific host.  The value of the hostname key is the fully qualified host name of the server.</p></div>
+<h2 id="startup">1.3. Startup</h2>
+<div class="paragraph"><p>On each server in your cluster, Start the swarm server agent listening to the local Docker API:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">LOCAL_HOST</span><span style="color: #990000">=</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.103</span>
+<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">SWARM_PORT</span><span style="color: #990000">=</span><span style="color: #993399">2375</span>
+swarm join --addr<span style="color: #990000">=</span><span style="color: #009900">$LOCAL_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$SWARM_PORT</span> token<span style="color: #990000">://</span>7b9fb5037919f89bd52c3c4888586be3</tt></pre></div></div>
+<div class="paragraph"><p>On one server in your cluster, Start the swarm manager that listens to CPM
+requests, in this example I specify two servers that will act as the cluster nodes, this is one simple form of Swarm Discovery:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">MANAGER_HOST</span><span style="color: #990000">=</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.103</span>
+<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">MANAGER_PORT</span><span style="color: #990000">=</span><span style="color: #993399">8000</span>
+swarm manage --host <span style="color: #009900">$MANAGER_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$MANAGER_PORT</span>
+nodes<span style="color: #990000">://</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.107</span><span style="color: #990000">:</span><span style="color: #993399">2375</span><span style="color: #990000">,</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.106</span><span style="color: #990000">:</span><span style="color: #993399">2375</span></tt></pre></div></div>
+<h2 id="test">1.4. Test</h2>
+<div class="paragraph"><p>To see what servers are include in the swarm:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">MANAGER_HOST</span><span style="color: #990000">=</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.103</span>
+<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">MANAGER_PORT</span><span style="color: #990000">=</span><span style="color: #993399">8000</span>
+swarm list token<span style="color: #990000">://</span>7b9fb5037919f89bd52c3c4888586be3
+docker -H tcp<span style="color: #990000">://</span><span style="color: #009900">$MANAGER_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$MANAGER_PORT</span> info</tt></pre></div></div>
+<div class="paragraph"><p>You now run docker commands via the swarm manager ip:port to interact with swarm:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">MANAGER_HOST</span><span style="color: #990000">=</span><span style="color: #993399">192.168</span><span style="color: #990000">.</span><span style="color: #993399">0.103</span>
+<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">MANAGER_PORT</span><span style="color: #990000">=</span><span style="color: #993399">8000</span>
+docker -H tcp<span style="color: #990000">://</span><span style="color: #009900">$MANAGER_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$MANAGER_PORT</span> info
+docker -H tcp<span style="color: #990000">://</span><span style="color: #009900">$MANAGER_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$MANAGER_PORT</span> run
+docker -H tcp<span style="color: #990000">://</span><span style="color: #009900">$MANAGER_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$MANAGER_PORT</span> ps
+docker -H tcp<span style="color: #990000">://</span><span style="color: #009900">$MANAGER_HOST</span><span style="color: #990000">:</span><span style="color: #009900">$MANAGER_PORT</span> logs</tt></pre></div></div>
+</div>
+        </div>  <!-- /.col-md-9 -->
+        <div class="col-md-3">
+        <div id="sidebar">
+    <div class="toc2">
+<div class="panel panel-default">
+<div class="panel-heading">Table of Contents</div>
+<div class="panel-body" id="toc">
+</div>
+</div>
+    </div>
+</div>
+        </div>  <!-- /.col-md-3 -->
+    </div>  <!-- /.row -->
+
+  </div>  <!-- /.container -->
+
+    <footer id="footer" role="contentinfo">
+        <div class="container">
+<div class="row"><div id="footnotes"></div></div>
+<div id="footer-text">
+Last updated 2015-12-14 08:22:42 CST
+<br>Built with <a href="https://github.com/llaville/asciidoc-bootstrap-backend">AsciiDoc-Bootstrap backend</a> 4.5.0
+</div>
+        </div>
+    </footer>
+
+    <script src="./javascripts/jquery.min.js"></script>
+    <script src="./bootstrap/js/bootstrap.min.js"></script>
+    <script src="./javascripts/asciidoc.js"></script>
+    <!-- Install TOC and/or footnotes (if necessary) -->
+    <script type="text/javascript">asciidoc.install(2);</script>
+
+    <script src="./javascripts/jquery.ui.totop.min.js"></script>
+
+
+
+    <!-- Remove footnotes if empty block -->
+    <script type="text/javascript">$(function(){ if ($("#footnotes div").length == 0) $("#footnotes").parent().remove(); });</script>
+
+    <script type="text/javascript">$(function(){ if ($("#dropdown-menu-versions")) $("#dropdown-menu-versions").parent().remove(); });</script>
+
+    <script type="text/javascript">$(function(){ $().UItoTop(); });</script>
+    </div> <!-- page -->
+  </body>
+</html>
