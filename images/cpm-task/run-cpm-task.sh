@@ -20,44 +20,35 @@ if [[ $EUID -ne 0 ]]; then
 	      exit 1
 fi
 
-#LOCAL_IP=192.168.0.107
-#SWARM_MANAGER_URL=tcp://$LOCAL_IP:8000
-#CPM_DOMAIN=crunchy.lab
-
 if [ -z "$LOCAL_IP" ]; then
-	echo "LOCAL_IP env var is required"
+	echo "LOCAL_IP is a required env var"
 	exit 1
 fi
 if [ -z "$SWARM_MANAGER_URL" ]; then
-	echo "SWARM_MANAGER_URL env var is required"
+	echo "SWARM_MANAGER_URL is a required env var"
 	exit 1
 fi
-if [ -z "$CPM_DOMAIN" ]; then
-	echo "CPM_DOMAIN env var is required"
+if [ -z "$FLUENT_URL" ]; then
+	echo "FLUENT_URL is a required env var"
 	exit 1
 fi
 
-DATADIR=/var/cpm/data/etcd
-mkdir -p $DATADIR
-rm -rf $DATADIR/*
-#	-e DOCKER_HOST=http://192.168.0.106:5000 \
-# 
-#	-v /run/docker.sock:/tmp/docker.sock \
+#export LOCAL_IP=192.168.0.107
+#export SWARM_MANAGER_URL=tcp://$LOCAL_IP:8000 
+#export FLUENT_URL=$LOCAL_IP:24224
 
-chcon -Rt svirt_sandbox_file_t $DATADIR
-echo "restarting skybridge container..."
-docker -H $SWARM_MANAGER_URL stop skybridge
-docker -H $SWARM_MANAGER_URL rm skybridge
-docker \
-	-H $SWARM_MANAGER_URL \
-	run --name=skybridge -d \
-	--hostname="skybridge" \
-	--privileged \
-	-p $LOCAL_IP:53:53/udp \
-	-v /var/cpm/data/etcd:/etcddata \
-	-e SWARM_MANAGER_URL=$SWARM_MANAGER_URL \
-	-e DNS_DOMAIN=$CPM_DOMAIN \
-	-e DNS_NAMESERVER=192.168.0.1 \
+echo "restarting cpm-task container..."
+sleep 2
+docker -H $SWARM_MANAGER_URL stop cpm-task
+docker -H $SWARM_MANAGER_URL rm cpm-task
+docker -H $SWARM_MANAGER_URL run -e DB_HOST=cpm-admin.crunchy.lab \
+	--log-driver=fluentd \
+	--log-opt fluentd-address=$FLUENT_URL \
+	--log-opt fluentd-tag=docker.cpm-task \
 	-e constraint:host==$LOCAL_IP \
-	crunchydata/skybridge:latest
+	-e CPMBASE=/var/cpm \
+	-e SWARM_MANAGER_URL=$SWARM_MANAGER_URL \
+	-e DB_PORT=5432 -e DB_USER=postgres \
+	--name=cpm-task \
+	-d crunchydata/cpm-task:latest
 

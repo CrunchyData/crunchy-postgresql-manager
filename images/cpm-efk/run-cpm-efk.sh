@@ -20,9 +20,20 @@ if [[ $EUID -ne 0 ]]; then
 	      exit 1
 fi
 
-LOCAL_IP=192.168.0.107
+#CPMROOT=/home/jeffmc/devproject/src/github.com/crunchydata/crunchy-postgresql-manager
+#LOCAL_IP=192.168.0.107
 
-EFKDATA=/home/jeffmc/devproject/src/github.com/crunchydata/crunchy-postgresql-manager/images/cpm-efk/elasticsearch-data
+if [ -z "$LOCAL_IP" ]; then
+	echo "LOCAL_IP env var required"
+	exit 1
+fi
+if [ -z "$CPMROOT" ]; then
+	echo "CPMROOT env var required"
+	exit 1
+fi
+
+
+EFKDATA=$CPMROOT/images/cpm-efk/elasticsearch-data
 mkdir -p $EFKDATA
 chmod 777 $EFKDATA
 chcon -Rt svirt_sandbox_file_t $EFKDATA
@@ -37,8 +48,8 @@ KIBANA_URL=$LOCAL_IP:5601
 # the presence of these config files locally will cause the
 # cpm-node containers to configure rsyslog for remote logging
 # comment these lines out if you don't want this
-cp ./conf/listen.conf /var/cpm/config
-cp ./conf/rsyslog.conf /var/cpm/config
+cp $CPMROOT/images/cpm-efk/conf/listen.conf /var/cpm/config
+cp $CPMROOT/images/cpm-efk/conf/rsyslog.conf /var/cpm/config
 
 echo "restarting cpm-efk"
 docker stop cpm-efk

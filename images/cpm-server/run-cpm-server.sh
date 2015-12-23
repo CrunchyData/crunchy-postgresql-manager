@@ -20,20 +20,35 @@ if [[ $EUID -ne 0 ]]; then
 	      exit 1
 fi
 
-EFK_IP=192.168.0.107
-LOCAL_IP=192.168.0.107
-SWARM_MASTER_IP=192.168.0.107
-SERVERNAME=espresso
-SWARM_MANAGER_URL=tcp://$SWARM_MASTER_IP:8000
+#LOCAL_IP=192.168.0.107
+#SWARM_MANAGER_URL=tcp://$LOCAL_IP:8000
+#SERVERNAME=server1
+
+if [ -z "$LOCAL_IP" ]; then
+	echo "LOCAL_IP env var is required"
+	exit 1
+fi
+
+if [ -z "$SERVERNAME" ]; then
+	echo "SERVERNAME env var is required"
+	exit 1
+fi
+
+if [ -z "$SWARM_MANAGER_URL" ]; then
+	echo "SWARM_MANAGER_URL env var is required"
+	exit 1
+fi
+
 
 echo "restarting cpm-server"
 docker stop cpm-$SERVERNAME
 docker rm cpm-$SERVERNAME
+
 docker -H $SWARM_MANAGER_URL \
 	run --name=cpm-$SERVERNAME -d \
 	--privileged \
 	--log-driver=fluentd \
-	--log-opt fluentd-address=$EFK_IP:24224 \
+	--log-opt fluentd-address=$LOCAL_IP:24224 \
 	--log-opt fluentd-tag=docker.cpm-$SERVERNAME \
 	-e constraint:host==$LOCAL_IP \
 	-p $LOCAL_IP:10001:10001 \
