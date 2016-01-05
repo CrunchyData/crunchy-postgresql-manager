@@ -14,7 +14,7 @@ been provisioned by CPM.
 ![CPM Web UI](./docs/cpm.png)
 
 A user guide is available at:
-[docs/userguide/user-guide.md](docs/userguide/user-guide.md)
+[docs/htmldoc/user-guide.html](https://rawgit.com/crunchydata/crunchy-postgresql-manager/master/docs/htmldoc/user-guide.html)
 
 A developer-installation guide is available at:
 [docs/htmldoc/doc.html](https://rawgit.com/crunchydata/crunchy-postgresql-manager/master/docs/htmldoc/doc.html)

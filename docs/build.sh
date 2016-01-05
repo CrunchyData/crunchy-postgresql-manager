@@ -57,3 +57,12 @@ asciidoc \
 -a toc-placement=right \
 -a theme=cerulean \
 ./logging.asciidoc
+
+asciidoc \
+-b bootstrap \
+-f ./demo.conf \
+-o ./htmldoc/user-guide.html \
+-a toc2 \
+-a toc-placement=right \
+-a theme=cerulean \
+./user-guide.asciidoc

@@ -25,7 +25,7 @@ fi
 # from this master script
 #
 export CPMROOT=/home/jeffmc/devproject/src/github.com/crunchydata/crunchy-postgresql-manager
-export LOCAL_IP=192.168.0.107
+export LOCAL_IP=192.168.0.108
 export SWARM_MANAGER_URL=tcp://$LOCAL_IP:8000 
 export FLUENT_URL=$LOCAL_IP:24224
 export CPM_DOMAIN=crunchy.lab

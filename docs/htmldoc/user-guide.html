@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="AsciiDoc 8.6.8, bootstrap backend 4.5.0">
+    <title>Crunchy Postgresql Manager (CPM) User Guide</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Jeff McCormick">
+    <!-- AsciiDoc Bootstrap styles -->
+    <link rel="stylesheet" type="text/css" id="bootstrapTheme" href="./stylesheets/asciidoc-bootstrap.cerulean.min.css">
+    <!-- Back to top (jquery plugin) -->
+    <link rel="stylesheet" type="text/css" href="./stylesheets/ui.totop.css">
+
+    <!--[if (lt IE 9) & (!IEMobile)]>
+        <script src="./javascripts/html5shiv.min.js"></script>
+        <script src="./javascripts/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+  <body id="toc-top">
+    <div id="page">
+
+
+      <div class="jumbotron">
+        <div class="container">
+          <h1>Crunchy Postgresql Manager (CPM) User Guide</h1>
+        </div>
+      </div>
+
+  <div id="content" class="container">
+
+    <div class="row">
+
+
+
+
+        <div class="col-md-9" role="main">
+<div class="paragraph"><p>This user guide provides a how-to set of instructions for accessing
+the various features that CPM offers to an end-user by means of a
+web browser based application.</p></div>
+<div class="section">
+    <h1 class="page-header" id="login">1. Login</h1>
+<div class="paragraph"><p>On the login page, enter <em>cpm</em> for the User Id value and <em>cpm</em> for the Password value.  The
+value of the CPM Admin URL defaults to <a href="http://cpm-admin:13001">http://cpm-admin:13001</a>.  Depending on your deployment
+you will need to change the CPM Admin URL to another value.  Click on the Login button
+to authenticate.</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="../userguide/login.png" alt="../userguide/login.png">
+</div>
+</div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="navigation_bar">2. Navigation Bar</h1>
+<div class="paragraph"><p>At the top of each page is a navigation bar, you can navigate to the following locations
+using the navigation bar:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Projects - the set of user defined and default projects
+</p>
+</li>
+<li>
+<p>
+Servers - the set of user defined servers in use by CPM
+</p>
+</li>
+<li>
+<p>
+Settings - at the far right of the page, the CPM settings defined by the CPM administrator
+</p>
+</li>
+<li>
+<p>
+Logo - clicking on the Crunchy logo will take you to the Health Check page
+</p>
+</li>
+</ul></div>
+<div class="imageblock">
+<div class="content">
+<img src="../userguide/homepage.png" alt="../userguide/homepage.png">
+</div>
+</div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="monitoring_health_check">3. Monitoring - Health Check</h1>
+<div class="paragraph"><p>On the Health Check page, you will see a snapshot of database containers and their
+last recorded status.  You can navigate to a project or container using the
+hyperlinks presented on the page.  The CPM Collect process collects health check
+metrics on a schedule that is used for displaying on the Health Check page.</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="../userguide/homepage.png" alt="../userguide/homepage.png">
+</div>
+</div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="projects">4. Projects</h1>
+<div class="paragraph"><p>On the Projects page, you will see a <em>default</em> project defined when CPM was
+installed.  From this page, you can create new projects that have meaning within
+your installation (e.g. geographic, business unit, lifecycle, etc.)</p></div>
+<div class="paragraph"><p>Database containers are grouped within a project.  Database container names must
+be unique across all projects in the current release of CPM.</p></div>
+<div class="paragraph"><p>The project page has hyperlinks that allow for the following:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Add Project - create a new project
+</p>
+</li>
+<li>
+<p>
+Delete Project - delete an existing project and any containers within the project
+</p>
+</li>
+<li>
+<p>
+Create Cluster - create a database cluster within this project
+</p>
+</li>
+<li>
+<p>
+Create Database - create a single database within this project
+</p>
+</li>
+<li>
+<p>
+Create DB Proxy - create a database proxy within this project
+</p>
+</li>
+</ul></div>
+<div class="imageblock">
+<div class="content">
+<img src="../userguide/projects.png" alt="../userguide/projects.png">
+</div>
+</div>
+<h2 id="projects_create_cluster">4.1. Projects - Create Cluster</h2>
+<div class="paragraph"><p>On the Projects Create Cluster page, you enter the following information
+to create a new Database cluster:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Cluster Name - unique name prefix given to master, slaves, and pgpool containers
+   that make up a database cluster
+</p>
+</li>
+<li>
+<p>
+Replication Type - select either async or sync replication type
+</p>
+</li>
+<li>
+<p>
+Cluster Profile - select either small, medium, or large.  This value will determine
+   the size of the cluster to be created including the number of slave containers
+   and the server capacity used when deploying a container
+</p>
+</li>
+</ul></div>
+<div class="imageblock">
+<div class="content">
+<img src="../userguide/create-cluster.png" alt="../userguide/create-cluster.png">
+</div>
+</div>
+<h2 id="projects_create_database">4.2. Projects - Create Database</h2>
+<div class="paragraph"><p>On the Projects Create Database page, you enter the following information
+to create a new Database:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Name - unique name given to database container
+</p>
+</li>
+<li>
+<p>
+Docker Profile - select either small, medium, or large.  This value will determine
+   the size of the database to be created and the server capacity used when deploying the container
+</p>
+</li>
+</ul></div>
+<div class="imageblock">
+<div class="content">
+<img src="../userguide/create-database.png" alt="../userguide/create-database.png">
+</div>
+</div>
+<h2 id="projects_create_database_proxy">4.3. Projects - Create Database Proxy</h2>
+<div class="paragraph"><p>On the Projects Create Database Proxy page, you enter the following information
+to create a new Database proxy:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Name - unique name given to database proxy container
+</p>
+</li>
+<li>
+<p>
+Database User ID - the Postgresql user ID to be used when connecting to the actual database
+</p>
+</li>
+<li>
+<p>
+Database User Password - the Postgresql user password to be used when connecting to the actual database
+</p>
+</li>
+<li>
+<p>
+Database Host - the host name or IP address to be used when connecting to the actual database
+</p>
+</li>
+<li>
+<p>
+Database Name - the Postgresql database to be used when connecting to the actual database
+</p>
+</li>
+<li>
+<p>
+Database Port - the Postgresql port to be used when connecting to the actual database
+</p>
+</li>
+<li>
+<p>
+Docker Profile - select either small, medium, or large.  This value will determine
+   the size of the database proxy to be created and the server capacity used when deploying the container
+</p>
+</li>
+</ul></div>
+<div class="imageblock">
+<div class="content">
+<img src="../userguide/create-db-proxy.png" alt="../userguide/create-db-proxy.png">
+</div>
+</div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="servers">5. Servers</h1>
+<div class="paragraph"><p>On the Servers page, you will see a list of servers defined within CPM.  The list of servers
+is determined by the Docker Swarm configuration being used by CPM.</p></div>
+<div class="paragraph"><p>The servers page has hyperlinks that allow for the following:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Containers - list the containers deployed on a server
+</p>
+</li>
+<li>
+<p>
+Monitor - display a server monitoring metric
+</p>
+</li>
+</ul></div>
+<div class="imageblock">
+<div class="content">
+<img src="../userguide/servers.png" alt="../userguide/servers.png">
+</div>
+</div>
+<h2 id="servers_containers">5.1. Servers - Containers</h2>
+<div class="paragraph"><p>On the Servers Containers page you will see a list of containers that were
+deployed to the selected server, from this list, you can navigate via hyperlink
+to the container detail page.</p></div>
+<div class="admonition warning">
+<div class="icon">
+<span class="fa"></span>
+</div>
+<div class="content">The user can start and stop all containers on the server by
+selecting the Start Containers and Stop Containers buttons.</div>
+</div>
+<h2 id="servers_monitoring">5.2. Servers - Monitoring</h2>
+<div class="paragraph"><p>On the Servers page, you can select the Monitor drop down menu and
+select various server monitoring metrics that can be displayed.</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="../userguide/servermon.png" alt="../userguide/servermon.png">
+</div>
+</div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="settings">6. Settings</h1>
+<div class="paragraph"><p>The Settings Drop Down menu lets CPM admins maintain the various
+configuration options within CPM.</p></div>
+<div class="paragraph"><p>The menu includes:
+ * Logout - log out the user
+ * About - links to CPM information and version number
+ * Settings - simple CPM settings in key/value format
+ * Users - add, delete, or change CPM users
+ * Access Rules - add, delete, or change pg_hba.conf rules
+ * Roles - add, delete, or change CPM user roles</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="../userguide/settings.png" alt="../userguide/settings.png">
+</div>
+</div>
+<h2 id="settings_users">6.1. Settings - Users</h2>
+<div class="paragraph"><p>From this screen you can create, delete, or change CPM users.  Note that
+the <em>cpm</em> user is created by default.  You pick the roles you want
+the user to have on this screen.</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="../userguide/users.png" alt="../userguide/users.png">
+</div>
+</div>
+<h2 id="settings_roles">6.2. Settings - Roles</h2>
+<div class="paragraph"><p>From this screen you can create, delete, or change CPM roles.  Note
+that the list of permissions is fixed and that default roles have
+been created when CPM is installed.</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="../userguide/roles.png" alt="../userguide/roles.png">
+</div>
+</div>
+<h2 id="settings_access_rules">6.3. Settings - Access Rules</h2>
+<div class="paragraph"><p>From this screen you can create, delete, or change CPM access rules
+which make their way into database containers pg_hba.conf configuration
+files.  You can create a rule here once, then apply it to new database
+containers after they have been created.</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="../userguide/access-rules.png" alt="../userguide/access-rules.png">
+</div>
+</div>
+</div>
+<div class="section">
+    <h1 class="page-header" id="use_cases">7. Use Cases</h1>
+<h2 id="create_database">7.1. Create Database</h2>
+<div class="paragraph"><p>Follow these steps to create a new database:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+navigate to the Project page
+</p>
+</li>
+<li>
+<p>
+select the Project you want the database to belong to
+</p>
+</li>
+<li>
+<p>
+click the Create Database link
+</p>
+</li>
+<li>
+<p>
+enter a unique database name
+</p>
+</li>
+<li>
+<p>
+select the Docker profile you want to use for the container sizing
+</p>
+</li>
+<li>
+<p>
+click the Create button
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>You should see the database details page after the successful creation.  Notice
+the status should be RUNNING.  You will also see the server which Docker Swarm deployed
+the container upon listed.  At this point you are ready to use the database.</p></div>
+<h2 id="create_database_cluster">7.2. Create Database Cluster</h2>
+<div class="paragraph"><p>Follow these steps to create a new database cluster:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+navigate to the Project page
+</p>
+</li>
+<li>
+<p>
+select the Project you want the database to belong to
+</p>
+</li>
+<li>
+<p>
+click the Create Cluster link
+</p>
+</li>
+<li>
+<p>
+enter a unique cluster name
+</p>
+</li>
+<li>
+<p>
+select the replication type of the cluster
+</p>
+</li>
+<li>
+<p>
+select the Docker profile you want to use for the container sizing
+</p>
+</li>
+<li>
+<p>
+click the Create button
+</p>
+</li>
+<li>
+<p>
+navigate to the cluster from the Project-Cluster folder
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>This will cause slaves, a single master, and a single pgpool container(s) to be
+created.</p></div>
+<div class="paragraph"><p>From the Cluster detail screen, you can navigate to the master, slaves, or the pgpool instance.</p></div>
+<h2 id="create_database_backup">7.3. Create Database Backup</h2>
+<div class="paragraph"><p>To create a database backup, follow these steps:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+navigate to the database detail page
+</p>
+</li>
+<li>
+<p>
+click the Schedules link
+</p>
+</li>
+<li>
+<p>
+click the <em>+</em> link to add a new backup schedule
+</p>
+</li>
+<li>
+<p>
+fill out the Schedule form, do not select the Enabled button for a simple one-time backup
+</p>
+</li>
+<li>
+<p>
+click the Create button to create the schedule
+</p>
+</li>
+<li>
+<p>
+click the Schedule link of the newly created schedule
+</p>
+</li>
+<li>
+<p>
+click the Execute Now link on the schedule to perform a one-time backup
+</p>
+</li>
+<li>
+<p>
+click the History link on the schedules page
+</p>
+</li>
+<li>
+<p>
+you should see either a completed or running schedule status line for the backup you performed
+</p>
+</li>
+</ul></div>
+<h2 id="restore_database_backup">7.4. Restore Database Backup</h2>
+<div class="paragraph"><p>To perform a restore of a backup, follow these steps:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+navigate to the schedule backup history that you want to restore
+</p>
+</li>
+<li>
+<p>
+click on the life preserver icon at the end of the history status line
+</p>
+</li>
+<li>
+<p>
+fill out the name of the restore container name, a default value is supplied as well
+</p>
+</li>
+<li>
+<p>
+click on the Restore button to start the restore job
+</p>
+</li>
+<li>
+<p>
+navigate to the restore database container
+</p>
+</li>
+<li>
+<p>
+refresh the web browser to reload the list of database containers presented in the
+   tree
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>At this point you should have a restored database running in a unique
+container.</p></div>
+</div>
+        </div>  <!-- /.col-md-9 -->
+        <div class="col-md-3">
+        <div id="sidebar">
+    <div class="toc2">
+<div class="panel panel-default">
+<div class="panel-heading">Table of Contents</div>
+<div class="panel-body" id="toc">
+</div>
+</div>
+    </div>
+</div>
+        </div>  <!-- /.col-md-3 -->
+    </div>  <!-- /.row -->
+
+  </div>  <!-- /.container -->
+
+    <footer id="footer" role="contentinfo">
+        <div class="container">
+<div class="row"><div id="footnotes"></div></div>
+<div id="footer-text">
+Version 1.0<br>
+Last updated 2016-01-05 15:11:39 CST
+<br>Built with <a href="https://github.com/llaville/asciidoc-bootstrap-backend">AsciiDoc-Bootstrap backend</a> 4.5.0
+</div>
+        </div>
+    </footer>
+
+    <script src="./javascripts/jquery.min.js"></script>
+    <script src="./bootstrap/js/bootstrap.min.js"></script>
+    <script src="./javascripts/asciidoc.js"></script>
+    <!-- Install TOC and/or footnotes (if necessary) -->
+    <script type="text/javascript">asciidoc.install(2);</script>
+
+    <script src="./javascripts/jquery.ui.totop.min.js"></script>
+
+
+
+    <!-- Remove footnotes if empty block -->
+    <script type="text/javascript">$(function(){ if ($("#footnotes div").length == 0) $("#footnotes").parent().remove(); });</script>
+
+    <script type="text/javascript">$(function(){ if ($("#dropdown-menu-versions")) $("#dropdown-menu-versions").parent().remove(); });</script>
+
+    <script type="text/javascript">$(function(){ $().UItoTop(); });</script>
+    </div> <!-- page -->
+  </body>
+</html>
