@@ -18,6 +18,12 @@
 				<a ui-sref="servers.detail.details({serverId:container.ServerID})">{{container.ServerID}}</a>
 			</div>
 		</div>
+		<div class="form-group">
+			<label for="inputIPAddress" class="control-label col-xs-2">IPAddress</label>
+			<div class="col-xs-5">
+				<p>{{container.IPAddress}}</p>
+			</div>
+		</div>
 		<div class="form-group" ng-show="container.ClusterID != '-1'">
 			<label for="inputCluster" class="control-label col-xs-2">Cluster</label>
 			<div class="col-xs-5">

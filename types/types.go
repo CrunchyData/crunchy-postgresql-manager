@@ -161,6 +161,7 @@ type ClusterNode struct {
 	ProjectName string //project name
 	ClusterName string //cluster name
 	ServerID    string //server info
+	IPAddress   string //current IP address
 }
 
 type ProvisionStatus struct {

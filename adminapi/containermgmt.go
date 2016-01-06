@@ -90,8 +90,19 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 		logit.Info.Println("pinging db finished")
 	}
 
-	clusternode := types.ClusterNode{node.ID, node.ClusterID,
-		node.Name, node.Role, node.Image, node.CreateDate, currentStatus, node.ProjectID, node.ProjectName, node.ClusterName, inspectInfo.IPAddress}
+	clusternode := new(types.ClusterNode)
+	clusternode.ID = node.ID
+	clusternode.ClusterID = node.ClusterID
+	clusternode.Name = node.Name
+	clusternode.Role = node.Role
+	clusternode.Image = node.Image
+	clusternode.CreateDate = node.CreateDate
+	clusternode.Status = currentStatus
+	clusternode.ProjectID = node.ProjectID
+	clusternode.ProjectName = node.ProjectName
+	clusternode.ClusterName = node.ClusterName
+	clusternode.ServerID = inspectInfo.ServerID
+	clusternode.IPAddress = inspectInfo.IPAddress
 
 	w.WriteJson(clusternode)
 }
