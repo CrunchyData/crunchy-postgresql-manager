@@ -1,10 +1,10 @@
 <p><strong>Create DB Proxy</strong></p>
 <div>
-	<form class="form-horizontal">
+	<form name="pForm" class="form-horizontal">
 		<div class="form-group">
 			<label for="inputName" class="control-label col-xs-2">Name</label>
 			<div class="col-xs-5">
-				<input type="text" class="form-control" id="inputName" ng-model="container.Name">
+				<input type="text" class="form-control" id="inputName" ng-model="container.Name" ng-pattern="/^[a-z0-9.-]*$/" />
 			</div>
 		</div>
 		<div class="form-group">
@@ -50,7 +50,7 @@
 		<span us-spinner spinner-key="spinner-1"></span>
 		<div class="form-group">
 			<div class="col-xs-offset-2 col-xs-5">
-				<button type="submit" ng-click="add()" class="btn btn-primary">Create</button>
+				<button type="submit" ng-click="add()" class="btn btn-primary" ng-disabled="pForm.$invalid || pForm.$pristine">Create</button>
 			</div>
 		</div>
 

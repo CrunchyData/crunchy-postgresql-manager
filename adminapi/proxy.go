@@ -122,7 +122,7 @@ func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 	params := &swarmapi.DockerRunRequest{}
 	params.Image = proxyrequest.Image
 	params.ProjectID = proxyrequest.ProjectID
-	params.ContainerName = proxyrequest.ContainerName
+	params.ContainerName = util.CleanName(proxyrequest.ContainerName)
 	params.Standalone = proxyrequest.Standalone
 	params.Profile = proxyrequest.Profile
 

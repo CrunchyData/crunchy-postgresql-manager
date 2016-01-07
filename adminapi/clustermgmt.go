@@ -1011,7 +1011,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	dbcluster := types.Cluster{}
 	dbcluster.ID = ""
 	dbcluster.ProjectID = params.ProjectID
-	dbcluster.Name = params.Name
+	dbcluster.Name = util.CleanName(params.Name)
 	dbcluster.ClusterType = params.ClusterType
 	dbcluster.Status = "uninitialized"
 	dbcluster.Containers = make(map[string]string)

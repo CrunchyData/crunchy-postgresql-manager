@@ -88,6 +88,7 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 	logit.Info.Println("params.Profile=" + params.Profile)
 	logit.Info.Println("params.ServerID=" + params.ServerID)
 	logit.Info.Println("params.ProjectID=" + params.ProjectID)
+	params.ContainerName = util.CleanName(params.ContainerName)
 	logit.Info.Println("params.ContainerName=" + params.ContainerName)
 
 	var newid string

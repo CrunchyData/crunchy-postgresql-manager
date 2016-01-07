@@ -17,6 +17,7 @@ package util
 
 import (
 	"os"
+	"strings"
 )
 
 var CPMBASE string
@@ -29,4 +30,8 @@ func GetBase() string {
 		}
 	}
 	return CPMBASE
+}
+
+func CleanName(name string) string {
+	return strings.Replace(strings.ToLower(name), " ", "", -1)
 }
