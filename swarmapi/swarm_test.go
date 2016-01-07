@@ -64,3 +64,19 @@ func TestPs(t *testing.T) {
 		}
 	}
 }
+
+func TestStop(t *testing.T) {
+
+	var response DockerStopResponse
+	var err error
+
+	request := new(DockerStopRequest)
+	request.ContainerName = "fookjadfa"
+	response, err = DockerStop(request)
+	if err != nil {
+		//t.Error(err.Error())
+		fmt.Println(err.Error())
+		t.Fail()
+	}
+	fmt.Println(response.Output)
+}
