@@ -16,8 +16,6 @@
 package adminapi
 
 import (
-	"bytes"
-	"database/sql"
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/cpmserverapi"
@@ -26,7 +24,6 @@ import (
 	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
 	"net/http"
-	"os/exec"
 	"strings"
 )
 
@@ -81,7 +78,14 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	if currentStatus != "CONTAINER NOT FOUND" {
-		currentStatus, err = NewPingPG(dbConn, &node)
+		var pgport types.Setting
+		pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
+		if err != nil {
+			logit.Error.Println(err.Error())
+			rest.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		currentStatus, err = util.FastPing(pgport.Value, node.Name)
 		if err != nil {
 			logit.Error.Println(err.Error())
 			rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -570,20 +574,14 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 }
 
 // NewPingPG performs a simple network (nc) ping on a given container's postgres database port
-func NewPingPG(dbConn *sql.DB, node *types.Container) (string, error) {
+/**
+func NewPingPG(pgport string, nodeName string) (string, error) {
 
 	var err error
 
-	var pgport types.Setting
-	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return "OFFLINE", err
-	}
-
 	var cmd *exec.Cmd
-	logit.Info.Println("about to newping " + node.Name + " at port " + pgport.Value)
-	cmd = exec.Command("ping-wrapper.sh", node.Name, pgport.Value)
+	logit.Info.Println("about to newping " + nodeName + " at port " + pgport)
+	cmd = exec.Command("ping-wrapper.sh", nodeName, pgport)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
@@ -601,6 +599,7 @@ func NewPingPG(dbConn *sql.DB, node *types.Container) (string, error) {
 
 	return "RUNNING", nil
 }
+*/
 
 // AdminStartServerContainers starts all containers on a given server
 func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {

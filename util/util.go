@@ -16,7 +16,9 @@
 package util
 
 import (
+	"bytes"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -34,4 +36,27 @@ func GetBase() string {
 
 func CleanName(name string) string {
 	return strings.Replace(strings.ToLower(name), " ", "", -1)
+}
+
+// FastPing returns either OFFLINE or RUNNING for a host and port combination
+func FastPing(port string, host string) (string, error) {
+
+	var err error
+
+	var cmd *exec.Cmd
+	cmd = exec.Command("ping-wrapper.sh", host, port)
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err = cmd.Run()
+	if err != nil {
+		return "OFFLINE", err
+	}
+	var rc = out.String()
+	if rc != "connected" {
+		return "OFFLINE", nil
+	}
+
+	return "RUNNING", nil
 }

@@ -627,7 +627,13 @@ func performConfigUpdate(dbConn *sql.DB, ContainerID string) error {
 
 	var currentStatus string
 	//currentStatus, err = GetPGStatus2(dbConn, container.Name, container.Name)
-	currentStatus, err = NewPingPG(dbConn, &container)
+	var pgport types.Setting
+	pgport, err = admindb.GetSetting(dbConn, "PG-PORT")
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
+	currentStatus, err = util.FastPing(pgport.Value, container.Name)
 	if err != nil {
 		logit.Error.Println("GetNode:" + err.Error())
 		return err
