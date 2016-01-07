@@ -164,7 +164,7 @@ which make their way into database containers pg_hba.conf configuration
 files.  You can create a rule here once, then apply it to new database
 containers after they have been created.
 
-image::../userguide/access-rules.png[]
+image::../userguide/accessrules.png[]
 
 
 == Use Cases
