@@ -26,9 +26,9 @@ var ClusterStopController = function($scope, $stateParams, $state, clustersFacto
             .error(function(error) {
                 $scope.alerts = [{
                     type: 'danger',
-                    msg: error.message
+                    msg: error.Error
                 }];
-                console.log('here is an error ' + error.message);
+                console.log('here is an error ' + error.Error);
                 usSpinnerService.stop('spinner-1');
             });
     };
@@ -52,9 +52,9 @@ var ClusterStartController = function($scope, $stateParams, $state, clustersFact
             .error(function(error) {
                 $scope.alerts = [{
                     type: 'danger',
-                    msg: error.message
+                    msg: error.Error
                 }];
-                console.log('here is an error ' + error.message);
+                console.log('here is an error ' + error.Error);
                 usSpinnerService.stop('spinner-1');
             });
     };
@@ -78,9 +78,9 @@ var ClusterDeleteController = function($scope, $stateParams, $state, clustersFac
             .error(function(error) {
                 $scope.alerts = [{
                     type: 'danger',
-                    msg: error.message
+                    msg: error.Error
                 }];
-                console.log('here is an error ' + error.message);
+                console.log('here is an error ' + error.Error);
                 usSpinnerService.stop('spinner-1');
             });
     };
@@ -103,9 +103,9 @@ var ClusterScaleController = function($scope, $stateParams, $state, clustersFact
             .error(function(error) {
                 $scope.alerts = [{
                     type: 'danger',
-                    msg: error.message
+                    msg: error.Error
                 }];
-                console.log('here is an error ' + error.message);
+                console.log('here is an error ' + error.Error);
                 usSpinnerService.stop('spinner-1');
             });
     };
@@ -138,9 +138,8 @@ var ClusterAutoClusterController = function($scope, $stateParams, $state, cluste
             .error(function(error) {
                 $scope.alerts = [{
                     type: 'danger',
-                    msg: error.message
+                    msg: error.Error
                 }];
-                console.log('here is an error ' + error.message);
                 usSpinnerService.stop('spinner-1');
             });
     };

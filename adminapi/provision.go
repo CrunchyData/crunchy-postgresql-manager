@@ -122,7 +122,7 @@ func provisionImpl(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standby bo
 			return "", err
 		}
 	} else {
-		errorStr = "container name" + params.ContainerName + " already used can't provision"
+		errorStr = "container name " + params.ContainerName + " already used can't provision"
 		logit.Error.Println(errorStr)
 		return "", errors.New(errorStr)
 	}
