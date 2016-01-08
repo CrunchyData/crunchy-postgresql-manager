@@ -60,6 +60,8 @@ angular.module('uiRouterSample.proxy.service', ['ngCookies'])
 		'ID' : proxy.ID,
 		'Port' : proxy.Port,
 		'Host' : proxy.Host,
+		'Usename' : proxy.Usename,
+		'Passwd' : proxy.Passwd,
 		'Database' : proxy.Database,
             	'Token': $cookieStore.get('cpm_token')
 	});

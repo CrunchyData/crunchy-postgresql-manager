@@ -101,7 +101,6 @@ type ContainerUser struct {
 
 type Proxy struct {
 	ID              string //unique key
-	ContainerUserID string //foreign key to the container user
 	Database        string //database name
 	Host            string //database host name
 	Usename         string //database user name

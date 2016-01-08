@@ -189,8 +189,11 @@ var ProxyAddController = function($scope, $stateParams, $state, serversFactory, 
 
     var newcontainer = {};
     var newproxy = {};
-	newproxy.DatabaseName = "postgres";
-	newproxy.DatabasePort = "5432";
+	newproxy.DatabaseName = 'cpmtest';
+	newproxy.DatabaseHost = '192.168.0.108';
+	newproxy.UserID = 'cpmtest';
+	newproxy.UserPassword = 'cpmtest';
+	newproxy.DatabasePort = '5432';
 	$scope.proxy = newproxy;
 
     serversFactory.all()
@@ -198,6 +201,10 @@ var ProxyAddController = function($scope, $stateParams, $state, serversFactory, 
             $scope.servers = data;
             newcontainer.ID = 0;
             newcontainer.Name = 'newproxy';
+            newcontainer.UserID = 'cpmtest';
+            newcontainer.UserPassword = 'cpmtest';
+            newcontainer.DatabaseHost = '192.168.0.108';
+            newcontainer.DatabaseName = 'cpmtest';
             newcontainer.Image = 'cpm-node-proxy';
             newcontainer.ServerID = $scope.servers[0].ID;
             $scope.selectedServer = $scope.servers[0];
@@ -222,7 +229,7 @@ var ProxyAddController = function($scope, $stateParams, $state, serversFactory, 
         proxyFactory.add($scope.proxy, $scope.container, $scope.standalone, $scope.dockerprofile)
             .success(function(data) {
                 usSpinnerService.stop('spinner-1');
-                $state.go('projects.proxy', $stateParams, {
+                $state.go('projects.list', $stateParams, {
                     reload: true,
                     inherit: false
                 });

@@ -58,7 +58,7 @@ func GetUserCredentials(dbConn *sql.DB, node *types.Container) (types.Credential
 	cred.Host = proxy.Host
 	cred.Username = proxy.Usename
 	cred.Password = proxy.Passwd
-	cred.Port = "5432"
+	cred.Port = proxy.Port
 	return cred, err
 
 }

@@ -227,12 +227,13 @@ create table containeruser (
 
 create table proxy (
 	id serial primary key,
-	containeruserid int references containeruser (id) on delete cascade not null,
 	containerid int references container (id) on delete cascade not null,
 	projectid int references project (id) on delete cascade not null,
 	port varchar(30) not null,
 	host varchar(30) not null,
 	databasename varchar(30) not null,
+	usename varchar(30) not null,
+	passwd varchar(30) not null,
 	updatedt timestamp not null
 );
 

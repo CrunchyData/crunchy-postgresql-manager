@@ -655,6 +655,7 @@ angular.module('uiRouterSample.projects', [
                                 }
 
                                 if ($stateParams.proxyId != "") {
+					console.log('calling getbycontainerid with id=' + $stateParams.containerId)
                                     proxyFactory.getbycontainerid($stateParams.containerId)
                                         .success(function(data) {
                                             $scope.proxy = data;

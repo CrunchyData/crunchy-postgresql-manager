@@ -2,44 +2,44 @@
 <div>
     <form name="pForm" class="form-horizontal">
         <div class="form-group">
-            <label for="inputName" class="control-label col-xs-2">Name</label>
+            <label for="inputName" class="control-label col-xs-4">Name</label>
             <div class="col-xs-5">
                 <input type="text" class="form-control" id="inputName" ng-model="container.Name"
                 ng-pattern="/^[a-z0-9.-]*$/" />
             </div>
         </div>
         <div class="form-group">
-            <label for="inputUserID" class="control-label col-xs-2">Database User ID</label>
+            <label for="inputUserID" class="control-label col-xs-4">Database User ID</label>
             <div class="col-xs-5">
-                <input type="text" class="form-control" id="inputUserID" ng-model="proxy.UserID">
+                <input type="text" class="form-control" id="inputUserID" ng-model="proxy.UserID" >
             </div>
         </div>
         <div class="form-group">
-            <label for="inputUserPassword" class="control-label col-xs-2">Database User Password</label>
+            <label for="inputUserPassword" class="control-label col-xs-4">Database User Password</label>
             <div class="col-xs-5">
-                <input type="password" class="form-control" id="inputUserPassword" ng-model="proxy.UserPassword">
+                <input type="password" class="form-control" id="inputUserPassword" ng-model="proxy.UserPassword" >
             </div>
         </div>
         <div class="form-group">
-            <label for="inputDatabaseHost" class="control-label col-xs-2">Database Host</label>
+            <label for="inputDatabaseHost" class="control-label col-xs-4">Database Host</label>
             <div class="col-xs-5">
-                <input type="text" class="form-control" id="inputDatabaseHost" ng-model="proxy.DatabaseHost">
+                <input type="text" class="form-control" id="inputDatabaseHost" ng-model="proxy.DatabaseHost" >
             </div>
         </div>
         <div class="form-group">
-            <label for="inputDatabaseName" class="control-label col-xs-2">Database Name</label>
+            <label for="inputDatabaseName" class="control-label col-xs-4">Database Name</label>
             <div class="col-xs-5">
-                <input type="text" class="form-control" id="inputDatabaseName" ng-model="proxy.DatabaseName">
+                <input type="text" class="form-control" id="inputDatabaseName" ng-model="proxy.DatabaseName" >
             </div>
         </div>
         <div class="form-group">
-            <label for="inputDatabasePort" class="control-label col-xs-2">Database Port</label>
+            <label for="inputDatabasePort" class="control-label col-xs-4">Database Port</label>
             <div class="col-xs-5">
                 <input type="text" class="form-control" id="inputDatabasePort" ng-model="proxy.DatabasePort">
             </div>
         </div>
         <div class="form-group">
-            <label for="inputDockerProfile" class="control-label col-xs-2">DockerProfile</label>
+            <label for="inputDockerProfile" class="control-label col-xs-4">DockerProfile</label>
             <div class="col-xs-5">
                 <select class="form-control" id="inputDockerProfile" ng-model="dockerprofile">
                     <option value="SM" selected>small</option>

@@ -21,6 +21,7 @@ import (
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/crunchydata/crunchy-postgresql-manager/admindb"
 	"github.com/crunchydata/crunchy-postgresql-manager/logit"
+	"github.com/crunchydata/crunchy-postgresql-manager/sec"
 	"github.com/crunchydata/crunchy-postgresql-manager/swarmapi"
 	"github.com/crunchydata/crunchy-postgresql-manager/types"
 	"github.com/crunchydata/crunchy-postgresql-manager/util"
@@ -112,6 +113,18 @@ func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, errorStr, http.StatusBadRequest)
 		return
 	}
+	if proxyrequest.Usename == "" {
+		logit.Error.Println("ProvisionProxy error Usename required")
+		errorStr = "Usename required"
+		rest.Error(w, errorStr, http.StatusBadRequest)
+		return
+	}
+	if proxyrequest.Passwd == "" {
+		logit.Error.Println("ProvisionProxy error Passwd required")
+		errorStr = "Passwd required"
+		rest.Error(w, errorStr, http.StatusBadRequest)
+		return
+	}
 
 	logit.Info.Println("Image=" + proxyrequest.Image)
 	logit.Info.Println("Profile=" + proxyrequest.Profile)
@@ -148,13 +161,13 @@ func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 
 func insertProxy(request *ProxyRequest) error {
 
-	var containerUserID int
-
+	/**
 	//create user in the admin db
 	dbuser := types.ContainerUser{}
 	dbuser.Containername = request.ContainerName
 	dbuser.Passwd = request.Passwd
 	dbuser.Rolname = request.Usename
+	*/
 
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
 	if err != nil {
@@ -164,13 +177,15 @@ func insertProxy(request *ProxyRequest) error {
 	}
 	defer dbConn.Close()
 
-	containerUserID, err = admindb.AddContainerUser(dbConn, dbuser)
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return err
-	}
+	/*
+		containerUserID, err = admindb.AddContainerUser(dbConn, dbuser)
+		if err != nil {
+			logit.Error.Println(err.Error())
+			return err
+		}
 
-	logit.Info.Printf("insertProxy: new ID %d\n ", containerUserID)
+		logit.Info.Printf("insertProxy: new ID %d\n ", containerUserID)
+	*/
 
 	var container types.Container
 	container, err = admindb.GetContainerByName(dbConn, request.ContainerName)
@@ -180,15 +195,25 @@ func insertProxy(request *ProxyRequest) error {
 	}
 
 	proxy := types.Proxy{}
-	proxy.ContainerUserID = strconv.Itoa(containerUserID)
 	proxy.ContainerID = container.ID
 	proxy.Host = request.Host
 	proxy.Database = request.Database
 	proxy.ProjectID = request.ProjectID
 	proxy.Port = request.Port
+	proxy.Usename = request.Usename
 
-	queryStr := fmt.Sprintf("insert into proxy ( containeruserid, containerid, projectid, port, host, databasename, updatedt) values ( %s, %s, %s, '%s', '%s', '%s', now()) returning id",
-		proxy.ContainerUserID, proxy.ContainerID, proxy.ProjectID, proxy.Port, proxy.Host, proxy.Database)
+	//encrypt the password...passwords at rest are encrypted
+	var encrypted string
+	encrypted, err = sec.EncryptPassword(request.Passwd)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		return err
+	}
+
+	proxy.Passwd = encrypted
+
+	queryStr := fmt.Sprintf("insert into proxy ( containerid, projectid, port, host, usename, passwd, databasename, updatedt) values ( %s, %s, '%s', '%s', '%s', '%s', '%s', now()) returning id",
+		proxy.ContainerID, proxy.ProjectID, proxy.Port, proxy.Host, proxy.Usename, proxy.Passwd, proxy.Database)
 
 	logit.Info.Println("insertProxy:" + queryStr)
 	var proxyid int
@@ -268,13 +293,23 @@ func ProxyUpdate(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	logit.Info.Println("ID=" + req.ID)
-	logit.Info.Println("Port" + req.Port)
-	logit.Info.Println("Host" + req.Host)
-	logit.Info.Println("Database" + req.Database)
+	//logit.Info.Println("ID=" + req.ID)
+	//logit.Info.Println("Port" + req.Port)
+	//logit.Info.Println("Host" + req.Host)
+	//logit.Info.Println("Database" + req.Database)
+	//logit.Info.Println("Usename" + req.Usename)
+	//logit.Info.Println("Passwd" + req.Passwd)
+	//encrypt the password...passwords at rest are encrypted
+	var encrypted string
+	encrypted, err = sec.EncryptPassword(req.Passwd)
+	if err != nil {
+		logit.Error.Println(err.Error())
+		rest.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	queryStr := fmt.Sprintf("update proxy set ( port, host, databasename, updatedt) = ( '%s', '%s', '%s', now()) where id = %s returning id",
-		req.Port, req.Host, req.Database, req.ID)
+	queryStr := fmt.Sprintf("update proxy set ( port, host, usename, passwd, databasename, updatedt) = ( '%s', '%s', '%s', '%s', '%s', now()) where id = %s returning id",
+		req.Port, req.Host, req.Usename, encrypted, req.Database, req.ID)
 
 	logit.Info.Println("UpdateProxy:" + queryStr)
 	var proxyid int
