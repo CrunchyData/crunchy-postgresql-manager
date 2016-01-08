@@ -11,8 +11,8 @@
 			<a ng-if="hc.ContainerImage == 'cpm-node'" ui-sref="projects.detail.gotocontainer({projectId:hc.ProjectID,containerId:hc.ContainerID})">{{hc.ContainerName}}</a>
 		</td>
             <td  class="col-md-2"header-class="text-left" data-title="'Status'" width="200">
-                <a tooltip="{{hc.Status}}" style="color:red" ng-if="hc.Status == 'down'" href=""><i class="fa fa-warning"></i></a>
-                <a tooltip="{{hc.Status}}" style="color:green" ng-if="hc.Status == 'up'" href=""><i class="fa fa-check"></i></a>
+		    <a style="color:red" ng-if="hc.Status == 'down'" href=""><span title="{{hc.Status}}"><i class="fa fa-warning"></i></span></a>
+		    <a style="color:green" ng-if="hc.Status == 'up'" href=""><span title="{{hc.Status}}"><i class="fa fa-check"></i></span></a>
             </td>
 
         </tr>

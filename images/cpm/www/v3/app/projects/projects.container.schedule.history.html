@@ -1,12 +1,19 @@
 <p><strong>History</strong>
-        <a tooltip="refresh" ng-click="refresh()"><i class="fa fa-refresh fa-fw"></i></a>
+<a ng-click="refresh()"><span title="refresh"><i class="fa fa-refresh fa-fw"></i></span></a>
 </p>
 
+
 <ul>
-	<li ng-repeat="stat in stats">
-	ID {{stat.ID}} - Started {{stat.StartTime}} - {{stat.Status}} - Elapsed {{stat.ElapsedTime}} <span ng-show="stat.TaskSize != 'n/a'">Size {{stat.TaskSize}}</span><a tooltip-placement="right" tooltip="delete" ui-sref="projects.container.schedule.history.delete({statusID:stat.ID})"><i class="fa fa-trash fa-fw"></i></a> <a ng-show="stat.ProfileName == 'pg_basebackup'" tooltip-placement="right" tooltip="restore" ui-sref="projects.container.schedule.history.restore({statusID:stat.ID})"><i class="fa fa-life-saver fa-fw"></i></a>
+    <li ng-repeat="stat in stats">
+        <p>
+            ID {{stat.ID}} - Started {{stat.StartTime}} - {{stat.Status}} - Elapsed {{stat.ElapsedTime}}
+            <span ng-show="stat.TaskSize != 'n/a'">Size {{stat.TaskSize}}</span>
+            <a ui-sref="projects.container.schedule.history.delete({statusID:stat.ID})"><span title="delete"> <i class="fa fa-trash fa-fw"></i></span></a>
+            <a ng-show="stat.ProfileName == 'pg_basebackup'" ui-sref="projects.container.schedule.history.restore({statusID:stat.ID})"><span title="restore"><i class="fa fa-life-saver fa-fw"></i></span></a>
+        </p>
     </li>
 </ul>
 
-<div ui-view class="slide"></div>
+<div ui-view class="slide">
 
+</div>
