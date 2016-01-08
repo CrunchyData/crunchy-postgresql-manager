@@ -103,7 +103,7 @@ func DockerInspect(req *DockerInspectRequest) (DockerInspectResponse, error) {
 		return response, errors.New("SWARM_MANAGER_URL not set")
 	}
 
-	logit.Info.Println("DockerInspect called")
+	//logit.Info.Println("DockerInspect called")
 
 	if req.ContainerName == "" {
 		err = errors.New("ContainerName required in request")
@@ -129,15 +129,15 @@ func DockerInspect(req *DockerInspectRequest) (DockerInspectResponse, error) {
 	}
 
 	if container != nil {
-		logit.Info.Println("container found during inspect")
+		//logit.Info.Println("container found during inspect")
 		if container.State.Running {
 			response.RunningState = "up"
-			logit.Info.Println("container status is up")
-			logit.Info.Println("container ipaddress is " + container.NetworkSettings.IPAddress)
+			//logit.Info.Println("container status is up")
+			//logit.Info.Println("container ipaddress is " + container.NetworkSettings.IPAddress)
 			response.IPAddress = container.NetworkSettings.IPAddress
 		} else {
 			response.RunningState = "down"
-			logit.Info.Println("container status is down")
+			//logit.Info.Println("container status is down")
 		}
 	}
 
@@ -177,13 +177,13 @@ func DockerRemove(req *DockerRemoveRequest) (DockerRemoveResponse, error) {
 	}
 
 	if container != nil {
-		logit.Info.Println("during remove...container found")
+		//logit.Info.Println("during remove...container found")
 		err3 = docker.StopContainer(req.ContainerName, 10)
 		if err3 != nil {
 			logit.Error.Println("can't stop container " + req.ContainerName)
 			logit.Error.Println(err3.Error())
 		}
-		logit.Info.Println("during remove....container stopped ")
+		//logit.Info.Println("during remove....container stopped ")
 		opts := dockerapi.RemoveContainerOptions{ID: req.ContainerName}
 		err := docker.RemoveContainer(opts)
 		if err != nil {
@@ -202,7 +202,7 @@ func DockerRemove(req *DockerRemoveRequest) (DockerRemoveResponse, error) {
 func DockerStart(req *DockerStartRequest) (DockerStartResponse, error) {
 	var response DockerStartResponse
 
-	logit.Info.Println("DockerStart called")
+	//logit.Info.Println("DockerStart called")
 	swarmURL := os.Getenv("SWARM_MANAGER_URL")
 	if swarmURL == "" {
 		logit.Error.Println("SWARM_MANAGER_URL not set")
@@ -227,7 +227,7 @@ func DockerStart(req *DockerStartRequest) (DockerStartResponse, error) {
 // DockerStop perform a docker stop
 func DockerStop(req *DockerStopRequest) (DockerStopResponse, error) {
 	var response DockerStopResponse
-	logit.Info.Println("DockerStop called")
+	//logit.Info.Println("DockerStop called")
 	swarmURL := os.Getenv("SWARM_MANAGER_URL")
 	if swarmURL == "" {
 		logit.Error.Println("SWARM_MANAGER_URL not set")
@@ -252,7 +252,7 @@ func DockerStop(req *DockerStopRequest) (DockerStopResponse, error) {
 // DockerRun perform a docker run
 func DockerRun(req *DockerRunRequest) (DockerRunResponse, error) {
 	response := DockerRunResponse{}
-	logit.Info.Println("DockerRun called")
+	//logit.Info.Println("DockerRun called")
 	swarmURL := os.Getenv("SWARM_MANAGER_URL")
 	if swarmURL == "" {
 		logit.Error.Println("SWARM_MANAGER_URL not set")
@@ -301,7 +301,7 @@ func DockerRun(req *DockerRunRequest) (DockerRunResponse, error) {
 	options.Name = req.ContainerName
 	options.Config.Env = envvars
 	options.Config.Image = "crunchydata/" + req.Image
-	logit.Info.Println("swarmapi using " + options.Config.Image + " as the image name")
+	//logit.Info.Println("swarmapi using " + options.Config.Image + " as the image name")
 	options.Config.Volumes = make(map[string]struct{})
 
 	//TODO figure out cpu shares and memory settings, these are different
@@ -351,7 +351,7 @@ func DockerInfo() (DockerInfoResponse, error) {
 		return response, errors.New("SWARM_MANAGER_URL not set")
 	}
 
-	logit.Info.Println("DockerInfo called")
+	//logit.Info.Println("DockerInfo called")
 
 	docker, err := dockerclient.NewDockerClient(swarmURL, nil)
 	if err != nil {
@@ -376,7 +376,7 @@ func DockerInfo() (DockerInfoResponse, error) {
 		colonLoc = strings.Index(trimmedStr, ":")
 		//fmt.Printf("colonLoc=%d\n", colonLoc)
 		if colonLoc > 0 {
-			logit.Info.Println("found " + trimmedStr)
+			//logit.Info.Println("found " + trimmedStr)
 			//parts := strings.Split(trimmedStr, ":")
 			//response.Output = append(response.Output, parts[0])
 			response.Output = append(response.Output, trimmedStr)
@@ -391,7 +391,7 @@ func DockerPs(serverid string) (DockerPsResponse, error) {
 	response := DockerPsResponse{}
 	var err error
 
-	logit.Info.Println("DockerPs called on " + serverid)
+	//logit.Info.Println("DockerPs called on " + serverid)
 
 	docker, err := dockerapi.NewClient("tcp://" + serverid)
 	if err != nil {
@@ -414,13 +414,13 @@ func DockerPs(serverid string) (DockerPsResponse, error) {
 	var apicontainer dockerapi.APIContainers
 	for x := range info {
 		apicontainer = info[x]
-		logit.Info.Printf("x=%d\n", x)
+		//logit.Info.Printf("x=%d\n", x)
 		if strings.Index(apicontainer.Image, "cpm-node") > 0 ||
 			strings.Index(apicontainer.Image, "cpm-pgpool") > 0 {
 			cinfo := DockerPsInfo{}
 			if len(apicontainer.Names) > 0 {
 				cinfo.Name = strings.Trim(apicontainer.Names[0], "/")
-				logit.Info.Println("name=" + cinfo.Name + " status=" + apicontainer.Status)
+				//logit.Info.Println("name=" + cinfo.Name + " status=" + apicontainer.Status)
 			}
 			cinfo.Status = apicontainer.Status
 			cinfo.Image = apicontainer.Image
@@ -428,6 +428,6 @@ func DockerPs(serverid string) (DockerPsResponse, error) {
 		}
 	}
 
-	logit.Info.Println("dockerps returning results")
+	//logit.Info.Println("dockerps returning results")
 	return response, nil
 }

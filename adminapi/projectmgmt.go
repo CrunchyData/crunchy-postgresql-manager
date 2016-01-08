@@ -56,7 +56,7 @@ func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer dbConn.Close()
 
-	logit.Info.Println("UpdateProject: in UpdateProject")
+	//logit.Info.Println("UpdateProject: in UpdateProject")
 	project := types.Project{}
 	err = r.DecodeJsonPayload(&project)
 	if err != nil {
@@ -65,10 +65,10 @@ func UpdateProject(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	logit.Info.Println("UpdateProject: ID=" + project.ID)
-	logit.Info.Println("UpdateProject: Name=" + project.Name)
-	logit.Info.Println("UpdateProject: Desc=" + project.Desc)
-	logit.Info.Println("UpdateProject: token=" + project.Token)
+	//logit.Info.Println("UpdateProject: ID=" + project.ID)
+	//logit.Info.Println("UpdateProject: Name=" + project.Name)
+	//logit.Info.Println("UpdateProject: Desc=" + project.Desc)
+	//logit.Info.Println("UpdateProject: token=" + project.Token)
 
 	err = secimpl.Authorize(dbConn, project.Token, "perm-container")
 	if err != nil {
@@ -110,7 +110,7 @@ func AddProject(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer dbConn.Close()
 
-	logit.Info.Println("AddProject: in AddProject")
+	//logit.Info.Println("AddProject: in AddProject")
 	project := types.Project{}
 	err = r.DecodeJsonPayload(&project)
 	if err != nil {

@@ -154,7 +154,7 @@ func MonitorContainerControldata(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	logit.Info.Println(cdout.Output)
+	//logit.Info.Println(cdout.Output)
 
 	lines := strings.Split(cdout.Output, "\n")
 	//fmt.Println(len(lines))
@@ -767,7 +767,7 @@ func BadgerGenerate(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	logit.Info.Println(cdout.Output)
+	//logit.Info.Println(cdout.Output)
 
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&cdout)
@@ -796,10 +796,10 @@ func getDatabaseStatus(dbConn *sql.DB, containerid string) (string, error) {
 	err = dbConn2.QueryRow(fmt.Sprintf("select now()::text")).Scan(&value)
 	switch {
 	case err == sql.ErrNoRows:
-		logit.Info.Println("getProxyStatus  no rows returned")
+		//logit.Info.Println("getProxyStatus  no rows returned")
 		return "OFFLINE", nil
 	case err != nil:
-		logit.Info.Println("getProxyStatus error " + err.Error())
+		//logit.Info.Println("getProxyStatus error " + err.Error())
 		return "OFFLINE", nil
 	default:
 		logit.Info.Println("getProxyStatus returned " + value)

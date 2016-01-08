@@ -57,7 +57,7 @@ func Login(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, "ID or PSW not supplied", http.StatusBadRequest)
 	}
 
-	logit.Info.Println("Login: called")
+	//logit.Info.Println("Login: called")
 
 	tokenContents, err := secimpl.Login(dbConn, ID, PSW)
 	if err != nil {
@@ -113,7 +113,7 @@ func UpdateUser(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer dbConn.Close()
 
-	logit.Info.Println("UpdateUser: in UpdateUser")
+	//logit.Info.Println("UpdateUser: in UpdateUser")
 	user := sec.User{}
 	err = r.DecodeJsonPayload(&user)
 	if err != nil {
@@ -122,8 +122,8 @@ func UpdateUser(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	logit.Info.Println("UpdateUser: Name=" + user.Name)
-	logit.Info.Println("UpdateUser: token=" + user.Token)
+	//logit.Info.Println("UpdateUser: Name=" + user.Name)
+	//logit.Info.Println("UpdateUser: token=" + user.Token)
 	err = secimpl.Authorize(dbConn, user.Token, "perm-user")
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -155,7 +155,7 @@ func AddUser(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer dbConn.Close()
 
-	logit.Info.Println("AddUser: in AddUser")
+	//logit.Info.Println("AddUser: in AddUser")
 	user := sec.User{}
 	err = r.DecodeJsonPayload(&user)
 	if err != nil {
@@ -240,9 +240,9 @@ func GetAllUsers(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	for i := range usersList {
-		logit.Info.Println("GetAllUsers: secimpl.GetAllUsers userName=" + usersList[i].Name)
-	}
+	//for i := range usersList {
+	//logit.Info.Println("GetAllUsers: secimpl.GetAllUsers userName=" + usersList[i].Name)
+	//}
 
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&usersList)
@@ -296,7 +296,7 @@ func UpdateRole(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer dbConn.Close()
 
-	logit.Info.Println("UpdateRole: in UpdateRole")
+	//logit.Info.Println("UpdateRole: in UpdateRole")
 	role := sec.Role{}
 	err = r.DecodeJsonPayload(&role)
 	if err != nil {
@@ -336,7 +336,7 @@ func AddRole(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer dbConn.Close()
 
-	logit.Info.Println("AddRole: in AddRole")
+	//logit.Info.Println("AddRole: in AddRole")
 	role := sec.Role{}
 	err = r.DecodeJsonPayload(&role)
 	if err != nil {
@@ -478,7 +478,7 @@ func ChangePassword(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer dbConn.Close()
 
-	logit.Info.Println("ChangePassword: in ChangePassword")
+	//logit.Info.Println("ChangePassword: in ChangePassword")
 	changePass := ChgPassword{}
 	err = r.DecodeJsonPayload(&changePass)
 	if err != nil {

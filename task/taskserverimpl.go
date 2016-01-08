@@ -103,7 +103,7 @@ const CLUSTERADMIN_DB = "clusteradmin"
 // StatusAdd called by backup jobs as they execute to write new status info
 func StatusAdd(w rest.ResponseWriter, r *rest.Request) {
 
-	logit.Info.Println("StatusAdd called")
+	//logit.Info.Println("StatusAdd called")
 
 	request := TaskStatus{}
 	err := r.DecodeJsonPayload(&request)
@@ -156,7 +156,7 @@ func StatusUpdate(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer dbConn.Close()
 
-	logit.Info.Println("StatusUpdate called")
+	//logit.Info.Println("StatusUpdate called")
 
 	err = UpdateStatus(dbConn, &request)
 	if err != nil {
@@ -191,7 +191,7 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 	defer dbConn.Close()
 	log.Println("-log- ExecuteNow.impl called profile=" + request.ProfileName)
 	fmt.Println("-fmt- ExecuteNow.impl called profile=" + request.ProfileName)
-	logit.Info.Println("-logit- ExecuteNow.impl called profile=" + request.ProfileName)
+	//logit.Info.Println("-logit- ExecuteNow.impl called profile=" + request.ProfileName)
 
 	if request.ProfileName == "pg_basebackup" {
 		err = ProvisionBackupJob(dbConn, &request)
@@ -232,7 +232,7 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 // Reload called by admin to cause a reload of the cron jobs
 func Reload(w rest.ResponseWriter, r *rest.Request) {
 
-	logit.Info.Println("Reload called")
+	//logit.Info.Println("Reload called")
 
 	err := LoadSchedules()
 	if err != nil {
@@ -257,7 +257,7 @@ func LoadSchedules() error {
 	}
 	defer dbConn.Close()
 
-	logit.Info.Println("LoadSchedules called")
+	//logit.Info.Println("LoadSchedules called")
 
 	var schedules []TaskSchedule
 	schedules, err = GetSchedules(dbConn)

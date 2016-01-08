@@ -84,12 +84,12 @@ func Provision(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, errorStr, http.StatusBadRequest)
 		return
 	}
-	logit.Info.Println("params.Image=" + params.Image)
-	logit.Info.Println("params.Profile=" + params.Profile)
-	logit.Info.Println("params.ServerID=" + params.ServerID)
-	logit.Info.Println("params.ProjectID=" + params.ProjectID)
+	//logit.Info.Println("params.Image=" + params.Image)
+	//logit.Info.Println("params.Profile=" + params.Profile)
+	//logit.Info.Println("params.ServerID=" + params.ServerID)
+	//logit.Info.Println("params.ProjectID=" + params.ProjectID)
 	params.ContainerName = util.CleanName(params.ContainerName)
-	logit.Info.Println("params.ContainerName=" + params.ContainerName)
+	//logit.Info.Println("params.ContainerName=" + params.ContainerName)
 
 	var newid string
 	newid, err = provisionImpl(dbConn, &params, false)
@@ -204,7 +204,7 @@ func provisionImpl(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standby bo
 	//pass any restore env vars to the new container
 	if params.RestoreJob != "" {
 		if params.EnvVars == nil {
-			logit.Info.Println("making envvars map")
+			//logit.Info.Println("making envvars map")
 			params.EnvVars = make(map[string]string)
 		}
 		params.EnvVars["RestoreJob"] = params.RestoreJob
@@ -223,8 +223,8 @@ func provisionImpl(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standby bo
 	runReq.Image = params.Image
 	runReq.ContainerName = params.ContainerName
 	runReq.EnvVars = params.EnvVars
-	logit.Info.Println("CPU=" + params.CPU)
-	logit.Info.Println("MEM=" + params.MEM)
+	//logit.Info.Println("CPU=" + params.CPU)
+	//logit.Info.Println("MEM=" + params.MEM)
 	runReq.CPU = "0"
 	runReq.MEM = "0"
 	var runResp swarmapi.DockerRunResponse
@@ -234,9 +234,6 @@ func provisionImpl(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standby bo
 		return "", err
 	}
 	logit.Info.Println("PROFILE provisionImpl created container 5 " + runResp.ID)
-	//
-
-	logit.Info.Println("PROFILE provisionImpl remove old container end 6")
 
 	dbnode := types.Container{}
 	dbnode.ID = ""
@@ -387,7 +384,6 @@ func provisionImplInit(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standb
 			}
 			logit.Info.Println("checkpt 3")
 			logit.Info.Println("initdb output was" + resp.Output)
-			logit.Info.Println("PROFILE initdb completed")
 			//create postgresql.conf
 			var data string
 			var mode = "standalone"

@@ -91,7 +91,7 @@ func GetNode(w rest.ResponseWriter, r *rest.Request) {
 			rest.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		logit.Info.Println("pinging db finished")
+		//logit.Info.Println("pinging db finished")
 	}
 
 	clusternode := new(types.ClusterNode)
@@ -507,8 +507,9 @@ func AdminStartNode(w rest.ResponseWriter, r *rest.Request) {
 	response, err = swarmapi.DockerStart(request)
 	if err != nil {
 		logit.Error.Println(err.Error())
+		logit.Error.Println(response.Output)
 	}
-	logit.Info.Println(response.Output)
+	//logit.Info.Println(response.Output)
 
 	w.WriteHeader(http.StatusOK)
 	status := types.SimpleStatus{}
@@ -573,34 +574,6 @@ func AdminStopNode(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
-// NewPingPG performs a simple network (nc) ping on a given container's postgres database port
-/**
-func NewPingPG(pgport string, nodeName string) (string, error) {
-
-	var err error
-
-	var cmd *exec.Cmd
-	logit.Info.Println("about to newping " + nodeName + " at port " + pgport)
-	cmd = exec.Command("ping-wrapper.sh", nodeName, pgport)
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-	err = cmd.Run()
-	if err != nil {
-		logit.Error.Println(err.Error())
-		return "OFFLINE", err
-	}
-	var rc = out.String()
-	logit.Info.Println("NewPingPG rc is " + rc)
-	if rc != "connected" {
-		return "OFFLINE", nil
-	}
-
-	return "RUNNING", nil
-}
-*/
-
 // AdminStartServerContainers starts all containers on a given server
 func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 	dbConn, err := util.GetConnection(CLUSTERADMIN_DB)
@@ -651,8 +624,9 @@ func AdminStartServerContainers(w rest.ResponseWriter, r *rest.Request) {
 		response, err = swarmapi.DockerStart(request)
 		if err != nil {
 			logit.Error.Println("AdminStartServerContainers: error when trying to start container " + err.Error())
+			logit.Error.Println(response.Output)
 		}
-		logit.Info.Println(response.Output)
+		//logit.Info.Println(response.Output)
 
 	}
 

@@ -55,7 +55,7 @@ type MetricDfResponse struct {
 
 // MetricCPU obtain the cpu metrics and return the results
 func MetricCPU(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("MetricCPU called")
+	//logit.Info.Println("MetricCPU called")
 	req := MetricCPURequest{}
 	err := r.DecodeJsonPayload(&req)
 	if err != nil {
@@ -82,7 +82,7 @@ func MetricCPU(w rest.ResponseWriter, r *rest.Request) {
 
 // MetricMEM perform the memory metric command and return the results
 func MetricMEM(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("MetricMEM called")
+	//logit.Info.Println("MetricMEM called")
 	req := MetricMEMRequest{}
 	err := r.DecodeJsonPayload(&req)
 	if err != nil {
@@ -109,7 +109,7 @@ func MetricMEM(w rest.ResponseWriter, r *rest.Request) {
 
 // MetricIostat perform the iostat command and return the results
 func MetricIostat(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("MetricIostat called")
+	//logit.Info.Println("MetricIostat called")
 	post := MetricIostatRequest{}
 	err := r.DecodeJsonPayload(&post)
 	if err != nil {
@@ -136,7 +136,7 @@ func MetricIostat(w rest.ResponseWriter, r *rest.Request) {
 
 // MetricDf perform the df command and return the results
 func MetricDf(w rest.ResponseWriter, r *rest.Request) {
-	logit.Info.Println("MetricDf called")
+	//logit.Info.Println("MetricDf called")
 	post := MetricDfRequest{}
 	err := r.DecodeJsonPayload(&post)
 	if err != nil {

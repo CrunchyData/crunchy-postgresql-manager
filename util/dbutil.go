@@ -41,10 +41,10 @@ func GetConnection(database string) (*sql.DB, error) {
 	var dbConn *sql.DB
 	var err error
 	if dbPassword != "" {
-		logit.Info.Println("connecting to database " + database + " host=" + dbHost + " user=" + dbUser + " port=" + dbPort + " password=" + dbPassword)
+		//logit.Info.Println("connecting to database " + database + " host=" + dbHost + " user=" + dbUser + " port=" + dbPort + " password=" + dbPassword)
 		dbConn, err = sql.Open("postgres", "sslmode=disable user="+dbUser+" host="+dbHost+" port="+dbPort+" dbname="+database+" password="+dbPassword)
 	} else {
-		logit.Info.Println("connecting to database " + database + " host=" + dbHost + " user=" + dbUser + " port=" + dbPort)
+		//logit.Info.Println("connecting to database " + database + " host=" + dbHost + " user=" + dbUser + " port=" + dbPort)
 		dbConn, err = sql.Open("postgres", "sslmode=disable user="+dbUser+" host="+dbHost+" port="+dbPort+" dbname="+database)
 	}
 	if err != nil {
@@ -60,10 +60,10 @@ func GetMonitoringConnection(dbHost string, dbUser string, dbPort string, databa
 	var err error
 
 	if dbPassword == "" {
-		logit.Info.Println("a open db with dbHost=[" + dbHost + "] dbUser=[" + dbUser + "] dbPort=[" + dbPort + "] database=[" + database + "]")
+		//logit.Info.Println("a open db with dbHost=[" + dbHost + "] dbUser=[" + dbUser + "] dbPort=[" + dbPort + "] database=[" + database + "]")
 		dbConn, err = sql.Open("postgres", "sslmode=disable user="+dbUser+" host="+dbHost+" port="+dbPort+" dbname="+database)
 	} else {
-		logit.Info.Println("b open db with dbHost=[" + dbHost + "] dbUser=[" + dbUser + "] dbPort=[" + dbPort + "] database=[" + database + "] password=[" + dbPassword + "]")
+		//logit.Info.Println("b open db with dbHost=[" + dbHost + "] dbUser=[" + dbUser + "] dbPort=[" + dbPort + "] database=[" + database + "] password=[" + dbPassword + "]")
 		dbConn, err = sql.Open("postgres", "sslmode=disable user="+dbUser+" host="+dbHost+" port="+dbPort+" dbname="+database+" password="+dbPassword)
 	}
 	if err != nil {

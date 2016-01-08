@@ -165,7 +165,7 @@ func RulesUpdate(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer dbConn.Close()
 
-	logit.Info.Println("RulesUpdate: in RulesUpdate")
+	//logit.Info.Println("RulesUpdate: in RulesUpdate")
 	rule := Rule{}
 	err = r.DecodeJsonPayload(&rule)
 	if err != nil {
@@ -218,7 +218,7 @@ func RulesInsert(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer dbConn.Close()
 
-	logit.Info.Println("RulesInsert: in RulesInsert")
+	//logit.Info.Println("RulesInsert: in RulesInsert")
 	rule := Rule{}
 	err = r.DecodeJsonPayload(&rule)
 	if err != nil {

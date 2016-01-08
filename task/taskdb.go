@@ -26,7 +26,6 @@ import (
 // AddStatus writes new status info to the database
 func AddStatus(dbConn *sql.DB, status *TaskStatus) (string, error) {
 
-	logit.Info.Println("AddStatus called")
 	//logit.Info.Println("AddStatus called")
 
 	queryStr := fmt.Sprintf("insert into taskstatus ( containername, starttime, taskname, path, elapsedtime, tasksize, status, profilename, scheduleid, updatedt) values ( '%s', now(), '%s', '%s', '%s', '%s', '%s', '%s', %s, now()) returning id",
@@ -57,7 +56,7 @@ func AddStatus(dbConn *sql.DB, status *TaskStatus) (string, error) {
 // UpdateStatus updates status info in the database for a job
 func UpdateStatus(dbConn *sql.DB, status *TaskStatus) error {
 
-	logit.Info.Println("backup.UpdateStatus called")
+	//logit.Info.Println("backup.UpdateStatus called")
 
 	queryStr := fmt.Sprintf("update taskstatus set ( status, tasksize, elapsedtime, updatedt) = ('%s', '%s', '%s', now()) where id = %s returning containername",
 		status.Status,
@@ -81,7 +80,7 @@ func UpdateStatus(dbConn *sql.DB, status *TaskStatus) error {
 // AddSchedule writes a new schedule to the database
 func AddSchedule(dbConn *sql.DB, s TaskSchedule) (string, error) {
 
-	logit.Info.Println("AddSchedule called")
+	//logit.Info.Println("AddSchedule called")
 
 	queryStr := fmt.Sprintf("insert into taskschedule ( containername, profilename, name, enabled, minutes, hours, dayofmonth, month, dayofweek, restoreset, restoreremotepath, restoreremotehost, restoreremoteuser, restoredbuser, restoredbpass, updatedt, serverip) values ( '%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s','%s','%s','%s','%s', '%s', '%s',  now(), '%s') returning id",
 		s.ContainerName,
@@ -123,7 +122,7 @@ func AddSchedule(dbConn *sql.DB, s TaskSchedule) (string, error) {
 // UpdateSchedule updates a schedule in the database
 func UpdateSchedule(dbConn *sql.DB, s TaskSchedule) error {
 
-	logit.Info.Println("backup.UpdateSchedule called")
+	//logit.Info.Println("backup.UpdateSchedule called")
 
 	queryStr := fmt.Sprintf("update taskschedule set ( enabled,  name, minutes, hours, dayofmonth, month, dayofweek, restoreset, restoreremotepath, restoreremotehost, restoreremoteuser, restoredbuser, restoredbpass, updatedt) = ('%s', '%s', '%s', '%s', '%s', '%s', '%s','%s','%s','%s','%s', '%s', '%s', now()) where id = %s  returning containername",
 		s.Enabled,
@@ -157,7 +156,7 @@ func UpdateSchedule(dbConn *sql.DB, s TaskSchedule) error {
 // DeleteSchedule deletes a schedule from the database
 func DeleteSchedule(dbConn *sql.DB, id string) error {
 	queryStr := fmt.Sprintf("delete from taskschedule where id=%s returning id", id)
-	logit.Info.Println("backup:DeleteSchedule:" + queryStr)
+	//logit.Info.Println("backup:DeleteSchedule:" + queryStr)
 
 	var theID int
 	err := dbConn.QueryRow(queryStr).Scan(&theID)
@@ -172,7 +171,7 @@ func DeleteSchedule(dbConn *sql.DB, id string) error {
 
 // GetSchedule returns a schedule from the database by id
 func GetSchedule(dbConn *sql.DB, id string) (TaskSchedule, error) {
-	logit.Info.Println("GetSchedule called with id=" + id)
+	//logit.Info.Println("GetSchedule called with id=" + id)
 	s := TaskSchedule{}
 
 	err := dbConn.QueryRow(fmt.Sprintf("select a.id, a.containername, a.profilename, a.name, a.enabled, a.minutes, a.hours, a.dayofmonth, a.month, a.dayofweek, a.restoreset, a.restoreremotepath, a.restoreremotehost, a.restoreremoteuser, a.restoredbuser, a.restoredbpass, date_trunc('second', a.updatedt)::text, a.serverip from taskschedule a where a.id=%s ", id)).Scan(&s.ID, &s.ContainerName, &s.ProfileName, &s.Name, &s.Enabled, &s.Minutes, &s.Hours, &s.DayOfMonth, &s.Month, &s.DayOfWeek,
@@ -195,7 +194,7 @@ func GetSchedule(dbConn *sql.DB, id string) (TaskSchedule, error) {
 
 // GetAllSchedules returns a list of all schedules for a given container
 func GetAllSchedules(dbConn *sql.DB, containerid string) ([]TaskSchedule, error) {
-	logit.Info.Println("GetAllSchedules called with id=" + containerid)
+	//logit.Info.Println("GetAllSchedules called with id=" + containerid)
 	var rows *sql.Rows
 	var err error
 
@@ -240,7 +239,7 @@ func GetAllSchedules(dbConn *sql.DB, containerid string) ([]TaskSchedule, error)
 
 // GetAllStatus returns a list of task status for given schedule
 func GetAllStatus(dbConn *sql.DB, scheduleid string) ([]TaskStatus, error) {
-	logit.Info.Println("GetAllStatus called with scheduleid=" + scheduleid)
+	//logit.Info.Println("GetAllStatus called with scheduleid=" + scheduleid)
 	var rows *sql.Rows
 	var err error
 
@@ -279,7 +278,7 @@ func GetAllStatus(dbConn *sql.DB, scheduleid string) ([]TaskStatus, error) {
 // DeleteStatus deletes a task status from the database
 func DeleteStatus(dbConn *sql.DB, id string) error {
 	queryStr := fmt.Sprintf("delete from taskstatus where id=%s returning id", id)
-	logit.Info.Println("backup:DeleteStatus:" + queryStr)
+	//logit.Info.Println("backup:DeleteStatus:" + queryStr)
 
 	var theID int
 	err := dbConn.QueryRow(queryStr).Scan(&theID)
@@ -294,7 +293,7 @@ func DeleteStatus(dbConn *sql.DB, id string) error {
 
 // GetStatus returns task status for a given task
 func GetStatus(dbConn *sql.DB, id string) (TaskStatus, error) {
-	logit.Info.Println("GetStatus called with id=" + id)
+	//logit.Info.Println("GetStatus called with id=" + id)
 	s := TaskStatus{}
 
 	err := dbConn.QueryRow(fmt.Sprintf("select id, scheduleid, profilename, containername, date_trunc('second', starttime)::text, taskname,  path, elapsedtime, tasksize, status, date_trunc('second', updatedt)::text from taskstatus where id=%s", id)).Scan(&s.ID, &s.ScheduleID, &s.ProfileName, &s.ContainerName, &s.StartTime, &s.TaskName, &s.Path, &s.ElapsedTime, &s.TaskSize, &s.Status, &s.UpdateDt)
@@ -313,7 +312,7 @@ func GetStatus(dbConn *sql.DB, id string) (TaskStatus, error) {
 
 // GetSchedules returns a list of all task schedules
 func GetSchedules(dbConn *sql.DB) ([]TaskSchedule, error) {
-	logit.Info.Println("GetSchedules called")
+	//logit.Info.Println("GetSchedules called")
 	var rows *sql.Rows
 	var err error
 

@@ -43,7 +43,7 @@ func GetServer(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 	ID := r.PathParam("ID")
-	logit.Info.Println("in GetServer with ID=" + ID)
+	//logit.Info.Println("in GetServer with ID=" + ID)
 
 	//currently no state about a server is maintained other than IP and port number
 	//which we use for the ID, Name, and IPAddress values
@@ -78,8 +78,8 @@ func MonitorServerGetInfo(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 	cleanIP := strings.Replace(ServerID, "_", ".", -1)
-	logit.Info.Println("ServerID=" + ServerID)
-	logit.Info.Println("cleanIP=" + cleanIP)
+	//logit.Info.Println("ServerID=" + ServerID)
+	//logit.Info.Println("cleanIP=" + cleanIP)
 	if Metric == "" {
 		logit.Error.Println("MonitorServerGetInfo: error metric required")
 		rest.Error(w, "Metric required", http.StatusBadRequest)
@@ -146,7 +146,7 @@ func GetAllServers(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	for x := 0; x < len(infoResponse.Output); {
-		logit.Info.Println("got back " + infoResponse.Output[x])
+		//logit.Info.Println("got back " + infoResponse.Output[x])
 		x++
 	}
 

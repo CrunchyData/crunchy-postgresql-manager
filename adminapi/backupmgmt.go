@@ -136,12 +136,12 @@ func ExecuteNow(w rest.ResponseWriter, r *rest.Request) {
 		provisionParams.ContainerName = postMsg.ContainerName
 		provisionParams.Image = "cpm-node"
 		provisionParams.IPAddress = schedule.Serverip
-		logit.Info.Println("before restore provision with...")
-		logit.Info.Println("profile=" + provisionParams.Profile)
-		logit.Info.Println("projectid=" + provisionParams.ProjectID)
-		logit.Info.Println("containername=" + provisionParams.ContainerName)
-		logit.Info.Println("image=" + provisionParams.Image)
-		logit.Info.Println("ipaddress=" + provisionParams.IPAddress)
+		//logit.Info.Println("before restore provision with...")
+		//logit.Info.Println("profile=" + provisionParams.Profile)
+		//logit.Info.Println("projectid=" + provisionParams.ProjectID)
+		//logit.Info.Println("containername=" + provisionParams.ContainerName)
+		//logit.Info.Println("image=" + provisionParams.Image)
+		//logit.Info.Println("ipaddress=" + provisionParams.IPAddress)
 		newid, err = provisionImpl(dbConn, &provisionParams, false)
 		if err != nil {
 			logit.Error.Println(err.Error())
@@ -199,7 +199,7 @@ func AddSchedule(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	logit.Info.Println("in adminapi.backupmgmt.AddSchedule got serverIP of " + postMsg.Serverip)
+	//logit.Info.Println("in adminapi.backupmgmt.AddSchedule got serverIP of " + postMsg.Serverip)
 
 	err = secimpl.Authorize(dbConn, postMsg.Token, "perm-backup")
 	if err != nil {
@@ -328,7 +328,7 @@ func GetSchedule(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), 400)
 		return
 	}
-	logit.Info.Println("GetSchedule api returns serverip of " + result.Serverip)
+	//logit.Info.Println("GetSchedule api returns serverip of " + result.Serverip)
 
 	w.WriteJson(result)
 

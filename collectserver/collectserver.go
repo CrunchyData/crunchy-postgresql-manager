@@ -92,14 +92,14 @@ func main() {
 				ipaddress := parts[0]
 				metric, err = collect.Collectcpu(ipaddress)
 				gauge.WithLabelValues(ipaddress).Set(metric.Value)
-				logit.Info.Println("setting cpu metric for " + ipaddress + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
+				//logit.Info.Println("setting cpu metric for " + ipaddress + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
 				metric, err = collect.Collectmem(ipaddress)
 				gaugeMem.WithLabelValues(ipaddress).Set(metric.Value)
-				logit.Info.Println("setting mem metric for " + ipaddress + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
+				//logit.Info.Println("setting mem metric for " + ipaddress + " to " + strconv.FormatFloat(metric.Value, 'f', -1, 64))
 				x++
 			}
 
-			logit.Info.Println("sleeping in the server metrics ....")
+			//logit.Info.Println("sleeping in the server metrics ....")
 
 			time.Sleep(time.Duration(SERVER_POLL_INT) * time.Minute)
 		}

@@ -97,7 +97,7 @@ func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	logit.Info.Println("AdminStoppg:called")
+	//logit.Info.Println("AdminStoppg:called")
 	ID := r.PathParam("ID")
 	if ID == "" {
 		logit.Error.Println("AdminStoppg:ID not found error")
@@ -112,7 +112,7 @@ func AdminStoppg(w rest.ResponseWriter, r *rest.Request) {
 		rest.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	logit.Info.Println("AdminStoppg: in stop with dbnode")
+	//logit.Info.Println("AdminStoppg: in stop with dbnode")
 
 	if dbNode.Role == "pgpool" {
 		var stoppoolResp cpmcontainerapi.StopPgpoolResponse

@@ -106,7 +106,7 @@ func SaveSetting(w rest.ResponseWriter, r *rest.Request) {
 
 	}
 	defer dbConn.Close()
-	logit.Info.Println("SaveSetting:")
+	//logit.Info.Println("SaveSetting:")
 	setting := types.Setting{}
 	err = r.DecodeJsonPayload(&setting)
 	if err != nil {

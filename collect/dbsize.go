@@ -58,7 +58,7 @@ func CollectDBSize(gauge *prometheus.GaugeVec) error {
 	var credential types.Credential
 
 	for i = range containers {
-		logit.Info.Println("dbsize processing " + containers[i].Name)
+		//logit.Info.Println("dbsize processing " + containers[i].Name)
 		credential, err = admindb.GetUserCredentials(dbConn, &containers[i])
 		if err != nil {
 			logit.Error.Println(err.Error())
@@ -77,7 +77,7 @@ func CollectDBSize(gauge *prometheus.GaugeVec) error {
 func process(node *types.Container, credential *types.Credential, gauge *prometheus.GaugeVec) error {
 	var err error
 
-	logit.Info.Println("dbsize node=" + node.Name + " credentials Username:" + credential.Username + " Password:" + credential.Password + " Database:" + credential.Database + " Host:" + credential.Host)
+	//logit.Info.Println("dbsize node=" + node.Name + " credentials Username:" + credential.Username + " Password:" + credential.Password + " Database:" + credential.Database + " Host:" + credential.Host)
 	var db *sql.DB
 	db, err = util.GetMonitoringConnection(credential.Host,
 		credential.Username, credential.Port, credential.Database, credential.Password)
@@ -88,14 +88,14 @@ func process(node *types.Container, credential *types.Credential, gauge *prometh
 	}
 
 	var metrics []DBMetric
-	logit.Info.Println("dbsize running pg2 on " + node.Name)
+	//logit.Info.Println("dbsize running pg2 on " + node.Name)
 	metrics, err = pg2(db)
 
 	//write metrcs to prometheus
 
 	i := 0
 	for i = range metrics {
-		logit.Info.Println("dbsize setting dbsize metric")
+		//logit.Info.Println("dbsize setting dbsize metric")
 		gauge.WithLabelValues(node.Name, metrics[i].Name).Set(metrics[i].Value)
 		i++
 	}
@@ -119,7 +119,7 @@ func pg2(databaseConn *sql.DB) ([]DBMetric, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		logit.Info.Println("dbsize pg2 got row")
+		//logit.Info.Println("dbsize pg2 got row")
 		m := DBMetric{}
 		if err = rows.Scan(
 			&databaseName,

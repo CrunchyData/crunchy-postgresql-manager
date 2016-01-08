@@ -126,11 +126,11 @@ func ProvisionProxy(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	logit.Info.Println("Image=" + proxyrequest.Image)
-	logit.Info.Println("Profile=" + proxyrequest.Profile)
-	logit.Info.Println("ProjectID=" + proxyrequest.ProjectID)
-	logit.Info.Println("ContainerName=" + proxyrequest.ContainerName)
-	logit.Info.Println("Standalone=" + proxyrequest.Standalone)
+	//logit.Info.Println("Image=" + proxyrequest.Image)
+	//logit.Info.Println("Profile=" + proxyrequest.Profile)
+	//logit.Info.Println("ProjectID=" + proxyrequest.ProjectID)
+	//logit.Info.Println("ContainerName=" + proxyrequest.ContainerName)
+	//logit.Info.Println("Standalone=" + proxyrequest.Standalone)
 
 	params := &swarmapi.DockerRunRequest{}
 	params.Image = proxyrequest.Image

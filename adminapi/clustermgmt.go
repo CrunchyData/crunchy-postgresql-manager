@@ -89,7 +89,7 @@ func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
 		}
 	}
 
-	logit.Info.Printf("standbyCnt ends at %d\n", standbyCnt)
+	//logit.Info.Printf("standbyCnt ends at %d\n", standbyCnt)
 
 	//provision new container
 	params := new(swarmapi.DockerRunRequest)
@@ -101,7 +101,7 @@ func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
 	var standby = true
 	params.Profile = "LG"
 
-	logit.Info.Printf("here with ProjectID %s\n", cluster.ProjectID)
+	//logit.Info.Printf("here with ProjectID %s\n", cluster.ProjectID)
 
 	_, err = provisionImpl(dbConn, params, standby)
 	if err != nil {
@@ -179,7 +179,7 @@ func GetCluster(w rest.ResponseWriter, r *rest.Request) {
 	cluster.Status = results.Status
 	cluster.CreateDate = results.CreateDate
 	cluster.Containers = results.Containers
-	logit.Info.Println("GetCluser:db call results=" + results.ID)
+	//logit.Info.Println("GetCluser:db call results=" + results.ID)
 
 	w.WriteJson(&cluster)
 }
@@ -246,7 +246,7 @@ func configureCluster(dbConn *sql.DB, cluster types.Cluster, autocluster bool) e
 		return err
 	}
 
-	logit.Info.Println("configureCluster:GetContainerMaster")
+	//logit.Info.Println("configureCluster:GetContainerMaster")
 
 	//configure master postgresql.conf file
 	var data string
@@ -354,9 +354,10 @@ func configureCluster(dbConn *sql.DB, cluster types.Cluster, autocluster bool) e
 				stopPGResp, err = cpmcontainerapi.StopPGClient(standbynodes[i].Name)
 				if err != nil {
 					logit.Error.Println(err.Error())
+					logit.Error.Println("configureCluster:stop output was" + stopPGResp.Output)
 					return err
 				}
-				logit.Info.Println("configureCluster:stop output was" + stopPGResp.Output)
+				//logit.Info.Println("configureCluster:stop output was" + stopPGResp.Output)
 			}
 
 			//
@@ -368,9 +369,10 @@ func configureCluster(dbConn *sql.DB, cluster types.Cluster, autocluster bool) e
 			backupresp, err = cpmcontainerapi.BasebackupClient(masterhost+"."+domainname.Value, standbynodes[i].Name, username, password)
 			if err != nil {
 				logit.Error.Println(err.Error())
+				logit.Error.Println("configureCluster:basebackup output was" + backupresp.Output)
 				return err
 			}
-			logit.Info.Println("configureCluster:basebackup output was" + backupresp.Output)
+			//logit.Info.Println("configureCluster:basebackup output was" + backupresp.Output)
 
 			data, err = template.Recovery(masterhost, pgport.Value, "postgres")
 			if err != nil {
@@ -436,12 +438,12 @@ func configureCluster(dbConn *sql.DB, cluster types.Cluster, autocluster bool) e
 	time.Sleep(clustersleepTime)
 
 	pgpoolNode, err4 := admindb.GetContainerPgpool(dbConn, cluster.ID)
-	logit.Info.Println("configureCluster: lookup pgpool node")
+	//logit.Info.Println("configureCluster: lookup pgpool node")
 	if err4 != nil {
 		logit.Error.Println(err.Error())
 		return err
 	}
-	logit.Info.Println("configureCluster:" + pgpoolNode.Name)
+	//logit.Info.Println("configureCluster:" + pgpoolNode.Name)
 
 	//configure the pgpool includes all standby nodes AND the master node
 	poolnames := make([]string, len(standbynodes)+1)
@@ -581,7 +583,7 @@ func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 
 	}
 	defer dbConn.Close()
-	logit.Info.Println("PostCluster: in PostCluster")
+	//logit.Info.Println("PostCluster: in PostCluster")
 	cluster := types.Cluster{}
 	err = r.DecodeJsonPayload(&cluster)
 	if err != nil {
@@ -603,7 +605,7 @@ func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	logit.Info.Println("PostCluster: have ID=" + cluster.ID + " Name=" + cluster.Name + " type=" + cluster.ClusterType + " status=" + cluster.Status)
+	//logit.Info.Println("PostCluster: have ID=" + cluster.ID + " Name=" + cluster.Name + " type=" + cluster.ClusterType + " status=" + cluster.Status)
 	dbcluster := types.Cluster{}
 	dbcluster.ID = cluster.ID
 	dbcluster.ProjectID = cluster.ProjectID
@@ -621,7 +623,7 @@ func PostCluster(w rest.ResponseWriter, r *rest.Request) {
 		}
 		cluster.ID = newid
 	} else {
-		logit.Info.Println("PostCluster: about to call UpdateCluster")
+		//logit.Info.Println("PostCluster: about to call UpdateCluster")
 		err2 := admindb.UpdateCluster(dbConn, dbcluster)
 		if err2 != nil {
 			logit.Error.Println(err.Error())
@@ -696,10 +698,10 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 	i = 0
-	server := types.Server{}
+	//server := types.Server{}
 	for i = range containers {
 
-		logit.Info.Println("DeleteCluster: got server IP " + server.IPAddress)
+		//logit.Info.Println("DeleteCluster: got server IP " + server.IPAddress)
 
 		//it is possible that someone can remove a container
 		//outside of us, so we let it pass that we can't remove
@@ -707,7 +709,7 @@ func DeleteCluster(w rest.ResponseWriter, r *rest.Request) {
 		//err = removeContainer(server.IPAddress, containers[i].Name)
 		dremreq := &swarmapi.DockerRemoveRequest{}
 		dremreq.ContainerName = containers[i].Name
-		logit.Info.Println("will attempt to delete container " + dremreq.ContainerName)
+		//logit.Info.Println("will attempt to delete container " + dremreq.ContainerName)
 		_, err = swarmapi.DockerRemove(dremreq)
 		if err != nil {
 			logit.Error.Println("error when trying to remove container" + err.Error())
@@ -968,7 +970,6 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 	defer dbConn.Close()
 	logit.Info.Println("AUTO CLUSTER PROFILE starts")
-	logit.Info.Println("AutoCluster: start AutoCluster")
 	params := AutoClusterInfo{}
 	err = r.DecodeJsonPayload(&params)
 	if err != nil {
@@ -1005,7 +1006,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	logit.Info.Println("AutoCluster: Name=" + params.Name + " ClusterType=" + params.ClusterType + " Profile=" + params.ClusterProfile + " ProjectID=" + params.ProjectID)
+	//logit.Info.Println("AutoCluster: Name=" + params.Name + " ClusterType=" + params.ClusterType + " Profile=" + params.ClusterProfile + " ProjectID=" + params.ProjectID)
 
 	//create cluster definition
 	dbcluster := types.Cluster{}
@@ -1020,7 +1021,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	ival, err = admindb.InsertCluster(dbConn, dbcluster)
 	clusterID := strconv.Itoa(ival)
 	dbcluster.ID = clusterID
-	logit.Info.Println(clusterID)
+	//logit.Info.Println(clusterID)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, "Insert Cluster error:"+err.Error(), http.StatusBadRequest)

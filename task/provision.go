@@ -43,10 +43,10 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 		return err
 	}
 
-	logit.Info.Println("backup.Provision called")
-	logit.Info.Println("with scheduleid=" + args.ScheduleID)
-	logit.Info.Println("with containername=" + args.ContainerName)
-	logit.Info.Println("with profilename=" + args.ProfileName)
+	logit.Info.Println("backup.Provision called" +
+		"with scheduleid=" + args.ScheduleID +
+		"with containername=" + args.ContainerName +
+		"with profilename=" + args.ProfileName)
 
 	params := &swarmapi.DockerRunRequest{}
 	params.Image = "cpm-backup-job"

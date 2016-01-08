@@ -100,7 +100,7 @@ func AddContainerUser(w rest.ResponseWriter, r *rest.Request) {
 	var LOGIN = ""
 	var REPLICATION = ""
 
-	logit.Info.Println("Rolsuper is " + strconv.FormatBool(postMsg.Rolsuper))
+	//logit.Info.Println("Rolsuper is " + strconv.FormatBool(postMsg.Rolsuper))
 	if postMsg.Rolsuper {
 		SUPERUSER = "SUPERUSER"
 	}
