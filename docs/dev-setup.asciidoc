@@ -127,6 +127,46 @@ sudo systemctl stop firewalld.service
 
 The document, firewall-setup.md, shows how the CPM ports can be opened up.
 
+=== Configure and Start Swarm
+
+Currently, centos 7 only offers golang 1.4.2, and Swarm 1.0.1 requires
+golang 1.5.  So for the time being, we will build and run Swarm 1.0.0.
+
+Download the swarm binary as follows, within a new swarm go project:
+
+....
+export GOPATH=~/swarmproject
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:$GOPATH/bin
+mkdir -p $GOPATH/src/github.com/docker/
+cd $GOPATH/src/github.com/docker/
+git clone https://github.com/docker/swarm
+cd swarm
+git checkout v1.0.0
+go get github.com/tools/godep
+$GOPATH/bin/godep go install
+....
+
+This will create the swarm binary located in $GOPATH/swarmproject/bin
+
+Start swarm up by running the $CPMROOT/sbin/run-swarm.sh script, first
+modify the script updating the LOCALIP and SWARM_TOKEN variables.
+
+.Get a swarm token
+....
+swarm create
+....
+
+.Run Swarm
+....
+$CPMROOT/sbin/run-swarm.sh
+....
+
+A swarm guide is available at:
+
+link:swarm-setup.html[Swarm Setup]
+
+
 === Setup skybridge 
 
 CPM services are found using DNS by the various parts of CPM.  When
@@ -179,45 +219,6 @@ to specify your local IP address, then run the skybridge container:
 ....
 sudo ./sbin/run-skybridge.sh
 ....
-
-=== Configure and Start Swarm
-
-Currently, centos 7 only offers golang 1.4.2, and Swarm 1.0.1 requires
-golang 1.5.  So for the time being, we will build and run Swarm 1.0.0.
-
-Download the swarm binary as follows, within a new swarm go project:
-
-....
-export GOPATH=~/swarmproject
-export GOBIN=$GOPATH/bin
-export PATH=$PATH:$GOPATH/bin
-mkdir -p $GOPATH/src/github.com/docker/
-cd $GOPATH/src/github.com/docker/
-git clone https://github.com/docker/swarm
-cd swarm
-git checkout v1.0.0
-go get github.com/tools/godep
-$GOPATH/bin/godep go install
-....
-
-This will create the swarm binary located in $GOPATH/swarmproject/bin
-
-Start swarm up by running the $CPMROOT/sbin/run-swarm.sh script, first
-modify the script updating the LOCALIP and SWARM_TOKEN variables.
-
-.Get a swarm token
-....
-swarm create
-....
-
-.Run Swarm
-....
-$CPMROOT/sbin/run-swarm.sh
-....
-
-A swarm guide is available at:
-
-link:swarm-setup.html[Swarm Setup]
 
 === Testing skybridge and Swarm
 
