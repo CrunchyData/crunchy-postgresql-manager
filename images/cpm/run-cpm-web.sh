@@ -37,22 +37,19 @@ if [ -z "$CPMROOT" ]; then
 	echo "This script requires CPMROOT" 1>&2
 	exit 1
 fi
-if [ -z "$KEYSDIR" ]; then
-	echo "This script requires KEYSDIR" 1>&2
-	exit 1
-fi
 
-#echo "setting up keys dir..."
-#export KEYSDIR=/var/cpm/keys
-#mkdir $KEYSDIR
-#cp $CPMROOT/sbin/key.pem $KEYSDIR
-#cp $CPMROOT/sbin/cert.pem $KEYSDIR
-#chcon -Rt svirt_sandbox_file_t $KEYSDIR
+echo "setting up keys dir..."
+export KEYSDIR=/var/cpm/keys
+mkdir $KEYSDIR
+cp $CPMROOT/sbin/key.pem $KEYSDIR
+cp $CPMROOT/sbin/cert.pem $KEYSDIR
+chcon -Rt svirt_sandbox_file_t $KEYSDIR
 
 echo "setting up log dir..."
 export LOGDIR=/var/cpm/logs
 mkdir $LOGDIR
 chcon -Rt svirt_sandbox_file_t $LOGDIR
+chmod 777 $LOGDIR
 
 echo "restarting cpm-web container..."
 docker -H $SWARM_MANAGER_URL stop cpm-web

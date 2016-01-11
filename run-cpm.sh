@@ -25,7 +25,7 @@ fi
 # from this master script
 #
 export CPMROOT=/home/jeffmc/devproject/src/github.com/crunchydata/crunchy-postgresql-manager
-export LOCAL_IP=192.168.0.108
+export LOCAL_IP=192.168.0.105
 export SWARM_MANAGER_URL=tcp://$LOCAL_IP:8000 
 export FLUENT_URL=$LOCAL_IP:24224
 export CPM_DOMAIN=crunchy.lab
@@ -41,7 +41,7 @@ cp $CPMROOT/sbin/cert.pem $KEYSDIR
 chcon -Rt svirt_sandbox_file_t $KEYSDIR
 
 
-$CPMROOT/sbin/run-skybridge.sh
+#$CPMROOT/sbin/run-skybridge.sh
 
 echo "sleeping a bit while skybridge starts up...."
 sleep 6
