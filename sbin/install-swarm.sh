@@ -14,30 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This install script assumes a Centos7 server is the installation host OS.
-# It will download some additional information to build a Docker image for that
-# type of host.
-#
-# Before running, confirm you can run docker commands as this user with
-# 'docker info'.  See the README.md file for more information on setup for
-# this program and Docker.  You will also need to install the dnsbridge
-# program before this one.
-#
+ROOT=~/swarmproject
+mkdir -p  ~/$ROOT/bin ~/$ROOT/pkg ~/$ROOT/src
 
+GOPATH=$ROOT
+GOBIN=$GOPATH/bin
+PATH=$PATH:$GOPATH/bin
 
-PRIMARYIP=192.168.0.101
-SECONDARYIP=192.168.0.110
-SWARM_CLUSTER_FILE=/tmp/my_cluster
-rm $SWARM_CLUSTER_FILE
-echo $PRIMARYIP:2375 >> $SWARM_CLUSTER_FILE
-echo $SECONDARYIP:2375 >> $SWARM_CLUSTER_FILE
-
-SWARM_URL=$PRIMARYIP:8000
-DOCKER_PORT=2375
-
-# use the random strategy just for testing - jeffmc
-swarm manage --strategy random --host $SWARM_URL file://$SWARM_CLUSTER_FILE &
-sleep 4
-swarm join --addr=$PRIMARYIP:$DOCKER_PORT file://$SWARM_CLUSTER_FILE &
-#swarm list file:///tmp/my_cluster
+mkdir -p $GOPATH/src/github.com/docker/
+cd $GOPATH/src/github.com/docker/
+git clone https://github.com/docker/swarm
+cd swarm
+git checkout v1.0.0
+go get github.com/tools/godep
+$GOPATH/bin/godep go install
+sudo cp $GOPATH/bin/swarm /usr/local/bin
 
