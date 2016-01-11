@@ -296,7 +296,7 @@ func Recovery(masterhost string, port string, masteruser string) (string, error)
 
 // Poolhba right now this is simple, just read the template and spit it back
 // out, no substitutions are done right now, they will be in the future no doubt
-func Poolhba() (string, error) {
+func Poolhba(cars []Rule) (string, error) {
 
 	var info RecoveryParameters
 

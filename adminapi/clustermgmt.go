@@ -489,8 +489,9 @@ func configureCluster(dbConn *sql.DB, cluster types.Cluster, autocluster bool) e
 	}
 	logit.Info.Println("configureCluster:pgpool pool_passwd copied remotely")
 
-	//generate pool_hba.conf
-	data, err = template.Poolhba()
+	//g enerate pool_hba.conf
+	cars := make([]template.Rule, 0)
+	data, err = template.Poolhba(cars)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		return err

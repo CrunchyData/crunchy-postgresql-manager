@@ -746,10 +746,30 @@ func templateChange(dbConn *sql.DB, containerName string, cars []ContainerAccess
 	fqdn := containerName + "." + domainname.Value
 
 	//place pg_hba.conf on node
-	_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/pg_hba.conf", data, fqdn)
-	if err != nil {
-		logit.Error.Println("templateChange:" + err.Error())
-		return err
+	if containerRole == "pgpool" {
+		//generate pool_hba.conf
+		data, err = template.Poolhba(rules)
+		if err != nil {
+			logit.Error.Println(err.Error())
+			return err
+		}
+
+		logit.Info.Println("configureCluster:pgpool pool_hba generated")
+
+		//write pgpool.conf to remote pool node
+		_, err = cpmcontainerapi.RemoteWritefileClient(util.GetBase()+"/bin/"+"pool_hba.conf", data, fqdn)
+		if err != nil {
+			logit.Error.Println(err.Error())
+			return err
+		}
+		logit.Info.Println("configureCluster:pgpool pool_hba copied remotely")
+
+	} else {
+		_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/pg_hba.conf", data, fqdn)
+		if err != nil {
+			logit.Error.Println("templateChange:" + err.Error())
+			return err
+		}
 	}
 
 	return err
