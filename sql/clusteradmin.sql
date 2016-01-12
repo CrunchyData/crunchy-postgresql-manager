@@ -138,6 +138,31 @@ insert into settings (name, value, description, updatedt) values ('CP-MED-ALGO',
 insert into settings (name, value, description, updatedt) values ('CP-LG-ALGO', 'round-robin', 'large cluster placement algorithm', now());
 insert into settings (name, value, description, updatedt) values ('SLEEP-PROV', '2s', 'time to sleep during provisioning check', now());
 
+
+insert into settings (name, value, description, updatedt) values ('TUNE-LG-MWM', '2GB', 'tuning parameter - maintenance_work_mem', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-LG-CCT', '0.9', 'tuning parameter - checkpoint_completion_target', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-LG-ECS', '24GB', 'tuning parameter - effective_cache_size', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-LG-WM', '160MB', 'tuning parameter - work_mem', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-LG-WB', '16MB', 'tuning parameter - wal_buffers', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-LG-CS', '32', 'tuning parameter - checkpoint_segments', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-LG-SB', '8GB', 'tuning parameter - shared_buffers', now());
+
+insert into settings (name, value, description, updatedt) values ('TUNE-MED-MWM', '1GB', 'tuning parameter - maintenance_work_mem', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-MED-CCT', '0.9', 'tuning parameter - checkpoint_completion_target', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-MED-ECS', '12GB', 'tuning parameter - effective_cache_size', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-MED-WM', '80MB', 'tuning parameter - work_mem', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-MED-WB', '16MB', 'tuning parameter - wal_buffers', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-MED-CS', '32', 'tuning parameter - checkpoint_segments', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-MED-SB', '4GB', 'tuning parameter - shared_buffers', now());
+
+insert into settings (name, value, description, updatedt) values ('TUNE-SM-MWM', '512MB', 'tuning parameter - maintenance_work_mem', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-SM-CCT', '0.9', 'tuning parameter - checkpoint_completion_target', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-SM-ECS', '6GB', 'tuning parameter - effective_cache_size', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-SM-WM', '40MB', 'tuning parameter - work_mem', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-SM-WB', '16MB', 'tuning parameter - wal_buffers', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-SM-CS', '32', 'tuning parameter - checkpoint_segments', now());
+insert into settings (name, value, description, updatedt) values ('TUNE-SM-SB', '2GB', 'tuning parameter - shared_buffers', now());
+
 create table taskprofile (
 	id serial primary key,
 	name varchar(30) unique not null
