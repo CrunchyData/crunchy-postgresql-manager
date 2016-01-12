@@ -1,4 +1,5 @@
-FROM docker.io/centos:centos7
+#FROM docker.io/centos:centos7
+FROM centos:7
 MAINTAINER crunchy
 
 #RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm

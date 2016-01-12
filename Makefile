@@ -38,6 +38,12 @@ buildimages:
 		cd images/cpm-collect && make
 		cd images/cpm-efk && make
 
+start:
+		./sbin/start-cpm.sh
+
+stop:
+		./sbin/stop-cpm.sh
+
 clean:
 		rm -rf $(GOBIN)/*server* $(GOBIN)/*command*
 		rm -rf $(GOPATH)/pkg/linux_amd64/github.com/crunchydata/crunchy-postgresql-manager/*.a

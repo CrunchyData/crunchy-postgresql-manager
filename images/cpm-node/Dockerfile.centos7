@@ -1,4 +1,4 @@
-FROM docker.io/centos:centos7
+FROM centos:7
 
 MAINTAINER crunchy
 
