@@ -384,41 +384,44 @@ func Poolconf(poolnames []string) (string, error) {
 
 func GetTuningParms(dbConn *sql.DB, profile string, info *PostgresqlParameters) error {
 	var err error
-	if profile != "SM" || profile != "LG" || profile != "MED" {
+	switch profile {
+	case "SM", "MED", "LG":
+	default:
 		return errors.New("profile not valid: " + profile)
 	}
+
 	var setting types.Setting
-	setting, err = admindb.GetSetting(dbConn, "TUNE_"+profile+"_MWM")
+	setting, err = admindb.GetSetting(dbConn, "TUNE-"+profile+"-MWM")
 	if err != nil {
 		return err
 	}
 	info.TUNE_MWM = setting.Value
-	setting, err = admindb.GetSetting(dbConn, "TUNE_"+profile+"_CCT")
+	setting, err = admindb.GetSetting(dbConn, "TUNE-"+profile+"-CCT")
 	if err != nil {
 		return err
 	}
 	info.TUNE_CCT = setting.Value
-	setting, err = admindb.GetSetting(dbConn, "TUNE_"+profile+"_ECS")
+	setting, err = admindb.GetSetting(dbConn, "TUNE-"+profile+"-ECS")
 	if err != nil {
 		return err
 	}
 	info.TUNE_ECS = setting.Value
-	setting, err = admindb.GetSetting(dbConn, "TUNE_"+profile+"_WM")
+	setting, err = admindb.GetSetting(dbConn, "TUNE-"+profile+"-WM")
 	if err != nil {
 		return err
 	}
 	info.TUNE_WM = setting.Value
-	setting, err = admindb.GetSetting(dbConn, "TUNE_"+profile+"_WB")
+	setting, err = admindb.GetSetting(dbConn, "TUNE-"+profile+"-WB")
 	if err != nil {
 		return err
 	}
 	info.TUNE_WB = setting.Value
-	setting, err = admindb.GetSetting(dbConn, "TUNE_"+profile+"_CS")
+	setting, err = admindb.GetSetting(dbConn, "TUNE-"+profile+"-CS")
 	if err != nil {
 		return err
 	}
 	info.TUNE_CS = setting.Value
-	setting, err = admindb.GetSetting(dbConn, "TUNE_"+profile+"_SB")
+	setting, err = admindb.GetSetting(dbConn, "TUNE-"+profile+"-SB")
 	if err != nil {
 		return err
 	}
