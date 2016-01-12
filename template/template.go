@@ -267,6 +267,11 @@ func logInfo(info HBAParameters) {
 		logit.Info.Println("BRIDGE_IP_LIST[" + strconv.Itoa(i) + "]=" + info.BRIDGE_IP_LIST[i])
 		i++
 	}
+	i = 0
+	for i = range info.RULES_LIST {
+		logit.Info.Println("RULES_LIST[" + strconv.Itoa(i) + "]=" + info.RULES_LIST[i].Type + " " + info.RULES_LIST[i].Database + " " + info.RULES_LIST[i].User + " " + info.RULES_LIST[i].Address)
+		i++
+	}
 }
 
 // Recovery create a recovery.conf file based on passed values and a template, return the file contents
@@ -298,7 +303,11 @@ func Recovery(masterhost string, port string, masteruser string) (string, error)
 // out, no substitutions are done right now, they will be in the future no doubt
 func Poolhba(cars []Rule) (string, error) {
 
-	var info RecoveryParameters
+	var hbaInfo HBAParameters
+	hbaInfo.RULES_LIST = cars
+
+	logit.Info.Println("here are the cars in Poolhba...")
+	logInfo(hbaInfo)
 
 	var path = util.GetBase() + "/conf/" + "pgpool/pool_hba.conf.template"
 
@@ -313,7 +322,7 @@ func Poolhba(cars []Rule) (string, error) {
 	}
 	buff := bytes.NewBufferString("")
 
-	err = tmpl.Execute(buff, info)
+	err = tmpl.Execute(buff, hbaInfo)
 	logit.Info.Println("Poolhba:" + buff.String())
 
 	return buff.String(), nil

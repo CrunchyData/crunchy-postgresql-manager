@@ -67,3 +67,9 @@
 host    all         postgres         0.0.0.0/0          trust
 host    all         pgpool         0.0.0.0/0          md5
 host    all         cpmtest         0.0.0.0/0          md5
+
+{{range .RULES_LIST}}
+{{.Type}}       {{.Database}}   {{.User}}       {{.Address}}    {{.Method}}
+{{end}}
+
+

@@ -23,6 +23,8 @@ fi
 #CPMROOT=/home/jeffmc/devproject/src/github.com/crunchydata/crunchy-postgresql-manager
 #LOCAL_IP=192.168.0.107
 
+source $CPMROOT/cpmenv
+
 if [ -z "$LOCAL_IP" ]; then
 	echo "LOCAL_IP env var required"
 	exit 1

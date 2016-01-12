@@ -24,6 +24,9 @@ if [ -z "$CPMROOT" ]; then
 	echo "CPMROOT is a required env var"
 	exit 1
 fi
+
+source $CPMROOT/cpmenv
+
 if [ -z "$LOCAL_IP" ]; then
 	echo "LOCAL_IP is a required env var"
 	exit 1

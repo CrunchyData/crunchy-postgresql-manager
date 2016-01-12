@@ -664,12 +664,13 @@ func performConfigUpdate(dbConn *sql.DB, ContainerID string) error {
 
 	//restart postgres
 
-	logit.Info.Println("performConfigUpdate....stopping postgres")
 	if container.Role == "pgpool" {
+		logit.Info.Println("performConfigUpdate....stopping pgpool")
 		var stoppoolResp cpmcontainerapi.StopPgpoolResponse
 		stoppoolResp, err = cpmcontainerapi.StopPgpoolClient(container.Name)
 		logit.Info.Println("AdminStoppg:" + stoppoolResp.Output)
 	} else {
+		logit.Info.Println("performConfigUpdate....stopping postgres")
 		var stoppgResp cpmcontainerapi.StopPGResponse
 		stoppgResp, err = cpmcontainerapi.StopPGClient(container.Name)
 		logit.Info.Println("AdminStoppg:" + stoppgResp.Output)
@@ -679,12 +680,13 @@ func performConfigUpdate(dbConn *sql.DB, ContainerID string) error {
 		return err
 	}
 
-	logit.Info.Println("performConfigUpdate....starting postgres")
 	if container.Role == "pgpool" {
+		logit.Info.Println("performConfigUpdate....starting pgpool")
 		var spgresp cpmcontainerapi.StartPgpoolResponse
 		spgresp, err = cpmcontainerapi.StartPgpoolClient(container.Name)
 		logit.Info.Println("AdminStartpg:" + spgresp.Output)
 	} else {
+		logit.Info.Println("performConfigUpdate....starting postgres")
 		var srep cpmcontainerapi.StartPGResponse
 		srep, err = cpmcontainerapi.StartPGClient(container.Name)
 		logit.Info.Println("AdminStartpg:" + srep.Output)
@@ -736,13 +738,6 @@ func templateChange(dbConn *sql.DB, containerName string, cars []ContainerAccess
 	logit.Info.Printf("templateChange rules going to template %d\n", len(rules))
 	var data string
 
-	data, err = template.Hba(dbConn, mode, containerName, "", "", domainname.Value, rules)
-
-	if err != nil {
-		logit.Error.Println("templateChange:" + err.Error())
-		return err
-	}
-
 	fqdn := containerName + "." + domainname.Value
 
 	//place pg_hba.conf on node
@@ -757,7 +752,8 @@ func templateChange(dbConn *sql.DB, containerName string, cars []ContainerAccess
 		logit.Info.Println("configureCluster:pgpool pool_hba generated")
 
 		//write pgpool.conf to remote pool node
-		_, err = cpmcontainerapi.RemoteWritefileClient(util.GetBase()+"/bin/"+"pool_hba.conf", data, fqdn)
+		var dest = util.GetBase() + "/bin/pool_hba.conf"
+		_, err = cpmcontainerapi.RemoteWritefileClient(dest, data, fqdn)
 		if err != nil {
 			logit.Error.Println(err.Error())
 			return err
@@ -765,6 +761,13 @@ func templateChange(dbConn *sql.DB, containerName string, cars []ContainerAccess
 		logit.Info.Println("configureCluster:pgpool pool_hba copied remotely")
 
 	} else {
+		data, err = template.Hba(dbConn, mode, containerName, "", "", domainname.Value, rules)
+
+		if err != nil {
+			logit.Error.Println("templateChange:" + err.Error())
+			return err
+		}
+
 		_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/pg_hba.conf", data, fqdn)
 		if err != nil {
 			logit.Error.Println("templateChange:" + err.Error())

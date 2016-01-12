@@ -21,6 +21,13 @@ env > /tmp/envvars.out
 
 source /var/cpm/bin/setenv.sh
 
+# if the syslog config file is found, assume the user wants to start the syslog daemon
+if [ -f /syslogconfig/rsyslog.conf ]; then
+	cp /syslogconfig/listen.conf /etc/rsyslog.d/
+	rsyslogd -f /syslogconfig/rsyslog.conf
+fi
+
+
 echo "about to run startpgpool.sh"
 startpgpool.sh
 

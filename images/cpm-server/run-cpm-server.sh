@@ -20,8 +20,11 @@ if [[ $EUID -ne 0 ]]; then
 	      exit 1
 fi
 
+source $CPMROOT/cpmenv
+
 #LOCAL_IP=192.168.0.107
 #SWARM_MANAGER_URL=tcp://$LOCAL_IP:8000
+
 SERVERNAME=server1
 
 if [ -z "$LOCAL_IP" ]; then

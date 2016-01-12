@@ -7,9 +7,12 @@ MAINTAINER crunchy
 RUN mkdir -p /var/cpm/bin
 RUN mkdir -p /var/cpm/conf
 RUN chown -R daemon:daemon /var/cpm/bin
+RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
 RUN rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-redhat94-9.4-1.noarch.rpm
-RUN yum install -y procps-ng postgresql94 postgresql94-contrib pgpool-II-94 libxslt which unzip openssh-clients hostname && yum clean all -y
+RUN yum install -y rsyslog procps-ng postgresql94 postgresql94-contrib pgpool-II-94 libxslt which unzip openssh-clients hostname && yum clean all -y
 
+
+VOLUME ["/syslogconfig"]
 
 # set environment vars
 
@@ -22,6 +25,7 @@ ADD conf/pgpool /var/cpm/conf/pgpool
 ADD conf/pgpool/pool_hba.conf  /etc/pgpool-II-94/pool_hba.conf
 ADD conf/pgpool/pool_passwd /etc/pgpool-II-94/pool_passwd
 
-USER daemon
+USER root
+#USER daemon
 
 CMD ["/var/cpm/bin/start-cpmcontainerapi.sh"]
