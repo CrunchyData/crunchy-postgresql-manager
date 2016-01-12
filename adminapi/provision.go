@@ -388,7 +388,15 @@ func provisionImplInit(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standb
 			var data string
 			var mode = "standalone"
 
-			data, err = template.Postgresql(mode, pgport.Value, "")
+			info := template.PostgresqlParameters{}
+			info.PG_PORT = pgport.Value
+			info.CLUSTER_TYPE = ""
+			err = template.GetTuningParms(dbConn, params.Profile, &info)
+			if err != nil {
+				logit.Error.Println(err.Error())
+				return err
+			}
+			data, err = template.Postgresql(mode, info)
 			if err != nil {
 				logit.Error.Println(err.Error())
 				return err

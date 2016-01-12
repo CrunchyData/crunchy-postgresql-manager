@@ -135,7 +135,7 @@ func ScaleUpCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	err = configureCluster(dbConn, cluster, false)
+	err = configureCluster(params.Profile, dbConn, cluster, false)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -210,7 +210,7 @@ func ConfigureCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	err = configureCluster(dbConn, cluster, false)
+	err = configureCluster("SM", dbConn, cluster, false)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -223,7 +223,7 @@ func ConfigureCluster(w rest.ResponseWriter, r *rest.Request) {
 	w.WriteJson(&status)
 }
 
-func configureCluster(dbConn *sql.DB, cluster types.Cluster, autocluster bool) error {
+func configureCluster(profile string, dbConn *sql.DB, cluster types.Cluster, autocluster bool) error {
 	logit.Info.Println("configureCluster:GetCluster")
 
 	//get master node for this cluster
@@ -250,10 +250,18 @@ func configureCluster(dbConn *sql.DB, cluster types.Cluster, autocluster bool) e
 
 	//configure master postgresql.conf file
 	var data string
+	info := template.PostgresqlParameters{}
+	info.PG_PORT = pgport.Value
 	if cluster.ClusterType == "synchronous" {
-		data, err = template.Postgresql("master", pgport.Value, "*")
+		info.CLUSTER_TYPE = "*"
+		data, err = template.Postgresql("master", info)
 	} else {
-		data, err = template.Postgresql("master", pgport.Value, "")
+		//TODO verify these next 2 lines look erroneous
+		info.CLUSTER_TYPE = "*"
+		data, err = template.Postgresql("master", info)
+
+		info.CLUSTER_TYPE = ""
+		data, err = template.Postgresql("master", info)
 	}
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -389,7 +397,10 @@ func configureCluster(dbConn *sql.DB, cluster types.Cluster, autocluster bool) e
 			}
 			logit.Info.Println("configureCluster:standby recovery.conf copied remotely")
 
-			data, err = template.Postgresql(STANDBY, pgport.Value, "")
+			info := template.PostgresqlParameters{}
+			info.PG_PORT = pgport.Value
+			info.CLUSTER_TYPE = ""
+			data, err = template.Postgresql(STANDBY, info)
 			if err != nil {
 				logit.Error.Println(err.Error())
 				return err
@@ -834,7 +845,7 @@ func AdminFailover(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	err = configureCluster(dbConn, cluster, false)
+	err = configureCluster("SM", dbConn, cluster, false)
 	if err != nil {
 		logit.Error.Println(err.Error())
 		rest.Error(w, err.Error(), http.StatusBadRequest)
@@ -1201,7 +1212,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	//configure cluster
 	//	ConfigureCluster
 	logit.Info.Println("AUTO CLUSTER PROFILE configure cluster ")
-	err2 = configureCluster(dbConn, dbcluster, true)
+	err2 = configureCluster(profile.MasterProfile, dbConn, dbcluster, true)
 	if err2 != nil {
 		logit.Error.Println("AutoCluster: error-configure cluster " + err2.Error())
 		rest.Error(w, "AutoCluster error"+err2.Error(), http.StatusBadRequest)

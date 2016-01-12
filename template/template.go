@@ -66,6 +66,13 @@ type PostgresqlParameters struct {
 	PG_HOST_IP   string
 	PG_PORT      string
 	CLUSTER_TYPE string
+	TUNE_MWM     string
+	TUNE_CCT     string
+	TUNE_ECS     string
+	TUNE_WM      string
+	TUNE_WB      string
+	TUNE_CS      string
+	TUNE_SB      string
 }
 type RecoveryParameters struct {
 	USER       string
@@ -78,10 +85,7 @@ type PGPoolParameters struct {
 }
 
 // Postgresql create a postgresql.conf file from a template and passed values, return the new file contents
-func Postgresql(mode string, port string, clusterType string) (string, error) {
-	var info PostgresqlParameters
-	info.PG_PORT = port
-	info.CLUSTER_TYPE = clusterType
+func Postgresql(mode string, info PostgresqlParameters) (string, error) {
 
 	var path string
 	switch mode {
@@ -376,4 +380,49 @@ func Poolconf(poolnames []string) (string, error) {
 	logit.Info.Println("Poolconf:" + buff.String())
 
 	return buff.String(), nil
+}
+
+func GetTuningParms(dbConn *sql.DB, profile string, info *PostgresqlParameters) error {
+	var err error
+	if profile != "SM" || profile != "LG" || profile != "MED" {
+		return errors.New("profile not valid: " + profile)
+	}
+	var setting types.Setting
+	setting, err = admindb.GetSetting(dbConn, "TUNE_"+profile+"_MWM")
+	if err != nil {
+		return err
+	}
+	info.TUNE_MWM = setting.Value
+	setting, err = admindb.GetSetting(dbConn, "TUNE_"+profile+"_CCT")
+	if err != nil {
+		return err
+	}
+	info.TUNE_CCT = setting.Value
+	setting, err = admindb.GetSetting(dbConn, "TUNE_"+profile+"_ECS")
+	if err != nil {
+		return err
+	}
+	info.TUNE_ECS = setting.Value
+	setting, err = admindb.GetSetting(dbConn, "TUNE_"+profile+"_WM")
+	if err != nil {
+		return err
+	}
+	info.TUNE_WM = setting.Value
+	setting, err = admindb.GetSetting(dbConn, "TUNE_"+profile+"_WB")
+	if err != nil {
+		return err
+	}
+	info.TUNE_WB = setting.Value
+	setting, err = admindb.GetSetting(dbConn, "TUNE_"+profile+"_CS")
+	if err != nil {
+		return err
+	}
+	info.TUNE_CS = setting.Value
+	setting, err = admindb.GetSetting(dbConn, "TUNE_"+profile+"_SB")
+	if err != nil {
+		return err
+	}
+	info.TUNE_SB = setting.Value
+
+	return nil
 }
