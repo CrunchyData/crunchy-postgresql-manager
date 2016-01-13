@@ -250,8 +250,14 @@ func configureCluster(profile string, dbConn *sql.DB, cluster types.Cluster, aut
 
 	//configure master postgresql.conf file
 	var data string
-	info := template.PostgresqlParameters{}
+	info := new(template.PostgresqlParameters)
 	info.PG_PORT = pgport.Value
+	err = template.GetTuningParms(dbConn, profile, info)
+	if err != nil {
+		logit.Error.Println("configureCluster:" + err.Error())
+		return err
+	}
+
 	if cluster.ClusterType == "synchronous" {
 		info.CLUSTER_TYPE = "*"
 		data, err = template.Postgresql("master", info)
@@ -260,8 +266,8 @@ func configureCluster(profile string, dbConn *sql.DB, cluster types.Cluster, aut
 		info.CLUSTER_TYPE = "*"
 		data, err = template.Postgresql("master", info)
 
-		info.CLUSTER_TYPE = ""
-		data, err = template.Postgresql("master", info)
+		//info.CLUSTER_TYPE = ""
+		//data, err = template.Postgresql("master", info)
 	}
 	if err != nil {
 		logit.Error.Println(err.Error())
@@ -397,9 +403,15 @@ func configureCluster(profile string, dbConn *sql.DB, cluster types.Cluster, aut
 			}
 			logit.Info.Println("configureCluster:standby recovery.conf copied remotely")
 
-			info := template.PostgresqlParameters{}
+			info := new(template.PostgresqlParameters)
 			info.PG_PORT = pgport.Value
 			info.CLUSTER_TYPE = ""
+			err = template.GetTuningParms(dbConn, profile, info)
+			if err != nil {
+				logit.Error.Println(err.Error())
+				return err
+			}
+
 			data, err = template.Postgresql(STANDBY, info)
 			if err != nil {
 				logit.Error.Println(err.Error())
@@ -1018,7 +1030,7 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	//logit.Info.Println("AutoCluster: Name=" + params.Name + " ClusterType=" + params.ClusterType + " Profile=" + params.ClusterProfile + " ProjectID=" + params.ProjectID)
+	logit.Info.Println("AutoCluster: Name=" + params.Name + " ClusterType=" + params.ClusterType + " Profile=" + params.ClusterProfile + " ProjectID=" + params.ProjectID)
 
 	//create cluster definition
 	dbcluster := types.Cluster{}
@@ -1072,6 +1084,8 @@ func AutoCluster(w rest.ResponseWriter, r *rest.Request) {
 	}
 
 	//	provision the master
+	logit.Info.Println("dockermaster profile is " + dockermaster.Profile)
+
 	_, err2 = provisionImpl(dbConn, &dockermaster, false)
 	if err2 != nil {
 		logit.Error.Println("AutoCluster: error-provision master " + err2.Error())

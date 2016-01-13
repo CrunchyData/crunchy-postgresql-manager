@@ -45,7 +45,7 @@ type Server struct {
 	Name        string //server name
 	IPAddress   string //server ip address
 	Port        string //swarm port
-	ServerClass string //the class of the server, small, medium, large
+	ServerClass string //the class of the server, SM, MED, LG
 	CreateDate  string
 	NodeCount   string //calculated value of the number of containers assigned to this server
 }
@@ -129,7 +129,7 @@ type HealthCheck struct {
 }
 
 type ClusterProfiles struct {
-	Size           string //either small, medium, or large
+	Size           string //either SM, MED, or LG
 	Count          string //number of standby nodes
 	Algo           string //round-robin
 	MasterProfile  string //the docker profile to use for the master node
@@ -139,12 +139,12 @@ type ClusterProfiles struct {
 	Token          string
 }
 type Profiles struct {
-	SmallCPU  string //small profile cpu shares setting
-	SmallMEM  string //small profile memory setting
-	MediumCPU string //medium profile cpu shares setting
-	MediumMEM string //medium profile docker memory setting
-	LargeCPU  string //large profile docker cpu shares setting
-	LargeMEM  string //large profile docker memory setting
+	SmallCPU  string //SM profile cpu shares setting
+	SmallMEM  string //SM profile memory setting
+	MediumCPU string //MED profile cpu shares setting
+	MediumMEM string //MED profile docker memory setting
+	LargeCPU  string //LG profile docker cpu shares setting
+	LargeMEM  string //LG profile docker memory setting
 	Token     string
 }
 

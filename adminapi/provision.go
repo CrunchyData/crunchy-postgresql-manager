@@ -388,14 +388,15 @@ func provisionImplInit(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standb
 			var data string
 			var mode = "standalone"
 
-			info := template.PostgresqlParameters{}
+			info := new(template.PostgresqlParameters)
 			info.PG_PORT = pgport.Value
 			info.CLUSTER_TYPE = ""
-			err = template.GetTuningParms(dbConn, params.Profile, &info)
+			err = template.GetTuningParms(dbConn, params.Profile, info)
 			if err != nil {
 				logit.Error.Println(err.Error())
 				return err
 			}
+			logit.Info.Println("after GetTuning call with MWM = " + info.TUNE_MWM)
 			data, err = template.Postgresql(mode, info)
 			if err != nil {
 				logit.Error.Println(err.Error())
@@ -404,6 +405,8 @@ func provisionImplInit(dbConn *sql.DB, params *swarmapi.DockerRunRequest, standb
 			logit.Info.Println("provision chkpt 4")
 
 			//place postgresql.conf on new node
+			logit.Info.Println("fqdn is " + fqdn)
+			logit.Info.Println("postgresql.conf file is " + data)
 			_, err = cpmcontainerapi.RemoteWritefileClient("/pgdata/postgresql.conf", data, fqdn)
 			if err != nil {
 				logit.Error.Println(err.Error())

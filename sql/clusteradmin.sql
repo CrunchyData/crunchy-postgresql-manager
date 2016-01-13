@@ -117,16 +117,16 @@ insert into settings (name, value, description, updatedt) values ('DOMAIN-NAME',
 insert into settings (name, value, description, updatedt) values ('ADMIN-URL', 'http://cpm:13001', 'CPM admin url', now());
 
 insert into settings (name, value, description, updatedt) values ('CP-SM-COUNT', '1', 'small cluster profile standby count', now());
-insert into settings (name, value, description, updatedt) values ('CP-SM-M-PROFILE', 'small', 'small cluster profile master Docker profile', now());
-insert into settings (name, value, description, updatedt) values ('CP-SM-S-PROFILE', 'small', 'small cluster profile standby Docker profile', now());
+insert into settings (name, value, description, updatedt) values ('CP-SM-M-PROFILE', 'SM', 'small cluster profile master Docker profile', now());
+insert into settings (name, value, description, updatedt) values ('CP-SM-S-PROFILE', 'SM', 'small cluster profile standby Docker profile', now());
 
 insert into settings (name, value, description, updatedt) values ('CP-MED-COUNT', '1', 'medium cluster profile standby count', now());
-insert into settings (name, value, description, updatedt) values ('CP-MED-M-PROFILE', 'small', 'medium cluster profile master Docker profile', now());
-insert into settings (name, value, description, updatedt) values ('CP-MED-S-PROFILE', 'small', 'medium cluster profile standby Docker profile', now());
+insert into settings (name, value, description, updatedt) values ('CP-MED-M-PROFILE', 'SM', 'medium cluster profile master Docker profile', now());
+insert into settings (name, value, description, updatedt) values ('CP-MED-S-PROFILE', 'SM', 'medium cluster profile standby Docker profile', now());
 
 insert into settings (name, value, description, updatedt) values ('CP-LG-COUNT', '1', 'large cluster profile standby count', now());
-insert into settings (name, value, description, updatedt) values ('CP-LG-M-PROFILE', 'small', 'large cluster profile master Docker profile', now());
-insert into settings (name, value, description, updatedt) values ('CP-LG-S-PROFILE', 'small', 'large cluster profile standby Docker profile', now());
+insert into settings (name, value, description, updatedt) values ('CP-LG-M-PROFILE', 'SM', 'large cluster profile master Docker profile', now());
+insert into settings (name, value, description, updatedt) values ('CP-LG-S-PROFILE', 'SM', 'large cluster profile standby Docker profile', now());
 insert into settings (name, value, description, updatedt) values ('CP-SM-M-SERVER', 'low', 'small cluster profile master server size', now());
 insert into settings (name, value, description, updatedt) values ('CP-SM-S-SERVER', 'low', 'small cluster profile standby server size', now());
 insert into settings (name, value, description, updatedt) values ('CP-MED-M-SERVER', 'low', 'medium cluster profile master server size', now());

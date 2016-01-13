@@ -55,11 +55,11 @@ chcon -Rt svirt_sandbox_file_t $DBDIR
 docker -H $SWARM_MANAGER_URL stop cpm-admin
 docker -H $SWARM_MANAGER_URL rm cpm-admin
 
+#	--log-opt fluentd-tag=docker.cpm-admin \
+#	--log-driver=fluentd \
+#	--log-opt fluentd-address=$FLUENT_URL \
 docker -H $SWARM_MANAGER_URL run -e DB_HOST=cpm-admin \
 	--hostname="cpm-admin" \
-	--log-driver=fluentd \
-	--log-opt fluentd-address=$FLUENT_URL \
-	--log-opt fluentd-tag=docker.cpm-admin \
 	-p $LOCAL_IP:14001:13001 \
 	-e constraint:host==$LOCAL_IP \
 	-e DOMAIN=crunchy.lab \

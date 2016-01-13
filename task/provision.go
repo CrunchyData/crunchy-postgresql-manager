@@ -53,7 +53,7 @@ func ProvisionBackupJob(dbConn *sql.DB, args *TaskRequest) error {
 	backupcontainername := args.ContainerName + "-backup"
 	params.ContainerName = backupcontainername
 	params.Standalone = "false"
-	params.Profile = "small"
+	params.Profile = "SM"
 
 	//remove the prior backup job if it exists
 	removeParams := &swarmapi.DockerRemoveRequest{}

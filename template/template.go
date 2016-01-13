@@ -85,8 +85,9 @@ type PGPoolParameters struct {
 }
 
 // Postgresql create a postgresql.conf file from a template and passed values, return the new file contents
-func Postgresql(mode string, info PostgresqlParameters) (string, error) {
+func Postgresql(mode string, info *PostgresqlParameters) (string, error) {
 
+	logit.Info.Println("in template.Postgresql with TUNE_MWM=" + info.TUNE_MWM)
 	var path string
 	switch mode {
 	case "standalone", "master", "standby":
@@ -384,6 +385,7 @@ func Poolconf(poolnames []string) (string, error) {
 
 func GetTuningParms(dbConn *sql.DB, profile string, info *PostgresqlParameters) error {
 	var err error
+	logit.Info.Println("GetTuningParms with profile=[" + profile + "]")
 	switch profile {
 	case "SM", "MED", "LG":
 	default:
@@ -396,6 +398,7 @@ func GetTuningParms(dbConn *sql.DB, profile string, info *PostgresqlParameters) 
 		return err
 	}
 	info.TUNE_MWM = setting.Value
+	logit.Info.Println("GetTuningParms with MWM=" + info.TUNE_MWM)
 	setting, err = admindb.GetSetting(dbConn, "TUNE-"+profile+"-CCT")
 	if err != nil {
 		return err

@@ -36,7 +36,7 @@ func ProvisionBackrestRestoreJob(dbConn *sql.DB, args *TaskRequest) error {
 	restorecontainername := args.ContainerName + "-backrest-restore-job"
 	params.ContainerName = restorecontainername
 	params.Standalone = "false"
-	params.Profile = "small"
+	params.Profile = "SM"
 
 	schedule, err := GetSchedule(dbConn, args.ScheduleID)
 	if err != nil {
