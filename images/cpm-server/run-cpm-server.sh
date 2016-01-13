@@ -47,12 +47,12 @@ echo "restarting cpm-server"
 docker stop cpm-$SERVERNAME
 docker rm cpm-$SERVERNAME
 
+#	--log-driver=fluentd \
+#	--log-opt fluentd-address=$LOCAL_IP:24224 \
+#	--log-opt fluentd-tag=docker.cpm-$SERVERNAME \
 docker -H $SWARM_MANAGER_URL \
 	run --name=cpm-$SERVERNAME -d \
 	--privileged \
-	--log-driver=fluentd \
-	--log-opt fluentd-address=$LOCAL_IP:24224 \
-	--log-opt fluentd-tag=docker.cpm-$SERVERNAME \
 	-e constraint:host==$LOCAL_IP \
 	-p $LOCAL_IP:10001:10001 \
 	-v /:/rootfs \

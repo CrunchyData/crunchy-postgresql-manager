@@ -41,10 +41,10 @@ echo "restarting cpm-task container..."
 sleep 2
 docker -H $SWARM_MANAGER_URL stop cpm-task
 docker -H $SWARM_MANAGER_URL rm cpm-task
+#	--log-driver=fluentd \
+#	--log-opt fluentd-address=$FLUENT_URL \
+#	--log-opt fluentd-tag=docker.cpm-task \
 docker -H $SWARM_MANAGER_URL run -e DB_HOST=cpm-admin.crunchy.lab \
-	--log-driver=fluentd \
-	--log-opt fluentd-address=$FLUENT_URL \
-	--log-opt fluentd-tag=docker.cpm-task \
 	-e constraint:host==$LOCAL_IP \
 	-e CPMBASE=/var/cpm \
 	-e SWARM_MANAGER_URL=$SWARM_MANAGER_URL \

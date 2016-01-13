@@ -13,6 +13,7 @@ ENV PGROOT /usr/pgsql-9.4
 ENV PGDATA /pgdata
 ADD bin/.bash_profile /var/lib/pgsql/
 VOLUME ["/pgdata"]
+
 RUN chown -R postgres:postgres /pgdata
 
 ADD sql /var/cpm/bin
