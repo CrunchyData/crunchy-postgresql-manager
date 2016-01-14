@@ -20,6 +20,8 @@ if [[ $EUID -ne 0 ]]; then
 	      exit 1
 fi
 
+source $CPMROOT/cpmenv
+
 if [ -z "$LOCAL_IP" ]; then
 	echo "LOCAL_IP is a required env var"
 	exit 1

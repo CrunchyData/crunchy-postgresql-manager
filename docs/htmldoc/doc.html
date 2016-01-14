@@ -316,7 +316,39 @@ sudo docker images</pre>
 sudo systemctl stop firewalld.service</pre>
 </div></div>
 <div class="paragraph"><p>The document, firewall-setup.md, shows how the CPM ports can be opened up.</p></div>
-<h2 id="setup_skybridge">3.6. Setup skybridge</h2>
+<h2 id="configure_and_start_swarm">3.6. Configure and Start Swarm</h2>
+<div class="paragraph"><p>Currently, centos 7 only offers golang 1.4.2, and Swarm 1.0.1 requires
+golang 1.5.  So for the time being, we will build and run Swarm 1.0.0.</p></div>
+<div class="paragraph"><p>Download the swarm binary as follows, within a new swarm go project:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>export GOPATH=~/swarmproject
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:$GOPATH/bin
+mkdir -p $GOPATH/src/github.com/docker/
+cd $GOPATH/src/github.com/docker/
+git clone https://github.com/docker/swarm
+cd swarm
+git checkout v1.0.0
+go get github.com/tools/godep
+$GOPATH/bin/godep go install</pre>
+</div></div>
+<div class="paragraph"><p>This will create the swarm binary located in $GOPATH/swarmproject/bin</p></div>
+<div class="paragraph"><p>Start swarm up by running the $CPMROOT/sbin/run-swarm.sh script, first
+modify the script updating the LOCALIP and SWARM_TOKEN variables.</p></div>
+<div class="literalblock">
+<div class="title">Get a swarm token</div>
+<div class="content monospaced">
+<pre>swarm create</pre>
+</div></div>
+<div class="literalblock">
+<div class="title">Run Swarm</div>
+<div class="content monospaced">
+<pre>$CPMROOT/sbin/run-swarm.sh</pre>
+</div></div>
+<div class="paragraph"><p>A swarm guide is available at:</p></div>
+<div class="paragraph"><p><a href="swarm-setup.html">Swarm Setup</a></p></div>
+<h2 id="setup_skybridge">3.7. Setup skybridge</h2>
 <div class="paragraph"><p>CPM services are found using DNS by the various parts of CPM.  When
 a Docker image is started, we need it to be registered with a DNS service
 and the local machine configured to resolve using that DNS server.</p></div>
@@ -358,38 +390,6 @@ to specify your local IP address, then run the skybridge container:</p></div>
 <div class="content monospaced">
 <pre>sudo ./sbin/run-skybridge.sh</pre>
 </div></div>
-<h2 id="configure_and_start_swarm">3.7. Configure and Start Swarm</h2>
-<div class="paragraph"><p>Currently, centos 7 only offers golang 1.4.2, and Swarm 1.0.1 requires
-golang 1.5.  So for the time being, we will build and run Swarm 1.0.0.</p></div>
-<div class="paragraph"><p>Download the swarm binary as follows, within a new swarm go project:</p></div>
-<div class="literalblock">
-<div class="content monospaced">
-<pre>export GOPATH=~/swarmproject
-export GOBIN=$GOPATH/bin
-export PATH=$PATH:$GOPATH/bin
-mkdir -p $GOPATH/src/github.com/docker/
-cd $GOPATH/src/github.com/docker/
-git clone https://github.com/docker/swarm
-cd swarm
-git checkout v1.0.0
-go get github.com/tools/godep
-$GOPATH/bin/godep go install</pre>
-</div></div>
-<div class="paragraph"><p>This will create the swarm binary located in $GOPATH/swarmproject/bin</p></div>
-<div class="paragraph"><p>Start swarm up by running the $CPMROOT/sbin/run-swarm.sh script, first
-modify the script updating the LOCALIP and SWARM_TOKEN variables.</p></div>
-<div class="literalblock">
-<div class="title">Get a swarm token</div>
-<div class="content monospaced">
-<pre>swarm create</pre>
-</div></div>
-<div class="literalblock">
-<div class="title">Run Swarm</div>
-<div class="content monospaced">
-<pre>$CPMROOT/sbin/run-swarm.sh</pre>
-</div></div>
-<div class="paragraph"><p>A swarm guide is available at:</p></div>
-<div class="paragraph"><p><a href="swarm-setup.html">Swarm Setup</a></p></div>
 <h2 id="testing_skybridge_and_swarm">3.8. Testing skybridge and Swarm</h2>
 <div class="paragraph"><p>At this point, it is a good time to test the installation of skybridge,
 docker, and docker swarm.</p></div>

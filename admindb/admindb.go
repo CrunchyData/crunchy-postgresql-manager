@@ -1022,7 +1022,15 @@ func GetProxyByContainerID(dbConn *sql.DB, containerID string) (types.Proxy, err
 	}
 	proxy.Passwd = unencrypted
 
-	//test the remote host connectivity first
+	//see if the container is up
+	var resp cpmcontainerapi.StatusResponse
+	resp, err = cpmcontainerapi.StatusClient(proxy.ContainerName)
+	proxy.ContainerStatus = resp.Status
+	if err != nil {
+		return proxy, err
+	}
+
+	//test the remote host connectivity
 	var hoststatus string
 	hoststatus, err = util.FastPing(proxy.Port, proxy.Host)
 	if err != nil {
@@ -1030,19 +1038,11 @@ func GetProxyByContainerID(dbConn *sql.DB, containerID string) (types.Proxy, err
 	}
 	if hoststatus == "OFFLINE" {
 		proxy.Status = hoststatus
-		proxy.ContainerStatus = hoststatus
 		return proxy, err
 	}
 
 	//test the database port on the remote host
 	proxy.Status, err = GetDatabaseStatus(proxy, containerID)
-	if err != nil {
-		return proxy, err
-	}
-
-	var resp cpmcontainerapi.StatusResponse
-	resp, err = cpmcontainerapi.StatusClient(proxy.ContainerName)
-	proxy.ContainerStatus = resp.Status
 	if err != nil {
 		return proxy, err
 	}
