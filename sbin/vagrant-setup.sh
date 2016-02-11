@@ -98,3 +98,10 @@ cp $DEVBASE/sbin/* $CPMBASE/bin
 echo "installing swarm binary into /usr/local/bin"
 #
 $DEVBASE/sbin/install-swarm.sh
+
+#
+echo "starting skybridge container..."
+#
+source $DEVBASE/cpmenv
+
+$DEVBASE/sbin/run-skybridge.sh
