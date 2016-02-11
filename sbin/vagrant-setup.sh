@@ -24,40 +24,56 @@
 # program before this one.
 #
 
-# install deps
-
 # Make sure only root can run our script
 if [[ $EUID -ne 0 ]]; then
 	echo "This script must be run as root" 1>&2
 	exit 1
 fi
 
+#
+echo " install host deps"
+#
 rpm -Uvh http://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/pgdg-centos95-9.5-2.noarch.rpm
 
 yum install -y postgresql95 postgresql95-contrib postgresql95-server
 yum install -y kernel-devel wget git mercurial net-tools bind-utils golang docker
 
+#
+echo " start docker"
+#
 systemctl start docker.service
+
+#
+echo " pull down images from docker hub"
+#
 docker pull centos:7
 docker pull prom/prometheus
 docker pull prom/promdash
+docker pull crunchydata/skybridge
 
-
+#
+echo " set up the CPM GOPATH"
+#
 export GOPATH=/home/vagrant/devproject
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:$GOBIN
 mkdir -p $GOPATH $GOPATH/bin $GOPATH/src $GOPATH/pkg
 export DEVBASE=$GOPATH/src/github.com/crunchydata/crunchy-postgresql-manager
-export CPMBASE=/var/cpm
 
+#
+echo " set up the host CPM directory, only used by the cpmserver container"
+#
+export CPMBASE=/var/cpm
 mkdir -p $CPMBASE/bin
 mkdir -p $CPMBASE/config
 mkdir -p $CPMBASE/data/pgsql
 mkdir -p $CPMBASE/logs
 mkdir -p $CPMBASE/keys
-
 chcon -Rt svirt_sandbox_file_t $CPMBASE
 
+#
+echo " build CPM"
+#
 cd $GOPATH
 go get github.com/tools/godep
 go get github.com/crunchydata/crunchy-postgresql-manager
@@ -69,8 +85,16 @@ cd ./images/cpm-efk
 make download
 cd ../..
 
+#
+echo "build the CPM container images"
+#
 make buildimages
 
 chown -R vagrant:vagrant $GOPATH
 
 cp $DEVBASE/sbin/* $CPMBASE/bin
+
+#
+echo "installing swarm binary into /usr/local/bin"
+#
+$DEVBASE/sbin/install-swarm.sh
