@@ -17,7 +17,7 @@
 ROOT=~/swarmproject
 mkdir -p  ~/$ROOT/bin ~/$ROOT/pkg ~/$ROOT/src
 
-GOPATH=$ROOT
+export GOPATH=$ROOT
 GOBIN=$GOPATH/bin
 PATH=$PATH:$GOPATH/bin
 
