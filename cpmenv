@@ -6,3 +6,4 @@ export SWARM_MANAGER_URL=tcp://$LOCAL_IP:8000
 export CPM_DOMAIN=crunchy.lab
 export FLUENT_URL=$LOCAL_IP:24224
 export KEYSDIR=/var/cpm/keys
+export CPM_DOMAIN=crunchy.lab

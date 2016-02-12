@@ -96,9 +96,24 @@ cp $DEVBASE/sbin/* $CPMBASE/bin
 
 
 #
-echo "starting skybridge container..."
+echo "set env vars used by installation scripts"
 #
 source $DEVBASE/cpmenv
+
+#
+echo "configure docker"
+#
+$DEVBASE/sbin/configure-docker.sh
+
+#
+echo " restart docker"
+#
+systemctl stop docker.service
+systemctl start docker.service
+
+#
+echo "starting skybridge container..."
+#
 
 $DEVBASE/sbin/run-skybridge.sh
 
@@ -111,3 +126,13 @@ $DEVBASE/sbin/install-swarm.sh
 echo "run swarm"
 #
 $DEVBASE/sbin/run-swarm.sh
+
+#
+echo "run cpm-server container"
+#
+$DEVBASE/images/cpm-server/run-cpm-server.sh
+
+#
+echo "run cpm app containers"
+#
+$DEVBASE/run-cpm.sh
