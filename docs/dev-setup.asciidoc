@@ -6,6 +6,15 @@ clean RHEL or Centos 7.1 minimal installation.
 This instruction assumes you are using a static IP address of
 192.168.0.107 for your CPM server.
 
+However,  If you want to get a build of CPM running quickly, you can create a VM using Vagrant.  Just create a vagrant project directory and run vagrant using the Vagrantfile that is included in the CPM git repo:
+....
+mkdir cpmproject
+cp Vagrantfile .
+vagrant up
+....
+The Vagrantfile specifies libvirt by default, but you can change it to use
+virtualbox by replacing the libvirt reference to virtualbox within the vagrantfile.
+
 === Centos/RHEL Setup 
 
 note that for RHEL 7.1, you will need to add the following repos:

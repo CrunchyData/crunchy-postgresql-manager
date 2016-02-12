@@ -206,6 +206,15 @@ skybridge : DNS-to-Docker agent for registering DNS names for each container
 clean RHEL or Centos 7.1 minimal installation.</p></div>
 <div class="paragraph"><p>This instruction assumes you are using a static IP address of
 192.168.0.107 for your CPM server.</p></div>
+<div class="paragraph"><p>However,  If you want to get a build of CPM running quickly, you can create a VM using Vagrant.  Just create a vagrant project directory and run vagrant using the Vagrantfile that is included in the CPM git repo:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>mkdir cpmproject
+cp Vagrantfile .
+vagrant up</pre>
+</div></div>
+<div class="paragraph"><p>The Vagrantfile specifies libvirt by default, but you can change it to use
+virtualbox by replacing the libvirt reference to virtualbox within the vagrantfile.</p></div>
 <h2 id="centos_rhel_setup">3.1. Centos/RHEL Setup</h2>
 <div class="paragraph"><p>note that for RHEL 7.1, you will need to add the following repos:</p></div>
 <div class="literalblock">
