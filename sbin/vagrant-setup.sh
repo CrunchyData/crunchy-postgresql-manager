@@ -76,7 +76,7 @@ echo " build CPM"
 #
 cd $GOPATH
 go get github.com/tools/godep
-go get github.com/crunchydata/crunchy-postgresql-manager
+go get github.com/CrunchyData/crunchy-postgresql-manager
 cd $DEVBASE
 godep restore
 make build
