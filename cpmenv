@@ -1,6 +1,7 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export CPMROOT=$DIR/src/github.com/crunchydata/crunchy-postgresql-manager
+#export CPMROOT=$DIR/src/github.com/crunchydata/crunchy-postgresql-manager
+export CPMROOT=$DIR
 export LOCAL_IP=`/sbin/ifconfig -a | awk '/(cast)/ { print $2 }' | cut -d':' -f2 | tail -1`
 export SWARM_MANAGER_URL=tcp://$LOCAL_IP:8000
 export CPM_DOMAIN=crunchy.lab

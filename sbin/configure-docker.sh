@@ -33,6 +33,6 @@ fi
 
 NEWOPTIONS="--selinux-enabled --bip=172.17.42.1/16 --dns-search=crunchy.lab --dns=$LOCAL_IP --dns=192.168.0.1 -H unix:///var/run/docker.sock --label host=$LOCAL_IP --label profile=SM -H tcp://$LOCAL_IP:2375"
 
-echo "'"$NEWOPTIONS"'" >> /etc/sysconfig/docker
+echo "OPTIONS='"$NEWOPTIONS"'" >> /etc/sysconfig/docker
 
 
