@@ -94,10 +94,6 @@ chown -R vagrant:vagrant $GOPATH
 
 cp $DEVBASE/sbin/* $CPMBASE/bin
 
-#
-echo "installing swarm binary into /usr/local/bin"
-#
-$DEVBASE/sbin/install-swarm.sh
 
 #
 echo "starting skybridge container..."
@@ -105,3 +101,13 @@ echo "starting skybridge container..."
 source $DEVBASE/cpmenv
 
 $DEVBASE/sbin/run-skybridge.sh
+
+#
+echo "installing swarm binary into /usr/local/bin"
+#
+$DEVBASE/sbin/install-swarm.sh
+
+#
+echo "run swarm"
+#
+$DEVBASE/sbin/run-swarm.sh

@@ -24,20 +24,14 @@
 # program before this one.
 #
 
+SWARM_CLUSTER_FILE=/var/cpm/data/swarm_cluster_file
 
-PRIMARYIP=192.168.0.101
-SECONDARYIP=192.168.0.110
-SWARM_CLUSTER_FILE=/tmp/my_cluster
-rm $SWARM_CLUSTER_FILE
-echo $PRIMARYIP:2375 >> $SWARM_CLUSTER_FILE
-echo $SECONDARYIP:2375 >> $SWARM_CLUSTER_FILE
-
-SWARM_URL=$PRIMARYIP:8000
+SWARM_URL=$LOCAL_IP:8000
 DOCKER_PORT=2375
 
 # use the random strategy just for testing - jeffmc
-swarm manage --strategy random --host $SWARM_URL file://$SWARM_CLUSTER_FILE &
+/usr/local/bin/swarm manage --strategy random --host $SWARM_URL file://$SWARM_CLUSTER_FILE &
 sleep 4
-swarm join --addr=$PRIMARYIP:$DOCKER_PORT file://$SWARM_CLUSTER_FILE &
+/usr/local/bin/swarm join --addr=$LOCAL_IP:$DOCKER_PORT file://$SWARM_CLUSTER_FILE &
 #swarm list file:///tmp/my_cluster
 

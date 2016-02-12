@@ -30,3 +30,8 @@ go get github.com/tools/godep
 $GOPATH/bin/godep go install
 sudo cp $GOPATH/bin/swarm /usr/local/bin
 
+SWARM_CLUSTER_FILE=/var/cpm/data/swarm_cluster_file
+rm $SWARM_CLUSTER_FILE
+echo $LOCAL_IP:2375 >> $SWARM_CLUSTER_FILE
+chmod +r $SWARM_CLUSTER_FILE
+
