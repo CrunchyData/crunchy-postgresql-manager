@@ -24,7 +24,6 @@ fi
 #export SWARM_MANAGER_URL=tcp://$LOCAL_IP:8000 
 #export FLUENT_URL=$LOCAL_IP:24224
 
-source $CPMROOT/cpmenv
 
 if [ -z "$LOCAL_IP" ]; then
 	echo "LOCAL_IP is a required env var"
@@ -34,10 +33,10 @@ if [ -z "$SWARM_MANAGER_URL" ]; then
 	echo "SWARM_MANAGER_URL is a required env var"
 	exit 1
 fi
-if [ -z "$FLUENT_URL" ]; then
-	echo "FLUENT_URL is a required env var"
-	exit 1
-fi
+#if [ -z "$FLUENT_URL" ]; then
+#	echo "FLUENT_URL is a required env var"
+#	exit 1
+#fi
 
 echo "restarting cpm-collect container..."
 sleep 5

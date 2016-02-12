@@ -110,12 +110,7 @@ echo " restart docker"
 #
 systemctl stop docker.service
 systemctl start docker.service
-
-#
-echo "starting skybridge container..."
-#
-
-$DEVBASE/sbin/run-skybridge.sh
+sleep 5
 
 #
 echo "installing swarm binary into /usr/local/bin"
@@ -126,6 +121,14 @@ $DEVBASE/sbin/install-swarm.sh
 echo "run swarm"
 #
 $DEVBASE/sbin/run-swarm.sh
+sleep 5
+
+#
+echo "starting skybridge container..."
+#
+
+$DEVBASE/sbin/run-skybridge.sh
+
 
 #
 echo "run cpm-server container"
@@ -136,3 +139,5 @@ $DEVBASE/images/cpm-server/run-cpm-server.sh
 echo "run cpm app containers"
 #
 $DEVBASE/run-cpm.sh
+
+chown -R vagrant:vagrant $GOPATH
