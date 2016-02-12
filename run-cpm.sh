@@ -24,13 +24,12 @@ fi
 # these env vars are passed down when components are started
 # from this master script
 #
-export CPMROOT=/home/jeffmc/devproject/src/github.com/crunchydata/crunchy-postgresql-manager
-export LOCAL_IP=192.168.0.101
-export SWARM_MANAGER_URL=tcp://$LOCAL_IP:8000 
-export FLUENT_URL=$LOCAL_IP:24224
-export CPM_DOMAIN=crunchy.lab
+#export CPMROOT=`dirname`
+#export LOCAL_IP=192.168.0.101
+#export SWARM_MANAGER_URL=tcp://$LOCAL_IP:8000 
+#export FLUENT_URL=$LOCAL_IP:24224
 # SERVERNAME is the name we give the CPM server container cpm-$SERVERNAME
-export SERVERNAME=server1
+export SERVERNAME=server
 
 # keys dir
 echo "setting up keys dir..."
@@ -43,15 +42,15 @@ chcon -Rt svirt_sandbox_file_t $KEYSDIR
 
 #$CPMROOT/sbin/run-skybridge.sh
 
-echo "sleeping a bit while skybridge starts up...."
-sleep 6
+#echo "sleeping a bit while skybridge starts up...."
+#sleep 6
 
-$CPMROOT/images/cpm-efk/run-cpm-efk.sh
+#$CPMROOT/images/cpm-efk/run-cpm-efk.sh
 
-echo "sleeping a bit while cpm-efk starts up...."
-sleep 6
+#echo "sleeping a bit while cpm-efk starts up...."
+#sleep 6
 
-$CPMROOT/images/cpm-server/run-cpm-server.sh
+#$CPMROOT/images/cpm-server/run-cpm-server.sh
 
 $CPMROOT/images/cpm/run-cpm-web.sh
 

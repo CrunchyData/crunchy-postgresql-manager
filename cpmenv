@@ -1,6 +1,10 @@
-export CPMROOT=/home/jeffmc/devproject/src/github.com/crunchydata/crunchy-postgresql-manager
-export LOCAL_IP=192.168.0.101
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+#export CPMROOT=$DIR/src/github.com/crunchydata/crunchy-postgresql-manager
+export CPMROOT=$DIR
+export LOCAL_IP=`/sbin/ifconfig -a | awk '/(cast)/ { print $2 }' | cut -d':' -f2 | tail -1`
 export SWARM_MANAGER_URL=tcp://$LOCAL_IP:8000
 export CPM_DOMAIN=crunchy.lab
 export FLUENT_URL=$LOCAL_IP:24224
 export KEYSDIR=/var/cpm/keys
+export CPM_DOMAIN=crunchy.lab

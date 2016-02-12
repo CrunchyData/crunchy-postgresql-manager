@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Copyright 2015 Crunchy Data Solutions, Inc.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,15 +22,17 @@
 # this program and Docker.  You will also need to install the dnsbridge
 # program before this one.
 #
+if [ -z "$LOCAL_IP" ]; then
+	echo "LOCAL_IP is not set and is required for this script"
+	exit	
+fi
+if [[ $EUID -ne 0 ]]; then
+           echo "This script must be run as root" 1>&2
+              exit 1
+fi
 
-SWARM_CLUSTER_FILE=/var/cpm/data/swarm_cluster_file
+NEWOPTIONS="--selinux-enabled --bip=172.17.42.1/16 --dns-search=crunchy.lab --dns=$LOCAL_IP --dns=192.168.0.1 -H unix:///var/run/docker.sock --label host=$LOCAL_IP --label profile=SM -H tcp://$LOCAL_IP:2375"
 
-SWARM_URL=$LOCAL_IP:8000
-DOCKER_PORT=2375
+echo "OPTIONS='"$NEWOPTIONS"'" >> /etc/sysconfig/docker
 
-# use the random strategy just for testing - jeffmc
-/usr/local/bin/swarm manage --strategy random --host $SWARM_URL file://$SWARM_CLUSTER_FILE &
-sleep 4
-/usr/local/bin/swarm join --addr=$LOCAL_IP:$DOCKER_PORT file://$SWARM_CLUSTER_FILE &
-#swarm list file:///tmp/my_cluster
 
