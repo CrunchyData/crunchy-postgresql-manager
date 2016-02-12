@@ -106,6 +106,11 @@ echo "configure docker"
 $DEVBASE/sbin/configure-docker.sh
 
 #
+echo "configure /etc/resolv.conf"
+#
+$DEVBASE/sbin/configure-resolv.sh
+
+#
 echo " restart docker"
 #
 systemctl stop docker.service
