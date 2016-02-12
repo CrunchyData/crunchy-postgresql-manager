@@ -27,10 +27,6 @@ buildimages:
 		cd images/cpm-server && make  
 		cd images/cpm-admin && make  
 		cd images/cpm && make 
-buildimagesreal:
-		cd images/cpm-server && make  
-		cd images/cpm-admin && make  
-		cd images/cpm && make 
 		cd images/cpm-node && make  
 		cd images/cpm-node-proxy && make  
 		cd images/cpm-pgpool && make

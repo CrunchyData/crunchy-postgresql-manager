@@ -134,6 +134,7 @@ echo "starting skybridge container..."
 
 $DEVBASE/sbin/run-skybridge.sh
 
+sleep 10
 
 #
 echo "run cpm-server container"

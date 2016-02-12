@@ -54,8 +54,6 @@ chcon -Rt svirt_sandbox_file_t $KEYSDIR
 
 $CPMROOT/images/cpm/run-cpm-web.sh
 
-exit 0
-
 $CPMROOT/images/cpm-admin/run-cpm-admin.sh
 
 $CPMROOT/images/cpm-task/run-cpm-task.sh
