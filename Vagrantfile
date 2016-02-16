@@ -16,7 +16,7 @@ Vagrant.configure(2) do |config|
   config.vm.hostname = "cpm.crunchy.lab"
   #config.vm.provision "shell", path: "dev-setup.sh"
   config.vm.provision "shell",
-	      inline: "yum -y install git;git clone https://github.com/CrunchyData/crunchy-postgresql-manager.git;./crunchy-postgresql-manager/sbin/vagrant-setup.sh"
+	      inline: "yum -y install git;git clone https://github.com/crunchydata/crunchy-postgresql-manager.git;./crunchy-postgresql-manager/sbin/vagrant-setup.sh"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
