@@ -49,7 +49,7 @@ echo " pull down images from docker hub"
 docker pull centos:7
 docker pull prom/prometheus
 docker pull prom/promdash
-docker pull crunchydata/skybridge
+docker pull crunchydata/skybridge2
 
 #
 echo " set up the CPM GOPATH"
