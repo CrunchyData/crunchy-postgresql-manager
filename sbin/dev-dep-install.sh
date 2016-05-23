@@ -35,6 +35,5 @@ fi
 echo -n "enter either redhat or centos: "
 read $OSFLAVOR
 yum -y install net-tools bind-utils install golang git docker mercurial sysstat
-rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
 rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-$OSFLAVOR94-9.4-1.noarch.rpm
-yum install -y nmap-ncat procps-ng postgresql94 postgresql94-contrib postgresql94-server libxslt unzip openssh-clients hostname bind-utils
+yum install -y epel-release nmap-ncat procps-ng postgresql94 postgresql94-contrib postgresql94-server libxslt unzip openssh-clients hostname bind-utils

@@ -60,9 +60,8 @@ set +e
 
 # install deps
 sudo yum -y install docker
-sudo rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
 sudo rpm -Uvh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
-sudo yum install -y postgresql94 postgresql94-contrib postgresql94-server libxslt unzip openssh-clients hostname bind-utils net-tools sysstat
+sudo yum install -y epel-release postgresql94 postgresql94-contrib postgresql94-server libxslt unzip openssh-clients hostname bind-utils net-tools sysstat
 
 set -e
 
