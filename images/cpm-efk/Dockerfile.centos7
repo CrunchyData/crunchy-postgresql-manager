@@ -2,9 +2,7 @@ FROM centos:7
 
 MAINTAINER crunchy
 
-RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
-
-RUN yum install -y tar wget java gcc make ruby ruby-devel procps-ng unzip openssh-clients hostname bind-utils && yum clean all -y
+RUN yum install -y epel-release tar wget java gcc make ruby ruby-devel procps-ng unzip openssh-clients hostname bind-utils && yum clean all -y
 
 ADD kibana.tar.gz /
 
