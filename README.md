@@ -1,3 +1,5 @@
+This project is no longer under active development and has been superseded by the Crunchy Container Suite which can be found link:https://github.com/CrunchyData/crunchy-containers
+
 Crunchy Postgresql Manager (v1.0.2)
 ==========================
 Crunchy Postgresql Manager (CPM) is a Docker-based solution which
